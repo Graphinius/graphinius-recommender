@@ -1,0 +1,26 @@
+{
+  "name": "graphinius-recommenders",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Graphinius-based recommender algorithms for iNodis client, based on other popular graph DB recommenders",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cassinius/graphinius-recommenders.git"
+  },
+  "author": "Bernd Malle",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/cassinius/graphinius-recommenders/issues"
+  },
+  "homepage": "https://github.com/cassinius/graphinius-recommenders#readme",
+  "dependencies": {
+    "graphinius": "^0.9.51"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0"
+  }
+}
