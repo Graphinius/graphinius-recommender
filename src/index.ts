@@ -1,5 +1,5 @@
-import { importGraphFromURL } from './src/helper/importGraph';
-import { similarGroupsRecommender } from './src/meetup/simpleGroupRecs';
+import { importGraphFromURL } from './helper/importGraph';
+import { similarGroupsRecommender } from './meetup/simpleGroupRecs';
 
 const meetupFile = './test-data/meetupGraph.json';
 

@@ -5,6 +5,7 @@
   "description": "Graphinius-based recommender algorithms for iNodis client, based on other popular graph DB recommenders",
   "main": "index.ts",
   "scripts": {
+    "build": "webpack",
     "dev": "ts-node-dev src/meetup/simpleGroupRecs.ts",
     "test": "jest"
   },
@@ -24,8 +25,11 @@
   },
   "devDependencies": {
     "jest": "^24.8.0",
+    "ts-loader": "^6.0.4",
     "ts-node": "^8.3.0",
     "ts-node-dev": "^1.0.0-pre.40",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
   }
 }
