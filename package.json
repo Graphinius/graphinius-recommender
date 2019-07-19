@@ -22,6 +22,7 @@
   "homepage": "https://github.com/cassinius/graphinius-recommenders#readme",
   "dependencies": {
     "@types/node": "^12.6.8",
+    "dexie": "^2.0.4",
     "graphinius": "^0.9.51"
   },
   "devDependencies": {

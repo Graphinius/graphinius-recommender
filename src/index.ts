@@ -2,10 +2,10 @@ import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
 import { importGraphFromURL } from './helpers/importGraph';
 import { similarGroupsRecommender } from './meetup/simpleGroupRecs';
 
-
-const graphName = `meetupGraph`;
+const testDataDir = `../public/test-data`;
 const graphExt = `json`;
-const meetupFile = `../public/test-data/${graphName}.json`;
+const graphName = `meetupGraph`;
+const meetupFile = `${testDataDir}/${graphName}.${graphExt}`;
 
 
 (async () => {
