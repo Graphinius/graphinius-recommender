@@ -17,8 +17,7 @@ let graphdb : IDBPDatabase;
 
 
 (async () => {
-
-
+  
   graphdb = await initDB();
   console.log(`IDB graph DB initialized:`);
   console.log(graphdb);

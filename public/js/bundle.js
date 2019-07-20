@@ -3613,7 +3613,6 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
 
@@ -3856,7 +3855,6 @@
             });
         });
     }
-    //# sourceMappingURL=graphDB.js.map
 
     var _this = undefined;
     window.$G = graphinius;
@@ -3897,3 +3895,4 @@
     }
 
 }));
+//# sourceMappingURL=bundle.js.map
