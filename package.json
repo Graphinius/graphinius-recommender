@@ -5,9 +5,8 @@
   "description": "Graphinius-based recommender algorithms for iNodis client, based on other popular graph DB recommenders",
   "main": "index.ts",
   "scripts": {
-    "web-dev": "webpack-dev-server --progress --colors",
-    "web": "webpack && npm run web-dev",
-    "build": "NODE_ENV=production webpack",
+    "build": "rollup -c",
+    "watch": "rollup -cw",
     "dev": "ts-node-dev src/meetup/simpleGroupRecs.ts",
     "test": "jest"
   },
@@ -23,19 +22,19 @@
   "homepage": "https://github.com/cassinius/graphinius-recommenders#readme",
   "dependencies": {
     "@types/node": "^12.6.8",
-    "graphinius": "^0.9.51",
-    "idb": "^4.0.4"
+    "idb": "^4.0.4",
+    "process": "^0.11.10"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.7",
-    "browser-sync-webpack-plugin": "^2.2.2",
     "jest": "^24.8.0",
-    "ts-loader": "^6.0.4",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-livereload": "^1.0.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-serve": "^1.0.1",
+    "rollup-plugin-typescript": "^1.0.1",
     "ts-node": "^8.3.0",
     "ts-node-dev": "^1.0.0-pre.40",
-    "typescript": "^3.5.3",
-    "webpack": "^4.36.1",
-    "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "^3.7.2"
+    "tslib": "^1.10.0",
+    "typescript": "^3.5.3"
   }
 }

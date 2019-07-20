@@ -1,8 +1,3899 @@
-!function(e){var t={};function r(n){if(t[n])return t[n].exports;var i=t[n]={i:n,l:!1,exports:{}};return e[n].call(i.exports,i,i.exports,r),i.l=!0,i.exports}r.m=e,r.c=t,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)r.d(n,i,function(t){return e[t]}.bind(null,i));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="",r(r.s=36)}([function(e,t){var r;r=function(){return this}();try{r=r||new Function("return this")()}catch(e){"object"==typeof window&&(r=window)}e.exports=r},function(e,t){var r,n,i=e.exports={};function o(){throw new Error("setTimeout has not been defined")}function s(){throw new Error("clearTimeout has not been defined")}function a(e){if(r===setTimeout)return setTimeout(e,0);if((r===o||!r)&&setTimeout)return r=setTimeout,setTimeout(e,0);try{return r(e,0)}catch(t){try{return r.call(null,e,0)}catch(t){return r.call(this,e,0)}}}!function(){try{r="function"==typeof setTimeout?setTimeout:o}catch(e){r=o}try{n="function"==typeof clearTimeout?clearTimeout:s}catch(e){n=s}}();var d,u=[],h=!1,l=-1;function c(){h&&d&&(h=!1,d.length?u=d.concat(u):l=-1,u.length&&f())}function f(){if(!h){var e=a(c);h=!0;for(var t=u.length;t;){for(d=u,u=[];++l<t;)d&&d[l].run();l=-1,t=u.length}d=null,h=!1,function(e){if(n===clearTimeout)return clearTimeout(e);if((n===s||!n)&&clearTimeout)return n=clearTimeout,clearTimeout(e);try{n(e)}catch(t){try{return n.call(null,e)}catch(t){return n.call(this,e)}}}(e)}}function g(e,t){this.fun=e,this.array=t}function p(){}i.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)t[r-1]=arguments[r];u.push(new g(e,t)),1!==u.length||h||a(f)},g.prototype.run=function(){this.fun.apply(null,this.array)},i.title="browser",i.browser=!0,i.env={},i.argv=[],i.version="",i.versions={},i.on=p,i.addListener=p,i.once=p,i.off=p,i.removeListener=p,i.removeAllListeners=p,i.emit=p,i.prependListener=p,i.prependOnceListener=p,i.listeners=function(e){return[]},i.binding=function(e){throw new Error("process.binding is not supported")},i.cwd=function(){return"/"},i.chdir=function(e){throw new Error("process.chdir is not supported")},i.umask=function(){return 0}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(4),i=r(12),o=r(21),s=r(22),a=r(14),d=r(15);new(r(7).Logger);const u=1;var h;!function(e){e[e.INIT=0]="INIT",e[e.DIRECTED=1]="DIRECTED",e[e.UNDIRECTED=2]="UNDIRECTED",e[e.MIXED=3]="MIXED"}(h=t.GraphMode||(t.GraphMode={}));class l{constructor(e){this._label=e,this._nr_nodes=0,this._nr_dir_edges=0,this._nr_und_edges=0,this._mode=h.INIT,this._nodes={},this._dir_edges={},this._und_edges={}}reweighIfHasNegativeEdge(e=!1){if(this.hasNegativeEdge()){let r=e?this.cloneStructure():this;var t=new n.BaseNode("extraNode");r=d.addExtraNandE(r,t);let i=a.BellmanFordDict(r,t);if(i.neg_cycle)throw new Error("The graph contains a negative cycle, thus it can not be processed");{let e=i.distances;(r=d.reWeighGraph(r,e,t)).deleteNode(t)}return r}}toDirectedGraph(e=!1){let t=e?this.cloneStructure():this;if(0===this._nr_dir_edges&&0===this._nr_und_edges)throw new Error("Cowardly refusing to re-interpret an empty graph.");return t}toUndirectedGraph(){return this}hasNegativeEdge(){let e,t=!1;for(let t in this._und_edges)if((e=this._und_edges[t]).isWeighted()&&e.getWeight()<0)return!0;for(let r in this._dir_edges)if((e=this._dir_edges[r]).isWeighted()&&e.getWeight()<0){t=!0;break}return t}hasNegativeCycles(e){if(!this.hasNegativeEdge())return!1;let t=!1,r=e||this.getRandomNode();return s.DFS(this,r).forEach(e=>{let r,n=Number.POSITIVE_INFINITY;Object.keys(e).forEach(t=>{n>e[t].counter&&(n=e[t].counter,r=t)}),a.BellmanFordArray(this,this._nodes[r]).neg_cycle&&(t=!0)}),t}nextArray(e=!1){let t=[],r=Object.keys(this._nodes);const n=this.adjListDict(e,!0,0);for(let e=0;e<this._nr_nodes;++e){t.push([]);for(let i=0;i<this._nr_nodes;++i)t[e].push([]),t[e][i].push(e===i?i:isFinite(n[r[e]][r[i]])?i:null)}return t}adjListArray(e=!1){let t=[],r=Object.keys(this._nodes);const n=this.adjListDict(e,!0,0);for(let e=0;e<this._nr_nodes;++e){t.push([]);for(let i=0;i<this._nr_nodes;++i)t[e].push(e===i?0:isFinite(n[r[e]][r[i]])?n[r[e]][r[i]]:Number.POSITIVE_INFINITY)}return t}adjListDict(e=!1,t=!1,r=0){let n,i,o,s={},a=this.getNodes();for(i in a)s[i]={},t&&(s[i][i]=r);for(i in a){(e?a[i].reachNodes().concat(a[i].prevNodes()):a[i].reachNodes()).forEach(t=>{n=s[i][t.node.getID()]||Number.POSITIVE_INFINITY,(o=isNaN(t.edge.getWeight())?u:t.edge.getWeight())<n?(s[i][t.node.getID()]=o,e&&(s[t.node.getID()][i]=o)):(s[i][t.node.getID()]=n,e&&(s[t.node.getID()][i]=n))})}return s}getMode(){return this._mode}getStats(){return{mode:this._mode,nr_nodes:this._nr_nodes,nr_und_edges:this._nr_und_edges,nr_dir_edges:this._nr_dir_edges,density_dir:this._nr_dir_edges/(this._nr_nodes*(this._nr_nodes-1)),density_und:2*this._nr_und_edges/(this._nr_nodes*(this._nr_nodes-1))}}nrNodes(){return this._nr_nodes}nrDirEdges(){return this._nr_dir_edges}nrUndEdges(){return this._nr_und_edges}addNodeByID(e,t){if(this.hasNodeID(e))throw new Error("Won't add node with duplicate ID.");var r=new n.BaseNode(e,t);return this.addNode(r)?r:null}addNode(e){if(this.hasNodeID(e.getID()))throw new Error("Won't add node with duplicate ID.");return this._nodes[e.getID()]=e,this._nr_nodes+=1,!0}hasNodeID(e){return!!this._nodes[e]}getNodeById(e){return this._nodes[e]}getNodes(){return this._nodes}getRandomNode(){return this.pickRandomProperty(this._nodes)}deleteNode(e){if(!this._nodes[e.getID()])throw new Error("Cannot remove un-added node.");var t=e.inDegree(),r=e.outDegree(),n=e.degree();t&&this.deleteInEdgesOf(e),r&&this.deleteOutEdgesOf(e),n&&this.deleteUndEdgesOf(e),delete this._nodes[e.getID()],this._nr_nodes-=1}hasEdgeID(e){return!!this._dir_edges[e]||!!this._und_edges[e]}getEdgeById(e){var t=this._dir_edges[e]||this._und_edges[e];if(!t)throw new Error("cannot retrieve edge with non-existing ID.");return t}checkExistanceOfEdgeNodes(e,t){if(!e)throw new Error("Cannot find edge. Node A does not exist (in graph).");if(!t)throw new Error("Cannot find edge. Node B does not exist (in graph).")}getDirEdgeByNodeIDs(e,t){const r=this.getNodeById(e),n=this.getNodeById(t);this.checkExistanceOfEdgeNodes(r,n);let i=r.outEdges(),o=Object.keys(i);for(let e=0;e<o.length;e++){var s=i[o[e]];if(s.getNodes().b.getID()==t)return s}throw new Error(`Cannot find edge. There is no edge between Node ${e} and ${t}.`)}getUndEdgeByNodeIDs(e,t){const r=this.getNodeById(e),n=this.getNodeById(t);this.checkExistanceOfEdgeNodes(r,n);let i=r.undEdges(),o=Object.keys(i);for(let r=0;r<o.length;r++){var s=i[o[r]];if((s.getNodes().a.getID()==e?s.getNodes().b.getID():s.getNodes().a.getID())==t)return s}}getDirEdges(){return this._dir_edges}getUndEdges(){return this._und_edges}getDirEdgesArray(){let e=[];for(let t in this._dir_edges)e.push(this._dir_edges[t]);return e}getUndEdgesArray(){let e=[];for(let t in this._und_edges)e.push(this._und_edges[t]);return e}addEdgeByNodeIDs(e,t,r,n){var i=this.getNodeById(t),o=this.getNodeById(r);if(i){if(o)return this.addEdgeByID(e,i,o,n);throw new Error("Cannot add edge. Node B does not exist")}throw new Error("Cannot add edge. Node A does not exist")}addEdgeByID(e,t,r,n){let o=new i.BaseEdge(e,t,r,n||{});return this.addEdge(o)}addEdge(e){let t=e.getNodes().a,r=e.getNodes().b;if(!this.hasNodeID(t.getID())||!this.hasNodeID(r.getID())||this._nodes[t.getID()]!==t||this._nodes[r.getID()]!==r)throw new Error("can only add edge between two nodes existing in graph");return t.addEdge(e),e.isDirected()?(r.addEdge(e),this._dir_edges[e.getID()]=e,this._nr_dir_edges+=1,this.updateGraphMode()):(t!==r&&r.addEdge(e),this._und_edges[e.getID()]=e,this._nr_und_edges+=1,this.updateGraphMode()),e}deleteEdge(e){var t=this._dir_edges[e.getID()],r=this._und_edges[e.getID()];if(!t&&!r)throw new Error("cannot remove non-existing edge.");var n=e.getNodes();n.a.removeEdge(e),n.a!==n.b&&n.b.removeEdge(e),t?(delete this._dir_edges[e.getID()],this._nr_dir_edges-=1):(delete this._und_edges[e.getID()],this._nr_und_edges-=1),this.updateGraphMode()}deleteInEdgesOf(e){this.checkConnectedNodeOrThrow(e);var t,r,n=e.inEdges();for(t in n)(r=n[t]).getNodes().a.removeEdge(r),delete this._dir_edges[r.getID()],this._nr_dir_edges-=1;e.clearInEdges(),this.updateGraphMode()}deleteOutEdgesOf(e){this.checkConnectedNodeOrThrow(e);var t,r,n=e.outEdges();for(t in n)(r=n[t]).getNodes().b.removeEdge(r),delete this._dir_edges[r.getID()],this._nr_dir_edges-=1;e.clearOutEdges(),this.updateGraphMode()}deleteDirEdgesOf(e){this.deleteInEdgesOf(e),this.deleteOutEdgesOf(e)}deleteUndEdgesOf(e){this.checkConnectedNodeOrThrow(e);var t,r,n=e.undEdges();for(t in n){var i=(r=n[t]).getNodes();i.a.removeEdge(r),i.a!==i.b&&i.b.removeEdge(r),delete this._und_edges[r.getID()],this._nr_und_edges-=1}e.clearUndEdges(),this.updateGraphMode()}deleteAllEdgesOf(e){this.deleteDirEdgesOf(e),this.deleteUndEdgesOf(e)}clearAllDirEdges(){for(var e in this._dir_edges)this.deleteEdge(this._dir_edges[e])}clearAllUndEdges(){for(var e in this._und_edges)this.deleteEdge(this._und_edges[e])}clearAllEdges(){this.clearAllDirEdges(),this.clearAllUndEdges()}getRandomDirEdge(){return this.pickRandomProperty(this._dir_edges)}getRandomUndEdge(){return this.pickRandomProperty(this._und_edges)}cloneStructure(){let e,t=new l(this._label),r=this.getNodes(),n=null,i=null;for(let e in r)t.addNode(r[e].clone());return[this.getDirEdges(),this.getUndEdges()].forEach(r=>{for(let o in r)e=r[o],n=t.getNodeById(e.getNodes().a.getID()),i=t.getNodeById(e.getNodes().b.getID()),t.addEdge(e.clone(n,i))}),t}cloneSubGraphStructure(e,t){let r=new l(this._label),n=o.prepareBFSStandardConfig();n.callbacks.node_unmarked.push(function(e){n.result[e.next_node.getID()].counter>t?e.queue=[]:r.addNode(e.next_node.clone())}),o.BFS(this,e,n);let i,s=null,a=null;return[this.getDirEdges(),this.getUndEdges()].forEach(e=>{for(let t in e)i=e[t],s=r.getNodeById(i.getNodes().a.getID()),a=r.getNodeById(i.getNodes().b.getID()),null!=s&&null!=a&&r.addEdge(i.clone(s,a))}),r}checkConnectedNodeOrThrow(e){if(!(e=this._nodes[e.getID()]))throw new Error("Cowardly refusing to delete edges of un-added node.")}updateGraphMode(){var e=this._nr_dir_edges,t=this._nr_und_edges;this._mode=e&&t?h.MIXED:e?h.DIRECTED:t?h.UNDIRECTED:h.INIT}pickRandomProperty(e){let t=Object.keys(e);return e[t[Math.floor(Math.random()*t.length)]]}pickRandomProperties(e,t){let r=[],n=Object.keys(e),i=t/n.length,o={};for(let e=0;r.length<t&&e<n.length;e++)Math.random()<i&&(r.push(n[e]),o[n[e]]=e);let s=t-r.length;for(let e=0;e<n.length&&s;e++)null==o[n[e]]&&(r.push(n[e]),s--);return r}}t.BaseGraph=l},function(e,t){"function"==typeof Object.create?e.exports=function(e,t){t&&(e.super_=t,e.prototype=Object.create(t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}))}:e.exports=function(e,t){if(t){e.super_=t;var r=function(){};r.prototype=t.prototype,e.prototype=new r,e.prototype.constructor=e}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(5);class i{constructor(e,t){this._id=e,this._in_degree=0,this._out_degree=0,this._und_degree=0,this._in_edges={},this._out_edges={},this._und_edges={},this._features=void 0!==t?n.clone(t):{},this._label=this._features.label||this._id}getID(){return this._id}getLabel(){return this._label}setLabel(e){this._label=e}getFeatures(){return this._features}getFeature(e){return this._features[e]}setFeatures(e){this._features=n.clone(e)}setFeature(e,t){this._features[e]=t}deleteFeature(e){var t=this._features[e];return delete this._features[e],t}clearFeatures(){this._features={}}inDegree(){return this._in_degree}outDegree(){return this._out_degree}degree(){return this._und_degree}addEdge(e){var t=e.getNodes();if(t.a!==this&&t.b!==this)throw new Error("Cannot add edge that does not connect to this node");var r=e.getID();if(e.isDirected())t.a!==this||this._out_edges[r]?this._in_edges[r]||(this._in_edges[e.getID()]=e,this._in_degree+=1):(this._out_edges[r]=e,this._out_degree+=1,t.b!==this||this._in_edges[r]||(this._in_edges[e.getID()]=e,this._in_degree+=1));else{if(this._und_edges[e.getID()])throw new Error("Cannot add same undirected edge multiple times.");this._und_edges[e.getID()]=e,this._und_degree+=1}}hasEdge(e){return!!this._in_edges[e.getID()]||!!this._out_edges[e.getID()]||!!this._und_edges[e.getID()]}hasEdgeID(e){return!!this._in_edges[e]||!!this._out_edges[e]||!!this._und_edges[e]}getEdge(e){var t=this._in_edges[e]||this._out_edges[e]||this._und_edges[e];if(!t)throw new Error("Cannot retrieve non-existing edge.");return t}inEdges(){return this._in_edges}outEdges(){return this._out_edges}undEdges(){return this._und_edges}dirEdges(){return n.mergeObjects([this._in_edges,this._out_edges])}allEdges(){return n.mergeObjects([this._in_edges,this._out_edges,this._und_edges])}removeEdge(e){if(!this.hasEdge(e))throw new Error("Cannot remove unconnected edge.");var t=e.getID(),r=this._und_edges[t];r&&(delete this._und_edges[t],this._und_degree-=1),(r=this._in_edges[t])&&(delete this._in_edges[t],this._in_degree-=1),(r=this._out_edges[t])&&(delete this._out_edges[t],this._out_degree-=1)}removeEdgeID(e){if(!this.hasEdgeID(e))throw new Error("Cannot remove unconnected edge.");var t=this._und_edges[e];t&&(delete this._und_edges[e],this._und_degree-=1),(t=this._in_edges[e])&&(delete this._in_edges[e],this._in_degree-=1),(t=this._out_edges[e])&&(delete this._out_edges[e],this._out_degree-=1)}clearOutEdges(){this._out_edges={},this._out_degree=0}clearInEdges(){this._in_edges={},this._in_degree=0}clearUndEdges(){this._und_edges={},this._und_degree=0}clearEdges(){this.clearInEdges(),this.clearOutEdges(),this.clearUndEdges()}prevNodes(){var e,t,r=[];for(e in this._in_edges)this._in_edges.hasOwnProperty(e)&&(t=this._in_edges[e],r.push({node:t.getNodes().a,edge:t}));return r}nextNodes(){var e,t,r=[];for(e in this._out_edges)this._out_edges.hasOwnProperty(e)&&(t=this._out_edges[e],r.push({node:t.getNodes().b,edge:t}));return r}connNodes(){var e,t,r=[];for(e in this._und_edges){if(this._und_edges.hasOwnProperty(e))(t=this._und_edges[e]).getNodes().a===this?r.push({node:t.getNodes().b,edge:t}):r.push({node:t.getNodes().a,edge:t})}return r}reachNodes(e){var t=0;return n.mergeArrays([this.nextNodes(),this.connNodes()],e||(e=>t++))}allNeighbors(e){var t=0;return n.mergeArrays([this.prevNodes(),this.nextNodes(),this.connNodes()],e||function(e){return t++})}clone(){let e=new i(this._id);return e._label=this._label,e.setFeatures(n.clone(this.getFeatures())),e}}t.BaseNode=i},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(4),i=r(12);t.clone=function e(t){if(null===t||"object"!=typeof t)return t;if(!(t instanceof n.BaseNode||t instanceof i.BaseEdge)){var r=t.constructor?t.constructor():{};for(var o in t)t.hasOwnProperty(o)&&("object"==typeof t[o]?r[o]=e(t[o]):r[o]=t[o]);return r}},t.shuffleArray=function(e){for(var t=e.length-1;t>=0;t--){var r=Math.floor(Math.random()*(t+1)),n=e[r];e[r]=e[t],e[t]=n}return e},t.mergeArrays=function(e,t){for(var r in e)if(!Array.isArray(e[r]))throw new Error("Will only mergeArrays arrays");for(var n,i={},o=[],s=0;s<e.length;s++)for(var a=0;a<e[s].length;a++)!0!==i[n=void 0!==t?t(e[s][a]):e[s][a]]&&(o.push(e[s][a]),i[n]=!0);return o},t.mergeObjects=function(e){for(var t=0;t<e.length;t++)if("[object Object]"!==Object.prototype.toString.call(e[t]))throw new Error("Will only take objects as inputs");var r={};for(t=0;t<e.length;t++)for(var n in e[t])e[t].hasOwnProperty(n)&&(r[n]=e[t][n]);return r},t.findKey=function(e,t){for(var r in e)if(e.hasOwnProperty(r)&&t(e[r]))return r},t.mergeOrderedArraysNoDups=function(e,t){let r=[],n=0,i=0;if(null!=e[0]&&null!=t[0])for(;!(n>=e.length||i>=t.length);)e[n]!=t[i]?e[n]<t[i]?(r.push(e[n]),n++):t[i]<e[n]&&(r.push(t[i]),i++):(r[r.length-1]!=e[n]&&r.push(e[n]),n++,i++);for(;n<e.length;)null!=e[n]&&r.push(e[n]),n++;for(;i<t.length;)null!=t[i]&&r.push(t[i]),i++;return r}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(12),i=r(2),o=r(13),s=r(18);function a(){var e={result:{},callbacks:{init_pfs:[],new_current:[],not_encountered:[],node_open:[],node_closed:[],better_path:[],equal_path:[],goal_reached:[]},messages:{init_pfs_msgs:[],new_current_msgs:[],not_enc_msgs:[],node_open_msgs:[],node_closed_msgs:[],better_path_msgs:[],equal_path_msgs:[],goal_reached_msgs:[]},dir_mode:i.GraphMode.MIXED,goal_node:null,evalPriority:function(e){return e.best||t.DEFAULT_WEIGHT},evalObjID:function(e){return e.node.getID()}},r=e.callbacks,n=0;r.init_pfs.push(function(t){for(var r in t.nodes)e.result[r]={distance:Number.POSITIVE_INFINITY,parent:null,counter:-1};e.result[t.root_node.getID()]={distance:0,parent:t.root_node,counter:n++}});r.not_encountered.push(function(r){r.next.best=r.current.best+(isNaN(r.next.edge.getWeight())?t.DEFAULT_WEIGHT:r.next.edge.getWeight()),e.result[r.next.node.getID()]={distance:r.next.best,parent:r.current.node,counter:void 0}});return r.better_path.push(function(t){e.result[t.next.node.getID()].distance=t.proposed_dist,e.result[t.next.node.getID()].parent=t.current.node}),e}t.DEFAULT_WEIGHT=1,t.PFS=function(e,r,d){var u=(d=d||a()).callbacks,h=d.dir_mode,l=d.evalPriority,c=d.evalObjID;if(e.getMode()===i.GraphMode.INIT)throw new Error("Cowardly refusing to traverse graph without edges.");if(h===i.GraphMode.INIT)throw new Error("Cannot traverse a graph with dir_mode set to INIT.");var f={node:r,edge:new n.BaseEdge("virtual start edge",r,r,{weighted:!0,weight:0}),best:0},g={OPEN_HEAP:new s.BinaryHeap(s.BinaryHeapMode.MIN,l,c),OPEN:{},CLOSED:{},nodes:e.getNodes(),root_node:r,current:f,adj_nodes:[],next:null,proposed_dist:Number.POSITIVE_INFINITY};for(u.init_pfs&&o.execCallbacks(u.init_pfs,g),g.OPEN_HEAP.insert(f),g.OPEN[f.node.getID()]=f;g.OPEN_HEAP.size();){if(g.current=g.OPEN_HEAP.pop(),u.new_current&&o.execCallbacks(u.new_current,g),null==g.current&&console.log("HEAP popped undefined - HEAP size: "+g.OPEN_HEAP.size()),g.OPEN[g.current.node.getID()]=void 0,g.CLOSED[g.current.node.getID()]=g.current,g.current.node===d.goal_node)return d.callbacks.goal_reached&&o.execCallbacks(d.callbacks.goal_reached,g),d.result;if(h===i.GraphMode.MIXED)g.adj_nodes=g.current.node.reachNodes();else if(h===i.GraphMode.UNDIRECTED)g.adj_nodes=g.current.node.connNodes();else{if(h!==i.GraphMode.DIRECTED)throw new Error("Unsupported traversal mode. Please use directed, undirected, or mixed");g.adj_nodes=g.current.node.nextNodes()}for(var p in g.adj_nodes)g.next=g.adj_nodes[p],g.CLOSED[g.next.node.getID()]?d.callbacks.node_closed&&o.execCallbacks(d.callbacks.node_closed,g):g.OPEN[g.next.node.getID()]?(g.next.best=g.OPEN[g.next.node.getID()].best,d.callbacks.node_open&&o.execCallbacks(d.callbacks.node_open,g),g.proposed_dist=g.current.best+(isNaN(g.next.edge.getWeight())?t.DEFAULT_WEIGHT:g.next.edge.getWeight()),g.next.best>g.proposed_dist?(d.callbacks.better_path&&o.execCallbacks(d.callbacks.better_path,g),g.OPEN_HEAP.remove(g.next),g.next.best=g.proposed_dist,g.OPEN_HEAP.insert(g.next),g.OPEN[g.next.node.getID()].best=g.proposed_dist):g.next.best===g.proposed_dist&&d.callbacks.equal_path&&o.execCallbacks(d.callbacks.equal_path,g)):(d.callbacks.not_encountered&&o.execCallbacks(d.callbacks.not_encountered,g),g.OPEN_HEAP.insert(g.next),g.OPEN[g.next.node.getID()]=g.next)}return d.result},t.preparePFSStandardConfig=a},function(e,t,r){"use strict";(function(e){Object.defineProperty(t,"__esModule",{value:!0});const n=r(38);!function(e){e[e.FgBlack=30]="FgBlack",e[e.FgRed=31]="FgRed",e[e.FgGreen=32]="FgGreen",e[e.FgYellow=33]="FgYellow",e[e.FgBlue=34]="FgBlue",e[e.FgMagenta=35]="FgMagenta",e[e.FgCyan=36]="FgCyan",e[e.FgWhite=37]="FgWhite",e[e.BgBlack=40]="BgBlack",e[e.BgRed=41]="BgRed",e[e.BgGreen=42]="BgGreen",e[e.BgYellow=43]="BgYellow",e[e.BgBlue=44]="BgBlue",e[e.BgMagenta=45]="BgMagenta",e[e.BgCyan=46]="BgCyan",e[e.BgWhite=47]="BgWhite"}(t.LogColors||(t.LogColors={}));const i=37;t.Logger=class{constructor(e){this.config=null,this.config=e||n.RUN_CONFIG}log(e,t=i,r=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(console.log.call(console,this.colorize(t,e,r)),!0)}error(e,t=i,r=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(console.error.call(console,this.colorize(t,e,r)),!0)}dir(e,t=i,r=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(console.dir.call(console,this.colorize(t,e,r)),!0)}info(e,t=i,r=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(console.info.call(console,this.colorize(t,e,r)),!0)}warn(e,t=i,r=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(console.warn.call(console,this.colorize(t,e,r)),!0)}write(t,r=i,o=!1){return this.config.log_level===n.LOG_LEVELS.debug&&(e.stdout.write.call(e.stdout,this.colorize(r,t,o)),!0)}colorize(e,t,r){return[r?"[1m":null,"[",e,"m",t,"[0m"].join("")}}}).call(this,r(1))},function(e,t,r){"use strict";var n=r(16),i=Object.keys||function(e){var t=[];for(var r in e)t.push(r);return t};e.exports=l;var o=r(11);o.inherits=r(3);var s=r(27),a=r(31);o.inherits(l,s);for(var d=i(a.prototype),u=0;u<d.length;u++){var h=d[u];l.prototype[h]||(l.prototype[h]=a.prototype[h])}function l(e){if(!(this instanceof l))return new l(e);s.call(this,e),a.call(this,e),e&&!1===e.readable&&(this.readable=!1),e&&!1===e.writable&&(this.writable=!1),this.allowHalfOpen=!0,e&&!1===e.allowHalfOpen&&(this.allowHalfOpen=!1),this.once("end",c)}function c(){this.allowHalfOpen||this._writableState.ended||n.nextTick(f,this)}function f(e){e.end()}Object.defineProperty(l.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}}),Object.defineProperty(l.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed&&this._writableState.destroyed)},set:function(e){void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed=e,this._writableState.destroyed=e)}}),l.prototype._destroy=function(e,t){this.push(null),this.end(),n.nextTick(t,e)}},function(e,t){},function(e,t,r){"use strict";(function(e){
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-var n=r(48),i=r(49),o=r(23);function s(){return d.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function a(e,t){if(s()<t)throw new RangeError("Invalid typed array length");return d.TYPED_ARRAY_SUPPORT?(e=new Uint8Array(t)).__proto__=d.prototype:(null===e&&(e=new d(t)),e.length=t),e}function d(e,t,r){if(!(d.TYPED_ARRAY_SUPPORT||this instanceof d))return new d(e,t,r);if("number"==typeof e){if("string"==typeof t)throw new Error("If encoding is specified then the first argument must be a string");return l(this,e)}return u(this,e,t,r)}function u(e,t,r,n){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?function(e,t,r,n){if(t.byteLength,r<0||t.byteLength<r)throw new RangeError("'offset' is out of bounds");if(t.byteLength<r+(n||0))throw new RangeError("'length' is out of bounds");t=void 0===r&&void 0===n?new Uint8Array(t):void 0===n?new Uint8Array(t,r):new Uint8Array(t,r,n);d.TYPED_ARRAY_SUPPORT?(e=t).__proto__=d.prototype:e=c(e,t);return e}(e,t,r,n):"string"==typeof t?function(e,t,r){"string"==typeof r&&""!==r||(r="utf8");if(!d.isEncoding(r))throw new TypeError('"encoding" must be a valid string encoding');var n=0|g(t,r),i=(e=a(e,n)).write(t,r);i!==n&&(e=e.slice(0,i));return e}(e,t,r):function(e,t){if(d.isBuffer(t)){var r=0|f(t.length);return 0===(e=a(e,r)).length?e:(t.copy(e,0,0,r),e)}if(t){if("undefined"!=typeof ArrayBuffer&&t.buffer instanceof ArrayBuffer||"length"in t)return"number"!=typeof t.length||(n=t.length)!=n?a(e,0):c(e,t);if("Buffer"===t.type&&o(t.data))return c(e,t.data)}var n;throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}(e,t)}function h(e){if("number"!=typeof e)throw new TypeError('"size" argument must be a number');if(e<0)throw new RangeError('"size" argument must not be negative')}function l(e,t){if(h(t),e=a(e,t<0?0:0|f(t)),!d.TYPED_ARRAY_SUPPORT)for(var r=0;r<t;++r)e[r]=0;return e}function c(e,t){var r=t.length<0?0:0|f(t.length);e=a(e,r);for(var n=0;n<r;n+=1)e[n]=255&t[n];return e}function f(e){if(e>=s())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+s().toString(16)+" bytes");return 0|e}function g(e,t){if(d.isBuffer(e))return e.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(e)||e instanceof ArrayBuffer))return e.byteLength;"string"!=typeof e&&(e=""+e);var r=e.length;if(0===r)return 0;for(var n=!1;;)switch(t){case"ascii":case"latin1":case"binary":return r;case"utf8":case"utf-8":case void 0:return W(e).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*r;case"hex":return r>>>1;case"base64":return q(e).length;default:if(n)return W(e).length;t=(""+t).toLowerCase(),n=!0}}function p(e,t,r){var n=!1;if((void 0===t||t<0)&&(t=0),t>this.length)return"";if((void 0===r||r>this.length)&&(r=this.length),r<=0)return"";if((r>>>=0)<=(t>>>=0))return"";for(e||(e="utf8");;)switch(e){case"hex":return x(this,t,r);case"utf8":case"utf-8":return S(this,t,r);case"ascii":return A(this,t,r);case"latin1":case"binary":return O(this,t,r);case"base64":return D(this,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return P(this,t,r);default:if(n)throw new TypeError("Unknown encoding: "+e);e=(e+"").toLowerCase(),n=!0}}function _(e,t,r){var n=e[t];e[t]=e[r],e[r]=n}function y(e,t,r,n,i){if(0===e.length)return-1;if("string"==typeof r?(n=r,r=0):r>2147483647?r=2147483647:r<-2147483648&&(r=-2147483648),r=+r,isNaN(r)&&(r=i?0:e.length-1),r<0&&(r=e.length+r),r>=e.length){if(i)return-1;r=e.length-1}else if(r<0){if(!i)return-1;r=0}if("string"==typeof t&&(t=d.from(t,n)),d.isBuffer(t))return 0===t.length?-1:m(e,t,r,n,i);if("number"==typeof t)return t&=255,d.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?i?Uint8Array.prototype.indexOf.call(e,t,r):Uint8Array.prototype.lastIndexOf.call(e,t,r):m(e,[t],r,n,i);throw new TypeError("val must be string, number or Buffer")}function m(e,t,r,n,i){var o,s=1,a=e.length,d=t.length;if(void 0!==n&&("ucs2"===(n=String(n).toLowerCase())||"ucs-2"===n||"utf16le"===n||"utf-16le"===n)){if(e.length<2||t.length<2)return-1;s=2,a/=2,d/=2,r/=2}function u(e,t){return 1===s?e[t]:e.readUInt16BE(t*s)}if(i){var h=-1;for(o=r;o<a;o++)if(u(e,o)===u(t,-1===h?0:o-h)){if(-1===h&&(h=o),o-h+1===d)return h*s}else-1!==h&&(o-=o-h),h=-1}else for(r+d>a&&(r=a-d),o=r;o>=0;o--){for(var l=!0,c=0;c<d;c++)if(u(e,o+c)!==u(t,c)){l=!1;break}if(l)return o}return-1}function v(e,t,r,n){r=Number(r)||0;var i=e.length-r;n?(n=Number(n))>i&&(n=i):n=i;var o=t.length;if(o%2!=0)throw new TypeError("Invalid hex string");n>o/2&&(n=o/2);for(var s=0;s<n;++s){var a=parseInt(t.substr(2*s,2),16);if(isNaN(a))return s;e[r+s]=a}return s}function b(e,t,r,n){return G(W(t,e.length-r),e,r,n)}function w(e,t,r,n){return G(function(e){for(var t=[],r=0;r<e.length;++r)t.push(255&e.charCodeAt(r));return t}(t),e,r,n)}function E(e,t,r,n){return w(e,t,r,n)}function I(e,t,r,n){return G(q(t),e,r,n)}function N(e,t,r,n){return G(function(e,t){for(var r,n,i,o=[],s=0;s<e.length&&!((t-=2)<0);++s)r=e.charCodeAt(s),n=r>>8,i=r%256,o.push(i),o.push(n);return o}(t,e.length-r),e,r,n)}function D(e,t,r){return 0===t&&r===e.length?n.fromByteArray(e):n.fromByteArray(e.slice(t,r))}function S(e,t,r){r=Math.min(e.length,r);for(var n=[],i=t;i<r;){var o,s,a,d,u=e[i],h=null,l=u>239?4:u>223?3:u>191?2:1;if(i+l<=r)switch(l){case 1:u<128&&(h=u);break;case 2:128==(192&(o=e[i+1]))&&(d=(31&u)<<6|63&o)>127&&(h=d);break;case 3:o=e[i+1],s=e[i+2],128==(192&o)&&128==(192&s)&&(d=(15&u)<<12|(63&o)<<6|63&s)>2047&&(d<55296||d>57343)&&(h=d);break;case 4:o=e[i+1],s=e[i+2],a=e[i+3],128==(192&o)&&128==(192&s)&&128==(192&a)&&(d=(15&u)<<18|(63&o)<<12|(63&s)<<6|63&a)>65535&&d<1114112&&(h=d)}null===h?(h=65533,l=1):h>65535&&(h-=65536,n.push(h>>>10&1023|55296),h=56320|1023&h),n.push(h),i+=l}return function(e){var t=e.length;if(t<=T)return String.fromCharCode.apply(String,e);var r="",n=0;for(;n<t;)r+=String.fromCharCode.apply(String,e.slice(n,n+=T));return r}(n)}t.Buffer=d,t.SlowBuffer=function(e){+e!=e&&(e=0);return d.alloc(+e)},t.INSPECT_MAX_BYTES=50,d.TYPED_ARRAY_SUPPORT=void 0!==e.TYPED_ARRAY_SUPPORT?e.TYPED_ARRAY_SUPPORT:function(){try{var e=new Uint8Array(1);return e.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===e.foo()&&"function"==typeof e.subarray&&0===e.subarray(1,1).byteLength}catch(e){return!1}}(),t.kMaxLength=s(),d.poolSize=8192,d._augment=function(e){return e.__proto__=d.prototype,e},d.from=function(e,t,r){return u(null,e,t,r)},d.TYPED_ARRAY_SUPPORT&&(d.prototype.__proto__=Uint8Array.prototype,d.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&d[Symbol.species]===d&&Object.defineProperty(d,Symbol.species,{value:null,configurable:!0})),d.alloc=function(e,t,r){return function(e,t,r,n){return h(t),t<=0?a(e,t):void 0!==r?"string"==typeof n?a(e,t).fill(r,n):a(e,t).fill(r):a(e,t)}(null,e,t,r)},d.allocUnsafe=function(e){return l(null,e)},d.allocUnsafeSlow=function(e){return l(null,e)},d.isBuffer=function(e){return!(null==e||!e._isBuffer)},d.compare=function(e,t){if(!d.isBuffer(e)||!d.isBuffer(t))throw new TypeError("Arguments must be Buffers");if(e===t)return 0;for(var r=e.length,n=t.length,i=0,o=Math.min(r,n);i<o;++i)if(e[i]!==t[i]){r=e[i],n=t[i];break}return r<n?-1:n<r?1:0},d.isEncoding=function(e){switch(String(e).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},d.concat=function(e,t){if(!o(e))throw new TypeError('"list" argument must be an Array of Buffers');if(0===e.length)return d.alloc(0);var r;if(void 0===t)for(t=0,r=0;r<e.length;++r)t+=e[r].length;var n=d.allocUnsafe(t),i=0;for(r=0;r<e.length;++r){var s=e[r];if(!d.isBuffer(s))throw new TypeError('"list" argument must be an Array of Buffers');s.copy(n,i),i+=s.length}return n},d.byteLength=g,d.prototype._isBuffer=!0,d.prototype.swap16=function(){var e=this.length;if(e%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;t<e;t+=2)_(this,t,t+1);return this},d.prototype.swap32=function(){var e=this.length;if(e%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;t<e;t+=4)_(this,t,t+3),_(this,t+1,t+2);return this},d.prototype.swap64=function(){var e=this.length;if(e%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;t<e;t+=8)_(this,t,t+7),_(this,t+1,t+6),_(this,t+2,t+5),_(this,t+3,t+4);return this},d.prototype.toString=function(){var e=0|this.length;return 0===e?"":0===arguments.length?S(this,0,e):p.apply(this,arguments)},d.prototype.equals=function(e){if(!d.isBuffer(e))throw new TypeError("Argument must be a Buffer");return this===e||0===d.compare(this,e)},d.prototype.inspect=function(){var e="",r=t.INSPECT_MAX_BYTES;return this.length>0&&(e=this.toString("hex",0,r).match(/.{2}/g).join(" "),this.length>r&&(e+=" ... ")),"<Buffer "+e+">"},d.prototype.compare=function(e,t,r,n,i){if(!d.isBuffer(e))throw new TypeError("Argument must be a Buffer");if(void 0===t&&(t=0),void 0===r&&(r=e?e.length:0),void 0===n&&(n=0),void 0===i&&(i=this.length),t<0||r>e.length||n<0||i>this.length)throw new RangeError("out of range index");if(n>=i&&t>=r)return 0;if(n>=i)return-1;if(t>=r)return 1;if(this===e)return 0;for(var o=(i>>>=0)-(n>>>=0),s=(r>>>=0)-(t>>>=0),a=Math.min(o,s),u=this.slice(n,i),h=e.slice(t,r),l=0;l<a;++l)if(u[l]!==h[l]){o=u[l],s=h[l];break}return o<s?-1:s<o?1:0},d.prototype.includes=function(e,t,r){return-1!==this.indexOf(e,t,r)},d.prototype.indexOf=function(e,t,r){return y(this,e,t,r,!0)},d.prototype.lastIndexOf=function(e,t,r){return y(this,e,t,r,!1)},d.prototype.write=function(e,t,r,n){if(void 0===t)n="utf8",r=this.length,t=0;else if(void 0===r&&"string"==typeof t)n=t,r=this.length,t=0;else{if(!isFinite(t))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t|=0,isFinite(r)?(r|=0,void 0===n&&(n="utf8")):(n=r,r=void 0)}var i=this.length-t;if((void 0===r||r>i)&&(r=i),e.length>0&&(r<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");n||(n="utf8");for(var o=!1;;)switch(n){case"hex":return v(this,e,t,r);case"utf8":case"utf-8":return b(this,e,t,r);case"ascii":return w(this,e,t,r);case"latin1":case"binary":return E(this,e,t,r);case"base64":return I(this,e,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return N(this,e,t,r);default:if(o)throw new TypeError("Unknown encoding: "+n);n=(""+n).toLowerCase(),o=!0}},d.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var T=4096;function A(e,t,r){var n="";r=Math.min(e.length,r);for(var i=t;i<r;++i)n+=String.fromCharCode(127&e[i]);return n}function O(e,t,r){var n="";r=Math.min(e.length,r);for(var i=t;i<r;++i)n+=String.fromCharCode(e[i]);return n}function x(e,t,r){var n=e.length;(!t||t<0)&&(t=0),(!r||r<0||r>n)&&(r=n);for(var i="",o=t;o<r;++o)i+=U(e[o]);return i}function P(e,t,r){for(var n=e.slice(t,r),i="",o=0;o<n.length;o+=2)i+=String.fromCharCode(n[o]+256*n[o+1]);return i}function k(e,t,r){if(e%1!=0||e<0)throw new RangeError("offset is not uint");if(e+t>r)throw new RangeError("Trying to access beyond buffer length")}function R(e,t,r,n,i,o){if(!d.isBuffer(e))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>i||t<o)throw new RangeError('"value" argument is out of bounds');if(r+n>e.length)throw new RangeError("Index out of range")}function C(e,t,r,n){t<0&&(t=65535+t+1);for(var i=0,o=Math.min(e.length-r,2);i<o;++i)e[r+i]=(t&255<<8*(n?i:1-i))>>>8*(n?i:1-i)}function M(e,t,r,n){t<0&&(t=4294967295+t+1);for(var i=0,o=Math.min(e.length-r,4);i<o;++i)e[r+i]=t>>>8*(n?i:3-i)&255}function B(e,t,r,n,i,o){if(r+n>e.length)throw new RangeError("Index out of range");if(r<0)throw new RangeError("Index out of range")}function j(e,t,r,n,o){return o||B(e,0,r,4),i.write(e,t,r,n,23,4),r+4}function L(e,t,r,n,o){return o||B(e,0,r,8),i.write(e,t,r,n,52,8),r+8}d.prototype.slice=function(e,t){var r,n=this.length;if((e=~~e)<0?(e+=n)<0&&(e=0):e>n&&(e=n),(t=void 0===t?n:~~t)<0?(t+=n)<0&&(t=0):t>n&&(t=n),t<e&&(t=e),d.TYPED_ARRAY_SUPPORT)(r=this.subarray(e,t)).__proto__=d.prototype;else{var i=t-e;r=new d(i,void 0);for(var o=0;o<i;++o)r[o]=this[o+e]}return r},d.prototype.readUIntLE=function(e,t,r){e|=0,t|=0,r||k(e,t,this.length);for(var n=this[e],i=1,o=0;++o<t&&(i*=256);)n+=this[e+o]*i;return n},d.prototype.readUIntBE=function(e,t,r){e|=0,t|=0,r||k(e,t,this.length);for(var n=this[e+--t],i=1;t>0&&(i*=256);)n+=this[e+--t]*i;return n},d.prototype.readUInt8=function(e,t){return t||k(e,1,this.length),this[e]},d.prototype.readUInt16LE=function(e,t){return t||k(e,2,this.length),this[e]|this[e+1]<<8},d.prototype.readUInt16BE=function(e,t){return t||k(e,2,this.length),this[e]<<8|this[e+1]},d.prototype.readUInt32LE=function(e,t){return t||k(e,4,this.length),(this[e]|this[e+1]<<8|this[e+2]<<16)+16777216*this[e+3]},d.prototype.readUInt32BE=function(e,t){return t||k(e,4,this.length),16777216*this[e]+(this[e+1]<<16|this[e+2]<<8|this[e+3])},d.prototype.readIntLE=function(e,t,r){e|=0,t|=0,r||k(e,t,this.length);for(var n=this[e],i=1,o=0;++o<t&&(i*=256);)n+=this[e+o]*i;return n>=(i*=128)&&(n-=Math.pow(2,8*t)),n},d.prototype.readIntBE=function(e,t,r){e|=0,t|=0,r||k(e,t,this.length);for(var n=t,i=1,o=this[e+--n];n>0&&(i*=256);)o+=this[e+--n]*i;return o>=(i*=128)&&(o-=Math.pow(2,8*t)),o},d.prototype.readInt8=function(e,t){return t||k(e,1,this.length),128&this[e]?-1*(255-this[e]+1):this[e]},d.prototype.readInt16LE=function(e,t){t||k(e,2,this.length);var r=this[e]|this[e+1]<<8;return 32768&r?4294901760|r:r},d.prototype.readInt16BE=function(e,t){t||k(e,2,this.length);var r=this[e+1]|this[e]<<8;return 32768&r?4294901760|r:r},d.prototype.readInt32LE=function(e,t){return t||k(e,4,this.length),this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24},d.prototype.readInt32BE=function(e,t){return t||k(e,4,this.length),this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]},d.prototype.readFloatLE=function(e,t){return t||k(e,4,this.length),i.read(this,e,!0,23,4)},d.prototype.readFloatBE=function(e,t){return t||k(e,4,this.length),i.read(this,e,!1,23,4)},d.prototype.readDoubleLE=function(e,t){return t||k(e,8,this.length),i.read(this,e,!0,52,8)},d.prototype.readDoubleBE=function(e,t){return t||k(e,8,this.length),i.read(this,e,!1,52,8)},d.prototype.writeUIntLE=function(e,t,r,n){(e=+e,t|=0,r|=0,n)||R(this,e,t,r,Math.pow(2,8*r)-1,0);var i=1,o=0;for(this[t]=255&e;++o<r&&(i*=256);)this[t+o]=e/i&255;return t+r},d.prototype.writeUIntBE=function(e,t,r,n){(e=+e,t|=0,r|=0,n)||R(this,e,t,r,Math.pow(2,8*r)-1,0);var i=r-1,o=1;for(this[t+i]=255&e;--i>=0&&(o*=256);)this[t+i]=e/o&255;return t+r},d.prototype.writeUInt8=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,1,255,0),d.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),this[t]=255&e,t+1},d.prototype.writeUInt16LE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,2,65535,0),d.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):C(this,e,t,!0),t+2},d.prototype.writeUInt16BE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,2,65535,0),d.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):C(this,e,t,!1),t+2},d.prototype.writeUInt32LE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,4,4294967295,0),d.TYPED_ARRAY_SUPPORT?(this[t+3]=e>>>24,this[t+2]=e>>>16,this[t+1]=e>>>8,this[t]=255&e):M(this,e,t,!0),t+4},d.prototype.writeUInt32BE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,4,4294967295,0),d.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):M(this,e,t,!1),t+4},d.prototype.writeIntLE=function(e,t,r,n){if(e=+e,t|=0,!n){var i=Math.pow(2,8*r-1);R(this,e,t,r,i-1,-i)}var o=0,s=1,a=0;for(this[t]=255&e;++o<r&&(s*=256);)e<0&&0===a&&0!==this[t+o-1]&&(a=1),this[t+o]=(e/s>>0)-a&255;return t+r},d.prototype.writeIntBE=function(e,t,r,n){if(e=+e,t|=0,!n){var i=Math.pow(2,8*r-1);R(this,e,t,r,i-1,-i)}var o=r-1,s=1,a=0;for(this[t+o]=255&e;--o>=0&&(s*=256);)e<0&&0===a&&0!==this[t+o+1]&&(a=1),this[t+o]=(e/s>>0)-a&255;return t+r},d.prototype.writeInt8=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,1,127,-128),d.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),e<0&&(e=255+e+1),this[t]=255&e,t+1},d.prototype.writeInt16LE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,2,32767,-32768),d.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):C(this,e,t,!0),t+2},d.prototype.writeInt16BE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,2,32767,-32768),d.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):C(this,e,t,!1),t+2},d.prototype.writeInt32LE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,4,2147483647,-2147483648),d.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8,this[t+2]=e>>>16,this[t+3]=e>>>24):M(this,e,t,!0),t+4},d.prototype.writeInt32BE=function(e,t,r){return e=+e,t|=0,r||R(this,e,t,4,2147483647,-2147483648),e<0&&(e=4294967295+e+1),d.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):M(this,e,t,!1),t+4},d.prototype.writeFloatLE=function(e,t,r){return j(this,e,t,!0,r)},d.prototype.writeFloatBE=function(e,t,r){return j(this,e,t,!1,r)},d.prototype.writeDoubleLE=function(e,t,r){return L(this,e,t,!0,r)},d.prototype.writeDoubleBE=function(e,t,r){return L(this,e,t,!1,r)},d.prototype.copy=function(e,t,r,n){if(r||(r=0),n||0===n||(n=this.length),t>=e.length&&(t=e.length),t||(t=0),n>0&&n<r&&(n=r),n===r)return 0;if(0===e.length||0===this.length)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(r<0||r>=this.length)throw new RangeError("sourceStart out of bounds");if(n<0)throw new RangeError("sourceEnd out of bounds");n>this.length&&(n=this.length),e.length-t<n-r&&(n=e.length-t+r);var i,o=n-r;if(this===e&&r<t&&t<n)for(i=o-1;i>=0;--i)e[i+t]=this[i+r];else if(o<1e3||!d.TYPED_ARRAY_SUPPORT)for(i=0;i<o;++i)e[i+t]=this[i+r];else Uint8Array.prototype.set.call(e,this.subarray(r,r+o),t);return o},d.prototype.fill=function(e,t,r,n){if("string"==typeof e){if("string"==typeof t?(n=t,t=0,r=this.length):"string"==typeof r&&(n=r,r=this.length),1===e.length){var i=e.charCodeAt(0);i<256&&(e=i)}if(void 0!==n&&"string"!=typeof n)throw new TypeError("encoding must be a string");if("string"==typeof n&&!d.isEncoding(n))throw new TypeError("Unknown encoding: "+n)}else"number"==typeof e&&(e&=255);if(t<0||this.length<t||this.length<r)throw new RangeError("Out of range index");if(r<=t)return this;var o;if(t>>>=0,r=void 0===r?this.length:r>>>0,e||(e=0),"number"==typeof e)for(o=t;o<r;++o)this[o]=e;else{var s=d.isBuffer(e)?e:W(new d(e,n).toString()),a=s.length;for(o=0;o<r-t;++o)this[o+t]=s[o%a]}return this};var F=/[^+\/0-9A-Za-z-_]/g;function U(e){return e<16?"0"+e.toString(16):e.toString(16)}function W(e,t){var r;t=t||1/0;for(var n=e.length,i=null,o=[],s=0;s<n;++s){if((r=e.charCodeAt(s))>55295&&r<57344){if(!i){if(r>56319){(t-=3)>-1&&o.push(239,191,189);continue}if(s+1===n){(t-=3)>-1&&o.push(239,191,189);continue}i=r;continue}if(r<56320){(t-=3)>-1&&o.push(239,191,189),i=r;continue}r=65536+(i-55296<<10|r-56320)}else i&&(t-=3)>-1&&o.push(239,191,189);if(i=null,r<128){if((t-=1)<0)break;o.push(r)}else if(r<2048){if((t-=2)<0)break;o.push(r>>6|192,63&r|128)}else if(r<65536){if((t-=3)<0)break;o.push(r>>12|224,r>>6&63|128,63&r|128)}else{if(!(r<1114112))throw new Error("Invalid code point");if((t-=4)<0)break;o.push(r>>18|240,r>>12&63|128,r>>6&63|128,63&r|128)}}return o}function q(e){return n.toByteArray(function(e){if((e=function(e){return e.trim?e.trim():e.replace(/^\s+|\s+$/g,"")}(e).replace(F,"")).length<2)return"";for(;e.length%4!=0;)e+="=";return e}(e))}function G(e,t,r,n){for(var i=0;i<n&&!(i+r>=t.length||i>=e.length);++i)t[i+r]=e[i];return i}}).call(this,r(0))},function(e,t,r){(function(e){function r(e){return Object.prototype.toString.call(e)}t.isArray=function(e){return Array.isArray?Array.isArray(e):"[object Array]"===r(e)},t.isBoolean=function(e){return"boolean"==typeof e},t.isNull=function(e){return null===e},t.isNullOrUndefined=function(e){return null==e},t.isNumber=function(e){return"number"==typeof e},t.isString=function(e){return"string"==typeof e},t.isSymbol=function(e){return"symbol"==typeof e},t.isUndefined=function(e){return void 0===e},t.isRegExp=function(e){return"[object RegExp]"===r(e)},t.isObject=function(e){return"object"==typeof e&&null!==e},t.isDate=function(e){return"[object Date]"===r(e)},t.isError=function(e){return"[object Error]"===r(e)||e instanceof Error},t.isFunction=function(e){return"function"==typeof e},t.isPrimitive=function(e){return null===e||"boolean"==typeof e||"number"==typeof e||"string"==typeof e||"symbol"==typeof e||void 0===e},t.isBuffer=e.isBuffer}).call(this,r(10).Buffer)},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(4);class i{constructor(e,t,r,i){if(this._id=e,this._node_a=t,this._node_b=r,!(t instanceof n.BaseNode&&r instanceof n.BaseNode))throw new Error("cannot instantiate edge without two valid node objects");i=i||{},this._directed=i.directed||!1,this._weighted=i.weighted||!1,this._weight=this._weighted?isNaN(i.weight)?1:i.weight:void 0,this._label=i.label||this._id}getID(){return this._id}getLabel(){return this._label}setLabel(e){this._label=e}isDirected(){return this._directed}isWeighted(){return this._weighted}getWeight(){return this._weight}setWeight(e){if(!this._weighted)throw new Error("Cannot set weight on unweighted edge.");this._weight=e}getNodes(){return{a:this._node_a,b:this._node_b}}clone(e,t){if(!(e instanceof n.BaseNode&&t instanceof n.BaseNode))throw new Error("refusing to clone edge if any new node is invalid");return new i(this._id,e,t,{directed:this._directed,weighted:this._weighted,weight:this._weight,label:this._label})}}t.BaseEdge=i},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.execCallbacks=function(e,t){e.forEach(function(e){if("function"!=typeof e)throw new Error("Provided callback is not a function.");e(t)})}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(6);function i(e,t){if(null==e||null==t)throw new Error("Graph as well as start node have to be valid objects.");if(0===e.nrDirEdges()&&0===e.nrUndEdges())throw new Error("Cowardly refusing to traverse a graph without edges.");if(!e.hasNodeID(t.getID()))throw new Error("Cannot start from an outside node.")}t.BellmanFordArray=function(e,t){i(e,t);let r,o,s,a=[],d=e.getNodes(),u=Object.keys(d),h={},l=!1;for(let e=0;e<u.length;++e)o=d[u[e]],a[e]=o===t?0:Number.POSITIVE_INFINITY,h[o.getID()]=e;let c=e.getDirEdgesArray().concat(e.getUndEdgesArray()),f=[];for(let e=0;e<c.length;++e)r=c[e],f.push([h[r.getNodes().a.getID()],h[r.getNodes().b.getID()],isFinite(r.getWeight())?r.getWeight():n.DEFAULT_WEIGHT,r.isDirected()]);for(let e=0;e<u.length-1;++e)for(let e=0;e<f.length;++e)g((r=f[e])[0],r[1],r[2]),!r[3]&&g(r[1],r[0],r[2]);for(let e=0;e<f.length;++e)if(p((r=f[e])[0],r[1],r[2])||!r[3]&&p(r[1],r[0],r[2])){l=!0;break}function g(e,t,r){s=a[e]+r,a[t]>s&&(a[t]=s)}function p(e,t,r){return a[t]>a[e]+r}return{distances:a,neg_cycle:l}},t.BellmanFordDict=function(e,t){i(e,t);let r,o,s,a,d,u,h,l={},c=!1;l={},r=e.getDirEdgesArray().concat(e.getUndEdgesArray()),h=e.nrNodes();for(let t in e.getNodes())l[t]=Number.POSITIVE_INFINITY;l[t.getID()]=0;for(let e=0;e<h-1;++e)for(let e=0;e<r.length;++e)f(s=(o=r[e]).getNodes().a.getID(),a=o.getNodes().b.getID(),d=isFinite(o.getWeight())?o.getWeight():n.DEFAULT_WEIGHT),!o.isDirected()&&f(a,s,d);for(let e in r)(g(s=(o=r[e]).getNodes().a.getID(),a=o.getNodes().b.getID(),d=isFinite(o.getWeight())?o.getWeight():n.DEFAULT_WEIGHT)||!o.isDirected()&&g(a,s,d))&&(c=!0);function f(e,t,r){u=l[e]+r,l[t]>u&&(l[t]=u)}function g(e,t,r){return l[t]>l[e]+r}return{distances:l,neg_cycle:c}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(4),i=r(6),o=r(14),s=r(5);function a(e,t){let r=e.getNodes();e.addNode(t);let n=0;for(let i in r)r[i].getID()!=t.getID()&&(e.addEdgeByNodeIDs("temp"+n,t.getID(),r[i].getID(),{directed:!0,weighted:!0,weight:0}),n++);return e}function d(e,t,r){let n=e.getDirEdgesArray().concat(e.getUndEdgesArray());for(let a of n){var o=a.getNodes().a.getID(),s=a.getNodes().b.getID();if(o!=r.getID())if(a.isWeighted){let e=a.getWeight()+t[o]-t[s];a.setWeight(e)}else{let r=i.DEFAULT_WEIGHT+t[o]-t[s],n=a.getID(),d=a.isDirected();e.deleteEdge(a),e.addEdgeByNodeIDs(n,o,s,{directed:d,weighted:!0,weight:r})}}return e}function u(e){let t=e.adjListArray(),r=e.nextArray(),n=e.getNodes(),o={},a=0;for(let e in n)o[n[e].getID()]=a++;let d=i.preparePFSStandardConfig();d.callbacks.not_encountered.splice(0,1,function(e){e.next.best=e.current.best+(isNaN(e.next.edge.getWeight())?i.DEFAULT_WEIGHT:e.next.edge.getWeight());let n=o[e.root_node.getID()],s=o[e.next.node.getID()];e.current.node==e.root_node?(t[n][s]=e.next.best,r[n][s][0]=s):(t[n][s]=e.next.best,r[n][s][0]=o[e.current.node.getID()])});d.callbacks.better_path.splice(0,1,function(e){let n=o[e.root_node.getID()],i=o[e.next.node.getID()];t[n][i]=e.proposed_dist,e.current.node!==e.root_node&&r[n][i].splice(0,r[n][i].length,o[e.current.node.getID()])});d.callbacks.equal_path.push(function(e){let t=o[e.root_node.getID()],n=o[e.next.node.getID()];e.current.node!==e.root_node&&(r[t][n]=s.mergeOrderedArraysNoDups(r[t][n],[o[e.current.node.getID()]]))});for(let t in n)i.PFS(e,n[t],d);return[t,r]}t.Johnsons=function(e){if(0===e.nrDirEdges()&&0===e.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");let t=e.getNodes();if(Object.keys(t),e.hasNegativeEdge()){var r=new n.BaseNode("extraNode");e=a(e,r);let t=o.BellmanFordDict(e,r);if(t.neg_cycle)throw new Error("The graph contains a negative cycle, thus it can not be processed");return(e=d(e,t.distances,r)).deleteNode(r),u(e)}return u(e)},t.addExtraNandE=a,t.reWeighGraph=d,t.PFSFromAllNodes=u},function(e,t,r){"use strict";(function(t){void 0===t||!t.version||0===t.version.indexOf("v0.")||0===t.version.indexOf("v1.")&&0!==t.version.indexOf("v1.8.")?e.exports={nextTick:function(e,r,n,i){if("function"!=typeof e)throw new TypeError('"callback" argument must be a function');var o,s,a=arguments.length;switch(a){case 0:case 1:return t.nextTick(e);case 2:return t.nextTick(function(){e.call(null,r)});case 3:return t.nextTick(function(){e.call(null,r,n)});case 4:return t.nextTick(function(){e.call(null,r,n,i)});default:for(o=new Array(a-1),s=0;s<o.length;)o[s++]=arguments[s];return t.nextTick(function(){e.apply(null,o)})}}}:e.exports=t}).call(this,r(1))},function(e,t,r){var n=r(10),i=n.Buffer;function o(e,t){for(var r in e)t[r]=e[r]}function s(e,t,r){return i(e,t,r)}i.from&&i.alloc&&i.allocUnsafe&&i.allocUnsafeSlow?e.exports=n:(o(n,t),t.Buffer=s),o(i,s),s.from=function(e,t,r){if("number"==typeof e)throw new TypeError("Argument must not be a number");return i(e,t,r)},s.alloc=function(e,t,r){if("number"!=typeof e)throw new TypeError("Argument must be a number");var n=i(e);return void 0!==t?"string"==typeof r?n.fill(t,r):n.fill(t):n.fill(0),n},s.allocUnsafe=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return i(e)},s.allocUnsafeSlow=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return n.SlowBuffer(e)}},function(e,t,r){"use strict";var n;Object.defineProperty(t,"__esModule",{value:!0}),function(e){e[e.MIN=0]="MIN",e[e.MAX=1]="MAX"}(n=t.BinaryHeapMode||(t.BinaryHeapMode={}));t.BinaryHeap=class{constructor(e=n.MIN,t=(e=>"number"!=typeof e&&"string"!=typeof e?NaN:"number"==typeof e?0|e:parseInt(e)),r=(e=>e)){this._mode=e,this._evalPriority=t,this._evalObjID=r,this._nr_removes=0,this._array=[],this._positions={}}getMode(){return this._mode}getArray(){return this._array}getPositions(){return this._positions}size(){return this._array.length}getEvalPriorityFun(){return this._evalPriority}evalInputScore(e){return this._evalPriority(e)}getEvalObjIDFun(){return this._evalObjID}evalInputObjID(e){return this._evalObjID(e)}peek(){return this._array[0]}pop(){if(this.size())return this.remove(this._array[0])}find(e){var t=this.getNodePosition(e);return this._array[t]}insert(e){if(isNaN(this._evalPriority(e)))throw new Error("Cannot insert object without numeric priority.");this._array.push(e),this.setNodePosition(e,this.size()-1),this.trickleUp(this.size()-1)}remove(e){if(this._nr_removes++,isNaN(this._evalPriority(e)))throw new Error("Object invalid.");this._evalObjID(e);var t=null,r=this.getNodePosition(e);if(null!==(t=null!=this._array[r]?this._array[r]:null)){var n=this._array.pop();return this.removeNodePosition(e),this.size()&&t!==n&&(this._array[r]=n,this.setNodePosition(n,r),this.trickleUp(r),this.trickleDown(r)),t}}trickleDown(e){for(var t=this._array[e];;){var r=2*(e+1),n=r-1,i=this._array[r],o=this._array[n],s=null;if(n<this.size()&&!this.orderCorrect(t,o)&&(s=n),r<this.size()&&!this.orderCorrect(t,i)&&!this.orderCorrect(o,i)&&(s=r),null===s)break;this._array[e]=this._array[s],this._array[s]=t,this.setNodePosition(this._array[e],e),this.setNodePosition(this._array[s],s),e=s}}trickleUp(e){for(var t=this._array[e];e;){var r=Math.floor((e+1)/2)-1,n=this._array[r];if(this.orderCorrect(n,t))break;this._array[r]=t,this._array[e]=n,this.setNodePosition(t,r),this.setNodePosition(n,e),e=r}}orderCorrect(e,t){var r=this._evalPriority(e),i=this._evalPriority(t);return this._mode===n.MIN?r<=i:r>=i}setNodePosition(e,t){if(null==e||null==t||t!==(0|t))throw new Error("minium required arguments are obj and new_pos");var r={score:this.evalInputScore(e),position:t},n=this.evalInputObjID(e);this._positions[n]=r}getNodePosition(e){var t=this.evalInputObjID(e),r=this._positions[t];return r?r.position:null}removeNodePosition(e){var t=this.evalInputObjID(e);delete this._positions[t]}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(5);function i(e,t,r,i){let o=[e],s=0;for(;o.length>0;){let a=o.pop();if(!(a==e&&s>0)){for(let d=0;d<r[a][t].length;d++)r[a][t][d]==t&&0==s?i[e][t]=n.mergeOrderedArraysNoDups(i[e][t],[t]):r[a][t][d]==t?i[e][t]=n.mergeOrderedArraysNoDups(i[e][t],[a]):o=n.mergeOrderedArraysNoDups(o,[r[a][t][d]]);s++}}}t.FloydWarshallAPSP=function(e){if(0===e.nrDirEdges()&&0===e.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");let t=e.adjListArray(),r=e.nextArray(),i=t.length;for(var o=0;o<i;++o)for(var s=0;s<i;++s)for(var a=0;a<i;++a)o!=s&&o!=a&&s!=a&&t[s][a]==t[s][o]+t[o][a]&&t[s][a]!==Number.POSITIVE_INFINITY&&(r[s][a]=n.mergeOrderedArraysNoDups(r[s][a],r[s][o])),o!=s&&o!=a&&s!=a&&t[s][a]>t[s][o]+t[o][a]&&(r[s][a]=r[s][o].slice(0),t[s][a]=t[s][o]+t[o][a]);return[t,r]},t.FloydWarshallArray=function(e){if(0===e.nrDirEdges()&&0===e.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");let t=e.adjListArray(),r=t.length;for(var n=0;n<r;++n)for(var i=0;i<r;++i)for(var o=0;o<r;++o)n!=i&&n!=o&&i!=o&&t[i][o]>t[i][n]+t[n][o]&&(t[i][o]=t[i][n]+t[n][o]);return t},t.FloydWarshallDict=function(e){if(0===e.nrDirEdges()&&0===e.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");let t=function(e){let t={},r=n.mergeObjects([e.getDirEdges(),e.getUndEdges()]);for(let e in r){let n=r[e].getNodes().a.getID(),i=r[e].getNodes().b.getID();null==t[n]&&(t[n]={}),t[n][i]=isNaN(r[e].getWeight())?1:r[e].getWeight(),r[e].isDirected()||(null==t[i]&&(t[i]={}),t[i][n]=isNaN(r[e].getWeight())?1:r[e].getWeight())}return t}(e);for(var r in t)for(var i in t)for(var o in t)i!==o&&null!=t[i][r]&&null!=t[r][o]&&(!t[i][o]&&0!=t[i][o]||t[i][o]>t[i][r]+t[r][o])&&(t[i][o]=t[i][r]+t[r][o]);return t},t.changeNextToDirectParents=function(e){let t=[];for(let r=0;r<e.length;r++){t.push([]);for(let n=0;n<e.length;n++)t[r].push([]),t[r][n]=e[r][n]}for(let r=0;r<e.length;r++)for(let n=0;n<e.length;n++)null!=e[r][n][0]&&(r==n||1===e[r][n].length&&e[r][n][0]===n||(t[r][n]=[],i(r,n,e,t)));return t}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(45),i=new(r(7).Logger),o="443";t.retrieveRemoteFile=function(e,t){if("function"!=typeof t)throw new Error("Provided callback is not a function.");i.log(`Requesting file via NodeJS request: ${e.remote_host}${e.remote_path}${e.file_name}`);let r={host:e.remote_host,port:o,path:e.remote_path+e.file_name,method:"GET"},s=n.get(r,e=>{var r="";e.setEncoding("utf8"),e.on("data",function(e){r+=e}),e.on("end",function(){t(r)})});return s.on("error",e=>{i.log(`Request error: ${e.message}`)}),s},t.checkNodeEnvironment=function(){if("undefined"!=typeof window)throw new Error("When in Browser, do as the Browsers do! (use fetch and call readFromJSON() directly...) ")}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(2),i=r(13);function o(){var e={result:{},callbacks:{init_bfs:[],node_unmarked:[],node_marked:[],sort_nodes:void 0},dir_mode:n.GraphMode.MIXED,messages:{},filters:{}},t=e.result,r=e.callbacks,i=0,o=function(){return i++};r.init_bfs.push(function(t){for(var r in t.nodes)e.result[r]={distance:Number.POSITIVE_INFINITY,parent:null,counter:-1};e.result[t.root_node.getID()]={distance:0,parent:t.root_node,counter:o()}});return r.node_unmarked.push(function(r){e.result[r.next_node.getID()]={distance:t[r.current.getID()].distance+1,parent:r.current,counter:o()},r.queue.push(r.next_node)}),e}t.BFS=function(e,t,r){var s=(r=r||o()).callbacks,a=r.dir_mode;if(e.getMode()===n.GraphMode.INIT)throw new Error("Cowardly refusing to traverse graph without edges.");if(a===n.GraphMode.INIT)throw new Error("Cannot traverse a graph with dir_mode set to INIT.");var d={marked:{},nodes:e.getNodes(),queue:[],current:null,next_node:null,next_edge:null,root_node:t,adj_nodes:[]};s.init_bfs&&i.execCallbacks(s.init_bfs,d),d.queue.push(t);for(var u=0;u<d.queue.length;)for(var h in d.current=d.queue[u++],a===n.GraphMode.MIXED?d.adj_nodes=d.current.reachNodes():a===n.GraphMode.UNDIRECTED?d.adj_nodes=d.current.connNodes():a===n.GraphMode.DIRECTED?d.adj_nodes=d.current.nextNodes():d.adj_nodes=[],"function"==typeof s.sort_nodes&&s.sort_nodes(d),d.adj_nodes)d.next_node=d.adj_nodes[h].node,d.next_edge=d.adj_nodes[h].edge,r.result[d.next_node.getID()].distance===Number.POSITIVE_INFINITY?s.node_unmarked&&i.execCallbacks(s.node_unmarked,d):s.node_marked&&i.execCallbacks(s.node_marked,d);return r.result},t.prepareBFSStandardConfig=o},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(2),i=r(13);function o(e,t,r){var o={stack:[],adj_nodes:[],stack_entry:null,current:null,current_root:t},a=(r=r||s()).callbacks,d=r.dir_mode;if(e.getMode()===n.GraphMode.INIT)throw new Error("Cowardly refusing to traverse graph without edges.");if(d===n.GraphMode.INIT)throw new Error("Cannot traverse a graph with dir_mode set to INIT.");for(a.init_dfs_visit&&i.execCallbacks(a.init_dfs_visit,o),o.stack.push({node:t,parent:t,weight:0});o.stack.length;)if(o.stack_entry=o.stack.pop(),o.current=o.stack_entry.node,a.node_popped&&i.execCallbacks(a.node_popped,o),r.dfs_visit_marked[o.current.getID()])a.node_marked&&i.execCallbacks(a.node_marked,o);else{for(var u in r.dfs_visit_marked[o.current.getID()]=!0,a.node_unmarked&&i.execCallbacks(a.node_unmarked,o),d===n.GraphMode.MIXED?o.adj_nodes=o.current.reachNodes():d===n.GraphMode.UNDIRECTED?o.adj_nodes=o.current.connNodes():d===n.GraphMode.DIRECTED&&(o.adj_nodes=o.current.nextNodes()),"function"==typeof a.sort_nodes&&a.sort_nodes(o),o.adj_nodes)o.stack.push({node:o.adj_nodes[u].node,parent:o.current,weight:o.adj_nodes[u].edge.getWeight()});a.adj_nodes_pushed&&i.execCallbacks(a.adj_nodes_pushed,o)}return r.visit_result}function s(){var e={visit_result:{},callbacks:{},messages:{},dfs_visit_marked:{},dir_mode:n.GraphMode.MIXED},t=e.visit_result,r=e.callbacks,i=0;r.init_dfs_visit=r.init_dfs_visit||[];r.init_dfs_visit.push(function(e){t[e.current_root.getID()]={parent:e.current_root}}),r.node_unmarked=r.node_unmarked||[];return r.node_unmarked.push(function(e){t[e.current.getID()]={parent:e.stack_entry.parent,counter:i++}}),e}function a(){var e=s(),t=e.callbacks;e.visit_result;t.init_dfs=t.init_dfs||[];return t.init_dfs.push(function(e){}),e}t.DFSVisit=o,t.DFS=function(e,t,r){var s=(r=r||a()).callbacks,d=r.dir_mode;if(e.getMode()===n.GraphMode.INIT)throw new Error("Cowardly refusing to traverse graph without edges.");if(d===n.GraphMode.INIT)throw new Error("Cannot traverse a graph with dir_mode set to INIT.");var u={marked:{},nodes:e.getNodes()};s.init_dfs&&i.execCallbacks(s.init_dfs,u),s.adj_nodes_pushed=s.adj_nodes_pushed||[],s.adj_nodes_pushed.push(function(e){u.marked[e.current.getID()]=!0});var h=[{}],l=0,c=0;for(var f in s&&s.node_unmarked&&s.node_unmarked.push(function(e){h[l][e.current.getID()]={parent:e.stack_entry.parent,counter:c++}}),o(e,t,r),u.nodes)u.marked[f]||(l++,h.push({}),o(e,u.nodes[f],r));return h},t.prepareDFSVisitStandardConfig=s,t.prepareDFSStandardConfig=a},function(e,t){var r={}.toString;e.exports=Array.isArray||function(e){return"[object Array]"==r.call(e)}},function(e,t,r){(function(e){t.fetch=a(e.fetch)&&a(e.ReadableStream),t.writableStream=a(e.WritableStream),t.abortController=a(e.AbortController),t.blobConstructor=!1;try{new Blob([new ArrayBuffer(1)]),t.blobConstructor=!0}catch(e){}var r;function n(){if(void 0!==r)return r;if(e.XMLHttpRequest){r=new e.XMLHttpRequest;try{r.open("GET",e.XDomainRequest?"/":"https://example.com")}catch(e){r=null}}else r=null;return r}function i(e){var t=n();if(!t)return!1;try{return t.responseType=e,t.responseType===e}catch(e){}return!1}var o=void 0!==e.ArrayBuffer,s=o&&a(e.ArrayBuffer.prototype.slice);function a(e){return"function"==typeof e}t.arraybuffer=t.fetch||o&&i("arraybuffer"),t.msstream=!t.fetch&&s&&i("ms-stream"),t.mozchunkedarraybuffer=!t.fetch&&o&&i("moz-chunked-arraybuffer"),t.overrideMimeType=t.fetch||!!n()&&a(n().overrideMimeType),t.vbArray=a(e.VBArray),r=null}).call(this,r(0))},function(e,t,r){(function(e,n,i){var o=r(24),s=r(3),a=r(26),d=t.readyStates={UNSENT:0,OPENED:1,HEADERS_RECEIVED:2,LOADING:3,DONE:4},u=t.IncomingMessage=function(t,r,s,d){var u=this;if(a.Readable.call(u),u._mode=s,u.headers={},u.rawHeaders=[],u.trailers={},u.rawTrailers=[],u.on("end",function(){e.nextTick(function(){u.emit("close")})}),"fetch"===s){if(u._fetchResponse=r,u.url=r.url,u.statusCode=r.status,u.statusMessage=r.statusText,r.headers.forEach(function(e,t){u.headers[t.toLowerCase()]=e,u.rawHeaders.push(t,e)}),o.writableStream){var h=new WritableStream({write:function(e){return new Promise(function(t,r){u._destroyed?r():u.push(new n(e))?t():u._resumeFetch=t})},close:function(){i.clearTimeout(d),u._destroyed||u.push(null)},abort:function(e){u._destroyed||u.emit("error",e)}});try{return void r.body.pipeTo(h).catch(function(e){i.clearTimeout(d),u._destroyed||u.emit("error",e)})}catch(e){}}var l=r.body.getReader();!function e(){l.read().then(function(t){if(!u._destroyed){if(t.done)return i.clearTimeout(d),void u.push(null);u.push(new n(t.value)),e()}}).catch(function(e){i.clearTimeout(d),u._destroyed||u.emit("error",e)})}()}else{if(u._xhr=t,u._pos=0,u.url=t.responseURL,u.statusCode=t.status,u.statusMessage=t.statusText,t.getAllResponseHeaders().split(/\r?\n/).forEach(function(e){var t=e.match(/^([^:]+):\s*(.*)/);if(t){var r=t[1].toLowerCase();"set-cookie"===r?(void 0===u.headers[r]&&(u.headers[r]=[]),u.headers[r].push(t[2])):void 0!==u.headers[r]?u.headers[r]+=", "+t[2]:u.headers[r]=t[2],u.rawHeaders.push(t[1],t[2])}}),u._charset="x-user-defined",!o.overrideMimeType){var c=u.rawHeaders["mime-type"];if(c){var f=c.match(/;\s*charset=([^;])(;|$)/);f&&(u._charset=f[1].toLowerCase())}u._charset||(u._charset="utf-8")}}};s(u,a.Readable),u.prototype._read=function(){var e=this._resumeFetch;e&&(this._resumeFetch=null,e())},u.prototype._onXHRProgress=function(){var e=this,t=e._xhr,r=null;switch(e._mode){case"text:vbarray":if(t.readyState!==d.DONE)break;try{r=new i.VBArray(t.responseBody).toArray()}catch(e){}if(null!==r){e.push(new n(r));break}case"text":try{r=t.responseText}catch(t){e._mode="text:vbarray";break}if(r.length>e._pos){var o=r.substr(e._pos);if("x-user-defined"===e._charset){for(var s=new n(o.length),a=0;a<o.length;a++)s[a]=255&o.charCodeAt(a);e.push(s)}else e.push(o,e._charset);e._pos=r.length}break;case"arraybuffer":if(t.readyState!==d.DONE||!t.response)break;r=t.response,e.push(new n(new Uint8Array(r)));break;case"moz-chunked-arraybuffer":if(r=t.response,t.readyState!==d.LOADING||!r)break;e.push(new n(new Uint8Array(r)));break;case"ms-stream":if(r=t.response,t.readyState!==d.LOADING)break;var u=new i.MSStreamReader;u.onprogress=function(){u.result.byteLength>e._pos&&(e.push(new n(new Uint8Array(u.result.slice(e._pos)))),e._pos=u.result.byteLength)},u.onload=function(){e.push(null)},u.readAsArrayBuffer(r)}e._xhr.readyState===d.DONE&&"ms-stream"!==e._mode&&e.push(null)}}).call(this,r(1),r(10).Buffer,r(0))},function(e,t,r){(t=e.exports=r(27)).Stream=t,t.Readable=t,t.Writable=r(31),t.Duplex=r(8),t.Transform=r(33),t.PassThrough=r(56)},function(e,t,r){"use strict";(function(t,n){var i=r(16);e.exports=v;var o,s=r(23);v.ReadableState=m;r(28).EventEmitter;var a=function(e,t){return e.listeners(t).length},d=r(29),u=r(17).Buffer,h=t.Uint8Array||function(){};var l=r(11);l.inherits=r(3);var c=r(50),f=void 0;f=c&&c.debuglog?c.debuglog("stream"):function(){};var g,p=r(51),_=r(30);l.inherits(v,d);var y=["error","close","destroy","pause","resume"];function m(e,t){e=e||{};var n=t instanceof(o=o||r(8));this.objectMode=!!e.objectMode,n&&(this.objectMode=this.objectMode||!!e.readableObjectMode);var i=e.highWaterMark,s=e.readableHighWaterMark,a=this.objectMode?16:16384;this.highWaterMark=i||0===i?i:n&&(s||0===s)?s:a,this.highWaterMark=Math.floor(this.highWaterMark),this.buffer=new p,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.destroyed=!1,this.defaultEncoding=e.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,e.encoding&&(g||(g=r(32).StringDecoder),this.decoder=new g(e.encoding),this.encoding=e.encoding)}function v(e){if(o=o||r(8),!(this instanceof v))return new v(e);this._readableState=new m(e,this),this.readable=!0,e&&("function"==typeof e.read&&(this._read=e.read),"function"==typeof e.destroy&&(this._destroy=e.destroy)),d.call(this)}function b(e,t,r,n,i){var o,s=e._readableState;null===t?(s.reading=!1,function(e,t){if(t.ended)return;if(t.decoder){var r=t.decoder.end();r&&r.length&&(t.buffer.push(r),t.length+=t.objectMode?1:r.length)}t.ended=!0,N(e)}(e,s)):(i||(o=function(e,t){var r;n=t,u.isBuffer(n)||n instanceof h||"string"==typeof t||void 0===t||e.objectMode||(r=new TypeError("Invalid non-string/buffer chunk"));var n;return r}(s,t)),o?e.emit("error",o):s.objectMode||t&&t.length>0?("string"==typeof t||s.objectMode||Object.getPrototypeOf(t)===u.prototype||(t=function(e){return u.from(e)}(t)),n?s.endEmitted?e.emit("error",new Error("stream.unshift() after end event")):w(e,s,t,!0):s.ended?e.emit("error",new Error("stream.push() after EOF")):(s.reading=!1,s.decoder&&!r?(t=s.decoder.write(t),s.objectMode||0!==t.length?w(e,s,t,!1):S(e,s)):w(e,s,t,!1))):n||(s.reading=!1));return function(e){return!e.ended&&(e.needReadable||e.length<e.highWaterMark||0===e.length)}(s)}function w(e,t,r,n){t.flowing&&0===t.length&&!t.sync?(e.emit("data",r),e.read(0)):(t.length+=t.objectMode?1:r.length,n?t.buffer.unshift(r):t.buffer.push(r),t.needReadable&&N(e)),S(e,t)}Object.defineProperty(v.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&this._readableState.destroyed},set:function(e){this._readableState&&(this._readableState.destroyed=e)}}),v.prototype.destroy=_.destroy,v.prototype._undestroy=_.undestroy,v.prototype._destroy=function(e,t){this.push(null),t(e)},v.prototype.push=function(e,t){var r,n=this._readableState;return n.objectMode?r=!0:"string"==typeof e&&((t=t||n.defaultEncoding)!==n.encoding&&(e=u.from(e,t),t=""),r=!0),b(this,e,t,!1,r)},v.prototype.unshift=function(e){return b(this,e,null,!0,!1)},v.prototype.isPaused=function(){return!1===this._readableState.flowing},v.prototype.setEncoding=function(e){return g||(g=r(32).StringDecoder),this._readableState.decoder=new g(e),this._readableState.encoding=e,this};var E=8388608;function I(e,t){return e<=0||0===t.length&&t.ended?0:t.objectMode?1:e!=e?t.flowing&&t.length?t.buffer.head.data.length:t.length:(e>t.highWaterMark&&(t.highWaterMark=function(e){return e>=E?e=E:(e--,e|=e>>>1,e|=e>>>2,e|=e>>>4,e|=e>>>8,e|=e>>>16,e++),e}(e)),e<=t.length?e:t.ended?t.length:(t.needReadable=!0,0))}function N(e){var t=e._readableState;t.needReadable=!1,t.emittedReadable||(f("emitReadable",t.flowing),t.emittedReadable=!0,t.sync?i.nextTick(D,e):D(e))}function D(e){f("emit readable"),e.emit("readable"),x(e)}function S(e,t){t.readingMore||(t.readingMore=!0,i.nextTick(T,e,t))}function T(e,t){for(var r=t.length;!t.reading&&!t.flowing&&!t.ended&&t.length<t.highWaterMark&&(f("maybeReadMore read 0"),e.read(0),r!==t.length);)r=t.length;t.readingMore=!1}function A(e){f("readable nexttick read 0"),e.read(0)}function O(e,t){t.reading||(f("resume read 0"),e.read(0)),t.resumeScheduled=!1,t.awaitDrain=0,e.emit("resume"),x(e),t.flowing&&!t.reading&&e.read(0)}function x(e){var t=e._readableState;for(f("flow",t.flowing);t.flowing&&null!==e.read(););}function P(e,t){return 0===t.length?null:(t.objectMode?r=t.buffer.shift():!e||e>=t.length?(r=t.decoder?t.buffer.join(""):1===t.buffer.length?t.buffer.head.data:t.buffer.concat(t.length),t.buffer.clear()):r=function(e,t,r){var n;e<t.head.data.length?(n=t.head.data.slice(0,e),t.head.data=t.head.data.slice(e)):n=e===t.head.data.length?t.shift():r?function(e,t){var r=t.head,n=1,i=r.data;e-=i.length;for(;r=r.next;){var o=r.data,s=e>o.length?o.length:e;if(s===o.length?i+=o:i+=o.slice(0,e),0===(e-=s)){s===o.length?(++n,r.next?t.head=r.next:t.head=t.tail=null):(t.head=r,r.data=o.slice(s));break}++n}return t.length-=n,i}(e,t):function(e,t){var r=u.allocUnsafe(e),n=t.head,i=1;n.data.copy(r),e-=n.data.length;for(;n=n.next;){var o=n.data,s=e>o.length?o.length:e;if(o.copy(r,r.length-e,0,s),0===(e-=s)){s===o.length?(++i,n.next?t.head=n.next:t.head=t.tail=null):(t.head=n,n.data=o.slice(s));break}++i}return t.length-=i,r}(e,t);return n}(e,t.buffer,t.decoder),r);var r}function k(e){var t=e._readableState;if(t.length>0)throw new Error('"endReadable()" called on non-empty stream');t.endEmitted||(t.ended=!0,i.nextTick(R,t,e))}function R(e,t){e.endEmitted||0!==e.length||(e.endEmitted=!0,t.readable=!1,t.emit("end"))}function C(e,t){for(var r=0,n=e.length;r<n;r++)if(e[r]===t)return r;return-1}v.prototype.read=function(e){f("read",e),e=parseInt(e,10);var t=this._readableState,r=e;if(0!==e&&(t.emittedReadable=!1),0===e&&t.needReadable&&(t.length>=t.highWaterMark||t.ended))return f("read: emitReadable",t.length,t.ended),0===t.length&&t.ended?k(this):N(this),null;if(0===(e=I(e,t))&&t.ended)return 0===t.length&&k(this),null;var n,i=t.needReadable;return f("need readable",i),(0===t.length||t.length-e<t.highWaterMark)&&f("length less than watermark",i=!0),t.ended||t.reading?f("reading or ended",i=!1):i&&(f("do read"),t.reading=!0,t.sync=!0,0===t.length&&(t.needReadable=!0),this._read(t.highWaterMark),t.sync=!1,t.reading||(e=I(r,t))),null===(n=e>0?P(e,t):null)?(t.needReadable=!0,e=0):t.length-=e,0===t.length&&(t.ended||(t.needReadable=!0),r!==e&&t.ended&&k(this)),null!==n&&this.emit("data",n),n},v.prototype._read=function(e){this.emit("error",new Error("_read() is not implemented"))},v.prototype.pipe=function(e,t){var r=this,o=this._readableState;switch(o.pipesCount){case 0:o.pipes=e;break;case 1:o.pipes=[o.pipes,e];break;default:o.pipes.push(e)}o.pipesCount+=1,f("pipe count=%d opts=%j",o.pipesCount,t);var d=(!t||!1!==t.end)&&e!==n.stdout&&e!==n.stderr?h:v;function u(t,n){f("onunpipe"),t===r&&n&&!1===n.hasUnpiped&&(n.hasUnpiped=!0,f("cleanup"),e.removeListener("close",y),e.removeListener("finish",m),e.removeListener("drain",l),e.removeListener("error",_),e.removeListener("unpipe",u),r.removeListener("end",h),r.removeListener("end",v),r.removeListener("data",p),c=!0,!o.awaitDrain||e._writableState&&!e._writableState.needDrain||l())}function h(){f("onend"),e.end()}o.endEmitted?i.nextTick(d):r.once("end",d),e.on("unpipe",u);var l=function(e){return function(){var t=e._readableState;f("pipeOnDrain",t.awaitDrain),t.awaitDrain&&t.awaitDrain--,0===t.awaitDrain&&a(e,"data")&&(t.flowing=!0,x(e))}}(r);e.on("drain",l);var c=!1;var g=!1;function p(t){f("ondata"),g=!1,!1!==e.write(t)||g||((1===o.pipesCount&&o.pipes===e||o.pipesCount>1&&-1!==C(o.pipes,e))&&!c&&(f("false write response, pause",r._readableState.awaitDrain),r._readableState.awaitDrain++,g=!0),r.pause())}function _(t){f("onerror",t),v(),e.removeListener("error",_),0===a(e,"error")&&e.emit("error",t)}function y(){e.removeListener("finish",m),v()}function m(){f("onfinish"),e.removeListener("close",y),v()}function v(){f("unpipe"),r.unpipe(e)}return r.on("data",p),function(e,t,r){if("function"==typeof e.prependListener)return e.prependListener(t,r);e._events&&e._events[t]?s(e._events[t])?e._events[t].unshift(r):e._events[t]=[r,e._events[t]]:e.on(t,r)}(e,"error",_),e.once("close",y),e.once("finish",m),e.emit("pipe",r),o.flowing||(f("pipe resume"),r.resume()),e},v.prototype.unpipe=function(e){var t=this._readableState,r={hasUnpiped:!1};if(0===t.pipesCount)return this;if(1===t.pipesCount)return e&&e!==t.pipes?this:(e||(e=t.pipes),t.pipes=null,t.pipesCount=0,t.flowing=!1,e&&e.emit("unpipe",this,r),this);if(!e){var n=t.pipes,i=t.pipesCount;t.pipes=null,t.pipesCount=0,t.flowing=!1;for(var o=0;o<i;o++)n[o].emit("unpipe",this,r);return this}var s=C(t.pipes,e);return-1===s?this:(t.pipes.splice(s,1),t.pipesCount-=1,1===t.pipesCount&&(t.pipes=t.pipes[0]),e.emit("unpipe",this,r),this)},v.prototype.on=function(e,t){var r=d.prototype.on.call(this,e,t);if("data"===e)!1!==this._readableState.flowing&&this.resume();else if("readable"===e){var n=this._readableState;n.endEmitted||n.readableListening||(n.readableListening=n.needReadable=!0,n.emittedReadable=!1,n.reading?n.length&&N(this):i.nextTick(A,this))}return r},v.prototype.addListener=v.prototype.on,v.prototype.resume=function(){var e=this._readableState;return e.flowing||(f("resume"),e.flowing=!0,function(e,t){t.resumeScheduled||(t.resumeScheduled=!0,i.nextTick(O,e,t))}(this,e)),this},v.prototype.pause=function(){return f("call pause flowing=%j",this._readableState.flowing),!1!==this._readableState.flowing&&(f("pause"),this._readableState.flowing=!1,this.emit("pause")),this},v.prototype.wrap=function(e){var t=this,r=this._readableState,n=!1;for(var i in e.on("end",function(){if(f("wrapped end"),r.decoder&&!r.ended){var e=r.decoder.end();e&&e.length&&t.push(e)}t.push(null)}),e.on("data",function(i){(f("wrapped data"),r.decoder&&(i=r.decoder.write(i)),r.objectMode&&null==i)||(r.objectMode||i&&i.length)&&(t.push(i)||(n=!0,e.pause()))}),e)void 0===this[i]&&"function"==typeof e[i]&&(this[i]=function(t){return function(){return e[t].apply(e,arguments)}}(i));for(var o=0;o<y.length;o++)e.on(y[o],this.emit.bind(this,y[o]));return this._read=function(t){f("wrapped _read",t),n&&(n=!1,e.resume())},this},Object.defineProperty(v.prototype,"readableHighWaterMark",{enumerable:!1,get:function(){return this._readableState.highWaterMark}}),v._fromList=P}).call(this,r(0),r(1))},function(e,t,r){"use strict";var n,i="object"==typeof Reflect?Reflect:null,o=i&&"function"==typeof i.apply?i.apply:function(e,t,r){return Function.prototype.apply.call(e,t,r)};n=i&&"function"==typeof i.ownKeys?i.ownKeys:Object.getOwnPropertySymbols?function(e){return Object.getOwnPropertyNames(e).concat(Object.getOwnPropertySymbols(e))}:function(e){return Object.getOwnPropertyNames(e)};var s=Number.isNaN||function(e){return e!=e};function a(){a.init.call(this)}e.exports=a,a.EventEmitter=a,a.prototype._events=void 0,a.prototype._eventsCount=0,a.prototype._maxListeners=void 0;var d=10;function u(e){return void 0===e._maxListeners?a.defaultMaxListeners:e._maxListeners}function h(e,t,r,n){var i,o,s,a;if("function"!=typeof r)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof r);if(void 0===(o=e._events)?(o=e._events=Object.create(null),e._eventsCount=0):(void 0!==o.newListener&&(e.emit("newListener",t,r.listener?r.listener:r),o=e._events),s=o[t]),void 0===s)s=o[t]=r,++e._eventsCount;else if("function"==typeof s?s=o[t]=n?[r,s]:[s,r]:n?s.unshift(r):s.push(r),(i=u(e))>0&&s.length>i&&!s.warned){s.warned=!0;var d=new Error("Possible EventEmitter memory leak detected. "+s.length+" "+String(t)+" listeners added. Use emitter.setMaxListeners() to increase limit");d.name="MaxListenersExceededWarning",d.emitter=e,d.type=t,d.count=s.length,a=d,console&&console.warn&&console.warn(a)}return e}function l(e,t,r){var n={fired:!1,wrapFn:void 0,target:e,type:t,listener:r},i=function(){for(var e=[],t=0;t<arguments.length;t++)e.push(arguments[t]);this.fired||(this.target.removeListener(this.type,this.wrapFn),this.fired=!0,o(this.listener,this.target,e))}.bind(n);return i.listener=r,n.wrapFn=i,i}function c(e,t,r){var n=e._events;if(void 0===n)return[];var i=n[t];return void 0===i?[]:"function"==typeof i?r?[i.listener||i]:[i]:r?function(e){for(var t=new Array(e.length),r=0;r<t.length;++r)t[r]=e[r].listener||e[r];return t}(i):g(i,i.length)}function f(e){var t=this._events;if(void 0!==t){var r=t[e];if("function"==typeof r)return 1;if(void 0!==r)return r.length}return 0}function g(e,t){for(var r=new Array(t),n=0;n<t;++n)r[n]=e[n];return r}Object.defineProperty(a,"defaultMaxListeners",{enumerable:!0,get:function(){return d},set:function(e){if("number"!=typeof e||e<0||s(e))throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received '+e+".");d=e}}),a.init=function(){void 0!==this._events&&this._events!==Object.getPrototypeOf(this)._events||(this._events=Object.create(null),this._eventsCount=0),this._maxListeners=this._maxListeners||void 0},a.prototype.setMaxListeners=function(e){if("number"!=typeof e||e<0||s(e))throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received '+e+".");return this._maxListeners=e,this},a.prototype.getMaxListeners=function(){return u(this)},a.prototype.emit=function(e){for(var t=[],r=1;r<arguments.length;r++)t.push(arguments[r]);var n="error"===e,i=this._events;if(void 0!==i)n=n&&void 0===i.error;else if(!n)return!1;if(n){var s;if(t.length>0&&(s=t[0]),s instanceof Error)throw s;var a=new Error("Unhandled error."+(s?" ("+s.message+")":""));throw a.context=s,a}var d=i[e];if(void 0===d)return!1;if("function"==typeof d)o(d,this,t);else{var u=d.length,h=g(d,u);for(r=0;r<u;++r)o(h[r],this,t)}return!0},a.prototype.addListener=function(e,t){return h(this,e,t,!1)},a.prototype.on=a.prototype.addListener,a.prototype.prependListener=function(e,t){return h(this,e,t,!0)},a.prototype.once=function(e,t){if("function"!=typeof t)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof t);return this.on(e,l(this,e,t)),this},a.prototype.prependOnceListener=function(e,t){if("function"!=typeof t)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof t);return this.prependListener(e,l(this,e,t)),this},a.prototype.removeListener=function(e,t){var r,n,i,o,s;if("function"!=typeof t)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof t);if(void 0===(n=this._events))return this;if(void 0===(r=n[e]))return this;if(r===t||r.listener===t)0==--this._eventsCount?this._events=Object.create(null):(delete n[e],n.removeListener&&this.emit("removeListener",e,r.listener||t));else if("function"!=typeof r){for(i=-1,o=r.length-1;o>=0;o--)if(r[o]===t||r[o].listener===t){s=r[o].listener,i=o;break}if(i<0)return this;0===i?r.shift():function(e,t){for(;t+1<e.length;t++)e[t]=e[t+1];e.pop()}(r,i),1===r.length&&(n[e]=r[0]),void 0!==n.removeListener&&this.emit("removeListener",e,s||t)}return this},a.prototype.off=a.prototype.removeListener,a.prototype.removeAllListeners=function(e){var t,r,n;if(void 0===(r=this._events))return this;if(void 0===r.removeListener)return 0===arguments.length?(this._events=Object.create(null),this._eventsCount=0):void 0!==r[e]&&(0==--this._eventsCount?this._events=Object.create(null):delete r[e]),this;if(0===arguments.length){var i,o=Object.keys(r);for(n=0;n<o.length;++n)"removeListener"!==(i=o[n])&&this.removeAllListeners(i);return this.removeAllListeners("removeListener"),this._events=Object.create(null),this._eventsCount=0,this}if("function"==typeof(t=r[e]))this.removeListener(e,t);else if(void 0!==t)for(n=t.length-1;n>=0;n--)this.removeListener(e,t[n]);return this},a.prototype.listeners=function(e){return c(this,e,!0)},a.prototype.rawListeners=function(e){return c(this,e,!1)},a.listenerCount=function(e,t){return"function"==typeof e.listenerCount?e.listenerCount(t):f.call(e,t)},a.prototype.listenerCount=f,a.prototype.eventNames=function(){return this._eventsCount>0?n(this._events):[]}},function(e,t,r){e.exports=r(28).EventEmitter},function(e,t,r){"use strict";var n=r(16);function i(e,t){e.emit("error",t)}e.exports={destroy:function(e,t){var r=this,o=this._readableState&&this._readableState.destroyed,s=this._writableState&&this._writableState.destroyed;return o||s?(t?t(e):!e||this._writableState&&this._writableState.errorEmitted||n.nextTick(i,this,e),this):(this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(e||null,function(e){!t&&e?(n.nextTick(i,r,e),r._writableState&&(r._writableState.errorEmitted=!0)):t&&t(e)}),this)},undestroy:function(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}}},function(e,t,r){"use strict";(function(t,n,i){var o=r(16);function s(e){var t=this;this.next=null,this.entry=null,this.finish=function(){!function(e,t,r){var n=e.entry;e.entry=null;for(;n;){var i=n.callback;t.pendingcb--,i(r),n=n.next}t.corkedRequestsFree?t.corkedRequestsFree.next=e:t.corkedRequestsFree=e}(t,e)}}e.exports=m;var a,d=!t.browser&&["v0.10","v0.9."].indexOf(t.version.slice(0,5))>-1?n:o.nextTick;m.WritableState=y;var u=r(11);u.inherits=r(3);var h={deprecate:r(55)},l=r(29),c=r(17).Buffer,f=i.Uint8Array||function(){};var g,p=r(30);function _(){}function y(e,t){a=a||r(8),e=e||{};var n=t instanceof a;this.objectMode=!!e.objectMode,n&&(this.objectMode=this.objectMode||!!e.writableObjectMode);var i=e.highWaterMark,u=e.writableHighWaterMark,h=this.objectMode?16:16384;this.highWaterMark=i||0===i?i:n&&(u||0===u)?u:h,this.highWaterMark=Math.floor(this.highWaterMark),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var l=!1===e.decodeStrings;this.decodeStrings=!l,this.defaultEncoding=e.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(e){!function(e,t){var r=e._writableState,n=r.sync,i=r.writecb;if(function(e){e.writing=!1,e.writecb=null,e.length-=e.writelen,e.writelen=0}(r),t)!function(e,t,r,n,i){--t.pendingcb,r?(o.nextTick(i,n),o.nextTick(N,e,t),e._writableState.errorEmitted=!0,e.emit("error",n)):(i(n),e._writableState.errorEmitted=!0,e.emit("error",n),N(e,t))}(e,r,n,t,i);else{var s=E(r);s||r.corked||r.bufferProcessing||!r.bufferedRequest||w(e,r),n?d(b,e,r,s,i):b(e,r,s,i)}}(t,e)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.bufferedRequestCount=0,this.corkedRequestsFree=new s(this)}function m(e){if(a=a||r(8),!(g.call(m,this)||this instanceof a))return new m(e);this._writableState=new y(e,this),this.writable=!0,e&&("function"==typeof e.write&&(this._write=e.write),"function"==typeof e.writev&&(this._writev=e.writev),"function"==typeof e.destroy&&(this._destroy=e.destroy),"function"==typeof e.final&&(this._final=e.final)),l.call(this)}function v(e,t,r,n,i,o,s){t.writelen=n,t.writecb=s,t.writing=!0,t.sync=!0,r?e._writev(i,t.onwrite):e._write(i,o,t.onwrite),t.sync=!1}function b(e,t,r,n){r||function(e,t){0===t.length&&t.needDrain&&(t.needDrain=!1,e.emit("drain"))}(e,t),t.pendingcb--,n(),N(e,t)}function w(e,t){t.bufferProcessing=!0;var r=t.bufferedRequest;if(e._writev&&r&&r.next){var n=t.bufferedRequestCount,i=new Array(n),o=t.corkedRequestsFree;o.entry=r;for(var a=0,d=!0;r;)i[a]=r,r.isBuf||(d=!1),r=r.next,a+=1;i.allBuffers=d,v(e,t,!0,t.length,i,"",o.finish),t.pendingcb++,t.lastBufferedRequest=null,o.next?(t.corkedRequestsFree=o.next,o.next=null):t.corkedRequestsFree=new s(t),t.bufferedRequestCount=0}else{for(;r;){var u=r.chunk,h=r.encoding,l=r.callback;if(v(e,t,!1,t.objectMode?1:u.length,u,h,l),r=r.next,t.bufferedRequestCount--,t.writing)break}null===r&&(t.lastBufferedRequest=null)}t.bufferedRequest=r,t.bufferProcessing=!1}function E(e){return e.ending&&0===e.length&&null===e.bufferedRequest&&!e.finished&&!e.writing}function I(e,t){e._final(function(r){t.pendingcb--,r&&e.emit("error",r),t.prefinished=!0,e.emit("prefinish"),N(e,t)})}function N(e,t){var r=E(t);return r&&(!function(e,t){t.prefinished||t.finalCalled||("function"==typeof e._final?(t.pendingcb++,t.finalCalled=!0,o.nextTick(I,e,t)):(t.prefinished=!0,e.emit("prefinish")))}(e,t),0===t.pendingcb&&(t.finished=!0,e.emit("finish"))),r}u.inherits(m,l),y.prototype.getBuffer=function(){for(var e=this.bufferedRequest,t=[];e;)t.push(e),e=e.next;return t},function(){try{Object.defineProperty(y.prototype,"buffer",{get:h.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch(e){}}(),"function"==typeof Symbol&&Symbol.hasInstance&&"function"==typeof Function.prototype[Symbol.hasInstance]?(g=Function.prototype[Symbol.hasInstance],Object.defineProperty(m,Symbol.hasInstance,{value:function(e){return!!g.call(this,e)||this===m&&(e&&e._writableState instanceof y)}})):g=function(e){return e instanceof this},m.prototype.pipe=function(){this.emit("error",new Error("Cannot pipe, not readable"))},m.prototype.write=function(e,t,r){var n,i=this._writableState,s=!1,a=!i.objectMode&&(n=e,c.isBuffer(n)||n instanceof f);return a&&!c.isBuffer(e)&&(e=function(e){return c.from(e)}(e)),"function"==typeof t&&(r=t,t=null),a?t="buffer":t||(t=i.defaultEncoding),"function"!=typeof r&&(r=_),i.ended?function(e,t){var r=new Error("write after end");e.emit("error",r),o.nextTick(t,r)}(this,r):(a||function(e,t,r,n){var i=!0,s=!1;return null===r?s=new TypeError("May not write null values to stream"):"string"==typeof r||void 0===r||t.objectMode||(s=new TypeError("Invalid non-string/buffer chunk")),s&&(e.emit("error",s),o.nextTick(n,s),i=!1),i}(this,i,e,r))&&(i.pendingcb++,s=function(e,t,r,n,i,o){if(!r){var s=function(e,t,r){e.objectMode||!1===e.decodeStrings||"string"!=typeof t||(t=c.from(t,r));return t}(t,n,i);n!==s&&(r=!0,i="buffer",n=s)}var a=t.objectMode?1:n.length;t.length+=a;var d=t.length<t.highWaterMark;d||(t.needDrain=!0);if(t.writing||t.corked){var u=t.lastBufferedRequest;t.lastBufferedRequest={chunk:n,encoding:i,isBuf:r,callback:o,next:null},u?u.next=t.lastBufferedRequest:t.bufferedRequest=t.lastBufferedRequest,t.bufferedRequestCount+=1}else v(e,t,!1,a,n,i,o);return d}(this,i,a,e,t,r)),s},m.prototype.cork=function(){this._writableState.corked++},m.prototype.uncork=function(){var e=this._writableState;e.corked&&(e.corked--,e.writing||e.corked||e.finished||e.bufferProcessing||!e.bufferedRequest||w(this,e))},m.prototype.setDefaultEncoding=function(e){if("string"==typeof e&&(e=e.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((e+"").toLowerCase())>-1))throw new TypeError("Unknown encoding: "+e);return this._writableState.defaultEncoding=e,this},Object.defineProperty(m.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}}),m.prototype._write=function(e,t,r){r(new Error("_write() is not implemented"))},m.prototype._writev=null,m.prototype.end=function(e,t,r){var n=this._writableState;"function"==typeof e?(r=e,e=null,t=null):"function"==typeof t&&(r=t,t=null),null!=e&&this.write(e,t),n.corked&&(n.corked=1,this.uncork()),n.ending||n.finished||function(e,t,r){t.ending=!0,N(e,t),r&&(t.finished?o.nextTick(r):e.once("finish",r));t.ended=!0,e.writable=!1}(this,n,r)},Object.defineProperty(m.prototype,"destroyed",{get:function(){return void 0!==this._writableState&&this._writableState.destroyed},set:function(e){this._writableState&&(this._writableState.destroyed=e)}}),m.prototype.destroy=p.destroy,m.prototype._undestroy=p.undestroy,m.prototype._destroy=function(e,t){this.end(),t(e)}}).call(this,r(1),r(53).setImmediate,r(0))},function(e,t,r){"use strict";var n=r(17).Buffer,i=n.isEncoding||function(e){switch((e=""+e)&&e.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};function o(e){var t;switch(this.encoding=function(e){var t=function(e){if(!e)return"utf8";for(var t;;)switch(e){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return e;default:if(t)return;e=(""+e).toLowerCase(),t=!0}}(e);if("string"!=typeof t&&(n.isEncoding===i||!i(e)))throw new Error("Unknown encoding: "+e);return t||e}(e),this.encoding){case"utf16le":this.text=d,this.end=u,t=4;break;case"utf8":this.fillLast=a,t=4;break;case"base64":this.text=h,this.end=l,t=3;break;default:return this.write=c,void(this.end=f)}this.lastNeed=0,this.lastTotal=0,this.lastChar=n.allocUnsafe(t)}function s(e){return e<=127?0:e>>5==6?2:e>>4==14?3:e>>3==30?4:e>>6==2?-1:-2}function a(e){var t=this.lastTotal-this.lastNeed,r=function(e,t,r){if(128!=(192&t[0]))return e.lastNeed=0,"�";if(e.lastNeed>1&&t.length>1){if(128!=(192&t[1]))return e.lastNeed=1,"�";if(e.lastNeed>2&&t.length>2&&128!=(192&t[2]))return e.lastNeed=2,"�"}}(this,e);return void 0!==r?r:this.lastNeed<=e.length?(e.copy(this.lastChar,t,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal)):(e.copy(this.lastChar,t,0,e.length),void(this.lastNeed-=e.length))}function d(e,t){if((e.length-t)%2==0){var r=e.toString("utf16le",t);if(r){var n=r.charCodeAt(r.length-1);if(n>=55296&&n<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1],r.slice(0,-1)}return r}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=e[e.length-1],e.toString("utf16le",t,e.length-1)}function u(e){var t=e&&e.length?this.write(e):"";if(this.lastNeed){var r=this.lastTotal-this.lastNeed;return t+this.lastChar.toString("utf16le",0,r)}return t}function h(e,t){var r=(e.length-t)%3;return 0===r?e.toString("base64",t):(this.lastNeed=3-r,this.lastTotal=3,1===r?this.lastChar[0]=e[e.length-1]:(this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1]),e.toString("base64",t,e.length-r))}function l(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+this.lastChar.toString("base64",0,3-this.lastNeed):t}function c(e){return e.toString(this.encoding)}function f(e){return e&&e.length?this.write(e):""}t.StringDecoder=o,o.prototype.write=function(e){if(0===e.length)return"";var t,r;if(this.lastNeed){if(void 0===(t=this.fillLast(e)))return"";r=this.lastNeed,this.lastNeed=0}else r=0;return r<e.length?t?t+this.text(e,r):this.text(e,r):t||""},o.prototype.end=function(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+"�":t},o.prototype.text=function(e,t){var r=function(e,t,r){var n=t.length-1;if(n<r)return 0;var i=s(t[n]);if(i>=0)return i>0&&(e.lastNeed=i-1),i;if(--n<r||-2===i)return 0;if((i=s(t[n]))>=0)return i>0&&(e.lastNeed=i-2),i;if(--n<r||-2===i)return 0;if((i=s(t[n]))>=0)return i>0&&(2===i?i=0:e.lastNeed=i-3),i;return 0}(this,e,t);if(!this.lastNeed)return e.toString("utf8",t);this.lastTotal=r;var n=e.length-(r-this.lastNeed);return e.copy(this.lastChar,0,n),e.toString("utf8",t,n)},o.prototype.fillLast=function(e){if(this.lastNeed<=e.length)return e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,e.length),this.lastNeed-=e.length}},function(e,t,r){"use strict";e.exports=s;var n=r(8),i=r(11);function o(e,t){var r=this._transformState;r.transforming=!1;var n=r.writecb;if(!n)return this.emit("error",new Error("write callback called multiple times"));r.writechunk=null,r.writecb=null,null!=t&&this.push(t),n(e);var i=this._readableState;i.reading=!1,(i.needReadable||i.length<i.highWaterMark)&&this._read(i.highWaterMark)}function s(e){if(!(this instanceof s))return new s(e);n.call(this,e),this._transformState={afterTransform:o.bind(this),needTransform:!1,transforming:!1,writecb:null,writechunk:null,writeencoding:null},this._readableState.needReadable=!0,this._readableState.sync=!1,e&&("function"==typeof e.transform&&(this._transform=e.transform),"function"==typeof e.flush&&(this._flush=e.flush)),this.on("prefinish",a)}function a(){var e=this;"function"==typeof this._flush?this._flush(function(t,r){d(e,t,r)}):d(this,null,null)}function d(e,t,r){if(t)return e.emit("error",t);if(null!=r&&e.push(r),e._writableState.length)throw new Error("Calling transform done when ws.length != 0");if(e._transformState.transforming)throw new Error("Calling transform done when still transforming");return e.push(null)}i.inherits=r(3),i.inherits(s,n),s.prototype.push=function(e,t){return this._transformState.needTransform=!1,n.prototype.push.call(this,e,t)},s.prototype._transform=function(e,t,r){throw new Error("_transform() is not implemented")},s.prototype._write=function(e,t,r){var n=this._transformState;if(n.writecb=r,n.writechunk=e,n.writeencoding=t,!n.transforming){var i=this._readableState;(n.needTransform||i.needReadable||i.length<i.highWaterMark)&&this._read(i.highWaterMark)}},s.prototype._read=function(e){var t=this._transformState;null!==t.writechunk&&t.writecb&&!t.transforming?(t.transforming=!0,this._transform(t.writechunk,t.writeencoding,t.afterTransform)):t.needTransform=!0},s.prototype._destroy=function(e,t){var r=this;n.prototype._destroy.call(this,e,function(e){t(e),r.emit("close")})}},function(e,t,r){"use strict";var n=r(60),i=r(62);function o(){this.protocol=null,this.slashes=null,this.auth=null,this.host=null,this.port=null,this.hostname=null,this.hash=null,this.search=null,this.query=null,this.pathname=null,this.path=null,this.href=null}t.parse=v,t.resolve=function(e,t){return v(e,!1,!0).resolve(t)},t.resolveObject=function(e,t){return e?v(e,!1,!0).resolveObject(t):t},t.format=function(e){i.isString(e)&&(e=v(e));return e instanceof o?e.format():o.prototype.format.call(e)},t.Url=o;var s=/^([a-z0-9.+-]+:)/i,a=/:[0-9]*$/,d=/^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,u=["{","}","|","\\","^","`"].concat(["<",">",'"',"`"," ","\r","\n","\t"]),h=["'"].concat(u),l=["%","/","?",";","#"].concat(h),c=["/","?","#"],f=/^[+a-z0-9A-Z_-]{0,63}$/,g=/^([+a-z0-9A-Z_-]{0,63})(.*)$/,p={javascript:!0,"javascript:":!0},_={javascript:!0,"javascript:":!0},y={http:!0,https:!0,ftp:!0,gopher:!0,file:!0,"http:":!0,"https:":!0,"ftp:":!0,"gopher:":!0,"file:":!0},m=r(63);function v(e,t,r){if(e&&i.isObject(e)&&e instanceof o)return e;var n=new o;return n.parse(e,t,r),n}o.prototype.parse=function(e,t,r){if(!i.isString(e))throw new TypeError("Parameter 'url' must be a string, not "+typeof e);var o=e.indexOf("?"),a=-1!==o&&o<e.indexOf("#")?"?":"#",u=e.split(a);u[0]=u[0].replace(/\\/g,"/");var v=e=u.join(a);if(v=v.trim(),!r&&1===e.split("#").length){var b=d.exec(v);if(b)return this.path=v,this.href=v,this.pathname=b[1],b[2]?(this.search=b[2],this.query=t?m.parse(this.search.substr(1)):this.search.substr(1)):t&&(this.search="",this.query={}),this}var w=s.exec(v);if(w){var E=(w=w[0]).toLowerCase();this.protocol=E,v=v.substr(w.length)}if(r||w||v.match(/^\/\/[^@\/]+@[^@\/]+/)){var I="//"===v.substr(0,2);!I||w&&_[w]||(v=v.substr(2),this.slashes=!0)}if(!_[w]&&(I||w&&!y[w])){for(var N,D,S=-1,T=0;T<c.length;T++){-1!==(A=v.indexOf(c[T]))&&(-1===S||A<S)&&(S=A)}-1!==(D=-1===S?v.lastIndexOf("@"):v.lastIndexOf("@",S))&&(N=v.slice(0,D),v=v.slice(D+1),this.auth=decodeURIComponent(N)),S=-1;for(T=0;T<l.length;T++){var A;-1!==(A=v.indexOf(l[T]))&&(-1===S||A<S)&&(S=A)}-1===S&&(S=v.length),this.host=v.slice(0,S),v=v.slice(S),this.parseHost(),this.hostname=this.hostname||"";var O="["===this.hostname[0]&&"]"===this.hostname[this.hostname.length-1];if(!O)for(var x=this.hostname.split(/\./),P=(T=0,x.length);T<P;T++){var k=x[T];if(k&&!k.match(f)){for(var R="",C=0,M=k.length;C<M;C++)k.charCodeAt(C)>127?R+="x":R+=k[C];if(!R.match(f)){var B=x.slice(0,T),j=x.slice(T+1),L=k.match(g);L&&(B.push(L[1]),j.unshift(L[2])),j.length&&(v="/"+j.join(".")+v),this.hostname=B.join(".");break}}}this.hostname.length>255?this.hostname="":this.hostname=this.hostname.toLowerCase(),O||(this.hostname=n.toASCII(this.hostname));var F=this.port?":"+this.port:"",U=this.hostname||"";this.host=U+F,this.href+=this.host,O&&(this.hostname=this.hostname.substr(1,this.hostname.length-2),"/"!==v[0]&&(v="/"+v))}if(!p[E])for(T=0,P=h.length;T<P;T++){var W=h[T];if(-1!==v.indexOf(W)){var q=encodeURIComponent(W);q===W&&(q=escape(W)),v=v.split(W).join(q)}}var G=v.indexOf("#");-1!==G&&(this.hash=v.substr(G),v=v.slice(0,G));var H=v.indexOf("?");if(-1!==H?(this.search=v.substr(H),this.query=v.substr(H+1),t&&(this.query=m.parse(this.query)),v=v.slice(0,H)):t&&(this.search="",this.query={}),v&&(this.pathname=v),y[E]&&this.hostname&&!this.pathname&&(this.pathname="/"),this.pathname||this.search){F=this.pathname||"";var Y=this.search||"";this.path=F+Y}return this.href=this.format(),this},o.prototype.format=function(){var e=this.auth||"";e&&(e=(e=encodeURIComponent(e)).replace(/%3A/i,":"),e+="@");var t=this.protocol||"",r=this.pathname||"",n=this.hash||"",o=!1,s="";this.host?o=e+this.host:this.hostname&&(o=e+(-1===this.hostname.indexOf(":")?this.hostname:"["+this.hostname+"]"),this.port&&(o+=":"+this.port)),this.query&&i.isObject(this.query)&&Object.keys(this.query).length&&(s=m.stringify(this.query));var a=this.search||s&&"?"+s||"";return t&&":"!==t.substr(-1)&&(t+=":"),this.slashes||(!t||y[t])&&!1!==o?(o="//"+(o||""),r&&"/"!==r.charAt(0)&&(r="/"+r)):o||(o=""),n&&"#"!==n.charAt(0)&&(n="#"+n),a&&"?"!==a.charAt(0)&&(a="?"+a),t+o+(r=r.replace(/[?#]/g,function(e){return encodeURIComponent(e)}))+(a=a.replace("#","%23"))+n},o.prototype.resolve=function(e){return this.resolveObject(v(e,!1,!0)).format()},o.prototype.resolveObject=function(e){if(i.isString(e)){var t=new o;t.parse(e,!1,!0),e=t}for(var r=new o,n=Object.keys(this),s=0;s<n.length;s++){var a=n[s];r[a]=this[a]}if(r.hash=e.hash,""===e.href)return r.href=r.format(),r;if(e.slashes&&!e.protocol){for(var d=Object.keys(e),u=0;u<d.length;u++){var h=d[u];"protocol"!==h&&(r[h]=e[h])}return y[r.protocol]&&r.hostname&&!r.pathname&&(r.path=r.pathname="/"),r.href=r.format(),r}if(e.protocol&&e.protocol!==r.protocol){if(!y[e.protocol]){for(var l=Object.keys(e),c=0;c<l.length;c++){var f=l[c];r[f]=e[f]}return r.href=r.format(),r}if(r.protocol=e.protocol,e.host||_[e.protocol])r.pathname=e.pathname;else{for(var g=(e.pathname||"").split("/");g.length&&!(e.host=g.shift()););e.host||(e.host=""),e.hostname||(e.hostname=""),""!==g[0]&&g.unshift(""),g.length<2&&g.unshift(""),r.pathname=g.join("/")}if(r.search=e.search,r.query=e.query,r.host=e.host||"",r.auth=e.auth,r.hostname=e.hostname||e.host,r.port=e.port,r.pathname||r.search){var p=r.pathname||"",m=r.search||"";r.path=p+m}return r.slashes=r.slashes||e.slashes,r.href=r.format(),r}var v=r.pathname&&"/"===r.pathname.charAt(0),b=e.host||e.pathname&&"/"===e.pathname.charAt(0),w=b||v||r.host&&e.pathname,E=w,I=r.pathname&&r.pathname.split("/")||[],N=(g=e.pathname&&e.pathname.split("/")||[],r.protocol&&!y[r.protocol]);if(N&&(r.hostname="",r.port=null,r.host&&(""===I[0]?I[0]=r.host:I.unshift(r.host)),r.host="",e.protocol&&(e.hostname=null,e.port=null,e.host&&(""===g[0]?g[0]=e.host:g.unshift(e.host)),e.host=null),w=w&&(""===g[0]||""===I[0])),b)r.host=e.host||""===e.host?e.host:r.host,r.hostname=e.hostname||""===e.hostname?e.hostname:r.hostname,r.search=e.search,r.query=e.query,I=g;else if(g.length)I||(I=[]),I.pop(),I=I.concat(g),r.search=e.search,r.query=e.query;else if(!i.isNullOrUndefined(e.search)){if(N)r.hostname=r.host=I.shift(),(O=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@"))&&(r.auth=O.shift(),r.host=r.hostname=O.shift());return r.search=e.search,r.query=e.query,i.isNull(r.pathname)&&i.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.href=r.format(),r}if(!I.length)return r.pathname=null,r.search?r.path="/"+r.search:r.path=null,r.href=r.format(),r;for(var D=I.slice(-1)[0],S=(r.host||e.host||I.length>1)&&("."===D||".."===D)||""===D,T=0,A=I.length;A>=0;A--)"."===(D=I[A])?I.splice(A,1):".."===D?(I.splice(A,1),T++):T&&(I.splice(A,1),T--);if(!w&&!E)for(;T--;T)I.unshift("..");!w||""===I[0]||I[0]&&"/"===I[0].charAt(0)||I.unshift(""),S&&"/"!==I.join("/").substr(-1)&&I.push("");var O,x=""===I[0]||I[0]&&"/"===I[0].charAt(0);N&&(r.hostname=r.host=x?"":I.length?I.shift():"",(O=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@"))&&(r.auth=O.shift(),r.host=r.hostname=O.shift()));return(w=w||r.host&&I.length)&&!x&&I.unshift(""),I.length?r.pathname=I.join("/"):(r.pathname=null,r.path=null),i.isNull(r.pathname)&&i.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.auth=e.auth||r.auth,r.slashes=r.slashes||e.slashes,r.href=r.format(),r},o.prototype.parseHost=function(){var e=this.host,t=a.exec(e);t&&(":"!==(t=t[0])&&(this.port=t.substr(1)),e=e.substr(0,e.length-t.length)),e&&(this.hostname=e)}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(9),i=r(2),o=r(20),s=(new(r(7).Logger),1);t.JSONInput=class{constructor(e){this._config=e||{explicit_direction:e&&e.explicit_direction||!0,directed:e&&e.directed||!1,weighted:e&&e.weighted||!1}}readFromJSONFile(e){o.checkNodeEnvironment();var t=JSON.parse(n.readFileSync(e).toString());return this.readFromJSON(t)}readFromJSONURL(e,t){var r,n=this;o.checkNodeEnvironment(),o.retrieveRemoteFile(e,function(e){r=n.readFromJSON(JSON.parse(e)),t(r,void 0)})}readFromJSON(e){var t,r,n,o,a=new i.BaseGraph(e.name);for(var d in e.data){var u=a.hasNodeID(d)?a.getNodeById(d):a.addNodeByID(d);if((o=e.data[d].features)&&u.setFeatures(o),t=e.data[d].coords){for(n in r={},t)r[n]=+t[n];u.setFeature("coords",r)}var h=e.data[d].edges;for(let e in h){let t=h[e],r=t.to,n=this._config.explicit_direction?t.directed:this._config.directed,i=n?"d":"u",o=this.handleEdgeWeights(t),l=o==o?o:s,c=this._config.weighted?l:void 0,f=a.hasNodeID(r)?a.getNodeById(r):a.addNodeByID(r),g=d+"_"+r+"_"+i,p=r+"_"+d+"_"+i;if(!a.hasEdgeID(g))if(n||!a.hasEdgeID(p))a.addEdgeByID(g,u,f,{directed:n,weighted:this._config.weighted,weight:c});else if(this._config.weighted&&c!=a.getEdgeById(p).getWeight())throw new Error("Input JSON flawed! Found duplicate edge with different weights!")}}return a}handleEdgeWeights(e){switch(e.weight){case"undefined":return s;case"Infinity":return Number.POSITIVE_INFINITY;case"-Infinity":return Number.NEGATIVE_INFINITY;case"MAX":return Number.MAX_VALUE;case"MIN":return Number.MIN_VALUE;default:return parseFloat(e.weight)}}}},function(e,t,r){"use strict";var n=this&&this.__awaiter||function(e,t,r,n){return new(r||(r=Promise))(function(i,o){function s(e){try{d(n.next(e))}catch(e){o(e)}}function a(e){try{d(n.throw(e))}catch(e){o(e)}}function d(e){e.done?i(e.value):new r(function(t){t(e.value)}).then(s,a)}d((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0}),window.$G=r(37);const i=r(71),o=r(72),s="../test-data/meetupGraph.json";let a;(()=>n(this,void 0,void 0,function*(){a=yield o.initDB(),console.log("IDB graph DB initialized:"),console.log(a),yield function(e){return n(this,void 0,void 0,function*(){let e=yield i.importGraphFromURL(s);return window.graph=e,e})}(),console.log("Bernie")}))()},function(e,t,r){(function(t){const n=r(12),i=r(4),o=r(2),s=r(39),a=r(40),d=r(41),u=r(42),h=r(43),l=r(44),c=r(66),f=r(35),g=r(67),p=r(21),_=r(22),y=r(6),m=r(68),v=r(14),b=r(19),w=r(15),E=r(5),I=r(20),N=r(13),D=r(18),S=r(69),T=r(70);let A="undefined"!=typeof window?window:t;A.$G={core:{BaseEdge:n.BaseEdge,BaseNode:i.BaseNode,BaseGraph:o.BaseGraph,GraphMode:o.GraphMode},centralities:{Betweenness:s.betweennessCentrality,Brandes:a.Brandes,Closeness:d.ClosenessCentrality,Degree:u.DegreeCentrality,Pagerank:h.Pagerank},input:{CSVInput:l.CSVInput,JSONInput:f.JSONInput},output:{CSVOutput:c.CSVOutput,JSONOutput:g.JSONOutput},search:{BFS:p,DFS:_,PFS:y,Dijkstra:m,BellmanFord:v,FloydWarshall:b,Johnsons:w},utils:{Struct:E,Remote:I,Callback:N},datastructs:{BinaryHeap:D.BinaryHeap},perturbation:{SimplePerturber:S.SimplePerturber},generators:{Kronecker:T.KROL}},e.exports=A.$G}).call(this,r(0))},function(e,t,r){"use strict";(function(e){Object.defineProperty(t,"__esModule",{value:!0});t.LOG_LEVELS={debug:"debug",production:"production"};const r={log_level:e.env.G_LOG};t.RUN_CONFIG=r}).call(this,r(1))},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(19),i=r(15);t.betweennessCentrality=function(e,t,r){let o;o=(r=r||!1)?i.Johnsons(e)[1]:n.changeNextToDirectParents(n.FloydWarshallAPSP(e)[1]);let s=e.getNodes(),a=Object.keys(s),d={};for(let e in s)d[e]=0;let u=o.length;for(var h=0;h<u;++h)for(var l=0;l<u;++l)if(h!=l&&(1!=o[h][l].length||o[h][l][0]!=l)&&null!=o[h][l][0]){let e={},t=[],r=0;do{let n=l,i=0;for(r++;;){let r=o[h][n],s=!1;if(1==r.length&&r[0]==n)break;if(1==r.length&&((n=r[0])in e?e[n]+=1:e[n]=1),r.length>1)if(0==t.length)t.push([0,r.length]),r[0]==n?s=!0:(n=r[0])in e?e[n]+=1:e[n]=1,i++;else if(i<t.length){let o=t[i][0];r[o]==n?s=!0:(n=r[o])in e?e[n]+=1:e[n]=1,i++}else t.push([0,r.length]),r[0]==n?s=!0:(n=r[0])in e?e[n]+=1:e[n]=1,i++;if(s)break}if(t.length>0)for(t[t.length-1][0]++;t[t.length-1][0]==t[t.length-1][1]&&(t.splice(t.length-1,1),0!=t.length);)t[t.length-1][0]++}while(0!=t.length);for(let t in e)d[a[t]]+=e[t]/r}return d}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(4),i=r(6),o=r(14),s=r(15),a=r(18);t.Brandes=class{constructor(e){this._graph=e}computeUnweighted(e=!1,t=!1){if(0===this._graph.nrDirEdges()&&0===this._graph.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");let r,n,i,o=this._graph.getNodes(),s=this._graph.adjListDict(),a={},d={},u={},h={},l=[],c=[],f={},g={};for(let e in o){let t=o[e].getID();f[t]=0,h[t]=Number.POSITIVE_INFINITY,d[t]=0,u[t]=0,a[t]=[],g[t]=!1}for(let e in o){let t=(r=o[e]).getID();for(h[t]=0,d[t]=1,l.push(t),g[t]=!0;l.length;){n=l.shift(),c.push(n);let e=s[n];g[n]=!0;for(let t in e)g[t]||(h[t]===Number.POSITIVE_INFINITY&&(l.push(t),h[t]=h[n]+1),h[t]===h[n]+1&&(d[t]+=d[n],a[t].push(n)))}for(;c.length>=1;){i=c.pop();for(let e of a[i])u[e]+=d[e]/d[i]*(1+u[i]);i!=r.getID()&&(f[i]+=u[i]),d[i]=0,u[i]=0,h[i]=Number.POSITIVE_INFINITY,a[i]=[],g[i]=!1}}return e&&this.normalizeScores(f,this._graph.nrNodes(),t),f}computeWeighted(e,t){if(0===this._graph.nrDirEdges()&&0===this._graph.nrUndEdges())throw new Error("Cowardly refusing to traverse graph without edges.");if(this._graph.hasNegativeEdge()){var r=new n.BaseNode("extraNode");let e=s.addExtraNandE(this._graph,r),t=o.BellmanFordDict(e,r);if(t.neg_cycle)throw new Error("The graph contains a negative cycle, thus it can not be processed");{let n=t.distances;(e=s.reWeighGraph(e,n,r)).deleteNode(r)}this._graph=e}let i,d,u,h=this._graph.getNodes(),l=Object.keys(h).length,c=this._graph.adjListDict(),f={},g={},p={},_={},y=[],m={},v={},b=new a.BinaryHeap(a.BinaryHeapMode.MIN,e=>e.best,e=>e.id);for(let e in h){let t=h[e].getID();m[t]=0,_[t]=Number.POSITIVE_INFINITY,g[t]=0,p[t]=0,f[t]=[],v[t]=!1}for(let e in h){let t=(i=h[e]).getID();_[t]=0,g[t]=1;let r={id:t,best:0};for(b.insert(r),v[t]=!0;b.size()>0;){let e=(d=b.pop()).id;y.push(e),v[e]=!0;let t=c[e];for(let r in t){if(v[r])continue;let n=_[e]+t[r],i={id:r,best:_[r]};_[r]>n&&(isFinite(_[r])?(b.remove(i),i.best=n,b.insert(i)):(i.best=n,b.insert(i)),g[r]=0,_[r]=n,f[r]=[]),_[r]===n&&(g[r]+=g[e],f[r].push(e))}}for(;y.length>=1;){u=y.pop();for(let e of f[u])p[e]+=g[e]/g[u]*(1+p[u]);u!=i.getID()&&(m[u]+=p[u]),g[u]=0,p[u]=0,_[u]=Number.POSITIVE_INFINITY,f[u]=[],v[u]=!1}}return e&&this.normalizeScores(m,l,t),m}computePFSbased(e,t){let r=this._graph.getNodes(),n=(this._graph.adjListDict(),{}),o={},s={},a=[],d={};for(let e in r){let t=r[e].getID();d[t]=0,o[t]=0,s[t]=0,n[t]=[]}let u=i.preparePFSStandardConfig();u.callbacks.not_encountered.splice(0,1,function(e){e.next.best=e.current.best+(isNaN(e.next.edge.getWeight())?i.DEFAULT_WEIGHT:e.next.edge.getWeight());let t=e.next.node.getID(),r=e.current.node.getID();n[t]=[r],o[t]+=o[r]}),u.callbacks.new_current.push(function(e){a.push(e.current.node.getID())}),u.callbacks.better_path.splice(0,1,function(e){let t=e.next.node.getID(),r=e.current.node.getID();o[t]=0,o[t]+=o[r],n[t]=[],n[t].push(r)}),u.callbacks.equal_path.push(function(e){let t=e.next.node.getID(),r=e.current.node.getID();o[t]+=o[r],-1===n[t].indexOf(r)&&n[t].push(r)});for(let e in r){let t=r[e];for(o[t.getID()]=1,i.PFS(this._graph,t,u);a.length>=1;){let e=a.pop();for(let t of n[e])s[t]+=o[t]/o[e]*(1+s[e]);e!=t.getID()&&(d[e]+=s[e]),o[e]=0,s[e]=0,n[e]=[]}}return e&&this.normalizeScores(d,this._graph.nrNodes(),t),d}normalizeScores(e,t,r){let n=r?(t-1)*(t-2):(t-1)*(t-2)/2;for(let t in e)e[t]/=n}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(6),i=r(19);t.ClosenessCentrality=class{constructor(){}getCentralityMapFW(e){let t=i.FloydWarshallArray(e),r=[],n=t.length;for(let e=0;e<n;++e){let i=0;for(let r=0;r<n;++r)t[e][r]!=Number.POSITIVE_INFINITY&&(i+=t[e][r]);r[e]=1/i}return r}getCentralityMap(e){let t=n.preparePFSStandardConfig(),r=0,i=t.callbacks.better_path.pop();t.callbacks.better_path.push(function(e){r-=t.result[e.next.node.getID()].distance-e.proposed_dist}),t.callbacks.better_path.push(i),t.callbacks.not_encountered.push(function(e){r+=e.current.best+(isNaN(e.next.edge.getWeight())?1:e.next.edge.getWeight())});let o={};for(let i in e.getNodes()){let s=e.getNodeById(i);null!=s&&(r=0,n.PFS(e,s,t),o[i]=1/r)}return o}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(5);var i;!function(e){e[e.in=0]="in",e[e.out=1]="out",e[e.und=2]="und",e[e.dir=3]="dir",e[e.all=4]="all"}(i=t.DegreeMode||(t.DegreeMode={}));t.DegreeCentrality=class{constructor(){}getCentralityMap(e,t,r){t=null==t||!!t;let o={};switch(r=null==r?i.all:r){case i.in:for(let r in e.getNodes()){let n=e.getNodeById(r);if(null!=n)if(t){o[r]=o[r]||0;for(let e in n.inEdges())o[r]+=n.inEdges()[e].getWeight()}else o[r]=n.inDegree()}break;case i.out:for(let r in e.getNodes()){let n=e.getNodeById(r);if(null!=n)if(t){o[r]=o[r]||0;for(let e in n.outEdges())o[r]+=n.outEdges()[e].getWeight()}else o[r]=n.outDegree()}break;case i.und:for(let r in e.getNodes()){let n=e.getNodeById(r);if(null!=n)if(t){o[r]=o[r]||0;for(let e in n.undEdges())o[r]+=n.undEdges()[e].getWeight()}else o[r]=n.degree()}break;case i.dir:for(let r in e.getNodes()){let i=e.getNodeById(r);if(null!=i)if(t){o[r]=o[r]||0;let e=n.mergeObjects([i.inEdges(),i.outEdges()]);for(let t in e)o[r]+=e[t].getWeight()}else o[r]=i.inDegree()+i.outDegree()}break;case i.all:for(let r in e.getNodes()){let i=e.getNodeById(r);if(null!=i)if(t){o[r]=o[r]||0;let e=n.mergeObjects([i.inEdges(),i.outEdges(),i.undEdges()]);for(let t in e)o[r]+=e[t].getWeight()}else o[r]=i.degree()+i.inDegree()+i.outDegree()}}return o}degreeDistribution(e){var t,r,n,i=0,o=e.getNodes();for(t in o)i=(n=(r=o[t]).inDegree()+r.outDegree()+r.degree()+1)>i?n:i;var s={in:new Uint32Array(i),out:new Uint32Array(i),dir:new Uint32Array(i),und:new Uint32Array(i),all:new Uint32Array(i)};for(t in o)r=o[t],s.in[r.inDegree()]++,s.out[r.outDegree()]++,s.dir[r.inDegree()+r.outDegree()]++,s.und[r.degree()]++,s.all[r.inDegree()+r.outDegree()+r.degree()]++;return s}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(5),i=new(r(7).Logger),o=!1,s=.15,a=1e3,d=1e-6,u=!1,h=e=>1/e.nrNodes();t.Pagerank=class{constructor(e,t){if(this._graph=e,t=t||{},this._weighted=t.weighted||o,this._alpha=t.alpha||s,this._maxIterations=t.iterations||a,this._epsilon=t.epsilon||d,this._normalize=t.normalize||u,this._personalized=!!t.personalized&&t.personalized,this._personalized&&!t.tele_set)throw Error("Personalized Pagerank requires tele_set as a config argument");if(t.init_map&&Object.keys(t.init_map).length!==this._graph.nrNodes())throw Error("init_map config parameter must be of size |nodes|");this._PRArrayDS=t.PRArrays||{curr:[],old:[],out_deg:[],pull:[],pull_weight:this._weighted?[]:null,teleport:t.tele_set?[]:null,tele_size:t.tele_set?0:null},t.PRArrays||this.constructPRArrayDataStructs(t)}getConfig(){return{_weighted:this._weighted,_alpha:this._alpha,_maxIterations:this._maxIterations,_epsilon:this._epsilon,_normalize:this._normalize}}getDSs(){return this._PRArrayDS}constructPRArrayDataStructs(e){let t=+new Date,r=this._graph.getNodes(),o=0,s=0,a=0;for(let t in r){let r=this._graph.getNodeById(t);if(r.setFeature("PR_index",o),e.init_map){if(null==e.init_map[t])throw Error("initial value must be given for each node in the graph.");let r=e.init_map[t];this._PRArrayDS.curr[o]=r,this._PRArrayDS.old[o]=r,a+=r}else this._PRArrayDS.curr[o]=h(this._graph),this._PRArrayDS.old[o]=h(this._graph);if(this._PRArrayDS.out_deg[o]=r.outDegree()+r.degree(),this._personalized){let t=e.tele_set[r.getID()]||0;this._PRArrayDS.teleport[o]=t,s+=t,t&&this._PRArrayDS.tele_size++}++o}e.init_map&&1!==a&&(this._PRArrayDS.curr=this._PRArrayDS.curr.map(e=>e/=a),this._PRArrayDS.old=this._PRArrayDS.old.map(e=>e/=a)),this._personalized&&1!==s&&(this._PRArrayDS.teleport=this._PRArrayDS.teleport.map(e=>e/=s));for(let e in r){let t=this._graph.getNodeById(e),r=t.getFeature("PR_index"),i=[],o=[],s=n.mergeObjects([t.inEdges(),t.undEdges()]);for(let e in s){let r=s[e],n=r.getNodes().a;r.getNodes().a.getID()==t.getID()&&(n=r.getNodes().b);let a=n.getFeature("PR_index");this._weighted&&o.push(r.getWeight()),i.push(a)}this._PRArrayDS.pull[r]=i,this._weighted&&(this._PRArrayDS.pull_weight[r]=o)}let d=+new Date;i.log(`PR Array DS init took ${d-t} ms.`)}getRankMapFromArray(){let e={},t=this._graph.getNodes();this._normalize&&this.normalizePR();for(let r in t){let n=this._PRArrayDS.curr[t[r].getFeature("PR_index")];e[r]=n}return e}normalizePR(){let e=this._PRArrayDS.curr.reduce((e,t)=>e+t,0);1!==e&&(this._PRArrayDS.curr=this._PRArrayDS.curr.map(t=>t/e))}pull2DTo1D(){let e=[],t=this._PRArrayDS.pull;for(let r in t){for(let n of t[r])e.push(n);+r!=t.length-1&&e.push(-1)}return e}computePR(){const e=this._PRArrayDS,t=this._graph.nrNodes();for(let r=0;r<this._maxIterations;++r){let r=0;for(let n in e.curr){let o=0,s=0;for(let t of e.pull[n]){if(0===e.out_deg[t])throw i.log(`Node: ${n}`),i.log(`Source: ${t} `),"Encountered zero divisor!";let r=this._weighted?e.pull_weight[n][s++]:1;o+=e.old[t]*r/e.out_deg[t]}let a=(1-this._alpha)*o;if(this._personalized){let t=e.teleport[n]/e.tele_size;e.curr[n]=a+t}else e.curr[n]=a+this._alpha/t;r+=Math.abs(e.curr[n]-e.old[n])}if(r<=this._epsilon)return this.getRankMapFromArray();e.old=[...e.curr]}return this.getRankMapFromArray()}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(9),i=r(9),o=r(2),s=r(20);let a=new(r(7).Logger);const d=1;t.CSVInput=class{constructor(e){this._config=e||{separator:e&&e.separator||",",explicit_direction:e&&e.explicit_direction||!0,direction_mode:e&&e.direction_mode||!1,weighted:e&&e.weighted||!1}}readFromAdjacencyListURL(e,t){this.readGraphFromURL(e,t,this.readFromAdjacencyList)}readFromEdgeListURL(e,t){this.readGraphFromURL(e,t,this.readFromEdgeList)}readGraphFromURL(e,t,r){var n,i=this,o=e.file_name;s.checkNodeEnvironment(),s.retrieveRemoteFile(e,function(e){var s=e.toString().split("\n");n=r.apply(i,[s,o]),t(n,void 0)})}readFromAdjacencyListFile(e){return this.readFileAndReturn(e,this.readFromAdjacencyList)}readFromEdgeListFile(e){return this.readFileAndReturn(e,this.readFromEdgeList)}readFileAndReturn(e,t){s.checkNodeEnvironment();var r=n.basename(e),o=i.readFileSync(e).toString().split("\n");return t.apply(this,[o,r])}readFromAdjacencyList(e,t){var r=new o.BaseGraph(t);for(var n in e){var i,s,a,d,u,h,l,c=e[n],f=this._config.separator.match(/\s+/g)?c.match(/\S+/g):c.replace(/\s+/g,"").split(this._config.separator),g=f[0],p=f.slice(1);if(g){i=r.hasNodeID(g)?r.getNodeById(g):r.addNodeByID(g);for(var _=0;_<p.length;){if(this._config.explicit_direction&&(!p||p.length%2))throw new Error("Every edge entry has to contain its direction info in explicit mode.");if(s=p[_++],a=r.hasNodeID(s)?r.getNodeById(s):r.addNodeByID(s),"d"!==(d=this._config.explicit_direction?p[_++]:this._config.direction_mode?"d":"u")&&"u"!==d)throw new Error("Specification of edge direction invalid (d and u are valid).");u="d"===d,h=g+"_"+s+"_"+d,l=s+"_"+g+"_"+d,r.hasEdgeID(h)||!u&&r.hasEdgeID(l)||r.addEdgeByID(h,i,a,{directed:u})}}}return r}readFromEdgeList(e,t,r=!1){var n=new o.BaseGraph(t);for(var i in e){var s=e[i],u=this._config.separator.match(/\s+/g)?s.match(/\S+/g):s.replace(/\s+/g,"").split(this._config.separator);if(u){if(u.length<2||u.length>3)throw a.log(u),new Error("Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)");var h,l,c,f,g,p,_,y=u[0],m=u[1],v=this._config.explicit_direction?u[2]:this._config.direction_mode?"d":"u";if(h=n.hasNodeID(y)?n.getNodeById(y):n.addNodeByID(y),l=n.hasNodeID(m)?n.getNodeById(m):n.addNodeByID(m),"d"!==v&&"u"!==v)throw new Error("Specification of edge direction invalid (d and u are valid).");c="d"===v,f=y+"_"+m+"_"+v,g=m+"_"+y+"_"+v,p=parseFloat(u[2]),_=this._config.weighted?isNaN(p)?d:p:null,n.hasEdgeID(f)||!c&&n.hasEdgeID(g)||(this._config.weighted?n.addEdgeByID(f,h,l,{directed:c,weighted:!0,weight:_}):n.addEdgeByID(f,h,l,{directed:c}))}}return n}}},function(e,t,r){var n=r(46),i=r(34),o=e.exports;for(var s in n)n.hasOwnProperty(s)&&(o[s]=n[s]);function a(e){if("string"==typeof e&&(e=i.parse(e)),e.protocol||(e.protocol="https:"),"https:"!==e.protocol)throw new Error('Protocol "'+e.protocol+'" not supported. Expected "https:"');return e}o.request=function(e,t){return e=a(e),n.request.call(this,e,t)},o.get=function(e,t){return e=a(e),n.get.call(this,e,t)}},function(e,t,r){(function(e){var n=r(47),i=r(25),o=r(58),s=r(59),a=r(34),d=t;d.request=function(t,r){t="string"==typeof t?a.parse(t):o(t);var i=-1===e.location.protocol.search(/^https?:$/)?"http:":"",s=t.protocol||i,d=t.hostname||t.host,u=t.port,h=t.path||"/";d&&-1!==d.indexOf(":")&&(d="["+d+"]"),t.url=(d?s+"//"+d:"")+(u?":"+u:"")+h,t.method=(t.method||"GET").toUpperCase(),t.headers=t.headers||{};var l=new n(t);return r&&l.on("response",r),l},d.get=function(e,t){var r=d.request(e,t);return r.end(),r},d.ClientRequest=n,d.IncomingMessage=i.IncomingMessage,d.Agent=function(){},d.Agent.defaultMaxSockets=4,d.globalAgent=new d.Agent,d.STATUS_CODES=s,d.METHODS=["CHECKOUT","CONNECT","COPY","DELETE","GET","HEAD","LOCK","M-SEARCH","MERGE","MKACTIVITY","MKCOL","MOVE","NOTIFY","OPTIONS","PATCH","POST","PROPFIND","PROPPATCH","PURGE","PUT","REPORT","SEARCH","SUBSCRIBE","TRACE","UNLOCK","UNSUBSCRIBE"]}).call(this,r(0))},function(e,t,r){(function(t,n,i){var o=r(24),s=r(3),a=r(25),d=r(26),u=r(57),h=a.IncomingMessage,l=a.readyStates;var c=e.exports=function(e){var r,n=this;d.Writable.call(n),n._opts=e,n._body=[],n._headers={},e.auth&&n.setHeader("Authorization","Basic "+new t(e.auth).toString("base64")),Object.keys(e.headers).forEach(function(t){n.setHeader(t,e.headers[t])});var i=!0;if("disable-fetch"===e.mode||"requestTimeout"in e&&!o.abortController)i=!1,r=!0;else if("prefer-streaming"===e.mode)r=!1;else if("allow-wrong-content-type"===e.mode)r=!o.overrideMimeType;else{if(e.mode&&"default"!==e.mode&&"prefer-fast"!==e.mode)throw new Error("Invalid value for opts.mode");r=!0}n._mode=function(e,t){return o.fetch&&t?"fetch":o.mozchunkedarraybuffer?"moz-chunked-arraybuffer":o.msstream?"ms-stream":o.arraybuffer&&e?"arraybuffer":o.vbArray&&e?"text:vbarray":"text"}(r,i),n._fetchTimer=null,n.on("finish",function(){n._onFinish()})};s(c,d.Writable),c.prototype.setHeader=function(e,t){var r=e.toLowerCase();-1===f.indexOf(r)&&(this._headers[r]={name:e,value:t})},c.prototype.getHeader=function(e){var t=this._headers[e.toLowerCase()];return t?t.value:null},c.prototype.removeHeader=function(e){delete this._headers[e.toLowerCase()]},c.prototype._onFinish=function(){var e=this;if(!e._destroyed){var r=e._opts,s=e._headers,a=null;"GET"!==r.method&&"HEAD"!==r.method&&(a=o.arraybuffer?u(t.concat(e._body)):o.blobConstructor?new n.Blob(e._body.map(function(e){return u(e)}),{type:(s["content-type"]||{}).value||""}):t.concat(e._body).toString());var d=[];if(Object.keys(s).forEach(function(e){var t=s[e].name,r=s[e].value;Array.isArray(r)?r.forEach(function(e){d.push([t,e])}):d.push([t,r])}),"fetch"===e._mode){var h=null;if(o.abortController){var c=new AbortController;h=c.signal,e._fetchAbortController=c,"requestTimeout"in r&&0!==r.requestTimeout&&(e._fetchTimer=n.setTimeout(function(){e.emit("requestTimeout"),e._fetchAbortController&&e._fetchAbortController.abort()},r.requestTimeout))}n.fetch(e._opts.url,{method:e._opts.method,headers:d,body:a||void 0,mode:"cors",credentials:r.withCredentials?"include":"same-origin",signal:h}).then(function(t){e._fetchResponse=t,e._connect()},function(t){n.clearTimeout(e._fetchTimer),e._destroyed||e.emit("error",t)})}else{var f=e._xhr=new n.XMLHttpRequest;try{f.open(e._opts.method,e._opts.url,!0)}catch(t){return void i.nextTick(function(){e.emit("error",t)})}"responseType"in f&&(f.responseType=e._mode.split(":")[0]),"withCredentials"in f&&(f.withCredentials=!!r.withCredentials),"text"===e._mode&&"overrideMimeType"in f&&f.overrideMimeType("text/plain; charset=x-user-defined"),"requestTimeout"in r&&(f.timeout=r.requestTimeout,f.ontimeout=function(){e.emit("requestTimeout")}),d.forEach(function(e){f.setRequestHeader(e[0],e[1])}),e._response=null,f.onreadystatechange=function(){switch(f.readyState){case l.LOADING:case l.DONE:e._onXHRProgress()}},"moz-chunked-arraybuffer"===e._mode&&(f.onprogress=function(){e._onXHRProgress()}),f.onerror=function(){e._destroyed||e.emit("error",new Error("XHR error"))};try{f.send(a)}catch(t){return void i.nextTick(function(){e.emit("error",t)})}}}},c.prototype._onXHRProgress=function(){(function(e){try{var t=e.status;return null!==t&&0!==t}catch(e){return!1}})(this._xhr)&&!this._destroyed&&(this._response||this._connect(),this._response._onXHRProgress())},c.prototype._connect=function(){var e=this;e._destroyed||(e._response=new h(e._xhr,e._fetchResponse,e._mode,e._fetchTimer),e._response.on("error",function(t){e.emit("error",t)}),e.emit("response",e._response))},c.prototype._write=function(e,t,r){this._body.push(e),r()},c.prototype.abort=c.prototype.destroy=function(){this._destroyed=!0,n.clearTimeout(this._fetchTimer),this._response&&(this._response._destroyed=!0),this._xhr?this._xhr.abort():this._fetchAbortController&&this._fetchAbortController.abort()},c.prototype.end=function(e,t,r){"function"==typeof e&&(r=e,e=void 0),d.Writable.prototype.end.call(this,e,t,r)},c.prototype.flushHeaders=function(){},c.prototype.setTimeout=function(){},c.prototype.setNoDelay=function(){},c.prototype.setSocketKeepAlive=function(){};var f=["accept-charset","accept-encoding","access-control-request-headers","access-control-request-method","connection","content-length","cookie","cookie2","date","dnt","expect","host","keep-alive","origin","referer","te","trailer","transfer-encoding","upgrade","via"]}).call(this,r(10).Buffer,r(0),r(1))},function(e,t,r){"use strict";t.byteLength=function(e){var t=u(e),r=t[0],n=t[1];return 3*(r+n)/4-n},t.toByteArray=function(e){for(var t,r=u(e),n=r[0],s=r[1],a=new o(function(e,t,r){return 3*(t+r)/4-r}(0,n,s)),d=0,h=s>0?n-4:n,l=0;l<h;l+=4)t=i[e.charCodeAt(l)]<<18|i[e.charCodeAt(l+1)]<<12|i[e.charCodeAt(l+2)]<<6|i[e.charCodeAt(l+3)],a[d++]=t>>16&255,a[d++]=t>>8&255,a[d++]=255&t;2===s&&(t=i[e.charCodeAt(l)]<<2|i[e.charCodeAt(l+1)]>>4,a[d++]=255&t);1===s&&(t=i[e.charCodeAt(l)]<<10|i[e.charCodeAt(l+1)]<<4|i[e.charCodeAt(l+2)]>>2,a[d++]=t>>8&255,a[d++]=255&t);return a},t.fromByteArray=function(e){for(var t,r=e.length,i=r%3,o=[],s=0,a=r-i;s<a;s+=16383)o.push(h(e,s,s+16383>a?a:s+16383));1===i?(t=e[r-1],o.push(n[t>>2]+n[t<<4&63]+"==")):2===i&&(t=(e[r-2]<<8)+e[r-1],o.push(n[t>>10]+n[t>>4&63]+n[t<<2&63]+"="));return o.join("")};for(var n=[],i=[],o="undefined"!=typeof Uint8Array?Uint8Array:Array,s="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",a=0,d=s.length;a<d;++a)n[a]=s[a],i[s.charCodeAt(a)]=a;function u(e){var t=e.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var r=e.indexOf("=");return-1===r&&(r=t),[r,r===t?0:4-r%4]}function h(e,t,r){for(var i,o,s=[],a=t;a<r;a+=3)i=(e[a]<<16&16711680)+(e[a+1]<<8&65280)+(255&e[a+2]),s.push(n[(o=i)>>18&63]+n[o>>12&63]+n[o>>6&63]+n[63&o]);return s.join("")}i["-".charCodeAt(0)]=62,i["_".charCodeAt(0)]=63},function(e,t){t.read=function(e,t,r,n,i){var o,s,a=8*i-n-1,d=(1<<a)-1,u=d>>1,h=-7,l=r?i-1:0,c=r?-1:1,f=e[t+l];for(l+=c,o=f&(1<<-h)-1,f>>=-h,h+=a;h>0;o=256*o+e[t+l],l+=c,h-=8);for(s=o&(1<<-h)-1,o>>=-h,h+=n;h>0;s=256*s+e[t+l],l+=c,h-=8);if(0===o)o=1-u;else{if(o===d)return s?NaN:1/0*(f?-1:1);s+=Math.pow(2,n),o-=u}return(f?-1:1)*s*Math.pow(2,o-n)},t.write=function(e,t,r,n,i,o){var s,a,d,u=8*o-i-1,h=(1<<u)-1,l=h>>1,c=23===i?Math.pow(2,-24)-Math.pow(2,-77):0,f=n?0:o-1,g=n?1:-1,p=t<0||0===t&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(a=isNaN(t)?1:0,s=h):(s=Math.floor(Math.log(t)/Math.LN2),t*(d=Math.pow(2,-s))<1&&(s--,d*=2),(t+=s+l>=1?c/d:c*Math.pow(2,1-l))*d>=2&&(s++,d/=2),s+l>=h?(a=0,s=h):s+l>=1?(a=(t*d-1)*Math.pow(2,i),s+=l):(a=t*Math.pow(2,l-1)*Math.pow(2,i),s=0));i>=8;e[r+f]=255&a,f+=g,a/=256,i-=8);for(s=s<<i|a,u+=i;u>0;e[r+f]=255&s,f+=g,s/=256,u-=8);e[r+f-g]|=128*p}},function(e,t){},function(e,t,r){"use strict";var n=r(17).Buffer,i=r(52);e.exports=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.head=null,this.tail=null,this.length=0}return e.prototype.push=function(e){var t={data:e,next:null};this.length>0?this.tail.next=t:this.head=t,this.tail=t,++this.length},e.prototype.unshift=function(e){var t={data:e,next:this.head};0===this.length&&(this.tail=t),this.head=t,++this.length},e.prototype.shift=function(){if(0!==this.length){var e=this.head.data;return 1===this.length?this.head=this.tail=null:this.head=this.head.next,--this.length,e}},e.prototype.clear=function(){this.head=this.tail=null,this.length=0},e.prototype.join=function(e){if(0===this.length)return"";for(var t=this.head,r=""+t.data;t=t.next;)r+=e+t.data;return r},e.prototype.concat=function(e){if(0===this.length)return n.alloc(0);if(1===this.length)return this.head.data;for(var t,r,i,o=n.allocUnsafe(e>>>0),s=this.head,a=0;s;)t=s.data,r=o,i=a,t.copy(r,i),a+=s.data.length,s=s.next;return o},e}(),i&&i.inspect&&i.inspect.custom&&(e.exports.prototype[i.inspect.custom]=function(){var e=i.inspect({length:this.length});return this.constructor.name+" "+e})},function(e,t){},function(e,t,r){(function(e){var n=void 0!==e&&e||"undefined"!=typeof self&&self||window,i=Function.prototype.apply;function o(e,t){this._id=e,this._clearFn=t}t.setTimeout=function(){return new o(i.call(setTimeout,n,arguments),clearTimeout)},t.setInterval=function(){return new o(i.call(setInterval,n,arguments),clearInterval)},t.clearTimeout=t.clearInterval=function(e){e&&e.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(n,this._id)},t.enroll=function(e,t){clearTimeout(e._idleTimeoutId),e._idleTimeout=t},t.unenroll=function(e){clearTimeout(e._idleTimeoutId),e._idleTimeout=-1},t._unrefActive=t.active=function(e){clearTimeout(e._idleTimeoutId);var t=e._idleTimeout;t>=0&&(e._idleTimeoutId=setTimeout(function(){e._onTimeout&&e._onTimeout()},t))},r(54),t.setImmediate="undefined"!=typeof self&&self.setImmediate||void 0!==e&&e.setImmediate||this&&this.setImmediate,t.clearImmediate="undefined"!=typeof self&&self.clearImmediate||void 0!==e&&e.clearImmediate||this&&this.clearImmediate}).call(this,r(0))},function(e,t,r){(function(e,t){!function(e,r){"use strict";if(!e.setImmediate){var n,i,o,s,a,d=1,u={},h=!1,l=e.document,c=Object.getPrototypeOf&&Object.getPrototypeOf(e);c=c&&c.setTimeout?c:e,"[object process]"==={}.toString.call(e.process)?n=function(e){t.nextTick(function(){g(e)})}:!function(){if(e.postMessage&&!e.importScripts){var t=!0,r=e.onmessage;return e.onmessage=function(){t=!1},e.postMessage("","*"),e.onmessage=r,t}}()?e.MessageChannel?((o=new MessageChannel).port1.onmessage=function(e){g(e.data)},n=function(e){o.port2.postMessage(e)}):l&&"onreadystatechange"in l.createElement("script")?(i=l.documentElement,n=function(e){var t=l.createElement("script");t.onreadystatechange=function(){g(e),t.onreadystatechange=null,i.removeChild(t),t=null},i.appendChild(t)}):n=function(e){setTimeout(g,0,e)}:(s="setImmediate$"+Math.random()+"$",a=function(t){t.source===e&&"string"==typeof t.data&&0===t.data.indexOf(s)&&g(+t.data.slice(s.length))},e.addEventListener?e.addEventListener("message",a,!1):e.attachEvent("onmessage",a),n=function(t){e.postMessage(s+t,"*")}),c.setImmediate=function(e){"function"!=typeof e&&(e=new Function(""+e));for(var t=new Array(arguments.length-1),r=0;r<t.length;r++)t[r]=arguments[r+1];var i={callback:e,args:t};return u[d]=i,n(d),d++},c.clearImmediate=f}function f(e){delete u[e]}function g(e){if(h)setTimeout(g,0,e);else{var t=u[e];if(t){h=!0;try{!function(e){var t=e.callback,n=e.args;switch(n.length){case 0:t();break;case 1:t(n[0]);break;case 2:t(n[0],n[1]);break;case 3:t(n[0],n[1],n[2]);break;default:t.apply(r,n)}}(t)}finally{f(e),h=!1}}}}}("undefined"==typeof self?void 0===e?this:e:self)}).call(this,r(0),r(1))},function(e,t,r){(function(t){function r(e){try{if(!t.localStorage)return!1}catch(e){return!1}var r=t.localStorage[e];return null!=r&&"true"===String(r).toLowerCase()}e.exports=function(e,t){if(r("noDeprecation"))return e;var n=!1;return function(){if(!n){if(r("throwDeprecation"))throw new Error(t);r("traceDeprecation")?console.trace(t):console.warn(t),n=!0}return e.apply(this,arguments)}}}).call(this,r(0))},function(e,t,r){"use strict";e.exports=o;var n=r(33),i=r(11);function o(e){if(!(this instanceof o))return new o(e);n.call(this,e)}i.inherits=r(3),i.inherits(o,n),o.prototype._transform=function(e,t,r){r(null,e)}},function(e,t,r){var n=r(10).Buffer;e.exports=function(e){if(e instanceof Uint8Array){if(0===e.byteOffset&&e.byteLength===e.buffer.byteLength)return e.buffer;if("function"==typeof e.buffer.slice)return e.buffer.slice(e.byteOffset,e.byteOffset+e.byteLength)}if(n.isBuffer(e)){for(var t=new Uint8Array(e.length),r=e.length,i=0;i<r;i++)t[i]=e[i];return t.buffer}throw new Error("Argument must be a Buffer")}},function(e,t){e.exports=function(){for(var e={},t=0;t<arguments.length;t++){var n=arguments[t];for(var i in n)r.call(n,i)&&(e[i]=n[i])}return e};var r=Object.prototype.hasOwnProperty},function(e,t){e.exports={100:"Continue",101:"Switching Protocols",102:"Processing",200:"OK",201:"Created",202:"Accepted",203:"Non-Authoritative Information",204:"No Content",205:"Reset Content",206:"Partial Content",207:"Multi-Status",208:"Already Reported",226:"IM Used",300:"Multiple Choices",301:"Moved Permanently",302:"Found",303:"See Other",304:"Not Modified",305:"Use Proxy",307:"Temporary Redirect",308:"Permanent Redirect",400:"Bad Request",401:"Unauthorized",402:"Payment Required",403:"Forbidden",404:"Not Found",405:"Method Not Allowed",406:"Not Acceptable",407:"Proxy Authentication Required",408:"Request Timeout",409:"Conflict",410:"Gone",411:"Length Required",412:"Precondition Failed",413:"Payload Too Large",414:"URI Too Long",415:"Unsupported Media Type",416:"Range Not Satisfiable",417:"Expectation Failed",418:"I'm a teapot",421:"Misdirected Request",422:"Unprocessable Entity",423:"Locked",424:"Failed Dependency",425:"Unordered Collection",426:"Upgrade Required",428:"Precondition Required",429:"Too Many Requests",431:"Request Header Fields Too Large",451:"Unavailable For Legal Reasons",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout",505:"HTTP Version Not Supported",506:"Variant Also Negotiates",507:"Insufficient Storage",508:"Loop Detected",509:"Bandwidth Limit Exceeded",510:"Not Extended",511:"Network Authentication Required"}},function(e,t,r){(function(e,n){var i;/*! https://mths.be/punycode v1.4.1 by @mathias */!function(o){t&&t.nodeType,e&&e.nodeType;var s="object"==typeof n&&n;s.global!==s&&s.window!==s&&s.self;var a,d=2147483647,u=36,h=1,l=26,c=38,f=700,g=72,p=128,_="-",y=/^xn--/,m=/[^\x20-\x7E]/,v=/[\x2E\u3002\uFF0E\uFF61]/g,b={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},w=u-h,E=Math.floor,I=String.fromCharCode;function N(e){throw new RangeError(b[e])}function D(e,t){for(var r=e.length,n=[];r--;)n[r]=t(e[r]);return n}function S(e,t){var r=e.split("@"),n="";return r.length>1&&(n=r[0]+"@",e=r[1]),n+D((e=e.replace(v,".")).split("."),t).join(".")}function T(e){for(var t,r,n=[],i=0,o=e.length;i<o;)(t=e.charCodeAt(i++))>=55296&&t<=56319&&i<o?56320==(64512&(r=e.charCodeAt(i++)))?n.push(((1023&t)<<10)+(1023&r)+65536):(n.push(t),i--):n.push(t);return n}function A(e){return D(e,function(e){var t="";return e>65535&&(t+=I((e-=65536)>>>10&1023|55296),e=56320|1023&e),t+=I(e)}).join("")}function O(e,t){return e+22+75*(e<26)-((0!=t)<<5)}function x(e,t,r){var n=0;for(e=r?E(e/f):e>>1,e+=E(e/t);e>w*l>>1;n+=u)e=E(e/w);return E(n+(w+1)*e/(e+c))}function P(e){var t,r,n,i,o,s,a,c,f,y,m,v=[],b=e.length,w=0,I=p,D=g;for((r=e.lastIndexOf(_))<0&&(r=0),n=0;n<r;++n)e.charCodeAt(n)>=128&&N("not-basic"),v.push(e.charCodeAt(n));for(i=r>0?r+1:0;i<b;){for(o=w,s=1,a=u;i>=b&&N("invalid-input"),((c=(m=e.charCodeAt(i++))-48<10?m-22:m-65<26?m-65:m-97<26?m-97:u)>=u||c>E((d-w)/s))&&N("overflow"),w+=c*s,!(c<(f=a<=D?h:a>=D+l?l:a-D));a+=u)s>E(d/(y=u-f))&&N("overflow"),s*=y;D=x(w-o,t=v.length+1,0==o),E(w/t)>d-I&&N("overflow"),I+=E(w/t),w%=t,v.splice(w++,0,I)}return A(v)}function k(e){var t,r,n,i,o,s,a,c,f,y,m,v,b,w,D,S=[];for(v=(e=T(e)).length,t=p,r=0,o=g,s=0;s<v;++s)(m=e[s])<128&&S.push(I(m));for(n=i=S.length,i&&S.push(_);n<v;){for(a=d,s=0;s<v;++s)(m=e[s])>=t&&m<a&&(a=m);for(a-t>E((d-r)/(b=n+1))&&N("overflow"),r+=(a-t)*b,t=a,s=0;s<v;++s)if((m=e[s])<t&&++r>d&&N("overflow"),m==t){for(c=r,f=u;!(c<(y=f<=o?h:f>=o+l?l:f-o));f+=u)D=c-y,w=u-y,S.push(I(O(y+D%w,0))),c=E(D/w);S.push(I(O(c,0))),o=x(r,b,n==i),r=0,++n}++r,++t}return S.join("")}a={version:"1.4.1",ucs2:{decode:T,encode:A},decode:P,encode:k,toASCII:function(e){return S(e,function(e){return m.test(e)?"xn--"+k(e):e})},toUnicode:function(e){return S(e,function(e){return y.test(e)?P(e.slice(4).toLowerCase()):e})}},void 0===(i=function(){return a}.call(t,r,t,e))||(e.exports=i)}()}).call(this,r(61)(e),r(0))},function(e,t){e.exports=function(e){return e.webpackPolyfill||(e.deprecate=function(){},e.paths=[],e.children||(e.children=[]),Object.defineProperty(e,"loaded",{enumerable:!0,get:function(){return e.l}}),Object.defineProperty(e,"id",{enumerable:!0,get:function(){return e.i}}),e.webpackPolyfill=1),e}},function(e,t,r){"use strict";e.exports={isString:function(e){return"string"==typeof e},isObject:function(e){return"object"==typeof e&&null!==e},isNull:function(e){return null===e},isNullOrUndefined:function(e){return null==e}}},function(e,t,r){"use strict";t.decode=t.parse=r(64),t.encode=t.stringify=r(65)},function(e,t,r){"use strict";function n(e,t){return Object.prototype.hasOwnProperty.call(e,t)}e.exports=function(e,t,r,o){t=t||"&",r=r||"=";var s={};if("string"!=typeof e||0===e.length)return s;var a=/\+/g;e=e.split(t);var d=1e3;o&&"number"==typeof o.maxKeys&&(d=o.maxKeys);var u=e.length;d>0&&u>d&&(u=d);for(var h=0;h<u;++h){var l,c,f,g,p=e[h].replace(a,"%20"),_=p.indexOf(r);_>=0?(l=p.substr(0,_),c=p.substr(_+1)):(l=p,c=""),f=decodeURIComponent(l),g=decodeURIComponent(c),n(s,f)?i(s[f])?s[f].push(g):s[f]=[s[f],g]:s[f]=g}return s};var i=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)}},function(e,t,r){"use strict";var n=function(e){switch(typeof e){case"string":return e;case"boolean":return e?"true":"false";case"number":return isFinite(e)?e:"";default:return""}};e.exports=function(e,t,r,a){return t=t||"&",r=r||"=",null===e&&(e=void 0),"object"==typeof e?o(s(e),function(s){var a=encodeURIComponent(n(s))+r;return i(e[s])?o(e[s],function(e){return a+encodeURIComponent(n(e))}).join(t):a+encodeURIComponent(n(e[s]))}).join(t):a?encodeURIComponent(n(a))+r+encodeURIComponent(n(e)):""};var i=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)};function o(e,t){if(e.map)return e.map(t);for(var r=[],n=0;n<e.length;n++)r.push(t(e[n],n));return r}var s=Object.keys||function(e){var t=[];for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&t.push(r);return t}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(9);t.CSVOutput=class{constructor(e){this._config=e||{separator:e&&e.separator||",",explicit_direction:e&&e.explicit_direction||!0,direction_mode:e&&e.direction_mode||!1}}writeToAdjacencyListFile(e,t){if("undefined"!=typeof window&&null!==window)throw new Error("cannot write to File inside of Browser");n.writeFileSync(e,this.writeToAdjacencyList(t))}writeToAdjacencyList(e){let t="",r=e.getNodes(),n=null,i=null,o=null;for(let e in r){t+=(n=r[e]).getID(),i=n.reachNodes(this.mergeFunc);for(let e in i)o=i[e].node,t+=this._config.separator+o.getID();t+="\n"}return t}writeToEdgeListFile(e,t,r=!1){if("undefined"!=typeof window&&null!==window)throw new Error("cannot write to File inside of Browser");n.writeFileSync(e,this.writeToEdgeList(t,r))}writeToEdgeList(e,t=!1){let r,n,i="",o=e.getNodes(),s=null,a=null,d=null;for(let e in o){a=(s=o[e]).reachNodes(this.mergeFunc);for(let e in a)d=(r=a[e]).node,n="",t&&(n=this._config.separator,n+=r.edge.isWeighted()?r.edge.getWeight():1),i+=s.getID()+this._config.separator+d.getID()+n+"\n"}return i}mergeFunc(e){return e.node.getID()}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(9);t.JSONOutput=class{constructor(){}writeToJSONFile(e,t){if("undefined"!=typeof window&&null!==window)throw new Error("cannot write to File inside of Browser");n.writeFileSync(e,this.writeToJSONString(t))}writeToJSONString(e){let t,r,n,i,o,s,a;var d={name:e._label,nodes:e.nrNodes(),dir_edges:e.nrDirEdges(),und_edges:e.nrUndEdges(),data:{}};t=e.getNodes();for(let e in t){r=t[e],n=d.data[r.getID()]={edges:[]},i=r.undEdges();for(let e in i){let t=(s=i[e]).getNodes();n.edges.push({to:t.a.getID()===r.getID()?t.b.getID():t.a.getID(),directed:s.isDirected(),weight:s.isWeighted()?s.getWeight():void 0})}o=r.outEdges();for(let e in o){let t=(s=o[e]).getNodes();n.edges.push({to:t.b.getID(),directed:s.isDirected(),weight:this.handleEdgeWeight(s)})}n.features=r.getFeatures(),null!=(a=r.getFeature("coords"))&&(n.coords=a)}return JSON.stringify(d)}handleEdgeWeight(e){if(e.isWeighted())switch(e.getWeight()){case Number.POSITIVE_INFINITY:return"Infinity";case Number.NEGATIVE_INFINITY:return"-Infinity";case Number.MAX_VALUE:return"MAX";case Number.MIN_VALUE:return"MIN";default:return e.getWeight()}}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(6);t.Dijkstra=function(e,t,r){let i=n.preparePFSStandardConfig();return r&&(i.goal_node=r),n.PFS(e,t,i)}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});new(r(7).Logger);t.SimplePerturber=class{constructor(e){this._graph=e}randomlyDeleteNodesPercentage(e){e>100&&(e=100);let t=Math.ceil(this._graph.nrNodes()*e/100);this.randomlyDeleteNodesAmount(t)}randomlyDeleteUndEdgesPercentage(e){e>100&&(e=100);let t=Math.ceil(this._graph.nrUndEdges()*e/100);this.randomlyDeleteUndEdgesAmount(t)}randomlyDeleteDirEdgesPercentage(e){e>100&&(e=100);let t=Math.ceil(this._graph.nrDirEdges()*e/100);this.randomlyDeleteDirEdgesAmount(t)}randomlyDeleteNodesAmount(e){if(e<0)throw"Cowardly refusing to remove a negative amount of nodes";if(0!==this._graph.nrNodes())for(let t=0,r=this._graph.pickRandomProperties(this._graph.getNodes(),e);t<r.length;t++)this._graph.deleteNode(this._graph.getNodes()[r[t]])}randomlyDeleteUndEdgesAmount(e){if(e<0)throw"Cowardly refusing to remove a negative amount of edges";if(0!==this._graph.nrUndEdges())for(let t=0,r=this._graph.pickRandomProperties(this._graph.getUndEdges(),e);t<r.length;t++)this._graph.deleteEdge(this._graph.getUndEdges()[r[t]])}randomlyDeleteDirEdgesAmount(e){if(e<0)throw"Cowardly refusing to remove a negative amount of edges";if(0!==this._graph.nrDirEdges())for(let t=0,r=this._graph.pickRandomProperties(this._graph.getDirEdges(),e);t<r.length;t++)this._graph.deleteEdge(this._graph.getDirEdges()[r[t]])}randomlyAddUndEdgesPercentage(e){let t=Math.ceil(this._graph.nrUndEdges()*e/100);this.randomlyAddEdgesAmount(t,{directed:!1})}randomlyAddDirEdgesPercentage(e){let t=Math.ceil(this._graph.nrDirEdges()*e/100);this.randomlyAddEdgesAmount(t,{directed:!0})}randomlyAddEdgesAmount(e,t){if(e<=0)throw new Error("Cowardly refusing to add a non-positive amount of edges");let r,n,i=!(!t||!t.directed)&&t.directed,o=i?"_d":"_u";for(;e;){for(r=this._graph.getRandomNode();(n=this._graph.getRandomNode())===r;);let t=`${r.getID()}_${n.getID()}${o}`;r.hasEdgeID(t)||(this._graph.addEdgeByID(t,r,n,{directed:i}),--e)}}randomlyAddNodesPercentage(e,t){let r=Math.ceil(this._graph.nrNodes()*e/100);this.randomlyAddNodesAmount(r,t)}randomlyAddNodesAmount(e,t){if(e<0)throw"Cowardly refusing to add a negative amount of nodes";let r={};for(;e--;){let e=(Math.random()+1).toString(36).substr(2,32)+(Math.random()+1).toString(36).substr(2,32);r[e]=this._graph.addNodeByID(e)}null!=t&&this.createEdgesByConfig(t,r)}createEdgesByConfig(e,t){let r,n,i;null!=e.und_degree||null!=e.dir_degree||null!=e.min_und_degree&&null!=e.max_und_degree||null!=e.min_dir_degree&&null!=e.max_dir_degree?(null!=(r=e.und_degree)?this.createRandomEdgesSpan(r,r,!1,t):null!=(n=e.min_und_degree)&&null!=(i=e.max_und_degree)&&this.createRandomEdgesSpan(n,i,!1,t),(r=e.dir_degree)?this.createRandomEdgesSpan(r,r,!0,t):null!=(n=e.min_dir_degree)&&null!=(i=e.max_dir_degree)&&this.createRandomEdgesSpan(n,i,!0,t)):(null!=e.probability_dir&&this.createRandomEdgesProb(e.probability_dir,!0,t),null!=e.probability_und&&this.createRandomEdgesProb(e.probability_und,!1,t))}createRandomEdgesProb(e,t,r){if(0>e||1<e)throw new Error("Probability out of range.");t=t||!1,r=r||this._graph.getNodes();let n,i,o,s=this._graph.getNodes(),a=t?"_d":"_u";for(n in r)for(i in s)if(n!==i&&Math.random()<=e){if(o=s[n].getID()+"_"+s[i].getID()+a,this._graph.getNodes()[n].hasEdgeID(o))continue;this._graph.addEdgeByID(o,s[n],s[i],{directed:t})}}createRandomEdgesSpan(e,t,r,n){if(e<0)throw new Error("Minimum degree cannot be negative.");if(t>=this._graph.nrNodes())throw new Error("Maximum degree exceeds number of reachable nodes.");if(e>t)throw new Error("Minimum degree cannot exceed maximum degree.");r=r||!1,e|=0,t|=0;var i,o,s,a,d,u=n||this._graph.getNodes(),h=this._graph.getNodes(),l=Object.keys(h),c=l.length,f=r?"_d":"_u";for(i in u)for(o=u[i],d=Math.random()*(t-e)+e|0;d;)if(o!==(s=h[l[c*Math.random()|0]])){if(a=o.getID()+"_"+s.getID()+f,o.hasEdgeID(a))continue;this._graph.addEdgeByID(a,o,s,{directed:r}),--d}}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});const n=r(2);t.KROL=class{constructor(e){this._config=e||this.prepareKROLStandardConfig(),this._genMat=this._config.genMat,this._cycles=this._config.cycles,this._graph=new n.BaseGraph("synth")}generate(){var e=this._genMat[0].length,t=Math.pow(e,this._cycles+1);for(let e=0;e<t;e++)this._graph.addNodeByID(e.toString());for(let r=0;r<t;r++)for(let n=0;n<t;n++)this.addEdge(r,n,e)&&this._graph.addEdgeByNodeIDs(r+"_"+n,r.toString(),n.toString());return{graph:this._graph}}addEdge(e,t,r){var n=Math.random(),i=1;for(let a=0;a<this._cycles;a++){var o=Math.floor(e/Math.pow(r,a+1))%r,s=Math.floor(t/Math.pow(r,a+1))%r;if(n>(i*=this._genMat[o][s]))return!1}return!0}prepareKROLStandardConfig(){return{genMat:[[.9,.5],[.5,.1]],cycles:5}}}},function(e,t,r){"use strict";var n=this&&this.__awaiter||function(e,t,r,n){return new(r||(r=Promise))(function(i,o){function s(e){try{d(n.next(e))}catch(e){o(e)}}function a(e){try{d(n.throw(e))}catch(e){o(e)}}function d(e){e.done?i(e.value):new r(function(t){t(e.value)}).then(s,a)}d((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0});const i=new(r(35).JSONInput)({directed:!0,explicit_direction:!1,weighted:!1});t.importGraphFromFile=function(e){let t=+new Date;const r=i.readFromJSONFile(e);let n=+new Date;return console.log(r.getStats()),console.log(`Importing graph of |V|=${r.nrNodes()} and |E_dir|=${r.nrDirEdges()} took ${n-t} ms.`),r},t.importGraphFromURL=function(e){return n(this,void 0,void 0,function*(){let t=+new Date;const r=yield yield fetch(e),n=yield r.json(),o=i.readFromJSON(n);let s=+new Date;return console.log(o.getStats()),console.log(`Importing graph of |V|=${o.nrNodes()} and |E_dir|=${o.nrDirEdges()} took ${s-t} ms.`),o})}},function(e,t,r){"use strict";var n=this&&this.__awaiter||function(e,t,r,n){return new(r||(r=Promise))(function(i,o){function s(e){try{d(n.next(e))}catch(e){o(e)}}function a(e){try{d(n.throw(e))}catch(e){o(e)}}function d(e){e.done?i(e.value):new r(function(t){t(e.value)}).then(s,a)}d((n=n.apply(e,t||[])).next())})};Object.defineProperty(t,"__esModule",{value:!0});const i=r(73),o="graphdb";t.initDB=function(){return n(this,void 0,void 0,function*(){return yield i.openDB(o,1)})}},function(e,t,r){"use strict";r.r(t);const n=(e,t)=>t.some(t=>e instanceof t);let i,o;const s=new WeakMap,a=new WeakMap,d=new WeakMap,u=new WeakMap,h=new WeakMap;let l={get(e,t,r){if(e instanceof IDBTransaction){if("done"===t)return a.get(e);if("objectStoreNames"===t)return e.objectStoreNames||d.get(e);if("store"===t)return r.objectStoreNames[1]?void 0:r.objectStore(r.objectStoreNames[0])}return g(e[t])},has:(e,t)=>e instanceof IDBTransaction&&("done"===t||"store"===t)||t in e};function c(e){return e!==IDBDatabase.prototype.transaction||"objectStoreNames"in IDBTransaction.prototype?(o||(o=[IDBCursor.prototype.advance,IDBCursor.prototype.continue,IDBCursor.prototype.continuePrimaryKey])).includes(e)?function(...t){return e.apply(p(this),t),g(s.get(this))}:function(...t){return g(e.apply(p(this),t))}:function(t,...r){const n=e.call(p(this),t,...r);return d.set(n,t.sort?t.sort():[t]),g(n)}}function f(e){return"function"==typeof e?c(e):(e instanceof IDBTransaction&&function(e){if(a.has(e))return;const t=new Promise((t,r)=>{const n=()=>{e.removeEventListener("complete",i),e.removeEventListener("error",o),e.removeEventListener("abort",o)},i=()=>{t(),n()},o=()=>{r(e.error),n()};e.addEventListener("complete",i),e.addEventListener("error",o),e.addEventListener("abort",o)});a.set(e,t)}(e),n(e,i||(i=[IDBDatabase,IDBObjectStore,IDBIndex,IDBCursor,IDBTransaction]))?new Proxy(e,l):e)}function g(e){if(e instanceof IDBRequest)return function(e){const t=new Promise((t,r)=>{const n=()=>{e.removeEventListener("success",i),e.removeEventListener("error",o)},i=()=>{t(g(e.result)),n()},o=()=>{r(e.error),n()};e.addEventListener("success",i),e.addEventListener("error",o)});return t.then(t=>{t instanceof IDBCursor&&s.set(t,e)}).catch(()=>{}),h.set(t,e),t}(e);if(u.has(e))return u.get(e);const t=f(e);return t!==e&&(u.set(e,t),h.set(t,e)),t}const p=e=>h.get(e);function _(e,t,{blocked:r,upgrade:n,blocking:i}={}){const o=indexedDB.open(e,t),s=g(o);return n&&o.addEventListener("upgradeneeded",e=>{n(g(o.result),e.oldVersion,e.newVersion,g(o.transaction))}),r&&o.addEventListener("blocked",()=>r()),i&&s.then(e=>e.addEventListener("versionchange",i)),s}function y(e,{blocked:t}={}){const r=indexedDB.deleteDatabase(e);return t&&r.addEventListener("blocked",()=>t()),g(r).then(()=>void 0)}r.d(t,"openDB",function(){return _}),r.d(t,"deleteDB",function(){return y}),r.d(t,"unwrap",function(){return p}),r.d(t,"wrap",function(){return g});const m=["get","getKey","getAll","getAllKeys","count"],v=["put","add","delete","clear"],b=new Map;function w(e,t){if(!(e instanceof IDBDatabase)||t in e||"string"!=typeof t)return;if(b.get(t))return b.get(t);const r=t.replace(/FromIndex$/,""),n=t!==r,i=v.includes(r);if(!(r in(n?IDBIndex:IDBObjectStore).prototype)||!i&&!m.includes(r))return;const o=async function(e,...t){const o=this.transaction(e,i?"readwrite":"readonly");let s=o.store;n&&(s=s.index(t.shift()));const a=s[r](...t);return i&&await o.done,a};return b.set(t,o),o}l=(e=>({get:(t,r,n)=>w(t,r)||e.get(t,r,n),has:(t,r)=>!!w(t,r)||e.has(t,r)}))(l)}]);
+
+(function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('path'), require('fs'), require('https')) :
+    typeof define === 'function' && define.amd ? define(['path', 'fs', 'https'], factory) :
+    (global = global || self, factory(global.path, global.fs, global.https));
+}(this, function (path, fs, https) { 'use strict';
+
+    path = path && path.hasOwnProperty('default') ? path['default'] : path;
+    fs = fs && fs.hasOwnProperty('default') ? fs['default'] : fs;
+    https = https && https.hasOwnProperty('default') ? https['default'] : https;
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+    function __awaiter(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    }
+
+    function __generator(thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    }
+
+    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+    function unwrapExports (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
+    function createCommonjsModule(fn, module) {
+    	return module = { exports: {} }, fn(module, module.exports), module.exports;
+    }
+
+    var StructUtils = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    function clone(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        if (obj instanceof Nodes.BaseNode || obj instanceof Edges.BaseEdge) {
+            return;
+        }
+        var cloneObj = obj.constructor ? obj.constructor() : {};
+        for (var attribute in obj) {
+            if (!obj.hasOwnProperty(attribute)) {
+                continue;
+            }
+            if (typeof obj[attribute] === "object") {
+                cloneObj[attribute] = clone(obj[attribute]);
+            }
+            else {
+                cloneObj[attribute] = obj[attribute];
+            }
+        }
+        return cloneObj;
+    }
+    exports.clone = clone;
+    function shuffleArray(arr) {
+        for (var i = arr.length - 1; i >= 0; i--) {
+            var randomIndex = Math.floor(Math.random() * (i + 1));
+            var itemAtIndex = arr[randomIndex];
+            arr[randomIndex] = arr[i];
+            arr[i] = itemAtIndex;
+        }
+        return arr;
+    }
+    exports.shuffleArray = shuffleArray;
+    function mergeArrays(args, cb = undefined) {
+        for (var arg_idx in args) {
+            if (!Array.isArray(args[arg_idx])) {
+                throw new Error('Will only mergeArrays arrays');
+            }
+        }
+        var seen = {}, result = [], identity;
+        for (var i = 0; i < args.length; i++) {
+            for (var j = 0; j < args[i].length; j++) {
+                identity = typeof cb !== 'undefined' ? cb(args[i][j]) : args[i][j];
+                if (seen[identity] !== true) {
+                    result.push(args[i][j]);
+                    seen[identity] = true;
+                }
+            }
+        }
+        return result;
+    }
+    exports.mergeArrays = mergeArrays;
+    function mergeObjects(args) {
+        for (var i = 0; i < args.length; i++) {
+            if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
+                throw new Error('Will only take objects as inputs');
+            }
+        }
+        var result = {};
+        for (var i = 0; i < args.length; i++) {
+            for (var key in args[i]) {
+                if (args[i].hasOwnProperty(key)) {
+                    result[key] = args[i][key];
+                }
+            }
+        }
+        return result;
+    }
+    exports.mergeObjects = mergeObjects;
+    function findKey(obj, cb) {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key) && cb(obj[key])) {
+                return key;
+            }
+        }
+        return undefined;
+    }
+    exports.findKey = findKey;
+    function mergeOrderedArraysNoDups(a, b) {
+        let ret = [];
+        let idx_a = 0;
+        let idx_b = 0;
+        if (a[0] != null && b[0] != null) {
+            while (true) {
+                if (idx_a >= a.length || idx_b >= b.length)
+                    break;
+                if (a[idx_a] == b[idx_b]) {
+                    if (ret[ret.length - 1] != a[idx_a])
+                        ret.push(a[idx_a]);
+                    idx_a++;
+                    idx_b++;
+                    continue;
+                }
+                if (a[idx_a] < b[idx_b]) {
+                    ret.push(a[idx_a]);
+                    idx_a++;
+                    continue;
+                }
+                if (b[idx_b] < a[idx_a]) {
+                    ret.push(b[idx_b]);
+                    idx_b++;
+                }
+            }
+        }
+        while (idx_a < a.length) {
+            if (a[idx_a] != null)
+                ret.push(a[idx_a]);
+            idx_a++;
+        }
+        while (idx_b < b.length) {
+            if (b[idx_b] != null)
+                ret.push(b[idx_b]);
+            idx_b++;
+        }
+        return ret;
+    }
+    exports.mergeOrderedArraysNoDups = mergeOrderedArraysNoDups;
+    });
+
+    unwrapExports(StructUtils);
+    var StructUtils_1 = StructUtils.clone;
+    var StructUtils_2 = StructUtils.shuffleArray;
+    var StructUtils_3 = StructUtils.mergeArrays;
+    var StructUtils_4 = StructUtils.mergeObjects;
+    var StructUtils_5 = StructUtils.findKey;
+    var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
+
+    var Nodes = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    class BaseNode {
+        constructor(_id, features) {
+            this._id = _id;
+            this._in_degree = 0;
+            this._out_degree = 0;
+            this._und_degree = 0;
+            this._in_edges = {};
+            this._out_edges = {};
+            this._und_edges = {};
+            this._features = typeof features !== 'undefined' ? StructUtils.clone(features) : {};
+            this._label = this._features["label"] || this._id;
+        }
+        getID() {
+            return this._id;
+        }
+        getLabel() {
+            return this._label;
+        }
+        setLabel(label) {
+            this._label = label;
+        }
+        getFeatures() {
+            return this._features;
+        }
+        getFeature(key) {
+            return this._features[key];
+        }
+        setFeatures(features) {
+            this._features = StructUtils.clone(features);
+        }
+        setFeature(key, value) {
+            this._features[key] = value;
+        }
+        deleteFeature(key) {
+            var feat = this._features[key];
+            delete this._features[key];
+            return feat;
+        }
+        clearFeatures() {
+            this._features = {};
+        }
+        inDegree() {
+            return this._in_degree;
+        }
+        outDegree() {
+            return this._out_degree;
+        }
+        degree() {
+            return this._und_degree;
+        }
+        addEdge(edge) {
+            var nodes = edge.getNodes();
+            if (nodes.a !== this && nodes.b !== this) {
+                throw new Error("Cannot add edge that does not connect to this node");
+            }
+            var edge_id = edge.getID();
+            if (edge.isDirected()) {
+                if (nodes.a === this && !this._out_edges[edge_id]) {
+                    this._out_edges[edge_id] = edge;
+                    this._out_degree += 1;
+                    if (nodes.b === this && !this._in_edges[edge_id]) {
+                        this._in_edges[edge.getID()] = edge;
+                        this._in_degree += 1;
+                    }
+                }
+                else if (!this._in_edges[edge_id]) {
+                    this._in_edges[edge.getID()] = edge;
+                    this._in_degree += 1;
+                }
+            }
+            else {
+                if (this._und_edges[edge.getID()]) {
+                    throw new Error("Cannot add same undirected edge multiple times.");
+                }
+                this._und_edges[edge.getID()] = edge;
+                this._und_degree += 1;
+            }
+        }
+        hasEdge(edge) {
+            return !!this._in_edges[edge.getID()] || !!this._out_edges[edge.getID()] || !!this._und_edges[edge.getID()];
+        }
+        hasEdgeID(id) {
+            return !!this._in_edges[id] || !!this._out_edges[id] || !!this._und_edges[id];
+        }
+        getEdge(id) {
+            var edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
+            if (!edge) {
+                throw new Error("Cannot retrieve non-existing edge.");
+            }
+            return edge;
+        }
+        inEdges() {
+            return this._in_edges;
+        }
+        outEdges() {
+            return this._out_edges;
+        }
+        undEdges() {
+            return this._und_edges;
+        }
+        dirEdges() {
+            return StructUtils.mergeObjects([this._in_edges, this._out_edges]);
+        }
+        allEdges() {
+            return StructUtils.mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
+        }
+        removeEdge(edge) {
+            if (!this.hasEdge(edge)) {
+                throw new Error("Cannot remove unconnected edge.");
+            }
+            var id = edge.getID();
+            var e = this._und_edges[id];
+            if (e) {
+                delete this._und_edges[id];
+                this._und_degree -= 1;
+            }
+            e = this._in_edges[id];
+            if (e) {
+                delete this._in_edges[id];
+                this._in_degree -= 1;
+            }
+            e = this._out_edges[id];
+            if (e) {
+                delete this._out_edges[id];
+                this._out_degree -= 1;
+            }
+        }
+        removeEdgeID(id) {
+            if (!this.hasEdgeID(id)) {
+                throw new Error("Cannot remove unconnected edge.");
+            }
+            var e = this._und_edges[id];
+            if (e) {
+                delete this._und_edges[id];
+                this._und_degree -= 1;
+            }
+            e = this._in_edges[id];
+            if (e) {
+                delete this._in_edges[id];
+                this._in_degree -= 1;
+            }
+            e = this._out_edges[id];
+            if (e) {
+                delete this._out_edges[id];
+                this._out_degree -= 1;
+            }
+        }
+        clearOutEdges() {
+            this._out_edges = {};
+            this._out_degree = 0;
+        }
+        clearInEdges() {
+            this._in_edges = {};
+            this._in_degree = 0;
+        }
+        clearUndEdges() {
+            this._und_edges = {};
+            this._und_degree = 0;
+        }
+        clearEdges() {
+            this.clearInEdges();
+            this.clearOutEdges();
+            this.clearUndEdges();
+        }
+        prevNodes() {
+            var prevs = [];
+            var key, edge;
+            for (key in this._in_edges) {
+                if (this._in_edges.hasOwnProperty(key)) {
+                    edge = this._in_edges[key];
+                    prevs.push({
+                        node: edge.getNodes().a,
+                        edge: edge
+                    });
+                }
+            }
+            return prevs;
+        }
+        nextNodes() {
+            var nexts = [];
+            var key, edge;
+            for (key in this._out_edges) {
+                if (this._out_edges.hasOwnProperty(key)) {
+                    edge = this._out_edges[key];
+                    nexts.push({
+                        node: edge.getNodes().b,
+                        edge: edge
+                    });
+                }
+            }
+            return nexts;
+        }
+        connNodes() {
+            var conns = [];
+            var key, edge;
+            for (key in this._und_edges) {
+                if (this._und_edges.hasOwnProperty(key)) {
+                    edge = this._und_edges[key];
+                    var nodes = edge.getNodes();
+                    if (nodes.a === this) {
+                        conns.push({
+                            node: edge.getNodes().b,
+                            edge: edge
+                        });
+                    }
+                    else {
+                        conns.push({
+                            node: edge.getNodes().a,
+                            edge: edge
+                        });
+                    }
+                }
+            }
+            return conns;
+        }
+        reachNodes(identityFunc) {
+            var identity = 0;
+            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (ne => identity++));
+        }
+        allNeighbors(identityFunc) {
+            var identity = 0;
+            return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
+        }
+        clone() {
+            let new_node = new BaseNode(this._id);
+            new_node._label = this._label;
+            new_node.setFeatures(StructUtils.clone(this.getFeatures()));
+            return new_node;
+        }
+    }
+    exports.BaseNode = BaseNode;
+    });
+
+    unwrapExports(Nodes);
+    var Nodes_1 = Nodes.BaseNode;
+
+    var Edges = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    class BaseEdge {
+        constructor(_id, _node_a, _node_b, options) {
+            this._id = _id;
+            this._node_a = _node_a;
+            this._node_b = _node_b;
+            if (!(_node_a instanceof Nodes.BaseNode) || !(_node_b instanceof Nodes.BaseNode)) {
+                throw new Error("cannot instantiate edge without two valid node objects");
+            }
+            options = options || {};
+            this._directed = options.directed || false;
+            this._weighted = options.weighted || false;
+            this._weight = this._weighted ? (isNaN(options.weight) ? 1 : options.weight) : undefined;
+            this._label = options.label || this._id;
+        }
+        getID() {
+            return this._id;
+        }
+        getLabel() {
+            return this._label;
+        }
+        setLabel(label) {
+            this._label = label;
+        }
+        isDirected() {
+            return this._directed;
+        }
+        isWeighted() {
+            return this._weighted;
+        }
+        getWeight() {
+            return this._weight;
+        }
+        setWeight(w) {
+            if (!this._weighted) {
+                throw new Error("Cannot set weight on unweighted edge.");
+            }
+            this._weight = w;
+        }
+        getNodes() {
+            return { a: this._node_a, b: this._node_b };
+        }
+        clone(new_node_a, new_node_b) {
+            if (!(new_node_a instanceof Nodes.BaseNode) || !(new_node_b instanceof Nodes.BaseNode)) {
+                throw new Error("refusing to clone edge if any new node is invalid");
+            }
+            return new BaseEdge(this._id, new_node_a, new_node_b, {
+                directed: this._directed,
+                weighted: this._weighted,
+                weight: this._weight,
+                label: this._label
+            });
+        }
+    }
+    exports.BaseEdge = BaseEdge;
+    });
+
+    unwrapExports(Edges);
+    var Edges_1 = Edges.BaseEdge;
+
+    var CallbackUtils = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function execCallbacks(cbs, context) {
+        cbs.forEach(function (cb) {
+            if (typeof cb === 'function') {
+                cb(context);
+            }
+            else {
+                throw new Error('Provided callback is not a function.');
+            }
+        });
+    }
+    exports.execCallbacks = execCallbacks;
+    });
+
+    unwrapExports(CallbackUtils);
+    var CallbackUtils_1 = CallbackUtils.execCallbacks;
+
+    var BFS_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    function BFS(graph, v, config) {
+        var config = config || prepareBFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        if (graph.getMode() === Graph.GraphMode.INIT) {
+            throw new Error('Cowardly refusing to traverse graph without edges.');
+        }
+        if (dir_mode === Graph.GraphMode.INIT) {
+            throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
+        }
+        var bfsScope = {
+            marked: {},
+            nodes: graph.getNodes(),
+            queue: [],
+            current: null,
+            next_node: null,
+            next_edge: null,
+            root_node: v,
+            adj_nodes: []
+        };
+        if (callbacks.init_bfs) {
+            CallbackUtils.execCallbacks(callbacks.init_bfs, bfsScope);
+        }
+        bfsScope.queue.push(v);
+        var i = 0;
+        while (i < bfsScope.queue.length) {
+            bfsScope.current = bfsScope.queue[i++];
+            if (dir_mode === Graph.GraphMode.MIXED) {
+                bfsScope.adj_nodes = bfsScope.current.reachNodes();
+            }
+            else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+                bfsScope.adj_nodes = bfsScope.current.connNodes();
+            }
+            else if (dir_mode === Graph.GraphMode.DIRECTED) {
+                bfsScope.adj_nodes = bfsScope.current.nextNodes();
+            }
+            else {
+                bfsScope.adj_nodes = [];
+            }
+            if (typeof callbacks.sort_nodes === 'function') {
+                callbacks.sort_nodes(bfsScope);
+            }
+            for (var adj_idx in bfsScope.adj_nodes) {
+                bfsScope.next_node = bfsScope.adj_nodes[adj_idx].node;
+                bfsScope.next_edge = bfsScope.adj_nodes[adj_idx].edge;
+                if (config.result[bfsScope.next_node.getID()].distance === Number.POSITIVE_INFINITY) {
+                    if (callbacks.node_unmarked) {
+                        CallbackUtils.execCallbacks(callbacks.node_unmarked, bfsScope);
+                    }
+                }
+                else {
+                    if (callbacks.node_marked) {
+                        CallbackUtils.execCallbacks(callbacks.node_marked, bfsScope);
+                    }
+                }
+            }
+        }
+        return config.result;
+    }
+    exports.BFS = BFS;
+    function prepareBFSStandardConfig() {
+        var config = {
+            result: {},
+            callbacks: {
+                init_bfs: [],
+                node_unmarked: [],
+                node_marked: [],
+                sort_nodes: undefined
+            },
+            dir_mode: Graph.GraphMode.MIXED,
+            messages: {},
+            filters: {}
+        }, result = config.result, callbacks = config.callbacks;
+        var count = 0;
+        var counter = function () {
+            return count++;
+        };
+        var initBFS = function (context) {
+            for (var key in context.nodes) {
+                config.result[key] = {
+                    distance: Number.POSITIVE_INFINITY,
+                    parent: null,
+                    counter: -1
+                };
+            }
+            config.result[context.root_node.getID()] = {
+                distance: 0,
+                parent: context.root_node,
+                counter: counter()
+            };
+        };
+        callbacks.init_bfs.push(initBFS);
+        var nodeUnmarked = function (context) {
+            config.result[context.next_node.getID()] = {
+                distance: result[context.current.getID()].distance + 1,
+                parent: context.current,
+                counter: counter()
+            };
+            context.queue.push(context.next_node);
+        };
+        callbacks.node_unmarked.push(nodeUnmarked);
+        return config;
+    }
+    exports.prepareBFSStandardConfig = prepareBFSStandardConfig;
+    });
+
+    unwrapExports(BFS_1);
+    var BFS_2 = BFS_1.BFS;
+    var BFS_3 = BFS_1.prepareBFSStandardConfig;
+
+    var DFS_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    function DFSVisit(graph, current_root, config) {
+        var dfsVisitScope = {
+            stack: [],
+            adj_nodes: [],
+            stack_entry: null,
+            current: null,
+            current_root: current_root
+        };
+        var config = config || prepareDFSVisitStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        if (graph.getMode() === Graph.GraphMode.INIT) {
+            throw new Error('Cowardly refusing to traverse graph without edges.');
+        }
+        if (dir_mode === Graph.GraphMode.INIT) {
+            throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
+        }
+        if (callbacks.init_dfs_visit) {
+            CallbackUtils.execCallbacks(callbacks.init_dfs_visit, dfsVisitScope);
+        }
+        dfsVisitScope.stack.push({
+            node: current_root,
+            parent: current_root,
+            weight: 0
+        });
+        while (dfsVisitScope.stack.length) {
+            dfsVisitScope.stack_entry = dfsVisitScope.stack.pop();
+            dfsVisitScope.current = dfsVisitScope.stack_entry.node;
+            if (callbacks.node_popped) {
+                CallbackUtils.execCallbacks(callbacks.node_popped, dfsVisitScope);
+            }
+            if (!config.dfs_visit_marked[dfsVisitScope.current.getID()]) {
+                config.dfs_visit_marked[dfsVisitScope.current.getID()] = true;
+                if (callbacks.node_unmarked) {
+                    CallbackUtils.execCallbacks(callbacks.node_unmarked, dfsVisitScope);
+                }
+                if (dir_mode === Graph.GraphMode.MIXED) {
+                    dfsVisitScope.adj_nodes = dfsVisitScope.current.reachNodes();
+                }
+                else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+                    dfsVisitScope.adj_nodes = dfsVisitScope.current.connNodes();
+                }
+                else if (dir_mode === Graph.GraphMode.DIRECTED) {
+                    dfsVisitScope.adj_nodes = dfsVisitScope.current.nextNodes();
+                }
+                if (typeof callbacks.sort_nodes === 'function') {
+                    callbacks.sort_nodes(dfsVisitScope);
+                }
+                for (var adj_idx in dfsVisitScope.adj_nodes) {
+                    dfsVisitScope.stack.push({
+                        node: dfsVisitScope.adj_nodes[adj_idx].node,
+                        parent: dfsVisitScope.current,
+                        weight: dfsVisitScope.adj_nodes[adj_idx].edge.getWeight()
+                    });
+                }
+                if (callbacks.adj_nodes_pushed) {
+                    CallbackUtils.execCallbacks(callbacks.adj_nodes_pushed, dfsVisitScope);
+                }
+            }
+            else {
+                if (callbacks.node_marked) {
+                    CallbackUtils.execCallbacks(callbacks.node_marked, dfsVisitScope);
+                }
+            }
+        }
+        return config.visit_result;
+    }
+    exports.DFSVisit = DFSVisit;
+    function DFS(graph, root, config) {
+        var config = config || prepareDFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        if (graph.getMode() === Graph.GraphMode.INIT) {
+            throw new Error('Cowardly refusing to traverse graph without edges.');
+        }
+        if (dir_mode === Graph.GraphMode.INIT) {
+            throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
+        }
+        var dfsScope = {
+            marked: {},
+            nodes: graph.getNodes()
+        };
+        if (callbacks.init_dfs) {
+            CallbackUtils.execCallbacks(callbacks.init_dfs, dfsScope);
+        }
+        callbacks.adj_nodes_pushed = callbacks.adj_nodes_pushed || [];
+        var markNode = function (context) {
+            dfsScope.marked[context.current.getID()] = true;
+        };
+        callbacks.adj_nodes_pushed.push(markNode);
+        var dfs_result = [{}];
+        var dfs_idx = 0;
+        var count = 0;
+        var counter = function () {
+            return count++;
+        };
+        var addToProperSegment = function (context) {
+            dfs_result[dfs_idx][context.current.getID()] = {
+                parent: context.stack_entry.parent,
+                counter: counter()
+            };
+        };
+        if (callbacks && callbacks.node_unmarked) {
+            callbacks.node_unmarked.push(addToProperSegment);
+        }
+        DFSVisit(graph, root, config);
+        for (var node_key in dfsScope.nodes) {
+            if (!dfsScope.marked[node_key]) {
+                dfs_idx++;
+                dfs_result.push({});
+                DFSVisit(graph, dfsScope.nodes[node_key], config);
+            }
+        }
+        return dfs_result;
+    }
+    exports.DFS = DFS;
+    function prepareDFSVisitStandardConfig() {
+        var config = {
+            visit_result: {},
+            callbacks: {},
+            messages: {},
+            dfs_visit_marked: {},
+            dir_mode: Graph.GraphMode.MIXED
+        }, result = config.visit_result, callbacks = config.callbacks;
+        var count = 0;
+        var counter = function () {
+            return count++;
+        };
+        callbacks.init_dfs_visit = callbacks.init_dfs_visit || [];
+        var initDFSVisit = function (context) {
+            result[context.current_root.getID()] = {
+                parent: context.current_root
+            };
+        };
+        callbacks.init_dfs_visit.push(initDFSVisit);
+        callbacks.node_unmarked = callbacks.node_unmarked || [];
+        var setResultEntry = function (context) {
+            result[context.current.getID()] = {
+                parent: context.stack_entry.parent,
+                counter: counter()
+            };
+        };
+        callbacks.node_unmarked.push(setResultEntry);
+        return config;
+    }
+    exports.prepareDFSVisitStandardConfig = prepareDFSVisitStandardConfig;
+    function prepareDFSStandardConfig() {
+        var config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
+        callbacks.init_dfs = callbacks.init_dfs || [];
+        var setInitialResultEntries = function (context) {
+        };
+        callbacks.init_dfs.push(setInitialResultEntries);
+        return config;
+    }
+    exports.prepareDFSStandardConfig = prepareDFSStandardConfig;
+    });
+
+    unwrapExports(DFS_1);
+    var DFS_2 = DFS_1.DFSVisit;
+    var DFS_3 = DFS_1.DFS;
+    var DFS_4 = DFS_1.prepareDFSVisitStandardConfig;
+    var DFS_5 = DFS_1.prepareDFSStandardConfig;
+
+    var BinaryHeap_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var BinaryHeapMode;
+    (function (BinaryHeapMode) {
+        BinaryHeapMode[BinaryHeapMode["MIN"] = 0] = "MIN";
+        BinaryHeapMode[BinaryHeapMode["MAX"] = 1] = "MAX";
+    })(BinaryHeapMode = exports.BinaryHeapMode || (exports.BinaryHeapMode = {}));
+    class BinaryHeap {
+        constructor(_mode = BinaryHeapMode.MIN, _evalPriority = (obj) => {
+            if (typeof obj !== 'number' && typeof obj !== 'string') {
+                return NaN;
+            }
+            if (typeof obj === 'number') {
+                return obj | 0;
+            }
+            return parseInt(obj);
+        }, _evalObjID = (obj) => {
+            return obj;
+        }) {
+            this._mode = _mode;
+            this._evalPriority = _evalPriority;
+            this._evalObjID = _evalObjID;
+            this._nr_removes = 0;
+            this._array = [];
+            this._positions = {};
+        }
+        getMode() {
+            return this._mode;
+        }
+        getArray() {
+            return this._array;
+        }
+        getPositions() {
+            return this._positions;
+        }
+        size() {
+            return this._array.length;
+        }
+        getEvalPriorityFun() {
+            return this._evalPriority;
+        }
+        evalInputScore(obj) {
+            return this._evalPriority(obj);
+        }
+        getEvalObjIDFun() {
+            return this._evalObjID;
+        }
+        evalInputObjID(obj) {
+            return this._evalObjID(obj);
+        }
+        peek() {
+            return this._array[0];
+        }
+        pop() {
+            if (this.size()) {
+                return this.remove(this._array[0]);
+            }
+        }
+        find(obj) {
+            var pos = this.getNodePosition(obj);
+            return this._array[pos];
+        }
+        insert(obj) {
+            if (isNaN(this._evalPriority(obj))) {
+                throw new Error("Cannot insert object without numeric priority.");
+            }
+            this._array.push(obj);
+            this.setNodePosition(obj, this.size() - 1);
+            this.trickleUp(this.size() - 1);
+        }
+        remove(obj) {
+            this._nr_removes++;
+            if (isNaN(this._evalPriority(obj))) {
+                throw new Error('Object invalid.');
+            }
+            var objID = this._evalObjID(obj), found = null;
+            var pos = this.getNodePosition(obj), found = this._array[pos] != null ? this._array[pos] : null;
+            if (found === null) {
+                return undefined;
+            }
+            var last_array_obj = this._array.pop();
+            this.removeNodePosition(obj);
+            if (this.size() && found !== last_array_obj) {
+                this._array[pos] = last_array_obj;
+                this.setNodePosition(last_array_obj, pos);
+                this.trickleUp(pos);
+                this.trickleDown(pos);
+            }
+            return found;
+        }
+        trickleDown(i) {
+            var parent = this._array[i];
+            while (true) {
+                var right_child_idx = (i + 1) * 2, left_child_idx = right_child_idx - 1, right_child = this._array[right_child_idx], left_child = this._array[left_child_idx], swap = null;
+                if (left_child_idx < this.size() && !this.orderCorrect(parent, left_child)) {
+                    swap = left_child_idx;
+                }
+                if (right_child_idx < this.size() && !this.orderCorrect(parent, right_child)
+                    && !this.orderCorrect(left_child, right_child)) {
+                    swap = right_child_idx;
+                }
+                if (swap === null) {
+                    break;
+                }
+                this._array[i] = this._array[swap];
+                this._array[swap] = parent;
+                this.setNodePosition(this._array[i], i);
+                this.setNodePosition(this._array[swap], swap);
+                i = swap;
+            }
+        }
+        trickleUp(i) {
+            var child = this._array[i];
+            while (i) {
+                var parent_idx = Math.floor((i + 1) / 2) - 1, parent = this._array[parent_idx];
+                if (this.orderCorrect(parent, child)) {
+                    break;
+                }
+                else {
+                    this._array[parent_idx] = child;
+                    this._array[i] = parent;
+                    this.setNodePosition(child, parent_idx);
+                    this.setNodePosition(parent, i);
+                    i = parent_idx;
+                }
+            }
+        }
+        orderCorrect(obj_a, obj_b) {
+            var obj_a_pr = this._evalPriority(obj_a);
+            var obj_b_pr = this._evalPriority(obj_b);
+            if (this._mode === BinaryHeapMode.MIN) {
+                return obj_a_pr <= obj_b_pr;
+            }
+            else {
+                return obj_a_pr >= obj_b_pr;
+            }
+        }
+        setNodePosition(obj, pos) {
+            if (obj == null || pos == null || pos !== (pos | 0)) {
+                throw new Error('minium required arguments are obj and new_pos');
+            }
+            var pos_obj = {
+                score: this.evalInputScore(obj),
+                position: pos
+            };
+            var obj_key = this.evalInputObjID(obj);
+            this._positions[obj_key] = pos_obj;
+        }
+        getNodePosition(obj) {
+            var obj_key = this.evalInputObjID(obj);
+            var occurrence = this._positions[obj_key];
+            return occurrence ? occurrence.position : null;
+        }
+        removeNodePosition(obj) {
+            var obj_key = this.evalInputObjID(obj);
+            delete this._positions[obj_key];
+        }
+    }
+    exports.BinaryHeap = BinaryHeap;
+    });
+
+    unwrapExports(BinaryHeap_1);
+    var BinaryHeap_2 = BinaryHeap_1.BinaryHeapMode;
+    var BinaryHeap_3 = BinaryHeap_1.BinaryHeap;
+
+    var PFS_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+    exports.DEFAULT_WEIGHT = 1;
+    function PFS(graph, v, config) {
+        var config = config || preparePFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
+        if (graph.getMode() === Graph.GraphMode.INIT) {
+            throw new Error('Cowardly refusing to traverse graph without edges.');
+        }
+        if (dir_mode === Graph.GraphMode.INIT) {
+            throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
+        }
+        var start_ne = {
+            node: v,
+            edge: new Edges.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
+            best: 0
+        };
+        var scope = {
+            OPEN_HEAP: new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID),
+            OPEN: {},
+            CLOSED: {},
+            nodes: graph.getNodes(),
+            root_node: v,
+            current: start_ne,
+            adj_nodes: [],
+            next: null,
+            proposed_dist: Number.POSITIVE_INFINITY,
+        };
+        callbacks.init_pfs && CallbackUtils.execCallbacks(callbacks.init_pfs, scope);
+        scope.OPEN_HEAP.insert(start_ne);
+        scope.OPEN[start_ne.node.getID()] = start_ne;
+        while (scope.OPEN_HEAP.size()) {
+            scope.current = scope.OPEN_HEAP.pop();
+            callbacks.new_current && CallbackUtils.execCallbacks(callbacks.new_current, scope);
+            if (scope.current == null) {
+                console.log("HEAP popped undefined - HEAP size: " + scope.OPEN_HEAP.size());
+            }
+            scope.OPEN[scope.current.node.getID()] = undefined;
+            scope.CLOSED[scope.current.node.getID()] = scope.current;
+            if (scope.current.node === config.goal_node) {
+                config.callbacks.goal_reached && CallbackUtils.execCallbacks(config.callbacks.goal_reached, scope);
+                return config.result;
+            }
+            if (dir_mode === Graph.GraphMode.MIXED) {
+                scope.adj_nodes = scope.current.node.reachNodes();
+            }
+            else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+                scope.adj_nodes = scope.current.node.connNodes();
+            }
+            else if (dir_mode === Graph.GraphMode.DIRECTED) {
+                scope.adj_nodes = scope.current.node.nextNodes();
+            }
+            else {
+                throw new Error('Unsupported traversal mode. Please use directed, undirected, or mixed');
+            }
+            for (var adj_idx in scope.adj_nodes) {
+                scope.next = scope.adj_nodes[adj_idx];
+                if (scope.CLOSED[scope.next.node.getID()]) {
+                    config.callbacks.node_closed && CallbackUtils.execCallbacks(config.callbacks.node_closed, scope);
+                    continue;
+                }
+                if (scope.OPEN[scope.next.node.getID()]) {
+                    scope.next.best = scope.OPEN[scope.next.node.getID()].best;
+                    config.callbacks.node_open && CallbackUtils.execCallbacks(config.callbacks.node_open, scope);
+                    scope.proposed_dist = scope.current.best + (isNaN(scope.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : scope.next.edge.getWeight());
+                    if (scope.next.best > scope.proposed_dist) {
+                        config.callbacks.better_path && CallbackUtils.execCallbacks(config.callbacks.better_path, scope);
+                        scope.OPEN_HEAP.remove(scope.next);
+                        scope.next.best = scope.proposed_dist;
+                        scope.OPEN_HEAP.insert(scope.next);
+                        scope.OPEN[scope.next.node.getID()].best = scope.proposed_dist;
+                    }
+                    else if (scope.next.best === scope.proposed_dist) {
+                        config.callbacks.equal_path && CallbackUtils.execCallbacks(config.callbacks.equal_path, scope);
+                    }
+                    continue;
+                }
+                config.callbacks.not_encountered && CallbackUtils.execCallbacks(config.callbacks.not_encountered, scope);
+                scope.OPEN_HEAP.insert(scope.next);
+                scope.OPEN[scope.next.node.getID()] = scope.next;
+            }
+        }
+        return config.result;
+    }
+    exports.PFS = PFS;
+    function preparePFSStandardConfig() {
+        let config = {
+            result: {},
+            callbacks: {
+                init_pfs: [],
+                new_current: [],
+                not_encountered: [],
+                node_open: [],
+                node_closed: [],
+                better_path: [],
+                equal_path: [],
+                goal_reached: []
+            },
+            messages: {
+                init_pfs_msgs: [],
+                new_current_msgs: [],
+                not_enc_msgs: [],
+                node_open_msgs: [],
+                node_closed_msgs: [],
+                better_path_msgs: [],
+                equal_path_msgs: [],
+                goal_reached_msgs: []
+            },
+            dir_mode: Graph.GraphMode.MIXED,
+            goal_node: null,
+            evalPriority: function (ne) {
+                return ne.best || exports.DEFAULT_WEIGHT;
+            },
+            evalObjID: function (ne) {
+                return ne.node.getID();
+            }
+        };
+        let callbacks = config.callbacks;
+        var count = 0;
+        var counter = function () {
+            return count++;
+        };
+        var initPFS = function (context) {
+            for (var key in context.nodes) {
+                config.result[key] = {
+                    distance: Number.POSITIVE_INFINITY,
+                    parent: null,
+                    counter: -1
+                };
+            }
+            config.result[context.root_node.getID()] = {
+                distance: 0,
+                parent: context.root_node,
+                counter: counter()
+            };
+        };
+        callbacks.init_pfs.push(initPFS);
+        var notEncountered = function (context) {
+            context.next.best = context.current.best + (isNaN(context.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : context.next.edge.getWeight());
+            config.result[context.next.node.getID()] = {
+                distance: context.next.best,
+                parent: context.current.node,
+                counter: undefined
+            };
+        };
+        callbacks.not_encountered.push(notEncountered);
+        var betterPathFound = function (context) {
+            config.result[context.next.node.getID()].distance = context.proposed_dist;
+            config.result[context.next.node.getID()].parent = context.current.node;
+        };
+        callbacks.better_path.push(betterPathFound);
+        return config;
+    }
+    exports.preparePFSStandardConfig = preparePFSStandardConfig;
+    });
+
+    unwrapExports(PFS_1);
+    var PFS_2 = PFS_1.DEFAULT_WEIGHT;
+    var PFS_3 = PFS_1.PFS;
+    var PFS_4 = PFS_1.preparePFSStandardConfig;
+
+    var BellmanFord = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    function BFSanityChecks(graph, start) {
+        if (graph == null || start == null) {
+            throw new Error('Graph as well as start node have to be valid objects.');
+        }
+        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
+            throw new Error('Cowardly refusing to traverse a graph without edges.');
+        }
+        if (!graph.hasNodeID(start.getID())) {
+            throw new Error('Cannot start from an outside node.');
+        }
+    }
+    function BellmanFordArray(graph, start) {
+        BFSanityChecks(graph, start);
+        let distances = [], nodes = graph.getNodes(), edge, node_keys = Object.keys(nodes), node, id_idx_map = {}, new_weight, neg_cycle = false;
+        for (let n_idx = 0; n_idx < node_keys.length; ++n_idx) {
+            node = nodes[node_keys[n_idx]];
+            distances[n_idx] = (node === start) ? 0 : Number.POSITIVE_INFINITY;
+            id_idx_map[node.getID()] = n_idx;
+        }
+        let graph_edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
+        let bf_edges = [];
+        for (let e_idx = 0; e_idx < graph_edges.length; ++e_idx) {
+            edge = graph_edges[e_idx];
+            let bf_edge_entry = bf_edges.push([
+                id_idx_map[edge.getNodes().a.getID()],
+                id_idx_map[edge.getNodes().b.getID()],
+                isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT,
+                edge.isDirected()
+            ]);
+        }
+        for (let i = 0; i < node_keys.length - 1; ++i) {
+            for (let e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
+                edge = bf_edges[e_idx];
+                updateDist(edge[0], edge[1], edge[2]);
+                !edge[3] && updateDist(edge[1], edge[0], edge[2]);
+            }
+        }
+        for (let e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
+            edge = bf_edges[e_idx];
+            if (betterDist(edge[0], edge[1], edge[2]) || (!edge[3] && betterDist(edge[1], edge[0], edge[2]))) {
+                neg_cycle = true;
+                break;
+            }
+        }
+        function updateDist(u, v, weight) {
+            new_weight = distances[u] + weight;
+            if (distances[v] > new_weight) {
+                distances[v] = new_weight;
+            }
+        }
+        function betterDist(u, v, weight) {
+            return (distances[v] > distances[u] + weight);
+        }
+        return { distances, neg_cycle };
+    }
+    exports.BellmanFordArray = BellmanFordArray;
+    function BellmanFordDict(graph, start) {
+        BFSanityChecks(graph, start);
+        let distances = {}, edges, edge, a, b, weight, new_weight, nodes_size, neg_cycle = false;
+        distances = {};
+        edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
+        nodes_size = graph.nrNodes();
+        for (let node in graph.getNodes()) {
+            distances[node] = Number.POSITIVE_INFINITY;
+        }
+        distances[start.getID()] = 0;
+        for (let i = 0; i < nodes_size - 1; ++i) {
+            for (let e_idx = 0; e_idx < edges.length; ++e_idx) {
+                edge = edges[e_idx];
+                a = edge.getNodes().a.getID();
+                b = edge.getNodes().b.getID();
+                weight = isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT;
+                updateDist(a, b, weight);
+                !edge.isDirected() && updateDist(b, a, weight);
+            }
+        }
+        for (let edgeID in edges) {
+            edge = edges[edgeID];
+            a = edge.getNodes().a.getID();
+            b = edge.getNodes().b.getID();
+            weight = isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT;
+            if (betterDist(a, b, weight) || (!edge.isDirected() && betterDist(b, a, weight))) {
+                neg_cycle = true;
+            }
+        }
+        function updateDist(u, v, weight) {
+            new_weight = distances[u] + weight;
+            if (distances[v] > new_weight) {
+                distances[v] = new_weight;
+            }
+        }
+        function betterDist(u, v, weight) {
+            return (distances[v] > distances[u] + weight);
+        }
+        return { distances, neg_cycle };
+    }
+    exports.BellmanFordDict = BellmanFordDict;
+    });
+
+    unwrapExports(BellmanFord);
+    var BellmanFord_1 = BellmanFord.BellmanFordArray;
+    var BellmanFord_2 = BellmanFord.BellmanFordDict;
+
+    var Johnsons_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+    function Johnsons(graph) {
+        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
+            throw new Error("Cowardly refusing to traverse graph without edges.");
+        }
+        let allNodes = graph.getNodes();
+        if (graph.hasNegativeEdge()) {
+            var extraNode = new Nodes.BaseNode("extraNode");
+            graph = addExtraNandE(graph, extraNode);
+            let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
+            if (BFresult.neg_cycle) {
+                throw new Error("The graph contains a negative cycle, thus it can not be processed");
+            }
+            else {
+                let newWeights = BFresult.distances;
+                graph = reWeighGraph(graph, newWeights, extraNode);
+                graph.deleteNode(extraNode);
+                return PFSFromAllNodes(graph);
+            }
+        }
+        return PFSFromAllNodes(graph);
+    }
+    exports.Johnsons = Johnsons;
+    function addExtraNandE(target, nodeToAdd) {
+        let allNodes = target.getNodes();
+        target.addNode(nodeToAdd);
+        let tempCounter = 0;
+        for (let nodeKey in allNodes) {
+            if (allNodes[nodeKey].getID() != nodeToAdd.getID()) {
+                target.addEdgeByNodeIDs("temp" + tempCounter, nodeToAdd.getID(), allNodes[nodeKey].getID(), { directed: true, weighted: true, weight: 0 });
+                tempCounter++;
+            }
+        }
+        return target;
+    }
+    exports.addExtraNandE = addExtraNandE;
+    function reWeighGraph(target, distDict, tempNode) {
+        let edges = target.getDirEdgesArray().concat(target.getUndEdgesArray());
+        for (let edge of edges) {
+            var a = edge.getNodes().a.getID();
+            var b = edge.getNodes().b.getID();
+            if (a == tempNode.getID()) {
+                continue;
+            }
+            else if (edge.isWeighted) {
+                let oldWeight = edge.getWeight();
+                let newWeight = oldWeight + distDict[a] - distDict[b];
+                edge.setWeight(newWeight);
+            }
+            else {
+                let oldWeight = PFS_1.DEFAULT_WEIGHT;
+                let newWeight = oldWeight + distDict[a] - distDict[b];
+                let edgeID = edge.getID();
+                let dirNess = edge.isDirected();
+                target.deleteEdge(edge);
+                target.addEdgeByNodeIDs(edgeID, a, b, { directed: dirNess, weighted: true, weight: newWeight });
+            }
+        }
+        return target;
+    }
+    exports.reWeighGraph = reWeighGraph;
+    function PFSFromAllNodes(graph) {
+        let dists = graph.adjListArray();
+        let next = graph.nextArray();
+        let nodesDict = graph.getNodes();
+        let nodeIDIdxMap = {};
+        let i = 0;
+        for (let key in nodesDict) {
+            nodeIDIdxMap[nodesDict[key].getID()] = i++;
+        }
+        let specialConfig = PFS_1.preparePFSStandardConfig();
+        var notEncounteredJohnsons = function (context) {
+            context.next.best =
+                context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
+            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+            if (context.current.node == context.root_node) {
+                dists[i][j] = context.next.best;
+                next[i][j][0] = j;
+            }
+            else {
+                dists[i][j] = context.next.best;
+                next[i][j][0] = nodeIDIdxMap[context.current.node.getID()];
+            }
+        };
+        specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredJohnsons);
+        var betterPathJohnsons = function (context) {
+            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+            dists[i][j] = context.proposed_dist;
+            if (context.current.node !== context.root_node) {
+                next[i][j].splice(0, next[i][j].length, nodeIDIdxMap[context.current.node.getID()]);
+            }
+        };
+        specialConfig.callbacks.better_path.splice(0, 1, betterPathJohnsons);
+        var equalPathJohnsons = function (context) {
+            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+            if (context.current.node !== context.root_node) {
+                next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], [nodeIDIdxMap[context.current.node.getID()]]);
+            }
+        };
+        specialConfig.callbacks.equal_path.push(equalPathJohnsons);
+        for (let key in nodesDict) {
+            PFS_1.PFS(graph, nodesDict[key], specialConfig);
+        }
+        return [dists, next];
+    }
+    exports.PFSFromAllNodes = PFSFromAllNodes;
+    });
+
+    unwrapExports(Johnsons_1);
+    var Johnsons_2 = Johnsons_1.Johnsons;
+    var Johnsons_3 = Johnsons_1.addExtraNandE;
+    var Johnsons_4 = Johnsons_1.reWeighGraph;
+    var Johnsons_5 = Johnsons_1.PFSFromAllNodes;
+
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const LOG_LEVELS = {
+        debug: "debug",
+        production: "production"
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    const DEFAULT_LEVEL = LOG_LEVELS.production;
+    let log_level;
+    if (typeof window !== 'undefined') {
+        log_level = DEFAULT_LEVEL;
+    }
+    else {
+        log_level = process.env['G_LOG'] ? process.env['G_LOG'] : DEFAULT_LEVEL;
+    }
+    const RUN_CONFIG = {
+        log_level
+    };
+    exports.RUN_CONFIG = RUN_CONFIG;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.LOG_LEVELS;
+    var run_config_2 = run_config.RUN_CONFIG;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    const DEFAULT_COLOR = 37;
+    class Logger {
+        constructor(config) {
+            this.config = null;
+            this.config = config || run_config.RUN_CONFIG;
+        }
+        log(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.log.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        error(err, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.error.call(console, this.colorize(color, err, bright));
+                return true;
+            }
+            return false;
+        }
+        dir(obj, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.dir.call(console, this.colorize(color, obj, bright));
+                return true;
+            }
+            return false;
+        }
+        info(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.info.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        warn(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.warn.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        write(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        colorize(color, output, bright) {
+            let out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        }
+    }
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
+
+    var Graph = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+
+
+
+    let logger = new Logger_1.Logger();
+    const DEFAULT_WEIGHT = 1;
+    var GraphMode;
+    (function (GraphMode) {
+        GraphMode[GraphMode["INIT"] = 0] = "INIT";
+        GraphMode[GraphMode["DIRECTED"] = 1] = "DIRECTED";
+        GraphMode[GraphMode["UNDIRECTED"] = 2] = "UNDIRECTED";
+        GraphMode[GraphMode["MIXED"] = 3] = "MIXED";
+    })(GraphMode = exports.GraphMode || (exports.GraphMode = {}));
+    class BaseGraph {
+        constructor(_label) {
+            this._label = _label;
+            this._nr_nodes = 0;
+            this._nr_dir_edges = 0;
+            this._nr_und_edges = 0;
+            this._mode = GraphMode.INIT;
+            this._nodes = {};
+            this._dir_edges = {};
+            this._und_edges = {};
+        }
+        reweighIfHasNegativeEdge(clone = false) {
+            if (this.hasNegativeEdge()) {
+                let result_graph = clone ? this.cloneStructure() : this;
+                var extraNode = new Nodes.BaseNode("extraNode");
+                result_graph = Johnsons_1.addExtraNandE(result_graph, extraNode);
+                let BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
+                if (BFresult.neg_cycle) {
+                    throw new Error("The graph contains a negative cycle, thus it can not be processed");
+                }
+                else {
+                    let newWeights = BFresult.distances;
+                    result_graph = Johnsons_1.reWeighGraph(result_graph, newWeights, extraNode);
+                    result_graph.deleteNode(extraNode);
+                }
+                return result_graph;
+            }
+        }
+        toDirectedGraph(copy = false) {
+            let result_graph = copy ? this.cloneStructure() : this;
+            if (this._nr_dir_edges === 0 && this._nr_und_edges === 0) {
+                throw new Error("Cowardly refusing to re-interpret an empty graph.");
+            }
+            return result_graph;
+        }
+        toUndirectedGraph() {
+            return this;
+        }
+        hasNegativeEdge() {
+            let has_neg_edge = false, edge;
+            for (let edge_id in this._und_edges) {
+                edge = this._und_edges[edge_id];
+                if (!edge.isWeighted()) {
+                    continue;
+                }
+                if (edge.getWeight() < 0) {
+                    return true;
+                }
+            }
+            for (let edge_id in this._dir_edges) {
+                edge = this._dir_edges[edge_id];
+                if (!edge.isWeighted()) {
+                    continue;
+                }
+                if (edge.getWeight() < 0) {
+                    has_neg_edge = true;
+                    break;
+                }
+            }
+            return has_neg_edge;
+        }
+        hasNegativeCycles(node) {
+            if (!this.hasNegativeEdge()) {
+                return false;
+            }
+            let negative_cycle = false, start = node ? node : this.getRandomNode();
+            DFS_1.DFS(this, start).forEach(comp => {
+                let min_count = Number.POSITIVE_INFINITY, comp_start_node;
+                Object.keys(comp).forEach(node_id => {
+                    if (min_count > comp[node_id].counter) {
+                        min_count = comp[node_id].counter;
+                        comp_start_node = node_id;
+                    }
+                });
+                if (BellmanFord.BellmanFordArray(this, this._nodes[comp_start_node]).neg_cycle) {
+                    negative_cycle = true;
+                }
+            });
+            return negative_cycle;
+        }
+        nextArray(incoming = false) {
+            let next = [], node_keys = Object.keys(this._nodes);
+            const adjDict = this.adjListDict(incoming, true, 0);
+            for (let i = 0; i < this._nr_nodes; ++i) {
+                next.push([]);
+                for (let j = 0; j < this._nr_nodes; ++j) {
+                    next[i].push([]);
+                    next[i][j].push(i === j ? j : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? j : null);
+                }
+            }
+            return next;
+        }
+        adjListArray(incoming = false) {
+            let adjList = [], node_keys = Object.keys(this._nodes);
+            const adjDict = this.adjListDict(incoming, true, 0);
+            for (let i = 0; i < this._nr_nodes; ++i) {
+                adjList.push([]);
+                for (let j = 0; j < this._nr_nodes; ++j) {
+                    adjList[i].push(i === j ? 0 : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? adjDict[node_keys[i]][node_keys[j]] : Number.POSITIVE_INFINITY);
+                }
+            }
+            return adjList;
+        }
+        adjListDict(incoming = false, include_self = false, self_dist = 0) {
+            let adj_list_dict = {}, nodes = this.getNodes(), cur_dist, key, cur_edge_weight;
+            for (key in nodes) {
+                adj_list_dict[key] = {};
+                if (include_self) {
+                    adj_list_dict[key][key] = self_dist;
+                }
+            }
+            for (key in nodes) {
+                let neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
+                neighbors.forEach((ne) => {
+                    cur_dist = adj_list_dict[key][ne.node.getID()] || Number.POSITIVE_INFINITY;
+                    cur_edge_weight = isNaN(ne.edge.getWeight()) ? DEFAULT_WEIGHT : ne.edge.getWeight();
+                    if (cur_edge_weight < cur_dist) {
+                        adj_list_dict[key][ne.node.getID()] = cur_edge_weight;
+                        if (incoming) {
+                            adj_list_dict[ne.node.getID()][key] = cur_edge_weight;
+                        }
+                    }
+                    else {
+                        adj_list_dict[key][ne.node.getID()] = cur_dist;
+                        if (incoming) {
+                            adj_list_dict[ne.node.getID()][key] = cur_dist;
+                        }
+                    }
+                });
+            }
+            return adj_list_dict;
+        }
+        getMode() {
+            return this._mode;
+        }
+        getStats() {
+            return {
+                mode: this._mode,
+                nr_nodes: this._nr_nodes,
+                nr_und_edges: this._nr_und_edges,
+                nr_dir_edges: this._nr_dir_edges,
+                density_dir: this._nr_dir_edges / (this._nr_nodes * (this._nr_nodes - 1)),
+                density_und: 2 * this._nr_und_edges / (this._nr_nodes * (this._nr_nodes - 1))
+            };
+        }
+        nrNodes() {
+            return this._nr_nodes;
+        }
+        nrDirEdges() {
+            return this._nr_dir_edges;
+        }
+        nrUndEdges() {
+            return this._nr_und_edges;
+        }
+        addNodeByID(id, opts) {
+            if (this.hasNodeID(id)) {
+                throw new Error("Won't add node with duplicate ID.");
+            }
+            var node = new Nodes.BaseNode(id, opts);
+            return this.addNode(node) ? node : null;
+        }
+        addNode(node) {
+            if (this.hasNodeID(node.getID())) {
+                throw new Error("Won't add node with duplicate ID.");
+            }
+            this._nodes[node.getID()] = node;
+            this._nr_nodes += 1;
+            return true;
+        }
+        hasNodeID(id) {
+            return !!this._nodes[id];
+        }
+        getNodeById(id) {
+            return this._nodes[id];
+        }
+        getNodes() {
+            return this._nodes;
+        }
+        getRandomNode() {
+            return this.pickRandomProperty(this._nodes);
+        }
+        deleteNode(node) {
+            var rem_node = this._nodes[node.getID()];
+            if (!rem_node) {
+                throw new Error('Cannot remove un-added node.');
+            }
+            var in_deg = node.inDegree();
+            var out_deg = node.outDegree();
+            var deg = node.degree();
+            if (in_deg) {
+                this.deleteInEdgesOf(node);
+            }
+            if (out_deg) {
+                this.deleteOutEdgesOf(node);
+            }
+            if (deg) {
+                this.deleteUndEdgesOf(node);
+            }
+            delete this._nodes[node.getID()];
+            this._nr_nodes -= 1;
+        }
+        hasEdgeID(id) {
+            return !!this._dir_edges[id] || !!this._und_edges[id];
+        }
+        getEdgeById(id) {
+            var edge = this._dir_edges[id] || this._und_edges[id];
+            if (!edge) {
+                throw new Error("cannot retrieve edge with non-existing ID.");
+            }
+            return edge;
+        }
+        checkExistanceOfEdgeNodes(node_a, node_b) {
+            if (!node_a) {
+                throw new Error("Cannot find edge. Node A does not exist (in graph).");
+            }
+            if (!node_b) {
+                throw new Error("Cannot find edge. Node B does not exist (in graph).");
+            }
+        }
+        getDirEdgeByNodeIDs(node_a_id, node_b_id) {
+            const node_a = this.getNodeById(node_a_id);
+            const node_b = this.getNodeById(node_b_id);
+            this.checkExistanceOfEdgeNodes(node_a, node_b);
+            let edges_dir = node_a.outEdges(), edges_dir_keys = Object.keys(edges_dir);
+            for (let i = 0; i < edges_dir_keys.length; i++) {
+                var edge = edges_dir[edges_dir_keys[i]];
+                if (edge.getNodes().b.getID() == node_b_id) {
+                    return edge;
+                }
+            }
+            throw new Error(`Cannot find edge. There is no edge between Node ${node_a_id} and ${node_b_id}.`);
+        }
+        getUndEdgeByNodeIDs(node_a_id, node_b_id) {
+            const node_a = this.getNodeById(node_a_id);
+            const node_b = this.getNodeById(node_b_id);
+            this.checkExistanceOfEdgeNodes(node_a, node_b);
+            let edges_und = node_a.undEdges(), edges_und_keys = Object.keys(edges_und);
+            for (let i = 0; i < edges_und_keys.length; i++) {
+                var edge = edges_und[edges_und_keys[i]];
+                var b;
+                (edge.getNodes().a.getID() == node_a_id) ? (b = edge.getNodes().b.getID()) : (b = edge.getNodes().a.getID());
+                if (b == node_b_id) {
+                    return edge;
+                }
+            }
+        }
+        getDirEdges() {
+            return this._dir_edges;
+        }
+        getUndEdges() {
+            return this._und_edges;
+        }
+        getDirEdgesArray() {
+            let edges = [];
+            for (let e_id in this._dir_edges) {
+                edges.push(this._dir_edges[e_id]);
+            }
+            return edges;
+        }
+        getUndEdgesArray() {
+            let edges = [];
+            for (let e_id in this._und_edges) {
+                edges.push(this._und_edges[e_id]);
+            }
+            return edges;
+        }
+        addEdgeByNodeIDs(label, node_a_id, node_b_id, opts) {
+            var node_a = this.getNodeById(node_a_id), node_b = this.getNodeById(node_b_id);
+            if (!node_a) {
+                throw new Error("Cannot add edge. Node A does not exist");
+            }
+            else if (!node_b) {
+                throw new Error("Cannot add edge. Node B does not exist");
+            }
+            else {
+                return this.addEdgeByID(label, node_a, node_b, opts);
+            }
+        }
+        addEdgeByID(id, node_a, node_b, opts) {
+            let edge = new Edges.BaseEdge(id, node_a, node_b, opts || {});
+            return this.addEdge(edge);
+        }
+        addEdge(edge) {
+            let node_a = edge.getNodes().a, node_b = edge.getNodes().b;
+            if (!this.hasNodeID(node_a.getID()) || !this.hasNodeID(node_b.getID())
+                || this._nodes[node_a.getID()] !== node_a || this._nodes[node_b.getID()] !== node_b) {
+                throw new Error("can only add edge between two nodes existing in graph");
+            }
+            node_a.addEdge(edge);
+            if (edge.isDirected()) {
+                node_b.addEdge(edge);
+                this._dir_edges[edge.getID()] = edge;
+                this._nr_dir_edges += 1;
+                this.updateGraphMode();
+            }
+            else {
+                if (node_a !== node_b) {
+                    node_b.addEdge(edge);
+                }
+                this._und_edges[edge.getID()] = edge;
+                this._nr_und_edges += 1;
+                this.updateGraphMode();
+            }
+            return edge;
+        }
+        deleteEdge(edge) {
+            var dir_edge = this._dir_edges[edge.getID()];
+            var und_edge = this._und_edges[edge.getID()];
+            if (!dir_edge && !und_edge) {
+                throw new Error('cannot remove non-existing edge.');
+            }
+            var nodes = edge.getNodes();
+            nodes.a.removeEdge(edge);
+            if (nodes.a !== nodes.b) {
+                nodes.b.removeEdge(edge);
+            }
+            if (dir_edge) {
+                delete this._dir_edges[edge.getID()];
+                this._nr_dir_edges -= 1;
+            }
+            else {
+                delete this._und_edges[edge.getID()];
+                this._nr_und_edges -= 1;
+            }
+            this.updateGraphMode();
+        }
+        deleteInEdgesOf(node) {
+            this.checkConnectedNodeOrThrow(node);
+            var in_edges = node.inEdges();
+            var key, edge;
+            for (key in in_edges) {
+                edge = in_edges[key];
+                edge.getNodes().a.removeEdge(edge);
+                delete this._dir_edges[edge.getID()];
+                this._nr_dir_edges -= 1;
+            }
+            node.clearInEdges();
+            this.updateGraphMode();
+        }
+        deleteOutEdgesOf(node) {
+            this.checkConnectedNodeOrThrow(node);
+            var out_edges = node.outEdges();
+            var key, edge;
+            for (key in out_edges) {
+                edge = out_edges[key];
+                edge.getNodes().b.removeEdge(edge);
+                delete this._dir_edges[edge.getID()];
+                this._nr_dir_edges -= 1;
+            }
+            node.clearOutEdges();
+            this.updateGraphMode();
+        }
+        deleteDirEdgesOf(node) {
+            this.deleteInEdgesOf(node);
+            this.deleteOutEdgesOf(node);
+        }
+        deleteUndEdgesOf(node) {
+            this.checkConnectedNodeOrThrow(node);
+            var und_edges = node.undEdges();
+            var key, edge;
+            for (key in und_edges) {
+                edge = und_edges[key];
+                var conns = edge.getNodes();
+                conns.a.removeEdge(edge);
+                if (conns.a !== conns.b) {
+                    conns.b.removeEdge(edge);
+                }
+                delete this._und_edges[edge.getID()];
+                this._nr_und_edges -= 1;
+            }
+            node.clearUndEdges();
+            this.updateGraphMode();
+        }
+        deleteAllEdgesOf(node) {
+            this.deleteDirEdgesOf(node);
+            this.deleteUndEdgesOf(node);
+        }
+        clearAllDirEdges() {
+            for (var edge in this._dir_edges) {
+                this.deleteEdge(this._dir_edges[edge]);
+            }
+        }
+        clearAllUndEdges() {
+            for (var edge in this._und_edges) {
+                this.deleteEdge(this._und_edges[edge]);
+            }
+        }
+        clearAllEdges() {
+            this.clearAllDirEdges();
+            this.clearAllUndEdges();
+        }
+        getRandomDirEdge() {
+            return this.pickRandomProperty(this._dir_edges);
+        }
+        getRandomUndEdge() {
+            return this.pickRandomProperty(this._und_edges);
+        }
+        cloneStructure() {
+            let new_graph = new BaseGraph(this._label), old_nodes = this.getNodes(), old_edge, new_node_a = null, new_node_b = null;
+            for (let node_id in old_nodes) {
+                new_graph.addNode(old_nodes[node_id].clone());
+            }
+            [this.getDirEdges(), this.getUndEdges()].forEach((old_edges) => {
+                for (let edge_id in old_edges) {
+                    old_edge = old_edges[edge_id];
+                    new_node_a = new_graph.getNodeById(old_edge.getNodes().a.getID());
+                    new_node_b = new_graph.getNodeById(old_edge.getNodes().b.getID());
+                    new_graph.addEdge(old_edge.clone(new_node_a, new_node_b));
+                }
+            });
+            return new_graph;
+        }
+        cloneSubGraphStructure(root, cutoff) {
+            let new_graph = new BaseGraph(this._label);
+            let config = BFS_1.prepareBFSStandardConfig();
+            var bfsNodeUnmarkedTestCallback = function (context) {
+                if (config.result[context.next_node.getID()].counter > cutoff) {
+                    context.queue = [];
+                }
+                else {
+                    new_graph.addNode(context.next_node.clone());
+                }
+            };
+            config.callbacks.node_unmarked.push(bfsNodeUnmarkedTestCallback);
+            BFS_1.BFS(this, root, config);
+            let old_edge, new_node_a = null, new_node_b = null;
+            [this.getDirEdges(), this.getUndEdges()].forEach((old_edges) => {
+                for (let edge_id in old_edges) {
+                    old_edge = old_edges[edge_id];
+                    new_node_a = new_graph.getNodeById(old_edge.getNodes().a.getID());
+                    new_node_b = new_graph.getNodeById(old_edge.getNodes().b.getID());
+                    if (new_node_a != null && new_node_b != null)
+                        new_graph.addEdge(old_edge.clone(new_node_a, new_node_b));
+                }
+            });
+            return new_graph;
+        }
+        checkConnectedNodeOrThrow(node) {
+            var node = this._nodes[node.getID()];
+            if (!node) {
+                throw new Error('Cowardly refusing to delete edges of un-added node.');
+            }
+        }
+        updateGraphMode() {
+            var nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
+            if (nr_dir && nr_und) {
+                this._mode = GraphMode.MIXED;
+            }
+            else if (nr_dir) {
+                this._mode = GraphMode.DIRECTED;
+            }
+            else if (nr_und) {
+                this._mode = GraphMode.UNDIRECTED;
+            }
+            else {
+                this._mode = GraphMode.INIT;
+            }
+        }
+        pickRandomProperty(propList) {
+            let tmpList = Object.keys(propList);
+            let randomPropertyName = tmpList[Math.floor(Math.random() * tmpList.length)];
+            return propList[randomPropertyName];
+        }
+        pickRandomProperties(propList, amount) {
+            let ids = [];
+            let keys = Object.keys(propList);
+            let fraction = amount / keys.length;
+            let used_keys = {};
+            for (let i = 0; ids.length < amount && i < keys.length; i++) {
+                if (Math.random() < fraction) {
+                    ids.push(keys[i]);
+                    used_keys[keys[i]] = i;
+                }
+            }
+            let diff = amount - ids.length;
+            for (let i = 0; i < keys.length && diff; i++) {
+                if (used_keys[keys[i]] == null) {
+                    ids.push(keys[i]);
+                    diff--;
+                }
+            }
+            return ids;
+        }
+    }
+    exports.BaseGraph = BaseGraph;
+    });
+
+    unwrapExports(Graph);
+    var Graph_1 = Graph.GraphMode;
+    var Graph_2 = Graph.BaseGraph;
+
+    var FloydWarshall = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    function initializeDistsWithEdges(graph) {
+        let dists = {}, edges = StructUtils.mergeObjects([graph.getDirEdges(), graph.getUndEdges()]);
+        for (let edge in edges) {
+            let a = edges[edge].getNodes().a.getID();
+            let b = edges[edge].getNodes().b.getID();
+            if (dists[a] == null)
+                dists[a] = {};
+            dists[a][b] = (isNaN(edges[edge].getWeight()) ? 1 : edges[edge].getWeight());
+            if (!edges[edge].isDirected()) {
+                if (dists[b] == null)
+                    dists[b] = {};
+                dists[b][a] = (isNaN(edges[edge].getWeight()) ? 1 : edges[edge].getWeight());
+            }
+        }
+        return dists;
+    }
+    function FloydWarshallAPSP(graph) {
+        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
+            throw new Error("Cowardly refusing to traverse graph without edges.");
+        }
+        let dists = graph.adjListArray();
+        let next = graph.nextArray();
+        let N = dists.length;
+        for (var k = 0; k < N; ++k) {
+            for (var i = 0; i < N; ++i) {
+                for (var j = 0; j < N; ++j) {
+                    if (k != i && k != j && i != j && dists[i][j] == (dists[i][k] + dists[k][j])) {
+                        if (dists[i][j] !== Number.POSITIVE_INFINITY) {
+                            next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], next[i][k]);
+                        }
+                    }
+                    if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
+                        next[i][j] = next[i][k].slice(0);
+                        dists[i][j] = dists[i][k] + dists[k][j];
+                    }
+                }
+            }
+        }
+        return [dists, next];
+    }
+    exports.FloydWarshallAPSP = FloydWarshallAPSP;
+    function FloydWarshallArray(graph) {
+        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
+            throw new Error("Cowardly refusing to traverse graph without edges.");
+        }
+        let dists = graph.adjListArray();
+        let N = dists.length;
+        for (var k = 0; k < N; ++k) {
+            for (var i = 0; i < N; ++i) {
+                for (var j = 0; j < N; ++j) {
+                    if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
+                        dists[i][j] = dists[i][k] + dists[k][j];
+                    }
+                }
+            }
+        }
+        return dists;
+    }
+    exports.FloydWarshallArray = FloydWarshallArray;
+    function FloydWarshallDict(graph) {
+        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
+            throw new Error("Cowardly refusing to traverse graph without edges.");
+        }
+        let dists = initializeDistsWithEdges(graph);
+        for (var k in dists) {
+            for (var i in dists) {
+                for (var j in dists) {
+                    if (i === j) {
+                        continue;
+                    }
+                    if (dists[i][k] == null || dists[k][j] == null) {
+                        continue;
+                    }
+                    if ((!dists[i][j] && dists[i][j] != 0) || (dists[i][j] > dists[i][k] + dists[k][j])) {
+                        dists[i][j] = dists[i][k] + dists[k][j];
+                    }
+                }
+            }
+        }
+        return dists;
+    }
+    exports.FloydWarshallDict = FloydWarshallDict;
+    function changeNextToDirectParents(input) {
+        let output = [];
+        for (let a = 0; a < input.length; a++) {
+            output.push([]);
+            for (let b = 0; b < input.length; b++) {
+                output[a].push([]);
+                output[a][b] = input[a][b];
+            }
+        }
+        for (let a = 0; a < input.length; a++) {
+            for (let b = 0; b < input.length; b++) {
+                if (input[a][b][0] == null) {
+                    continue;
+                }
+                else if (a != b && !(input[a][b].length === 1 && input[a][b][0] === b)) {
+                    output[a][b] = [];
+                    findDirectParents(a, b, input, output);
+                }
+            }
+        }
+        return output;
+    }
+    exports.changeNextToDirectParents = changeNextToDirectParents;
+    function findDirectParents(u, v, inNext, outNext) {
+        let nodesInTracking = [u];
+        let counter = 0;
+        while (nodesInTracking.length > 0) {
+            let currNode = nodesInTracking.pop();
+            if (currNode == u && counter > 0) {
+                continue;
+            }
+            else {
+                for (let e = 0; e < inNext[currNode][v].length; e++) {
+                    if (inNext[currNode][v][e] == v && counter == 0) {
+                        outNext[u][v] = StructUtils.mergeOrderedArraysNoDups(outNext[u][v], [v]);
+                    }
+                    else if (inNext[currNode][v][e] == v) {
+                        outNext[u][v] = StructUtils.mergeOrderedArraysNoDups(outNext[u][v], [currNode]);
+                    }
+                    else {
+                        nodesInTracking = StructUtils.mergeOrderedArraysNoDups(nodesInTracking, [inNext[currNode][v][e]]);
+                    }
+                }
+            }
+            counter++;
+        }
+    }
+    });
+
+    unwrapExports(FloydWarshall);
+    var FloydWarshall_1 = FloydWarshall.FloydWarshallAPSP;
+    var FloydWarshall_2 = FloydWarshall.FloydWarshallArray;
+    var FloydWarshall_3 = FloydWarshall.FloydWarshallDict;
+    var FloydWarshall_4 = FloydWarshall.changeNextToDirectParents;
+
+    var Betweenness = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    function betweennessCentrality(graph, directed, sparse) {
+        let paths;
+        var sparse = sparse || false;
+        if (sparse) {
+            paths = Johnsons_1.Johnsons(graph)[1];
+        }
+        else {
+            paths = FloydWarshall.changeNextToDirectParents(FloydWarshall.FloydWarshallAPSP(graph)[1]);
+        }
+        let nodes = graph.getNodes();
+        let nodeKeys = Object.keys(nodes);
+        let map = {};
+        for (let key in nodes) {
+            map[key] = 0;
+        }
+        let N = paths.length;
+        for (var a = 0; a < N; ++a) {
+            for (var b = 0; b < N; ++b) {
+                if (a != b && !(paths[a][b].length == 1 && paths[a][b][0] == b) && paths[a][b][0] != null) {
+                    let tempMap = {};
+                    let leadArray = [];
+                    let pathCount = 0;
+                    do {
+                        let tracer = b;
+                        let leadCounter = 0;
+                        pathCount++;
+                        while (true) {
+                            let previous = paths[a][tracer];
+                            let terminate = false;
+                            if (previous.length == 1 && previous[0] == tracer) {
+                                break;
+                            }
+                            else if (previous.length == 1) {
+                                tracer = previous[0];
+                                tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
+                            }
+                            if (previous.length > 1) {
+                                if (leadArray.length == 0) {
+                                    leadArray.push([0, previous.length]);
+                                    if (previous[0] == tracer) {
+                                        terminate = true;
+                                    }
+                                    else {
+                                        tracer = previous[0];
+                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
+                                    }
+                                    leadCounter++;
+                                }
+                                else if (leadCounter < leadArray.length) {
+                                    let choice = leadArray[leadCounter][0];
+                                    if (previous[choice] == tracer) {
+                                        terminate = true;
+                                    }
+                                    else {
+                                        tracer = previous[choice];
+                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
+                                    }
+                                    leadCounter++;
+                                }
+                                else {
+                                    leadArray.push([0, previous.length]);
+                                    if (previous[0] == tracer) {
+                                        terminate = true;
+                                    }
+                                    else {
+                                        tracer = previous[0];
+                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
+                                    }
+                                    leadCounter++;
+                                }
+                            }
+                            if (terminate) {
+                                break;
+                            }
+                        }
+                        if (leadArray.length > 0) {
+                            leadArray[leadArray.length - 1][0]++;
+                            while (leadArray[leadArray.length - 1][0] == leadArray[leadArray.length - 1][1]) {
+                                leadArray.splice(leadArray.length - 1, 1);
+                                if (leadArray.length == 0) {
+                                    break;
+                                }
+                                leadArray[leadArray.length - 1][0]++;
+                            }
+                        }
+                    } while (leadArray.length != 0);
+                    for (let key in tempMap) {
+                        let mapKey = nodeKeys[key];
+                        map[mapKey] += tempMap[key] / pathCount;
+                    }
+                }
+            }
+        }
+        return map;
+    }
+    exports.betweennessCentrality = betweennessCentrality;
+    });
+
+    unwrapExports(Betweenness);
+    var Betweenness_1 = Betweenness.betweennessCentrality;
+
+    var Brandes_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+
+    class Brandes {
+        constructor(_graph) {
+            this._graph = _graph;
+        }
+        computeUnweighted(normalize = false, directed = false) {
+            if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
+                throw new Error("Cowardly refusing to traverse graph without edges.");
+            }
+            let nodes = this._graph.getNodes();
+            let adjList = this._graph.adjListDict();
+            let s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, Q = [], S = [], CB = {};
+            let closedNodes = {};
+            for (let n in nodes) {
+                let node_id = nodes[n].getID();
+                CB[node_id] = 0;
+                dist[node_id] = Number.POSITIVE_INFINITY;
+                sigma[node_id] = 0;
+                delta[node_id] = 0;
+                Pred[node_id] = [];
+                closedNodes[node_id] = false;
+            }
+            for (let i in nodes) {
+                s = nodes[i];
+                let id = s.getID();
+                dist[id] = 0;
+                sigma[id] = 1;
+                Q.push(id);
+                closedNodes[id] = true;
+                while (Q.length) {
+                    v = Q.shift();
+                    S.push(v);
+                    let neighbors = adjList[v];
+                    closedNodes[v] = true;
+                    for (let w in neighbors) {
+                        if (closedNodes[w]) {
+                            continue;
+                        }
+                        if (dist[w] === Number.POSITIVE_INFINITY) {
+                            Q.push(w);
+                            dist[w] = dist[v] + 1;
+                        }
+                        if (dist[w] === dist[v] + 1) {
+                            sigma[w] += sigma[v];
+                            Pred[w].push(v);
+                        }
+                    }
+                }
+                while (S.length >= 1) {
+                    w = S.pop();
+                    for (let parent of Pred[w]) {
+                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    }
+                    if (w != s.getID()) {
+                        CB[w] += delta[w];
+                    }
+                    sigma[w] = 0;
+                    delta[w] = 0;
+                    dist[w] = Number.POSITIVE_INFINITY;
+                    Pred[w] = [];
+                    closedNodes[w] = false;
+                }
+            }
+            if (normalize) {
+                this.normalizeScores(CB, this._graph.nrNodes(), directed);
+            }
+            return CB;
+        }
+        computeWeighted(normalize, directed) {
+            if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
+                throw new Error("Cowardly refusing to traverse graph without edges.");
+            }
+            if (this._graph.hasNegativeEdge()) {
+                var extraNode = new Nodes.BaseNode("extraNode");
+                let graph = Johnsons_1.addExtraNandE(this._graph, extraNode);
+                let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
+                if (BFresult.neg_cycle) {
+                    throw new Error("The graph contains a negative cycle, thus it can not be processed");
+                }
+                else {
+                    let newWeights = BFresult.distances;
+                    graph = Johnsons_1.reWeighGraph(graph, newWeights, extraNode);
+                    graph.deleteNode(extraNode);
+                }
+                this._graph = graph;
+            }
+            let nodes = this._graph.getNodes();
+            let N = Object.keys(nodes).length;
+            let adjList = this._graph.adjListDict();
+            const evalPriority = (nb) => nb.best;
+            const evalObjID = (nb) => nb.id;
+            let s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, S = [], CB = {}, closedNodes = {}, Q = new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID);
+            for (let n in nodes) {
+                let currID = nodes[n].getID();
+                CB[currID] = 0;
+                dist[currID] = Number.POSITIVE_INFINITY;
+                sigma[currID] = 0;
+                delta[currID] = 0;
+                Pred[currID] = [];
+                closedNodes[currID] = false;
+            }
+            for (let i in nodes) {
+                s = nodes[i];
+                let id_s = s.getID();
+                dist[id_s] = 0;
+                sigma[id_s] = 1;
+                let source = { id: id_s, best: 0 };
+                Q.insert(source);
+                closedNodes[id_s] = true;
+                while (Q.size() > 0) {
+                    v = Q.pop();
+                    let current_id = v.id;
+                    S.push(current_id);
+                    closedNodes[current_id] = true;
+                    let neighbors = adjList[current_id];
+                    for (let w in neighbors) {
+                        if (closedNodes[w]) {
+                            continue;
+                        }
+                        let new_dist = dist[current_id] + neighbors[w];
+                        let nextNode = { id: w, best: dist[w] };
+                        if (dist[w] > new_dist) {
+                            if (isFinite(dist[w])) {
+                                let x = Q.remove(nextNode);
+                                nextNode.best = new_dist;
+                                Q.insert(nextNode);
+                            }
+                            else {
+                                nextNode.best = new_dist;
+                                Q.insert(nextNode);
+                            }
+                            sigma[w] = 0;
+                            dist[w] = new_dist;
+                            Pred[w] = [];
+                        }
+                        if (dist[w] === new_dist) {
+                            sigma[w] += sigma[current_id];
+                            Pred[w].push(current_id);
+                        }
+                    }
+                }
+                while (S.length >= 1) {
+                    w = S.pop();
+                    for (let parent of Pred[w]) {
+                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    }
+                    if (w != s.getID()) {
+                        CB[w] += delta[w];
+                    }
+                    sigma[w] = 0;
+                    delta[w] = 0;
+                    dist[w] = Number.POSITIVE_INFINITY;
+                    Pred[w] = [];
+                    closedNodes[w] = false;
+                }
+            }
+            if (normalize) {
+                this.normalizeScores(CB, N, directed);
+            }
+            return CB;
+        }
+        computePFSbased(normalize, directed) {
+            let nodes = this._graph.getNodes();
+            let adjList = this._graph.adjListDict();
+            let Pred = {}, sigma = {}, delta = {}, S = [], CB = {};
+            for (let n in nodes) {
+                let currID = nodes[n].getID();
+                CB[currID] = 0;
+                sigma[currID] = 0;
+                delta[currID] = 0;
+                Pred[currID] = [];
+            }
+            let specialConfig = PFS_1.preparePFSStandardConfig();
+            var notEncounteredBrandes = function (context) {
+                context.next.best =
+                    context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
+                let next_id = context.next.node.getID();
+                let current_id = context.current.node.getID();
+                Pred[next_id] = [current_id];
+                sigma[next_id] += sigma[current_id];
+            };
+            specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredBrandes);
+            var newCurrentBrandes = function (context) {
+                S.push(context.current.node.getID());
+            };
+            specialConfig.callbacks.new_current.push(newCurrentBrandes);
+            var betterPathBrandes = function (context) {
+                let next_id = context.next.node.getID();
+                let current_id = context.current.node.getID();
+                sigma[next_id] = 0;
+                sigma[next_id] += sigma[current_id];
+                Pred[next_id] = [];
+                Pred[next_id].push(current_id);
+            };
+            specialConfig.callbacks.better_path.splice(0, 1, betterPathBrandes);
+            var equalPathBrandes = function (context) {
+                let next_id = context.next.node.getID();
+                let current_id = context.current.node.getID();
+                sigma[next_id] += sigma[current_id];
+                if (Pred[next_id].indexOf(current_id) === -1) {
+                    Pred[next_id].push(current_id);
+                }
+            };
+            specialConfig.callbacks.equal_path.push(equalPathBrandes);
+            for (let i in nodes) {
+                let s = nodes[i];
+                sigma[s.getID()] = 1;
+                PFS_1.PFS(this._graph, s, specialConfig);
+                while (S.length >= 1) {
+                    let w = S.pop();
+                    for (let parent of Pred[w]) {
+                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    }
+                    if (w != s.getID()) {
+                        CB[w] += delta[w];
+                    }
+                    sigma[w] = 0;
+                    delta[w] = 0;
+                    Pred[w] = [];
+                }
+            }
+            if (normalize) {
+                this.normalizeScores(CB, this._graph.nrNodes(), directed);
+            }
+            return CB;
+        }
+        normalizeScores(CB, N, directed) {
+            let factor = directed ? ((N - 1) * (N - 2)) : ((N - 1) * (N - 2) / 2);
+            for (let node in CB) {
+                CB[node] /= factor;
+            }
+        }
+    }
+    exports.Brandes = Brandes;
+    });
+
+    unwrapExports(Brandes_1);
+    var Brandes_2 = Brandes_1.Brandes;
+
+    var Closeness = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    class ClosenessCentrality {
+        constructor() { }
+        getCentralityMapFW(graph) {
+            let dists = FloydWarshall.FloydWarshallArray(graph);
+            let ret = [];
+            let N = dists.length;
+            for (let a = 0; a < N; ++a) {
+                let sum = 0;
+                for (let b = 0; b < N; ++b) {
+                    if (dists[a][b] != Number.POSITIVE_INFINITY)
+                        sum += dists[a][b];
+                }
+                ret[a] = 1 / sum;
+            }
+            return ret;
+        }
+        getCentralityMap(graph) {
+            let pfs_config = PFS_1.preparePFSStandardConfig();
+            let accumulated_distance = 0;
+            let not_encountered = function (context) {
+                accumulated_distance += context.current.best + (isNaN(context.next.edge.getWeight()) ? 1 : context.next.edge.getWeight());
+            };
+            var betterPathFound = function (context) {
+                accumulated_distance -= pfs_config.result[context.next.node.getID()].distance - context.proposed_dist;
+            };
+            let bp = pfs_config.callbacks.better_path.pop();
+            pfs_config.callbacks.better_path.push(betterPathFound);
+            pfs_config.callbacks.better_path.push(bp);
+            pfs_config.callbacks.not_encountered.push(not_encountered);
+            let ret = {};
+            for (let key in graph.getNodes()) {
+                let node = graph.getNodeById(key);
+                if (node != null) {
+                    accumulated_distance = 0;
+                    PFS_1.PFS(graph, node, pfs_config);
+                    ret[key] = 1 / accumulated_distance;
+                }
+            }
+            return ret;
+        }
+    }
+    exports.ClosenessCentrality = ClosenessCentrality;
+    });
+
+    unwrapExports(Closeness);
+    var Closeness_1 = Closeness.ClosenessCentrality;
+
+    var Degree = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var DegreeMode;
+    (function (DegreeMode) {
+        DegreeMode[DegreeMode["in"] = 0] = "in";
+        DegreeMode[DegreeMode["out"] = 1] = "out";
+        DegreeMode[DegreeMode["und"] = 2] = "und";
+        DegreeMode[DegreeMode["dir"] = 3] = "dir";
+        DegreeMode[DegreeMode["all"] = 4] = "all";
+    })(DegreeMode = exports.DegreeMode || (exports.DegreeMode = {}));
+    class DegreeCentrality {
+        constructor() { }
+        getCentralityMap(graph, weighted, conf) {
+            weighted = (weighted != null) ? !!weighted : true;
+            conf = (conf == null) ? DegreeMode.all : conf;
+            let ret = {};
+            switch (conf) {
+                case DegreeMode.in:
+                    for (let key in graph.getNodes()) {
+                        let node = graph.getNodeById(key);
+                        if (node != null) {
+                            if (!weighted) {
+                                ret[key] = node.inDegree();
+                            }
+                            else {
+                                ret[key] = ret[key] || 0;
+                                for (let k in node.inEdges()) {
+                                    ret[key] += node.inEdges()[k].getWeight();
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case DegreeMode.out:
+                    for (let key in graph.getNodes()) {
+                        let node = graph.getNodeById(key);
+                        if (node != null) {
+                            if (!weighted) {
+                                ret[key] = node.outDegree();
+                            }
+                            else {
+                                ret[key] = ret[key] || 0;
+                                for (let k in node.outEdges()) {
+                                    ret[key] += node.outEdges()[k].getWeight();
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case DegreeMode.und:
+                    for (let key in graph.getNodes()) {
+                        let node = graph.getNodeById(key);
+                        if (node != null) {
+                            if (!weighted) {
+                                ret[key] = node.degree();
+                            }
+                            else {
+                                ret[key] = ret[key] || 0;
+                                for (let k in node.undEdges()) {
+                                    ret[key] += node.undEdges()[k].getWeight();
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case DegreeMode.dir:
+                    for (let key in graph.getNodes()) {
+                        let node = graph.getNodeById(key);
+                        if (node != null) {
+                            if (!weighted) {
+                                ret[key] = node.inDegree() + node.outDegree();
+                            }
+                            else {
+                                ret[key] = ret[key] || 0;
+                                let comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges()]);
+                                for (let k in comb) {
+                                    ret[key] += comb[k].getWeight();
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case DegreeMode.all:
+                    for (let key in graph.getNodes()) {
+                        let node = graph.getNodeById(key);
+                        if (node != null) {
+                            if (!weighted) {
+                                ret[key] = node.degree() + node.inDegree() + node.outDegree();
+                            }
+                            else {
+                                ret[key] = ret[key] || 0;
+                                let comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges(), node.undEdges()]);
+                                for (let k in comb) {
+                                    ret[key] += comb[k].getWeight();
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+            return ret;
+        }
+        degreeDistribution(graph) {
+            var max_deg = 0, key, nodes = graph.getNodes(), node, all_deg;
+            for (key in nodes) {
+                node = nodes[key];
+                all_deg = node.inDegree() + node.outDegree() + node.degree() + 1;
+                max_deg = all_deg > max_deg ? all_deg : max_deg;
+            }
+            var deg_dist = {
+                in: new Uint32Array(max_deg),
+                out: new Uint32Array(max_deg),
+                dir: new Uint32Array(max_deg),
+                und: new Uint32Array(max_deg),
+                all: new Uint32Array(max_deg)
+            };
+            for (key in nodes) {
+                node = nodes[key];
+                deg_dist.in[node.inDegree()]++;
+                deg_dist.out[node.outDegree()]++;
+                deg_dist.dir[node.inDegree() + node.outDegree()]++;
+                deg_dist.und[node.degree()]++;
+                deg_dist.all[node.inDegree() + node.outDegree() + node.degree()]++;
+            }
+            return deg_dist;
+        }
+    }
+    exports.DegreeCentrality = DegreeCentrality;
+    });
+
+    unwrapExports(Degree);
+    var Degree_1 = Degree.DegreeMode;
+    var Degree_2 = Degree.DegreeCentrality;
+
+    var Pagerank_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    const DEFAULT_WEIGHTED = false;
+    const DEFAULT_ALPHA = 0.15;
+    const DEFAULT_MAX_ITERATIONS = 1e3;
+    const DEFAULT_EPSILON = 1e-6;
+    const DEFAULT_NORMALIZE = false;
+    const defaultInit = (graph) => 1 / graph.nrNodes();
+    class Pagerank {
+        constructor(_graph, config) {
+            this._graph = _graph;
+            config = config || {};
+            this._weighted = config.weighted || DEFAULT_WEIGHTED;
+            this._alpha = config.alpha || DEFAULT_ALPHA;
+            this._maxIterations = config.iterations || DEFAULT_MAX_ITERATIONS;
+            this._epsilon = config.epsilon || DEFAULT_EPSILON;
+            this._normalize = config.normalize || DEFAULT_NORMALIZE;
+            this._personalized = config.personalized ? config.personalized : false;
+            if (this._personalized && !config.tele_set) {
+                throw Error("Personalized Pagerank requires tele_set as a config argument");
+            }
+            if (config.init_map && Object.keys(config.init_map).length !== this._graph.nrNodes()) {
+                throw Error("init_map config parameter must be of size |nodes|");
+            }
+            this._PRArrayDS = config.PRArrays || {
+                curr: [],
+                old: [],
+                out_deg: [],
+                pull: [],
+                pull_weight: this._weighted ? [] : null,
+                teleport: config.tele_set ? [] : null,
+                tele_size: config.tele_set ? 0 : null
+            };
+            config.PRArrays || this.constructPRArrayDataStructs(config);
+        }
+        getConfig() {
+            return {
+                _weighted: this._weighted,
+                _alpha: this._alpha,
+                _maxIterations: this._maxIterations,
+                _epsilon: this._epsilon,
+                _normalize: this._normalize,
+            };
+        }
+        getDSs() {
+            return this._PRArrayDS;
+        }
+        constructPRArrayDataStructs(config) {
+            let tic = +new Date;
+            let nodes = this._graph.getNodes();
+            let i = 0;
+            let teleport_prob_sum = 0;
+            let init_sum = 0;
+            for (let key in nodes) {
+                let node = this._graph.getNodeById(key);
+                node.setFeature('PR_index', i);
+                if (config.init_map) {
+                    if (config.init_map[key] == null) {
+                        throw Error("initial value must be given for each node in the graph.");
+                    }
+                    let val = config.init_map[key];
+                    this._PRArrayDS.curr[i] = val;
+                    this._PRArrayDS.old[i] = val;
+                    init_sum += val;
+                }
+                else {
+                    this._PRArrayDS.curr[i] = defaultInit(this._graph);
+                    this._PRArrayDS.old[i] = defaultInit(this._graph);
+                }
+                this._PRArrayDS.out_deg[i] = node.outDegree() + node.degree();
+                if (this._personalized) {
+                    let tele_prob_node = config.tele_set[node.getID()] || 0;
+                    this._PRArrayDS.teleport[i] = tele_prob_node;
+                    teleport_prob_sum += tele_prob_node;
+                    tele_prob_node && this._PRArrayDS.tele_size++;
+                }
+                ++i;
+            }
+            if (config.init_map && init_sum !== 1) {
+                this._PRArrayDS.curr = this._PRArrayDS.curr.map(n => n /= init_sum);
+                this._PRArrayDS.old = this._PRArrayDS.old.map(n => n /= init_sum);
+            }
+            if (this._personalized && teleport_prob_sum !== 1) {
+                this._PRArrayDS.teleport = this._PRArrayDS.teleport.map(n => n /= teleport_prob_sum);
+            }
+            for (let key in nodes) {
+                let node = this._graph.getNodeById(key);
+                let node_idx = node.getFeature('PR_index');
+                let pull_i = [];
+                let pull_weight_i = [];
+                let incoming_edges = StructUtils.mergeObjects([node.inEdges(), node.undEdges()]);
+                for (let edge_key in incoming_edges) {
+                    let edge = incoming_edges[edge_key];
+                    let source = edge.getNodes().a;
+                    if (edge.getNodes().a.getID() == node.getID()) {
+                        source = edge.getNodes().b;
+                    }
+                    let parent_idx = source.getFeature('PR_index');
+                    if (this._weighted) {
+                        pull_weight_i.push(edge.getWeight());
+                    }
+                    pull_i.push(parent_idx);
+                }
+                this._PRArrayDS.pull[node_idx] = pull_i;
+                if (this._weighted) {
+                    this._PRArrayDS.pull_weight[node_idx] = pull_weight_i;
+                }
+            }
+            let toc = +new Date;
+            logger.log(`PR Array DS init took ${toc - tic} ms.`);
+        }
+        getRankMapFromArray() {
+            let result = {};
+            let nodes = this._graph.getNodes();
+            if (this._normalize) {
+                this.normalizePR();
+            }
+            for (let key in nodes) {
+                let node_val = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
+                result[key] = node_val;
+            }
+            return result;
+        }
+        normalizePR() {
+            let pr_sum = this._PRArrayDS.curr.reduce((i, j) => i + j, 0);
+            if (pr_sum !== 1) {
+                this._PRArrayDS.curr = this._PRArrayDS.curr.map(n => n / pr_sum);
+            }
+        }
+        pull2DTo1D() {
+            let p1d = [];
+            let p2d = this._PRArrayDS.pull;
+            for (let n in p2d) {
+                for (let i of p2d[n]) {
+                    p1d.push(i);
+                }
+                +n !== p2d.length - 1 && p1d.push(-1);
+            }
+            return p1d;
+        }
+        computePR() {
+            const ds = this._PRArrayDS;
+            const N = this._graph.nrNodes();
+            for (let i = 0; i < this._maxIterations; ++i) {
+                let delta_iter = 0.0;
+                for (let node in ds.curr) {
+                    let pull_rank = 0;
+                    let idx = 0;
+                    for (let source of ds.pull[node]) {
+                        if (ds.out_deg[source] === 0) {
+                            logger.log(`Node: ${node}`);
+                            logger.log(`Source: ${source} `);
+                            throw ('Encountered zero divisor!');
+                        }
+                        let weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
+                        pull_rank += ds.old[source] * weight / ds.out_deg[source];
+                    }
+                    let link_pr = (1 - this._alpha) * pull_rank;
+                    if (this._personalized) {
+                        let jump_chance = ds.teleport[node] / ds.tele_size;
+                        ds.curr[node] = link_pr + jump_chance;
+                    }
+                    else {
+                        ds.curr[node] = link_pr + this._alpha / N;
+                    }
+                    delta_iter += Math.abs(ds.curr[node] - ds.old[node]);
+                }
+                if (delta_iter <= this._epsilon) {
+                    return this.getRankMapFromArray();
+                }
+                ds.old = [...ds.curr];
+            }
+            return this.getRankMapFromArray();
+        }
+    }
+    exports.Pagerank = Pagerank;
+    });
+
+    unwrapExports(Pagerank_1);
+    var Pagerank_2 = Pagerank_1.Pagerank;
+
+    var RemoteUtils = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    const SSL_PORT = '443';
+    function retrieveRemoteFile(config, cb) {
+        if (typeof cb !== 'function') {
+            throw new Error('Provided callback is not a function.');
+        }
+        logger.log(`Requesting file via NodeJS request: ${config.remote_host}${config.remote_path}${config.file_name}`);
+        let options = {
+            host: config.remote_host,
+            port: SSL_PORT,
+            path: config.remote_path + config.file_name,
+            method: 'GET'
+        };
+        let req = https.get(options, response => {
+            var body = '';
+            response.setEncoding('utf8');
+            response.on('data', function (d) {
+                body += d;
+            });
+            response.on('end', function () {
+                cb(body);
+            });
+        });
+        req.on('error', e => {
+            logger.log(`Request error: ${e.message}`);
+        });
+        return req;
+    }
+    exports.retrieveRemoteFile = retrieveRemoteFile;
+    function checkNodeEnvironment() {
+        if (typeof window !== 'undefined') {
+            throw new Error('When in Browser, do as the Browsers do! (use fetch and call readFromJSON() directly...) ');
+        }
+    }
+    exports.checkNodeEnvironment = checkNodeEnvironment;
+    });
+
+    unwrapExports(RemoteUtils);
+    var RemoteUtils_1 = RemoteUtils.retrieveRemoteFile;
+    var RemoteUtils_2 = RemoteUtils.checkNodeEnvironment;
+
+    var CSVInput_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+
+    let logger = new Logger_1.Logger();
+    const DEFAULT_WEIGHT = 1;
+    class CSVInput {
+        constructor(config) {
+            this._config = config || {
+                separator: config && config.separator || ',',
+                explicit_direction: config && config.explicit_direction || true,
+                direction_mode: config && config.direction_mode || false,
+                weighted: config && config.weighted || false
+            };
+        }
+        readFromAdjacencyListURL(config, cb) {
+            this.readGraphFromURL(config, cb, this.readFromAdjacencyList);
+        }
+        readFromEdgeListURL(config, cb) {
+            this.readGraphFromURL(config, cb, this.readFromEdgeList);
+        }
+        readGraphFromURL(config, cb, localFun) {
+            var self = this, graph_name = config.file_name, graph;
+            RemoteUtils.checkNodeEnvironment();
+            RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
+                var input = raw_graph.toString().split('\n');
+                graph = localFun.apply(self, [input, graph_name]);
+                cb(graph, undefined);
+            });
+        }
+        readFromAdjacencyListFile(filepath) {
+            return this.readFileAndReturn(filepath, this.readFromAdjacencyList);
+        }
+        readFromEdgeListFile(filepath) {
+            return this.readFileAndReturn(filepath, this.readFromEdgeList);
+        }
+        readFileAndReturn(filepath, func) {
+            RemoteUtils.checkNodeEnvironment();
+            var graph_name = path.basename(filepath);
+            var input = fs.readFileSync(filepath).toString().split('\n');
+            return func.apply(this, [input, graph_name]);
+        }
+        readFromAdjacencyList(input, graph_name) {
+            var graph = new Graph.BaseGraph(graph_name);
+            for (var idx in input) {
+                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node, edge_array = elements.slice(1), edge, target_node_id, target_node, dir_char, directed, edge_id, edge_id_u2;
+                if (!node_id) {
+                    continue;
+                }
+                node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
+                for (var e = 0; e < edge_array.length;) {
+                    if (this._config.explicit_direction && (!edge_array || edge_array.length % 2)) {
+                        throw new Error('Every edge entry has to contain its direction info in explicit mode.');
+                    }
+                    target_node_id = edge_array[e++];
+                    target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                    dir_char = this._config.explicit_direction ? edge_array[e++] : this._config.direction_mode ? 'd' : 'u';
+                    if (dir_char !== 'd' && dir_char !== 'u') {
+                        throw new Error("Specification of edge direction invalid (d and u are valid).");
+                    }
+                    directed = dir_char === 'd';
+                    edge_id = node_id + "_" + target_node_id + "_" + dir_char;
+                    edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
+                    if (graph.hasEdgeID(edge_id) || (!directed && graph.hasEdgeID(edge_id_u2))) {
+                        continue;
+                    }
+                    else {
+                        edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed });
+                    }
+                }
+            }
+            return graph;
+        }
+        readFromEdgeList(input, graph_name, weighted = false) {
+            var graph = new Graph.BaseGraph(graph_name);
+            for (var idx in input) {
+                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
+                if (!elements) {
+                    continue;
+                }
+                if (elements.length < 2 || elements.length > 3) {
+                    logger.log(elements);
+                    throw new Error('Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)');
+                }
+                var node_id = elements[0], node, target_node, edge, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed, edge_id, edge_id_u2, parse_weight, edge_weight;
+                node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
+                target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                if (dir_char !== 'd' && dir_char !== 'u') {
+                    throw new Error("Specification of edge direction invalid (d and u are valid).");
+                }
+                directed = dir_char === 'd';
+                edge_id = node_id + "_" + target_node_id + "_" + dir_char;
+                edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
+                parse_weight = parseFloat(elements[2]);
+                edge_weight = this._config.weighted ? (isNaN(parse_weight) ? DEFAULT_WEIGHT : parse_weight) : null;
+                if (graph.hasEdgeID(edge_id) || (!directed && graph.hasEdgeID(edge_id_u2))) {
+                    continue;
+                }
+                else if (this._config.weighted) {
+                    edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed, weighted: true, weight: edge_weight });
+                }
+                else {
+                    edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed });
+                }
+            }
+            return graph;
+        }
+    }
+    exports.CSVInput = CSVInput;
+    });
+
+    unwrapExports(CSVInput_1);
+    var CSVInput_2 = CSVInput_1.CSVInput;
+
+    var CSVOutput_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    class CSVOutput {
+        constructor(config) {
+            this._config = config || {
+                separator: config && config.separator || ',',
+                explicit_direction: config && config.explicit_direction || true,
+                direction_mode: config && config.direction_mode || false
+            };
+        }
+        writeToAdjacencyListFile(filepath, graph) {
+            if (typeof window !== 'undefined' && window !== null) {
+                throw new Error('cannot write to File inside of Browser');
+            }
+            fs.writeFileSync(filepath, this.writeToAdjacencyList(graph));
+        }
+        writeToAdjacencyList(graph) {
+            let graphString = "";
+            let nodes = graph.getNodes(), node = null, adj_nodes = null, adj_node = null;
+            for (let node_key in nodes) {
+                node = nodes[node_key];
+                graphString += node.getID();
+                adj_nodes = node.reachNodes(this.mergeFunc);
+                for (let adj_idx in adj_nodes) {
+                    adj_node = adj_nodes[adj_idx].node;
+                    graphString += this._config.separator + adj_node.getID();
+                }
+                graphString += "\n";
+            }
+            return graphString;
+        }
+        writeToEdgeListFile(filepath, graph, weighted = false) {
+            if (typeof window !== 'undefined' && window !== null) {
+                throw new Error('cannot write to File inside of Browser');
+            }
+            fs.writeFileSync(filepath, this.writeToEdgeList(graph, weighted));
+        }
+        writeToEdgeList(graph, weighted = false) {
+            let graphString = "", nodes = graph.getNodes(), node = null, adj_nodes = null, adj_entry, adj_node = null, weight_str;
+            for (let node_key in nodes) {
+                node = nodes[node_key];
+                adj_nodes = node.reachNodes(this.mergeFunc);
+                for (let adj_idx in adj_nodes) {
+                    adj_entry = adj_nodes[adj_idx];
+                    adj_node = adj_entry.node;
+                    weight_str = '';
+                    if (weighted) {
+                        weight_str = this._config.separator;
+                        weight_str += adj_entry.edge.isWeighted() ? adj_entry.edge.getWeight() : 1;
+                    }
+                    graphString += node.getID() + this._config.separator + adj_node.getID() + weight_str + '\n';
+                }
+            }
+            return graphString;
+        }
+        mergeFunc(ne) {
+            return ne.node.getID();
+        }
+    }
+    exports.CSVOutput = CSVOutput;
+    });
+
+    unwrapExports(CSVOutput_1);
+    var CSVOutput_2 = CSVOutput_1.CSVOutput;
+
+    var JSONInput_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+    const logger = new Logger_1.Logger();
+    const DEFAULT_WEIGHT = 1;
+    class JSONInput {
+        constructor(config) {
+            this._config = config || {
+                explicit_direction: config && config.explicit_direction || true,
+                directed: config && config.directed || false,
+                weighted: config && config.weighted || false
+            };
+        }
+        readFromJSONFile(filepath) {
+            RemoteUtils.checkNodeEnvironment();
+            var json = JSON.parse(fs.readFileSync(filepath).toString());
+            return this.readFromJSON(json);
+        }
+        readFromJSONURL(config, cb) {
+            var self = this, graph;
+            RemoteUtils.checkNodeEnvironment();
+            RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
+                graph = self.readFromJSON(JSON.parse(raw_graph));
+                cb(graph, undefined);
+            });
+        }
+        readFromJSON(json) {
+            var graph = new Graph.BaseGraph(json.name), coords_json, coords, coord_idx, features;
+            for (var node_id in json.data) {
+                var node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
+                if (features = json.data[node_id].features) {
+                    node.setFeatures(features);
+                }
+                if (coords_json = json.data[node_id].coords) {
+                    coords = {};
+                    for (coord_idx in coords_json) {
+                        coords[coord_idx] = +coords_json[coord_idx];
+                    }
+                    node.setFeature('coords', coords);
+                }
+                var edges = json.data[node_id].edges;
+                for (let e in edges) {
+                    let edge_input = edges[e], target_node_id = edge_input.to, directed = this._config.explicit_direction ? edge_input.directed : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = this.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                    let edge_id = node_id + "_" + target_node_id + "_" + dir_char, edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
+                    if (graph.hasEdgeID(edge_id)) {
+                        continue;
+                    }
+                    if ((!directed && graph.hasEdgeID(edge_id_u2))) {
+                        if (this._config.weighted) {
+                            let edge = graph.getEdgeById(edge_id_u2);
+                            if (edge_weight != edge.getWeight()) {
+                                throw new Error('Input JSON flawed! Found duplicate edge with different weights!');
+                            }
+                        }
+                        continue;
+                    }
+                    else {
+                        var edge = graph.addEdgeByID(edge_id, node, target_node, {
+                            directed: directed,
+                            weighted: this._config.weighted,
+                            weight: edge_weight
+                        });
+                    }
+                }
+            }
+            return graph;
+        }
+        handleEdgeWeights(edge_input) {
+            switch (edge_input.weight) {
+                case "undefined":
+                    return DEFAULT_WEIGHT;
+                case "Infinity":
+                    return Number.POSITIVE_INFINITY;
+                case "-Infinity":
+                    return Number.NEGATIVE_INFINITY;
+                case "MAX":
+                    return Number.MAX_VALUE;
+                case "MIN":
+                    return Number.MIN_VALUE;
+                default:
+                    return parseFloat(edge_input.weight);
+            }
+        }
+    }
+    exports.JSONInput = JSONInput;
+    });
+
+    unwrapExports(JSONInput_1);
+    var JSONInput_2 = JSONInput_1.JSONInput;
+
+    var JSONOutput_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    class JSONOutput {
+        constructor() { }
+        writeToJSONFile(filepath, graph) {
+            if (typeof window !== 'undefined' && window !== null) {
+                throw new Error('cannot write to File inside of Browser');
+            }
+            fs.writeFileSync(filepath, this.writeToJSONString(graph));
+        }
+        writeToJSONString(graph) {
+            let nodes, node, node_struct, und_edges, dir_edges, edge, coords;
+            var result = {
+                name: graph._label,
+                nodes: graph.nrNodes(),
+                dir_edges: graph.nrDirEdges(),
+                und_edges: graph.nrUndEdges(),
+                data: {}
+            };
+            nodes = graph.getNodes();
+            for (let node_key in nodes) {
+                node = nodes[node_key];
+                node_struct = result.data[node.getID()] = {
+                    edges: []
+                };
+                und_edges = node.undEdges();
+                for (let edge_key in und_edges) {
+                    edge = und_edges[edge_key];
+                    let connected_nodes = edge.getNodes();
+                    node_struct.edges.push({
+                        to: connected_nodes.a.getID() === node.getID() ? connected_nodes.b.getID() : connected_nodes.a.getID(),
+                        directed: edge.isDirected(),
+                        weight: edge.isWeighted() ? edge.getWeight() : undefined
+                    });
+                }
+                dir_edges = node.outEdges();
+                for (let edge_key in dir_edges) {
+                    edge = dir_edges[edge_key];
+                    let connected_nodes = edge.getNodes();
+                    node_struct.edges.push({
+                        to: connected_nodes.b.getID(),
+                        directed: edge.isDirected(),
+                        weight: this.handleEdgeWeight(edge)
+                    });
+                }
+                node_struct.features = node.getFeatures();
+                if ((coords = node.getFeature('coords')) != null) {
+                    node_struct['coords'] = coords;
+                }
+            }
+            return JSON.stringify(result);
+        }
+        handleEdgeWeight(edge) {
+            if (!edge.isWeighted()) {
+                return undefined;
+            }
+            switch (edge.getWeight()) {
+                case Number.POSITIVE_INFINITY:
+                    return 'Infinity';
+                case Number.NEGATIVE_INFINITY:
+                    return '-Infinity';
+                case Number.MAX_VALUE:
+                    return 'MAX';
+                case Number.MIN_VALUE:
+                    return 'MIN';
+                default:
+                    return edge.getWeight();
+            }
+        }
+    }
+    exports.JSONOutput = JSONOutput;
+    });
+
+    unwrapExports(JSONOutput_1);
+    var JSONOutput_2 = JSONOutput_1.JSONOutput;
+
+    var Dijkstra_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    function Dijkstra(graph, source, target) {
+        let config = PFS_1.preparePFSStandardConfig();
+        if (target) {
+            config.goal_node = target;
+        }
+        return PFS_1.PFS(graph, source, config);
+    }
+    exports.Dijkstra = Dijkstra;
+    });
+
+    unwrapExports(Dijkstra_1);
+    var Dijkstra_2 = Dijkstra_1.Dijkstra;
+
+    var SimplePerturbations = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    let logger = new Logger_1.Logger();
+    class SimplePerturber {
+        constructor(_graph) {
+            this._graph = _graph;
+        }
+        randomlyDeleteNodesPercentage(percentage) {
+            if (percentage > 100) {
+                percentage = 100;
+            }
+            let nr_nodes_to_delete = Math.ceil(this._graph.nrNodes() * percentage / 100);
+            this.randomlyDeleteNodesAmount(nr_nodes_to_delete);
+        }
+        randomlyDeleteUndEdgesPercentage(percentage) {
+            if (percentage > 100) {
+                percentage = 100;
+            }
+            let nr_edges_to_delete = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
+            this.randomlyDeleteUndEdgesAmount(nr_edges_to_delete);
+        }
+        randomlyDeleteDirEdgesPercentage(percentage) {
+            if (percentage > 100) {
+                percentage = 100;
+            }
+            let nr_edges_to_delete = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
+            this.randomlyDeleteDirEdgesAmount(nr_edges_to_delete);
+        }
+        randomlyDeleteNodesAmount(amount) {
+            if (amount < 0) {
+                throw 'Cowardly refusing to remove a negative amount of nodes';
+            }
+            if (this._graph.nrNodes() === 0) {
+                return;
+            }
+            for (let nodeID = 0, randomNodes = this._graph.pickRandomProperties(this._graph.getNodes(), amount); nodeID < randomNodes.length; nodeID++) {
+                this._graph.deleteNode(this._graph.getNodes()[randomNodes[nodeID]]);
+            }
+        }
+        randomlyDeleteUndEdgesAmount(amount) {
+            if (amount < 0) {
+                throw 'Cowardly refusing to remove a negative amount of edges';
+            }
+            if (this._graph.nrUndEdges() === 0) {
+                return;
+            }
+            for (let edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getUndEdges(), amount); edgeID < randomEdges.length; edgeID++) {
+                this._graph.deleteEdge(this._graph.getUndEdges()[randomEdges[edgeID]]);
+            }
+        }
+        randomlyDeleteDirEdgesAmount(amount) {
+            if (amount < 0) {
+                throw 'Cowardly refusing to remove a negative amount of edges';
+            }
+            if (this._graph.nrDirEdges() === 0) {
+                return;
+            }
+            for (let edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getDirEdges(), amount); edgeID < randomEdges.length; edgeID++) {
+                this._graph.deleteEdge(this._graph.getDirEdges()[randomEdges[edgeID]]);
+            }
+        }
+        randomlyAddUndEdgesPercentage(percentage) {
+            let nr_und_edges_to_add = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
+            this.randomlyAddEdgesAmount(nr_und_edges_to_add, { directed: false });
+        }
+        randomlyAddDirEdgesPercentage(percentage) {
+            let nr_dir_edges_to_add = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
+            this.randomlyAddEdgesAmount(nr_dir_edges_to_add, { directed: true });
+        }
+        randomlyAddEdgesAmount(amount, config) {
+            if (amount <= 0) {
+                throw new Error('Cowardly refusing to add a non-positive amount of edges');
+            }
+            let node_a, node_b;
+            let direction = (config && config.directed) ? config.directed : false, dir = direction ? "_d" : "_u";
+            while (amount) {
+                node_a = this._graph.getRandomNode();
+                while ((node_b = this._graph.getRandomNode()) === node_a) { }
+                let edge_id = `${node_a.getID()}_${node_b.getID()}${dir}`;
+                if (node_a.hasEdgeID(edge_id)) {
+                    continue;
+                }
+                else {
+                    this._graph.addEdgeByID(edge_id, node_a, node_b, { directed: direction });
+                    --amount;
+                }
+            }
+        }
+        randomlyAddNodesPercentage(percentage, config) {
+            let nr_nodes_to_add = Math.ceil(this._graph.nrNodes() * percentage / 100);
+            this.randomlyAddNodesAmount(nr_nodes_to_add, config);
+        }
+        randomlyAddNodesAmount(amount, config) {
+            if (amount < 0) {
+                throw 'Cowardly refusing to add a negative amount of nodes';
+            }
+            let new_nodes = {};
+            while (amount--) {
+                let new_node_id = (Math.random() + 1).toString(36).substr(2, 32) + (Math.random() + 1).toString(36).substr(2, 32);
+                new_nodes[new_node_id] = this._graph.addNodeByID(new_node_id);
+            }
+            if (config == null) {
+                return;
+            }
+            else {
+                this.createEdgesByConfig(config, new_nodes);
+            }
+        }
+        createEdgesByConfig(config, new_nodes) {
+            let degree, min_degree, max_degree;
+            if (config.und_degree != null ||
+                config.dir_degree != null ||
+                config.min_und_degree != null && config.max_und_degree != null ||
+                config.min_dir_degree != null && config.max_dir_degree != null) {
+                if ((degree = config.und_degree) != null) {
+                    this.createRandomEdgesSpan(degree, degree, false, new_nodes);
+                }
+                else if ((min_degree = config.min_und_degree) != null
+                    && (max_degree = config.max_und_degree) != null) {
+                    this.createRandomEdgesSpan(min_degree, max_degree, false, new_nodes);
+                }
+                if (degree = config.dir_degree) {
+                    this.createRandomEdgesSpan(degree, degree, true, new_nodes);
+                }
+                else if ((min_degree = config.min_dir_degree) != null
+                    && (max_degree = config.max_dir_degree) != null) {
+                    this.createRandomEdgesSpan(min_degree, max_degree, true, new_nodes);
+                }
+            }
+            else {
+                if (config.probability_dir != null) {
+                    this.createRandomEdgesProb(config.probability_dir, true, new_nodes);
+                }
+                if (config.probability_und != null) {
+                    this.createRandomEdgesProb(config.probability_und, false, new_nodes);
+                }
+            }
+        }
+        createRandomEdgesProb(probability, directed, new_nodes) {
+            if (0 > probability || 1 < probability) {
+                throw new Error("Probability out of range.");
+            }
+            directed = directed || false;
+            new_nodes = new_nodes || this._graph.getNodes();
+            let all_nodes = this._graph.getNodes(), node_a, node_b, edge_id, dir = directed ? '_d' : '_u';
+            for (node_a in new_nodes) {
+                for (node_b in all_nodes) {
+                    if (node_a !== node_b && Math.random() <= probability) {
+                        edge_id = all_nodes[node_a].getID() + "_" + all_nodes[node_b].getID() + dir;
+                        if (this._graph.getNodes()[node_a].hasEdgeID(edge_id)) {
+                            continue;
+                        }
+                        this._graph.addEdgeByID(edge_id, all_nodes[node_a], all_nodes[node_b], { directed: directed });
+                    }
+                }
+            }
+        }
+        createRandomEdgesSpan(min, max, directed, setOfNodes) {
+            if (min < 0) {
+                throw new Error('Minimum degree cannot be negative.');
+            }
+            if (max >= this._graph.nrNodes()) {
+                throw new Error('Maximum degree exceeds number of reachable nodes.');
+            }
+            if (min > max) {
+                throw new Error('Minimum degree cannot exceed maximum degree.');
+            }
+            directed = directed || false;
+            var min = min | 0, max = max | 0, new_nodes = setOfNodes || this._graph.getNodes(), all_nodes = this._graph.getNodes(), idx_a, node_a, node_b, edge_id, node_keys = Object.keys(all_nodes), keys_len = node_keys.length, rand_idx, rand_deg, dir = directed ? '_d' : '_u';
+            for (idx_a in new_nodes) {
+                node_a = new_nodes[idx_a];
+                rand_idx = 0;
+                rand_deg = (Math.random() * (max - min) + min) | 0;
+                while (rand_deg) {
+                    rand_idx = (keys_len * Math.random()) | 0;
+                    node_b = all_nodes[node_keys[rand_idx]];
+                    if (node_a !== node_b) {
+                        edge_id = node_a.getID() + "_" + node_b.getID() + dir;
+                        if (node_a.hasEdgeID(edge_id)) {
+                            continue;
+                        }
+                        this._graph.addEdgeByID(edge_id, node_a, node_b, { directed: directed });
+                        --rand_deg;
+                    }
+                }
+            }
+        }
+    }
+    exports.SimplePerturber = SimplePerturber;
+    });
+
+    unwrapExports(SimplePerturbations);
+    var SimplePerturbations_1 = SimplePerturbations.SimplePerturber;
+
+    var KroneckerLeskovec = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    class KROL {
+        constructor(config) {
+            this._config = config || this.prepareKROLStandardConfig();
+            this._genMat = this._config.genMat;
+            this._cycles = this._config.cycles;
+            this._graph = new Graph.BaseGraph('synth');
+        }
+        generate() {
+            var gen_dims = this._genMat[0].length;
+            var res_dims = Math.pow(gen_dims, this._cycles + 1);
+            for (let index = 0; index < res_dims; index++) {
+                this._graph.addNodeByID(index.toString());
+            }
+            for (let node1 = 0; node1 < res_dims; node1++) {
+                for (let node2 = 0; node2 < res_dims; node2++) {
+                    if (this.addEdge(node1, node2, gen_dims)) {
+                        this._graph.addEdgeByNodeIDs(node1 + '_' + node2, node1.toString(), node2.toString());
+                    }
+                }
+            }
+            var result = {
+                graph: this._graph
+            };
+            return result;
+        }
+        addEdge(node1, node2, dims) {
+            var rprob = Math.random();
+            var prob = 1.0;
+            for (let level = 0; level < this._cycles; level++) {
+                var id_1 = Math.floor(node1 / Math.pow(dims, level + 1)) % dims;
+                var id_2 = Math.floor(node2 / Math.pow(dims, level + 1)) % dims;
+                prob *= this._genMat[id_1][id_2];
+                if (rprob > prob) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        prepareKROLStandardConfig() {
+            var genMat = [[0.9, 0.5], [0.5, 0.1]];
+            return {
+                genMat: genMat,
+                cycles: 5
+            };
+        }
+    }
+    exports.KROL = KROL;
+    });
+
+    unwrapExports(KroneckerLeskovec);
+    var KroneckerLeskovec_1 = KroneckerLeskovec.KROL;
+
+    // CORE
+
+
+
+    // CENTRALITIES
+
+
+
+
+
+    // IO
+
+
+
+
+    // SEARCH
+
+
+
+
+
+
+
+    // UTILS
+
+
+
+    // DATASTRUCTS
+
+    // PERTURBATION
+
+    // GENERATORS
+
+    // MISC
+    // var MCMFBoykov							= require("./dist/mincutmaxflow/minCutMaxFlowBoykov.js");
+    // var PRGauss								= require("./lib/centralities/PageRankGaussian.js");
+
+
+    // Define global object
+    let out = typeof window !== 'undefined' ? window : commonjsGlobal;
+
+    /**
+     * Inside Global or Window object
+     */
+    out.$G = {
+    	core: {
+    		BaseEdge 									: Edges.BaseEdge,
+    		BaseNode 									: Nodes.BaseNode,
+    		BaseGraph 								: Graph.BaseGraph,
+    		GraphMode									: Graph.GraphMode
+    	},
+    	centralities: {
+    		Betweenness								: Betweenness.betweennessCentrality,
+    		Brandes										: Brandes_1.Brandes,
+    		Closeness									: Closeness.ClosenessCentrality,
+    		Degree										: Degree.DegreeCentrality,
+    		Pagerank									: Pagerank_1.Pagerank
+    	},							
+    	input: {							
+    		CSVInput 									: CSVInput_1.CSVInput,
+    		JSONInput 								: JSONInput_1.JSONInput
+    	},							
+    	output: {							
+    		CSVOutput									: CSVOutput_1.CSVOutput,
+    		JSONOutput								: JSONOutput_1.JSONOutput
+    	},
+    	search: {
+    		BFS												: BFS_1,
+    		DFS 											: DFS_1,
+    		PFS           						: PFS_1,
+    		Dijkstra									: Dijkstra_1,
+    		BellmanFord								: BellmanFord,
+    		FloydWarshall							: FloydWarshall,
+    		Johnsons									: Johnsons_1
+    	},						
+      utils: {						
+        Struct        						: StructUtils,
+    		Remote        						: RemoteUtils,
+        Callback 									: CallbackUtils
+      },
+      datastructs: {
+        BinaryHeap  							: BinaryHeap_1.BinaryHeap
+      },
+    	perturbation: {
+    		SimplePerturber						: SimplePerturbations.SimplePerturber
+    	},
+    	generators: {
+    		Kronecker									: KroneckerLeskovec.KROL
+    	},
+    	// mincut: {
+    	// 	MCMFBoykov							: MCMFBoykov.MCMFBoykov
+    	// },
+    };
+
+    /**
+     * For NodeJS / CommonJS global object
+     */
+    var graphinius = out.$G;
+
+    var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
+    function importGraphFromURL(graphFile) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tic, graphBytes, graphString, graph, toc;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        tic = +new Date;
+                        return [4, fetch(graphFile)];
+                    case 1: return [4, (_a.sent())];
+                    case 2:
+                        graphBytes = _a.sent();
+                        return [4, graphBytes.json()];
+                    case 3:
+                        graphString = _a.sent();
+                        graph = jsonIn.readFromJSON(graphString);
+                        toc = +new Date;
+                        console.log(graph.getStats());
+                        console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                        return [2, graph];
+                }
+            });
+        });
+    }
+    //# sourceMappingURL=importGraph.js.map
+
+    const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
+
+    let idbProxyableTypes;
+    let cursorAdvanceMethods;
+    // This is a function to prevent it throwing up in node environments.
+    function getIdbProxyableTypes() {
+        return idbProxyableTypes ||
+            (idbProxyableTypes = [IDBDatabase, IDBObjectStore, IDBIndex, IDBCursor, IDBTransaction]);
+    }
+    // This is a function to prevent it throwing up in node environments.
+    function getCursorAdvanceMethods() {
+        return cursorAdvanceMethods || (cursorAdvanceMethods = [
+            IDBCursor.prototype.advance,
+            IDBCursor.prototype.continue,
+            IDBCursor.prototype.continuePrimaryKey,
+        ]);
+    }
+    const cursorRequestMap = new WeakMap();
+    const transactionDoneMap = new WeakMap();
+    const transactionStoreNamesMap = new WeakMap();
+    const transformCache = new WeakMap();
+    const reverseTransformCache = new WeakMap();
+    function promisifyRequest(request) {
+        const promise = new Promise((resolve, reject) => {
+            const unlisten = () => {
+                request.removeEventListener('success', success);
+                request.removeEventListener('error', error);
+            };
+            const success = () => {
+                resolve(wrap(request.result));
+                unlisten();
+            };
+            const error = () => {
+                reject(request.error);
+                unlisten();
+            };
+            request.addEventListener('success', success);
+            request.addEventListener('error', error);
+        });
+        promise.then((value) => {
+            // Since cursoring reuses the IDBRequest (*sigh*), we cache it for later retrieval
+            // (see wrapFunction).
+            if (value instanceof IDBCursor) {
+                cursorRequestMap.set(value, request);
+            }
+            // Catching to avoid "Uncaught Promise exceptions"
+        }).catch(() => { });
+        // This mapping exists in reverseTransformCache but doesn't doesn't exist in transformCache. This
+        // is because we create many promises from a single IDBRequest.
+        reverseTransformCache.set(promise, request);
+        return promise;
+    }
+    function cacheDonePromiseForTransaction(tx) {
+        // Early bail if we've already created a done promise for this transaction.
+        if (transactionDoneMap.has(tx))
+            return;
+        const done = new Promise((resolve, reject) => {
+            const unlisten = () => {
+                tx.removeEventListener('complete', complete);
+                tx.removeEventListener('error', error);
+                tx.removeEventListener('abort', error);
+            };
+            const complete = () => {
+                resolve();
+                unlisten();
+            };
+            const error = () => {
+                reject(tx.error);
+                unlisten();
+            };
+            tx.addEventListener('complete', complete);
+            tx.addEventListener('error', error);
+            tx.addEventListener('abort', error);
+        });
+        // Cache it for later retrieval.
+        transactionDoneMap.set(tx, done);
+    }
+    let idbProxyTraps = {
+        get(target, prop, receiver) {
+            if (target instanceof IDBTransaction) {
+                // Special handling for transaction.done.
+                if (prop === 'done')
+                    return transactionDoneMap.get(target);
+                // Polyfill for objectStoreNames because of Edge.
+                if (prop === 'objectStoreNames') {
+                    return target.objectStoreNames || transactionStoreNamesMap.get(target);
+                }
+                // Make tx.store return the only store in the transaction, or undefined if there are many.
+                if (prop === 'store') {
+                    return receiver.objectStoreNames[1] ?
+                        undefined : receiver.objectStore(receiver.objectStoreNames[0]);
+                }
+            }
+            // Else transform whatever we get back.
+            return wrap(target[prop]);
+        },
+        has(target, prop) {
+            if (target instanceof IDBTransaction && (prop === 'done' || prop === 'store'))
+                return true;
+            return prop in target;
+        },
+    };
+    function addTraps(callback) {
+        idbProxyTraps = callback(idbProxyTraps);
+    }
+    function wrapFunction(func) {
+        // Due to expected object equality (which is enforced by the caching in `wrap`), we
+        // only create one new func per func.
+        // Edge doesn't support objectStoreNames (booo), so we polyfill it here.
+        if (func === IDBDatabase.prototype.transaction &&
+            !('objectStoreNames' in IDBTransaction.prototype)) {
+            return function (storeNames, ...args) {
+                const tx = func.call(unwrap(this), storeNames, ...args);
+                transactionStoreNamesMap.set(tx, storeNames.sort ? storeNames.sort() : [storeNames]);
+                return wrap(tx);
+            };
+        }
+        // Cursor methods are special, as the behaviour is a little more different to standard IDB. In
+        // IDB, you advance the cursor and wait for a new 'success' on the IDBRequest that gave you the
+        // cursor. It's kinda like a promise that can resolve with many values. That doesn't make sense
+        // with real promises, so each advance methods returns a new promise for the cursor object, or
+        // undefined if the end of the cursor has been reached.
+        if (getCursorAdvanceMethods().includes(func)) {
+            return function (...args) {
+                // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
+                // the original object.
+                func.apply(unwrap(this), args);
+                return wrap(cursorRequestMap.get(this));
+            };
+        }
+        return function (...args) {
+            // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
+            // the original object.
+            return wrap(func.apply(unwrap(this), args));
+        };
+    }
+    function transformCachableValue(value) {
+        if (typeof value === 'function')
+            return wrapFunction(value);
+        // This doesn't return, it just creates a 'done' promise for the transaction,
+        // which is later returned for transaction.done (see idbObjectHandler).
+        if (value instanceof IDBTransaction)
+            cacheDonePromiseForTransaction(value);
+        if (instanceOfAny(value, getIdbProxyableTypes()))
+            return new Proxy(value, idbProxyTraps);
+        // Return the same value back if we're not going to transform it.
+        return value;
+    }
+    function wrap(value) {
+        // We sometimes generate multiple promises from a single IDBRequest (eg when cursoring), because
+        // IDB is weird and a single IDBRequest can yield many responses, so these can't be cached.
+        if (value instanceof IDBRequest)
+            return promisifyRequest(value);
+        // If we've already transformed this value before, reuse the transformed value.
+        // This is faster, but it also provides object equality.
+        if (transformCache.has(value))
+            return transformCache.get(value);
+        const newValue = transformCachableValue(value);
+        // Not all types are transformed.
+        // These may be primitive types, so they can't be WeakMap keys.
+        if (newValue !== value) {
+            transformCache.set(value, newValue);
+            reverseTransformCache.set(newValue, value);
+        }
+        return newValue;
+    }
+    const unwrap = (value) => reverseTransformCache.get(value);
+
+    /**
+     * Open a database.
+     *
+     * @param name Name of the database.
+     * @param version Schema version.
+     * @param callbacks Additional callbacks.
+     */
+    function openDB(name, version, { blocked, upgrade, blocking } = {}) {
+        const request = indexedDB.open(name, version);
+        const openPromise = wrap(request);
+        if (upgrade) {
+            request.addEventListener('upgradeneeded', (event) => {
+                upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction));
+            });
+        }
+        if (blocked)
+            request.addEventListener('blocked', () => blocked());
+        if (blocking)
+            openPromise.then(db => db.addEventListener('versionchange', blocking));
+        return openPromise;
+    }
+
+    const readMethods = ['get', 'getKey', 'getAll', 'getAllKeys', 'count'];
+    const writeMethods = ['put', 'add', 'delete', 'clear'];
+    const cachedMethods = new Map();
+    function getMethod(target, prop) {
+        if (!(target instanceof IDBDatabase &&
+            !(prop in target) &&
+            typeof prop === 'string'))
+            return;
+        if (cachedMethods.get(prop))
+            return cachedMethods.get(prop);
+        const targetFuncName = prop.replace(/FromIndex$/, '');
+        const useIndex = prop !== targetFuncName;
+        const isWrite = writeMethods.includes(targetFuncName);
+        if (
+        // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
+        !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) ||
+            !(isWrite || readMethods.includes(targetFuncName)))
+            return;
+        const method = async function (storeName, ...args) {
+            // isWrite ? 'readwrite' : undefined gzipps better, but fails in Edge :(
+            const tx = this.transaction(storeName, isWrite ? 'readwrite' : 'readonly');
+            let target = tx.store;
+            if (useIndex)
+                target = target.index(args.shift());
+            const returnVal = target[targetFuncName](...args);
+            if (isWrite)
+                await tx.done;
+            return returnVal;
+        };
+        cachedMethods.set(prop, method);
+        return method;
+    }
+    addTraps(oldTraps => ({
+        get: (target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver),
+        has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop),
+    }));
+
+    var GRAPH_DB_NAME = 'graphdb';
+    function initDB() {
+        return __awaiter(this, void 0, void 0, function () {
+            var db;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, openDB(GRAPH_DB_NAME, 1)];
+                    case 1:
+                        db = _a.sent();
+                        return [2, db];
+                }
+            });
+        });
+    }
+    //# sourceMappingURL=graphDB.js.map
+
+    var _this = undefined;
+    window.$G = graphinius;
+    var testDataDir = "../test-data";
+    var graphExt = "json";
+    var graphName = "meetupGraph";
+    var meetupFile = testDataDir + "/" + graphName + "." + graphExt;
+    var graphdb;
+    (function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, initDB()];
+                case 1:
+                    graphdb = _a.sent();
+                    console.log("IDB graph DB initialized:");
+                    console.log(graphdb);
+                    return [4, getOrCreateGraph()];
+                case 2:
+                    _a.sent();
+                    console.log("Imported Meetup graph");
+                    return [2];
+            }
+        });
+    }); })();
+    function getOrCreateGraph(graphName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var graph;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, importGraphFromURL(meetupFile)];
+                    case 1:
+                        graph = _a.sent();
+                        window.graph = graph;
+                        return [2, graph];
+                }
+            });
+        });
+    }
+
+}));

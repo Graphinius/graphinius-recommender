@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "file": "bundle.js",
+  "sources": [
+    "../../src/helpers/importGraph.ts",
+    "../../src/helpers/graphDB.ts",
+    "../../src/index.ts"
+  ],
+  "sourcesContent": [
+    "import { IGraph } from 'graphinius/lib/core/Graph';\nimport { JSONInput, JSONGraph, JSONNode } from 'graphinius/lib/io/input/JSONInput';\n\nconst jsonIn = new JSONInput({directed: true, explicit_direction: false, weighted: false});\n\n\nfunction importGraphFromFile(graphFile) : IGraph {\n  let tic = +new Date;\n  const graph = jsonIn.readFromJSONFile(graphFile);\n  let toc = +new Date;\n\n  console.log(graph.getStats());\n  console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);\n  \n  return graph;\n}\n\n\nasync function importGraphFromURL(graphFile) : Promise<IGraph> | null {\n  let tic = +new Date;\n  const graphBytes = await(await fetch(graphFile));\n  // console.log(graphBytes);  \n  const graphString = await graphBytes.json();\n  const graph = jsonIn.readFromJSON(graphString);\n  let toc = +new Date;\n\n  console.log(graph.getStats());\n  console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);\n  \n  return graph;\n}\n\n\nexport {\n  importGraphFromFile,\n  importGraphFromURL\n}\n\n",
+    "import { openDB, deleteDB, wrap, unwrap } from 'idb';\n\nconst GRAPH_DB_NAME = 'graphdb';\n\nasync function initDB() {\n  const db = await openDB(GRAPH_DB_NAME, 1);\n\n  return db;\n}\n\n\nexport {\n  initDB\n}\n",
+    "// window.$G = require('graphinius');\nimport { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';\nimport { importGraphFromURL } from './helpers/importGraph';\nimport { similarGroupsRec } from './meetup/simpleGroupRecs';\nimport { initDB } from './helpers/graphDB';\nimport { IDBPDatabase } from 'idb';\n\n\nconst testDataDir = `../test-data`;\nconst graphExt = `json`;\nconst graphName = `meetupGraph`;\nconst meetupFile = `${testDataDir}/${graphName}.${graphExt}`;\n\nlet graphdb : IDBPDatabase;\n\n(async () => {\n  graphdb = await initDB();\n  console.log(`IDB graph DB initialized:`);\n  console.log(graphdb);\n\n  await getOrCreateGraph(meetupFile);\n  console.log('Bernie');\n})();\n\n\nasync function getOrCreateGraph(graphName: string) {\n\n  let graph = await importGraphFromURL(meetupFile);\n\n  /* HACKETY HACK */\n  window.graph = graph;\n  return graph;\n}\n\n"
+  ],
+  "names": [
+    "JSONInput",
+    "openDB"
+  ],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAGA,IAAM,MAAM,GAAG,IAAIA,mBAAS,CAAC,EAAC,QAAQ,EAAE,IAAI,EAAE,kBAAkB,EAAE,KAAK,EAAE,QAAQ,EAAE,KAAK,EAAC,CAAC,CAAC;AAG3F,IAYA,SAAe,kBAAkB,CAAC,SAAS;;;;;;wBACrC,GAAG,GAAG,CAAC,IAAI,IAAI,CAAC;wBACK,WAAM,KAAK,CAAC,SAAS,CAAC,EAAA;4BAA5B,YAAM,SAAsB,GAAC;;wBAA1C,UAAU,GAAG,SAA6B;wBAE5B,WAAM,UAAU,CAAC,IAAI,EAAE,EAAA;;wBAArC,WAAW,GAAG,SAAuB;wBACrC,KAAK,GAAG,MAAM,CAAC,YAAY,CAAC,WAAW,CAAC,CAAC;wBAC3C,GAAG,GAAG,CAAC,IAAI,IAAI,CAAC;wBAEpB,OAAO,CAAC,GAAG,CAAC,KAAK,CAAC,QAAQ,EAAE,CAAC,CAAC;wBAC9B,OAAO,CAAC,GAAG,CAAC,4BAA0B,KAAK,CAAC,OAAO,EAAE,qBAAgB,KAAK,CAAC,UAAU,EAAE,eAAS,GAAG,GAAC,GAAG,UAAM,CAAC,CAAC;wBAE/G,WAAO,KAAK,EAAC;;;;KACd;;IC5BD,IAAM,aAAa,GAAG,SAAS,CAAC;IAEhC,SAAe,MAAM;;;;;4BACR,WAAMC,UAAM,CAAC,aAAa,EAAE,CAAC,CAAC,EAAA;;wBAAnC,EAAE,GAAG,SAA8B;wBAEzC,WAAO,EAAE,EAAC;;;;KACX;;ICPD,sBAiCA;IA1BA,IAAM,WAAW,GAAG,cAAc,CAAC;IACnC,IAAM,QAAQ,GAAG,MAAM,CAAC;IACxB,IAAM,SAAS,GAAG,aAAa,CAAC;IAChC,IAAM,UAAU,GAAM,WAAW,SAAI,SAAS,SAAI,QAAU,CAAC;IAE7D,IAAI,OAAsB,CAAC;IAE3B,CAAC;;;wBACW,WAAM,MAAM,EAAE,EAAA;;oBAAxB,OAAO,GAAG,SAAc,CAAC;oBACzB,OAAO,CAAC,GAAG,CAAC,2BAA2B,CAAC,CAAC;oBACzC,OAAO,CAAC,GAAG,CAAC,OAAO,CAAC,CAAC;oBAErB,WAAM,gBAAgB,CAAC,AAAU,CAAC,EAAA;;oBAAlC,SAAkC,CAAC;oBACnC,OAAO,CAAC,GAAG,CAAC,QAAQ,CAAC,CAAC;;;;SACvB,GAAG,CAAC;IAGL,SAAe,gBAAgB,CAAC,SAAiB;;;;;4BAEnC,WAAM,kBAAkB,CAAC,UAAU,CAAC,EAAA;;wBAA5C,KAAK,GAAG,SAAoC;wBAGhD,MAAM,CAAC,KAAK,GAAG,KAAK,CAAC;wBACrB,WAAO,KAAK,EAAC;;;;KACd;;;;"
+}

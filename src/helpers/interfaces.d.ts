@@ -21,5 +21,8 @@ declare global {
 
     $G                    : any;
     graph                 : IGraph;
+
+    process               : any;
   }
 }
+
