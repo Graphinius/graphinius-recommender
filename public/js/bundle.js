@@ -3613,6 +3613,7 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
 
     const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
 
@@ -3842,12 +3843,23 @@
     }));
 
     var GRAPH_DB_NAME = 'graphdb';
+    var STORE_NAME = 'graphs';
     function initDB() {
         return __awaiter(this, void 0, void 0, function () {
             var db;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, openDB(GRAPH_DB_NAME, 1)];
+                    case 0: return [4, openDB(GRAPH_DB_NAME, 1, {
+                            upgrade: function (db, oldVersion, newVersion, transaction) {
+                                var graphStore = db.createObjectStore(STORE_NAME, { keyPath: 'name' });
+                            },
+                            blocked: function () {
+                                console.log('IDB blocked...');
+                            },
+                            blocking: function () {
+                                console.log('IDB blocking...');
+                            }
+                        })];
                     case 1:
                         db = _a.sent();
                         return [2, db];
@@ -3855,26 +3867,25 @@
             });
         });
     }
+    //# sourceMappingURL=graphDB.js.map
 
     var _this = undefined;
-    window.$G = graphinius;
     var testDataDir = "../test-data";
     var graphExt = "json";
     var graphName = "meetupGraph";
     var meetupFile = testDataDir + "/" + graphName + "." + graphExt;
-    var graphdb;
+    var db;
     (function () { return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4, initDB()];
                 case 1:
-                    graphdb = _a.sent();
-                    console.log("IDB graph DB initialized:");
-                    console.log(graphdb);
+                    db = _a.sent();
+                    console.log("IDB graph DB store initialized:");
+                    console.log(db);
                     return [4, getOrCreateGraph()];
                 case 2:
                     _a.sent();
-                    console.log("Imported Meetup graph");
                     return [2];
             }
         });
@@ -3884,10 +3895,39 @@
             var graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, importGraphFromURL(meetupFile)];
+                    case 0: return [4, getGraphFromIDB()];
                     case 1:
                         graph = _a.sent();
+                        if (!graph) return [3, 2];
+                        console.log("RETRIEVED Meetup graph from IDB");
+                        return [3, 4];
+                    case 2: return [4, importGraphFromURL(meetupFile)];
+                    case 3:
+                        graph = _a.sent();
+                        console.log("CREATED Meetup graph from JSON");
+                        _a.label = 4;
+                    case 4:
+                        window.$G = graphinius;
                         window.graph = graph;
+                        return [2, graph];
+                }
+            });
+        });
+    }
+    function getGraphFromIDB() {
+        return __awaiter(this, void 0, void 0, function () {
+            var tx, store, graph;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        tx = db.transaction(STORE_NAME);
+                        store = tx.objectStore(STORE_NAME);
+                        return [4, store.get(graphName)];
+                    case 1:
+                        graph = _a.sent();
+                        return [4, tx.done];
+                    case 2:
+                        _a.sent();
                         return [2, graph];
                 }
             });
