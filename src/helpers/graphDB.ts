@@ -26,7 +26,7 @@ interface IGraphStore {
 }
 
 
-export class GraphStore implements IGraphStore {
+class GraphStore implements IGraphStore {
   _name  : string;
   _graph : IGraph;
 
@@ -59,6 +59,11 @@ export class GraphStore implements IGraphStore {
 const db = new MainGraphDB();
 db.graphs.mapToClass(GraphStore);
 
+
+export {
+  GraphStore,
+  db
+}
 
 
 // // In the following line, you should include the prefixes of implementations you want to test.

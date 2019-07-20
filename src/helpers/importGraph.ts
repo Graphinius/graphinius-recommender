@@ -19,8 +19,7 @@ function importGraphFromFile(graphFile) : IGraph {
 async function importGraphFromURL(graphFile) : Promise<IGraph> | null {
   let tic = +new Date;
   const graphBytes = await(await fetch(graphFile));
-  console.log(graphBytes);
-  
+  // console.log(graphBytes);  
   const graphString = await graphBytes.json();
   const graph = jsonIn.readFromJSON(graphString);
   let toc = +new Date;
