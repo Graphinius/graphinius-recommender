@@ -11,7 +11,7 @@ const devtool = isProduction ? false : 'inline-source-map';
 
 
 module.exports = env => {
-  return [{
+  return {
     entry: './src/index.ts',
     target: 'web',
     mode,
@@ -19,7 +19,7 @@ module.exports = env => {
     module: {
       rules: [
         {
-          test: /\.ts?$/,
+          test: /\.tsx?$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
           options: {
@@ -42,14 +42,25 @@ module.exports = env => {
       __filename: false,
       fs: 'empty',
       path: 'empty',
-      Buffer: false
+      // Buffer: false
+    },
+    devServer: {
+      contentBase: path.join(__dirname, "dist"),
+      compress: true,
+      port: 8080,
+      clientLogLevel: "none",
+      historyApiFallback: true,
+      watchContentBase: true
     },
     plugins: [
-      new BrowserSyncPlugin({
-        host: 'localhost',
-        port: 3000,
-        proxy: 'http://localhost:8080/'
-      })
+      // new BrowserSyncPlugin({
+      //   host: 'localhost',
+      //   port: 3000,
+      //   server: {
+      //     baseDir: 'public'
+      //   },
+      //   open: false
+      // })
     ]
-  }]
+  }
 };

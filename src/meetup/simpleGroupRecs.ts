@@ -6,11 +6,12 @@ const meetupFile = path.join(__dirname, '../../public/test-data/meetupGraph.json
 const mug = importGraphFromFile(meetupFile);
 
 
+
 function similarGroupsRec(graph: BaseGraph) {
 
 }
 
 
 export {
-  similarGroupsRec as similarGroupsRecommender
+  similarGroupsRec
 }

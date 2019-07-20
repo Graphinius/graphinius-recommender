@@ -19,6 +19,7 @@ declare global {
     webkitIDBKeyRange     : any;
     msIDBKeyRange         : any;
 
+    $G                    : any;
     graph                 : IGraph;
   }
 }
