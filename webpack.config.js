@@ -2,13 +2,16 @@ const path = require('path');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 
 
-const isProduction = typeof NODE_ENV !== 'undefined' && NODE_ENV === 'production';
-// const isProduction = true;
+console.log('NODE_ENV: ', process.env.NODE_ENV);
+// console.log('Production: ', process.env.PRODUCTION);
+
+const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 const devtool = isProduction ? false : 'inline-source-map';
 
-module.exports = [
-  {
+
+module.exports = env => {
+  return [{
     entry: './src/index.ts',
     target: 'web',
     mode,
@@ -38,7 +41,8 @@ module.exports = [
       __dirname: false,
       __filename: false,
       fs: 'empty',
-      path: 'empty'
+      path: 'empty',
+      Buffer: false
     },
     plugins: [
       new BrowserSyncPlugin({
@@ -47,5 +51,5 @@ module.exports = [
         proxy: 'http://localhost:8080/'
       })
     ]
-  } 
-];
+  }]
+};

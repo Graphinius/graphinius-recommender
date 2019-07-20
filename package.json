@@ -7,6 +7,7 @@
   "scripts": {
     "web-dev": "webpack-dev-server --progress --colors",
     "web": "webpack && npm run web-dev",
+    "build": "NODE_ENV=production webpack",
     "dev": "ts-node-dev src/meetup/simpleGroupRecs.ts",
     "test": "jest"
   },
@@ -22,8 +23,8 @@
   "homepage": "https://github.com/cassinius/graphinius-recommenders#readme",
   "dependencies": {
     "@types/node": "^12.6.8",
-    "dexie": "^2.0.4",
-    "graphinius": "^0.9.51"
+    "graphinius": "^0.9.51",
+    "idb": "^4.0.4"
   },
   "devDependencies": {
     "browser-sync": "^2.26.7",
