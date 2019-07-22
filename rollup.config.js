@@ -16,14 +16,19 @@ export default {
     format: 'umd' // "amd", "cjs", "system", "esm", "iife" or "umd"
   },
   plugins: [
+    resolve({
+      jsnext: true,
+      main: true,
+      browser: true,
+      process: true
+    }),
+    commonjs({
+      // include: 'node_modules/lunr'
+    }),
     typescript({
       target: "es5",
       lib: ["es5", "es6", "dom"]}
     ),
-    resolve({
-      process: true
-    }),
-    commonjs(),
     serve({
       contentBase: 'public',
       open: false,

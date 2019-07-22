@@ -1,13 +1,9 @@
-import * as path from 'path';
-import { BaseGraph } from 'graphinius/lib/core/Graph';
-import { importGraphFromFile } from '../helpers/importGraph';
-const meetupFile = path.join(__dirname, '../../public/test-data/meetupGraph.json');
-
-const mug = importGraphFromFile(meetupFile);
+import { IBaseNode } from 'graphinius/lib/core/Nodes';
+import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
+import { indexes } from '../common/meetupIndexes';
 
 
-
-function similarGroupsRec(graph: BaseGraph) {
+function similarGroupsRec(graph: IGraph) {
 
 }
 

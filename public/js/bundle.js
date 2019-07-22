@@ -1353,17 +1353,13 @@
     var run_config = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     const LOG_LEVELS = {
-        debug: "debug",
-        production: "production"
+        debug: 'debug',
+        production: 'production'
     };
     exports.LOG_LEVELS = LOG_LEVELS;
-    const DEFAULT_LEVEL = LOG_LEVELS.production;
-    let log_level;
-    if (typeof window !== 'undefined') {
-        log_level = DEFAULT_LEVEL;
-    }
-    else {
-        log_level = process.env['G_LOG'] ? process.env['G_LOG'] : DEFAULT_LEVEL;
+    let log_level = LOG_LEVELS.production;
+    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
+        log_level = process.env['G_LOG'];
     }
     const RUN_CONFIG = {
         log_level
@@ -3087,6 +3083,10 @@
             var graph = new Graph.BaseGraph(json.name), coords_json, coords, coord_idx, features;
             for (var node_id in json.data) {
                 var node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
+                let label = json.data[node_id]['label'];
+                if (label) {
+                    node.setLabel(label);
+                }
                 if (features = json.data[node_id].features) {
                     node.setFeatures(features);
                 }
@@ -3171,6 +3171,7 @@
             for (let node_key in nodes) {
                 node = nodes[node_key];
                 node_struct = result.data[node.getID()] = {
+                    label: node.getLabel(),
                     edges: []
                 };
                 und_edges = node.undEdges();
@@ -3587,17 +3588,15 @@
     /**
      * For NodeJS / CommonJS global object
      */
-    var graphinius = out.$G;
+    var GraphiniusJS = out.$G;
 
     var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
     function importGraphFromURL(graphFile) {
         return __awaiter(this, void 0, void 0, function () {
-            var tic, graphBytes, graphString, graph, toc;
+            var graphBytes, graphString, graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        tic = +new Date;
-                        return [4, fetch(graphFile)];
+                    case 0: return [4, fetch(graphFile)];
                     case 1: return [4, (_a.sent())];
                     case 2:
                         graphBytes = _a.sent();
@@ -3605,15 +3604,77 @@
                     case 3:
                         graphString = _a.sent();
                         graph = jsonIn.readFromJSON(graphString);
-                        toc = +new Date;
-                        console.log(graph.getStats());
-                        console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
                         return [2, graph];
                 }
             });
         });
     }
     //# sourceMappingURL=importGraph.js.map
+
+    var types = {
+        Group: [],
+        Topic: [],
+        Member: [],
+        Event: []
+    };
+    function buildIndexes(graph) {
+        var indexes = {
+            groupIdx: null,
+            topicIdx: null,
+            memberIdx: null,
+            eventIdx: null
+        };
+        Object.values(graph.getNodes()).forEach(function (n) {
+            types[n.getLabel()].push(n);
+        });
+        Object.keys(types).forEach(function (k) { return console.log(types[k].length + " nodes of type " + k + " registered."); });
+        indexes.groupIdx = lunr(function () {
+            var _this = this;
+            this.ref('id');
+            this.field('name');
+            this.field('description');
+            this.field('organiserName');
+            types.Group.forEach(function (n) { return _this.add({
+                id: n.getID(),
+                name: n.getFeature('name'),
+                description: n.getFeature('description'),
+                organiserName: n.getFeature('organiserName')
+            }); });
+        });
+        indexes.topicIdx = lunr(function () {
+            var _this = this;
+            this.ref('id');
+            this.field('name');
+            this.field('urlkey');
+            types.Topic.forEach(function (n) { return _this.add({
+                id: n.getID(),
+                name: n.getFeature('name'),
+                urlkey: n.getFeature('urlkey'),
+            }); });
+        });
+        indexes.memberIdx = lunr(function () {
+            var _this = this;
+            this.ref('id');
+            this.field('name');
+            types.Member.forEach(function (n) { return _this.add({
+                id: n.getID(),
+                name: n.getFeature('name'),
+            }); });
+        });
+        indexes.eventIdx = lunr(function () {
+            var _this = this;
+            this.ref('id');
+            this.field('name');
+            this.field('description');
+            types.Event.forEach(function (n) { return _this.add({
+                id: n.getID(),
+                name: n.getFeature('name'),
+                description: n.getFeature('description')
+            }); });
+        });
+        return indexes;
+    }
+    //# sourceMappingURL=meetupIndexes.js.map
 
     const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
 
@@ -3783,28 +3844,6 @@
     }
     const unwrap = (value) => reverseTransformCache.get(value);
 
-    /**
-     * Open a database.
-     *
-     * @param name Name of the database.
-     * @param version Schema version.
-     * @param callbacks Additional callbacks.
-     */
-    function openDB(name, version, { blocked, upgrade, blocking } = {}) {
-        const request = indexedDB.open(name, version);
-        const openPromise = wrap(request);
-        if (upgrade) {
-            request.addEventListener('upgradeneeded', (event) => {
-                upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction));
-            });
-        }
-        if (blocked)
-            request.addEventListener('blocked', () => blocked());
-        if (blocking)
-            openPromise.then(db => db.addEventListener('versionchange', blocking));
-        return openPromise;
-    }
-
     const readMethods = ['get', 'getKey', 'getAll', 'getAllKeys', 'count'];
     const writeMethods = ['put', 'add', 'delete', 'clear'];
     const cachedMethods = new Map();
@@ -3842,50 +3881,32 @@
         has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop),
     }));
 
-    var GRAPH_DB_NAME = 'graphdb';
-    var STORE_NAME = 'graphs';
-    function initDB() {
-        return __awaiter(this, void 0, void 0, function () {
-            var db;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, openDB(GRAPH_DB_NAME, 1, {
-                            upgrade: function (db, oldVersion, newVersion, transaction) {
-                                var graphStore = db.createObjectStore(STORE_NAME, { keyPath: 'name' });
-                            },
-                            blocked: function () {
-                                console.log('IDB blocked...');
-                            },
-                            blocking: function () {
-                                console.log('IDB blocking...');
-                            }
-                        })];
-                    case 1:
-                        db = _a.sent();
-                        return [2, db];
-                }
-            });
-        });
-    }
-    //# sourceMappingURL=graphDB.js.map
-
     var _this = undefined;
     var testDataDir = "../test-data";
     var graphExt = "json";
     var graphName = "meetupGraph";
     var meetupFile = testDataDir + "/" + graphName + "." + graphExt;
-    var db;
     (function () { return __awaiter(_this, void 0, void 0, function () {
+        var tic, mug, toc, indexes, searchRes;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, initDB()];
-                case 1:
-                    db = _a.sent();
-                    console.log("IDB graph DB store initialized:");
-                    console.log(db);
+                case 0:
+                    console.log("Loading Meetup graph...");
+                    tic = +new Date;
                     return [4, getOrCreateGraph()];
-                case 2:
-                    _a.sent();
+                case 1:
+                    mug = _a.sent();
+                    toc = +new Date;
+                    console.log("Importing graph of |V|=" + mug.nrNodes() + " and |E_dir|=" + mug.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                    tic = +new Date;
+                    indexes = buildIndexes(mug);
+                    toc = +new Date;
+                    console.log("Building Indexes in LUNR took " + (toc - tic) + " ms.");
+                    searchRes = indexes.groupIdx.search('neo4j');
+                    searchRes.forEach(function (res) {
+                        var node = mug.getNodeById(res.ref);
+                        console.log(node.getFeatures());
+                    });
                     return [2];
             }
         });
@@ -3895,39 +3916,11 @@
             var graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, getGraphFromIDB()];
+                    case 0: return [4, importGraphFromURL(meetupFile)];
                     case 1:
                         graph = _a.sent();
-                        if (!graph) return [3, 2];
-                        console.log("RETRIEVED Meetup graph from IDB");
-                        return [3, 4];
-                    case 2: return [4, importGraphFromURL(meetupFile)];
-                    case 3:
-                        graph = _a.sent();
-                        console.log("CREATED Meetup graph from JSON");
-                        _a.label = 4;
-                    case 4:
-                        window.$G = graphinius;
+                        window.$G = GraphiniusJS;
                         window.graph = graph;
-                        return [2, graph];
-                }
-            });
-        });
-    }
-    function getGraphFromIDB() {
-        return __awaiter(this, void 0, void 0, function () {
-            var tx, store, graph;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        tx = db.transaction(STORE_NAME);
-                        store = tx.objectStore(STORE_NAME);
-                        return [4, store.get(graphName)];
-                    case 1:
-                        graph = _a.sent();
-                        return [4, tx.done];
-                    case 2:
-                        _a.sent();
                         return [2, graph];
                 }
             });
