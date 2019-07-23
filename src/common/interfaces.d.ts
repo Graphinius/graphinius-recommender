@@ -1,3 +1,4 @@
+import { IBaseNode } from 'graphinius/lib/core/Nodes';
 import { IGraph } from 'graphinius/lib/core/Graph';
 
 /**
@@ -21,8 +22,33 @@ declare global {
 
     $G                    : any;
     graph                 : IGraph;
+    idxFuse               : any;
 
     process               : any;
   }
 }
+
+
+/**
+ * @todo generalize
+ */
+export interface MeetupIndexesLunr {
+  groupIdx: lunr.Index
+  topicIdx: lunr.Index;
+  memberIdx: lunr.Index;
+  eventIdx: lunr.Index;
+}
+
+
+/**
+ * @todo generalize
+ */
+export interface MeetupIndexesFuse {
+  groupIdx: Fuse<IBaseNode, Fuse.FuseOptions<any>>;
+  topicIdx: Fuse<IBaseNode, Fuse.FuseOptions<any>>;
+  memberIdx: Fuse<IBaseNode, Fuse.FuseOptions<any>>;
+  eventIdx: Fuse<IBaseNode, Fuse.FuseOptions<any>>;
+}
+
+
 

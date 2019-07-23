@@ -1,6 +1,5 @@
 import { IBaseNode } from 'graphinius/lib/core/Nodes';
 import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
-import { indexes } from '../common/meetupIndexes';
 
 
 function similarGroupsRec(graph: IGraph) {

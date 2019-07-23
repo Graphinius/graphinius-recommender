@@ -1,5 +1,6 @@
 import { IBaseNode } from 'graphinius/lib/core/Nodes';
 import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
+import { MeetupIndexesLunr } from '../common/interfaces';
 
 declare const lunr;
 
@@ -11,22 +12,11 @@ const types = {
 };
 
 
-/**
- * @todo generalize
- */
-export interface Indexes {
-  groupIdx: lunr.Index;
-  topicIdx: lunr.Index;
-  memberIdx: lunr.Index;
-  eventIdx: lunr.Index;
-}
-
-
-function buildIndexes(graph: IGraph) : Indexes {
-  const indexes: Indexes = {
-    groupIdx: null, 
-    topicIdx: null, 
-    memberIdx: null, 
+function buildIndexesLunr(graph: IGraph) : MeetupIndexesLunr {
+  const indexes: MeetupIndexesLunr = {
+    groupIdx: null,
+    topicIdx: null,
+    memberIdx: null,
     eventIdx: null
   }
 
@@ -87,5 +77,5 @@ function buildIndexes(graph: IGraph) : Indexes {
 }
 
 export {
-  buildIndexes
+  buildIndexesLunr
 }
