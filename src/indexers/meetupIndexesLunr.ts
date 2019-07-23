@@ -73,6 +73,7 @@ function buildIndexesLunr(graph: IGraph) : MeetupIndexesLunr {
     }));
   });
 
+  window.idxLunr = indexes;
   return indexes;
 }
 

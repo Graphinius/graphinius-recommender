@@ -2,8 +2,9 @@ import * as $G from 'graphinius';
 
 import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
 import { importGraphFromURL } from './common/importGraph';
-import {  buildIndexesLunr } from './meetup/meetupIndexesLunr';
-import {  buildIndexesFuse } from './meetup/meetupIndexesFuse';
+import {  buildIndexesLunr } from './indexers/meetupIndexesLunr';
+import {  buildIndexesFuse } from './indexers/meetupIndexesFuse';
+import {  buildIndexesJSSearch } from './indexers/meetupIndexesJSSearch';
 import { similarGroupsRec } from './meetup/simpleGroupRecs';
 import { initDB, GRAPH_DB_NAME, STORE_NAME } from './common/graphDB';
 import { IDBPDatabase, IDBPObjectStore } from 'idb';
@@ -16,7 +17,7 @@ const meetupFile = `${testGraphDir}/${graphName}.${graphExt}`;
 let db : IDBPDatabase;
 let store   : IDBPObjectStore<unknown, ["graphs"], "graphs">;
 
-const SEARCH_TERM = "pottery";
+const SEARCH_TERM = "neo4j";
 
 
 (async () => {
@@ -26,8 +27,9 @@ const SEARCH_TERM = "pottery";
   let toc = +new Date;
   console.log(`Importing graph of |V|=${mug.nrNodes()} and |E_dir|=${mug.nrDirEdges()} took ${toc-tic} ms.`);
 
-  // const indexesLunr = createLunrIndex(mug);
+  const indexesLunr = createLunrIndex(mug);
   const indexesFuse = createFuseIndex(mug);
+  const indexesJSSearch = createJSSearchIndex(mug);
 })();
 
 
@@ -39,6 +41,9 @@ function createLunrIndex(graph: IGraph) {
 
   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
   console.log(`LUNR search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
+
+  console.log(searchRes);
+  
   // searchRes.forEach(res => {
   //   let node = graph.getNodeById(res.ref);
   //   console.log(node.getFeatures());
@@ -59,12 +64,34 @@ function createFuseIndex(graph: IGraph) {
   
   console.log(searchRes);
   
-  searchRes.forEach(res => {
-    if ( res['matches'].length ) {
-      let node = graph.getNodeById(res['item']);
-      console.log(node.getFeatures());
-    }
-  });
+  // searchRes.forEach(res => {
+  //   if ( res['matches'].length ) {
+  //     let node = graph.getNodeById(res['item']);
+  //     console.log(node.getFeatures());
+  //   }
+  // });
+
+  return indexes;
+}
+
+
+function createJSSearchIndex(graph: IGraph) {
+  let tic = +new Date;
+  const indexes = buildIndexesJSSearch(graph);
+  let toc = +new Date;
+  console.log(`Building Indexes in JS-SEARCH took ${toc-tic} ms.`)
+
+  let searchRes = indexes.groupIdx.search(SEARCH_TERM);
+  console.log(`JS-SEARCH search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
+  
+  console.log(searchRes);
+  
+  // searchRes.forEach(res => {
+  //   if ( res['matches'].length ) {
+  //     let node = graph.getNodeById(res['item']);
+  //     console.log(node.getFeatures());
+  //   }
+  // });
 
   return indexes;
 }

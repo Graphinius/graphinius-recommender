@@ -1,5 +1,6 @@
 import { IBaseNode } from 'graphinius/lib/core/Nodes';
 import { IGraph } from 'graphinius/lib/core/Graph';
+import * as JsSearch from 'js-search';
 
 /**
  * @todo figure out why this works when `export interface Window` does not
@@ -22,9 +23,13 @@ declare global {
 
     $G                    : any;
     graph                 : IGraph;
+    
+    idxLunr               : any;
     idxFuse               : any;
+    idxJSSearch           : any;
 
     process               : any;
+    jsSearch              : any;
   }
 }
 
@@ -51,4 +56,12 @@ export interface MeetupIndexesFuse {
 }
 
 
-
+/**
+ * @todo generalize
+ */
+export interface MeetupIndexesJSSearch {
+  groupIdx: any;
+  topicIdx: any;
+  memberIdx: any;
+  eventIdx: any;
+}
