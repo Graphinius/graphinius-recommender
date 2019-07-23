@@ -14,20 +14,20 @@ const types = {
 
 const fuseCfg = {
   distance: 100,
-  findAllMatches: false,
+  findAllMatches: true,
   id: 'id',
-  includeMatches: false,
+  includeMatches: true,
   includeScore: true,
   isCaseSensitive: false,
   location: 0,
   matchAllTokens: false,
   maxPatternLength: 32,
-  minMatchCharLength: 1,
+  minMatchCharLength: 3,
   shouldSort: true,
-  sortFn: (e,t) => e-t,
+  sortFn: (e,t) => t.score-e.score,
   threshold: 0.6,
   tokenSeparator: / +/g,
-  tokenize: true,
+  tokenize: false,
   verbose: false
 }
 

@@ -3622,71 +3622,6 @@
     }
     //# sourceMappingURL=importGraph.js.map
 
-    var types = {
-        Group: [],
-        Topic: [],
-        Member: [],
-        Event: []
-    };
-    function buildIndexesLunr(graph) {
-        var indexes = {
-            groupIdx: null,
-            topicIdx: null,
-            memberIdx: null,
-            eventIdx: null
-        };
-        Object.values(graph.getNodes()).forEach(function (n) {
-            types[n.getLabel()].push(n);
-        });
-        Object.keys(types).forEach(function (k) { return console.log(types[k].length + " nodes of type " + k + " registered."); });
-        indexes.groupIdx = lunr(function () {
-            var _this = this;
-            this.ref('id');
-            this.field('name');
-            this.field('description');
-            this.field('organiserName');
-            types.Group.forEach(function (n) { return _this.add({
-                id: n.getID(),
-                name: n.getFeature('name'),
-                description: n.getFeature('description'),
-                organiserName: n.getFeature('organiserName')
-            }); });
-        });
-        indexes.topicIdx = lunr(function () {
-            var _this = this;
-            this.ref('id');
-            this.field('name');
-            this.field('urlkey');
-            types.Topic.forEach(function (n) { return _this.add({
-                id: n.getID(),
-                name: n.getFeature('name'),
-                urlkey: n.getFeature('urlkey'),
-            }); });
-        });
-        indexes.memberIdx = lunr(function () {
-            var _this = this;
-            this.ref('id');
-            this.field('name');
-            types.Member.forEach(function (n) { return _this.add({
-                id: n.getID(),
-                name: n.getFeature('name'),
-            }); });
-        });
-        indexes.eventIdx = lunr(function () {
-            var _this = this;
-            this.ref('id');
-            this.field('name');
-            this.field('description');
-            types.Event.forEach(function (n) { return _this.add({
-                id: n.getID(),
-                name: n.getFeature('name'),
-                description: n.getFeature('description')
-            }); });
-        });
-        return indexes;
-    }
-    //# sourceMappingURL=meetupIndexesLunr.js.map
-
     var fuse = createCommonjsModule(function (module, exports) {
     /*!
      * Fuse.js v3.4.5 - Lightweight fuzzy-search (http://fusejs.io)
@@ -3702,7 +3637,7 @@
     var Fuse = unwrapExports(fuse);
     var fuse_1 = fuse.Fuse;
 
-    var types$1 = {
+    var types = {
         Groups: [],
         Topics: [],
         Members: [],
@@ -3710,20 +3645,20 @@
     };
     var fuseCfg = {
         distance: 100,
-        findAllMatches: false,
+        findAllMatches: true,
         id: 'id',
-        includeMatches: false,
+        includeMatches: true,
         includeScore: true,
         isCaseSensitive: false,
         location: 0,
         matchAllTokens: false,
         maxPatternLength: 32,
-        minMatchCharLength: 1,
+        minMatchCharLength: 3,
         shouldSort: true,
-        sortFn: function (e, t) { return e - t; },
+        sortFn: function (e, t) { return t.score - e.score; },
         threshold: 0.6,
         tokenSeparator: / +/g,
-        tokenize: true,
+        tokenize: false,
         verbose: false
     };
     function buildIndexesFuse(graph) {
@@ -3742,7 +3677,7 @@
                         description: n.getFeature('description'),
                         organiserName: n.getFeature('organiserName')
                     };
-                    types$1.Groups.push(groupIdxEntry);
+                    types.Groups.push(groupIdxEntry);
                     break;
                 case 'Topic':
                     var topicIdxEntry = {
@@ -3750,14 +3685,14 @@
                         name: n.getFeature('name'),
                         urlkey: n.getFeature('urlkey')
                     };
-                    types$1.Topics.push(topicIdxEntry);
+                    types.Topics.push(topicIdxEntry);
                     break;
                 case 'Member':
                     var memberIdxEntry = {
                         id: n.getID(),
                         name: n.getFeature('name')
                     };
-                    types$1.Members.push(memberIdxEntry);
+                    types.Members.push(memberIdxEntry);
                     break;
                 case 'Event':
                     var eventIdxEntry = {
@@ -3765,21 +3700,22 @@
                         name: n.getFeature('name'),
                         description: n.getFeature('description')
                     };
-                    types$1.Events.push(eventIdxEntry);
+                    types.Events.push(eventIdxEntry);
                     break;
                 default:
                     console.log("Node Type not supported in Meetup scenario...!");
                     return false;
             }
         });
-        Object.keys(types$1).forEach(function (k) { return console.log(types$1[k].length + " nodes of type " + k + " registered."); });
-        indexes.groupIdx = new Fuse(types$1.Groups, __assign({ keys: ['name', 'description', 'organiserName'] }, fuseCfg));
-        indexes.topicIdx = new Fuse(types$1.Topics, __assign({ keys: ['name', 'urlkey'] }, fuseCfg));
-        indexes.memberIdx = new Fuse(types$1.Members, __assign({ keys: ['name'] }, fuseCfg));
-        indexes.eventIdx = new Fuse(types$1.Events, __assign({ keys: ['name', 'description'] }, fuseCfg));
+        Object.keys(types).forEach(function (k) { return console.log(types[k].length + " nodes of type " + k + " registered."); });
+        indexes.groupIdx = new Fuse(types.Groups, __assign({ keys: ['name', 'description', 'organiserName'] }, fuseCfg));
+        indexes.topicIdx = new Fuse(types.Topics, __assign({ keys: ['name', 'urlkey'] }, fuseCfg));
+        indexes.memberIdx = new Fuse(types.Members, __assign({ keys: ['name'] }, fuseCfg));
+        indexes.eventIdx = new Fuse(types.Events, __assign({ keys: ['name', 'description'] }, fuseCfg));
         window.idxFuse = indexes;
         return indexes;
     }
+    //# sourceMappingURL=meetupIndexesFuse.js.map
 
     const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
 
@@ -3991,9 +3927,9 @@
     var graphExt = "json";
     var graphName = "meetupGraph";
     var meetupFile = testGraphDir + "/" + graphName + "." + graphExt;
-    var SEARCH_TERM = "Graph Database";
+    var SEARCH_TERM = "pottery";
     (function () { return __awaiter(_this, void 0, void 0, function () {
-        var tic, mug, toc, indexesLunr, indexesFuse;
+        var tic, mug, toc, indexesFuse;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -4004,33 +3940,24 @@
                     mug = _a.sent();
                     toc = +new Date;
                     console.log("Importing graph of |V|=" + mug.nrNodes() + " and |E_dir|=" + mug.nrDirEdges() + " took " + (toc - tic) + " ms.");
-                    indexesLunr = createLunrIndex(mug);
                     indexesFuse = createFuseIndex(mug);
                     return [2];
             }
         });
     }); })();
-    function createLunrIndex(graph) {
-        var tic = +new Date;
-        var indexes = buildIndexesLunr(graph);
-        var toc = +new Date;
-        console.log("Building Indexes in LUNR took " + (toc - tic) + " ms.");
-        var searchRes = indexes.groupIdx.search(SEARCH_TERM);
-        searchRes.forEach(function (res) {
-            var node = graph.getNodeById(res.ref);
-            console.log(node.getFeatures());
-        });
-        return indexes;
-    }
     function createFuseIndex(graph) {
         var tic = +new Date;
         var indexes = buildIndexesFuse(graph);
         var toc = +new Date;
         console.log("Building Indexes in FUSE took " + (toc - tic) + " ms.");
         var searchRes = indexes.groupIdx.search(SEARCH_TERM);
+        console.log("FUSE search on '" + SEARCH_TERM + "' returned " + Object.keys(searchRes).length + " results.");
+        console.log(searchRes);
         searchRes.forEach(function (res) {
-            var node = graph.getNodeById(res['item']);
-            console.log(node.getFeatures());
+            if (res['matches'].length) {
+                var node = graph.getNodeById(res['item']);
+                console.log(node.getFeatures());
+            }
         });
         return indexes;
     }
@@ -4049,7 +3976,6 @@
             });
         });
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

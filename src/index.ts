@@ -16,7 +16,7 @@ const meetupFile = `${testGraphDir}/${graphName}.${graphExt}`;
 let db : IDBPDatabase;
 let store   : IDBPObjectStore<unknown, ["graphs"], "graphs">;
 
-const SEARCH_TERM = "Graph Database";
+const SEARCH_TERM = "pottery";
 
 
 (async () => {
@@ -26,7 +26,7 @@ const SEARCH_TERM = "Graph Database";
   let toc = +new Date;
   console.log(`Importing graph of |V|=${mug.nrNodes()} and |E_dir|=${mug.nrDirEdges()} took ${toc-tic} ms.`);
 
-  const indexesLunr = createLunrIndex(mug);
+  // const indexesLunr = createLunrIndex(mug);
   const indexesFuse = createFuseIndex(mug);
 })();
 
@@ -38,10 +38,11 @@ function createLunrIndex(graph: IGraph) {
   console.log(`Building Indexes in LUNR took ${toc-tic} ms.`)
 
   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
-  searchRes.forEach(res => {
-    let node = graph.getNodeById(res.ref);
-    console.log(node.getFeatures());
-  })
+  console.log(`LUNR search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
+  // searchRes.forEach(res => {
+  //   let node = graph.getNodeById(res.ref);
+  //   console.log(node.getFeatures());
+  // });
 
   return indexes;
 }
@@ -54,11 +55,16 @@ function createFuseIndex(graph: IGraph) {
   console.log(`Building Indexes in FUSE took ${toc-tic} ms.`)
 
   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
-  // console.log(searchRes);
+  console.log(`FUSE search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
+  
+  console.log(searchRes);
+  
   searchRes.forEach(res => {
-    let node = graph.getNodeById(res['item']);
-    console.log(node.getFeatures());
-  })
+    if ( res['matches'].length ) {
+      let node = graph.getNodeById(res['item']);
+      console.log(node.getFeatures());
+    }
+  });
 
   return indexes;
 }
