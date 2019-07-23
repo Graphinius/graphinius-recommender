@@ -20,7 +20,7 @@ const fuseCfg = {
   includeScore: true,
   isCaseSensitive: false,
   location: 0,
-  matchAllTokens: false,
+  matchAllTokens: true,
   maxPatternLength: 32,
   minMatchCharLength: 3,
   shouldSort: true,

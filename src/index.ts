@@ -17,7 +17,9 @@ const meetupFile = `${testGraphDir}/${graphName}.${graphExt}`;
 let db : IDBPDatabase;
 let store   : IDBPObjectStore<unknown, ["graphs"], "graphs">;
 
-const SEARCH_TERM = "neo4j";
+const SEARCH_TERM = 'artificial intelligence';
+/* Nope... */
+// const SEARCH_TERM = ['network storage', 'artificial intelligence'];
 
 
 (async () => {
@@ -27,8 +29,8 @@ const SEARCH_TERM = "neo4j";
   let toc = +new Date;
   console.log(`Importing graph of |V|=${mug.nrNodes()} and |E_dir|=${mug.nrDirEdges()} took ${toc-tic} ms.`);
 
-  const indexesLunr = createLunrIndex(mug);
-  const indexesFuse = createFuseIndex(mug);
+  // const indexesLunr = createLunrIndex(mug);
+  // const indexesFuse = createFuseIndex(mug);
   const indexesJSSearch = createJSSearchIndex(mug);
 })();
 
@@ -43,7 +45,7 @@ function createLunrIndex(graph: IGraph) {
   console.log(`LUNR search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
 
   console.log(searchRes);
-  
+
   // searchRes.forEach(res => {
   //   let node = graph.getNodeById(res.ref);
   //   console.log(node.getFeatures());
@@ -60,16 +62,17 @@ function createFuseIndex(graph: IGraph) {
   console.log(`Building Indexes in FUSE took ${toc-tic} ms.`)
 
   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
+  
   console.log(`FUSE search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
   
   console.log(searchRes);
   
-  // searchRes.forEach(res => {
-  //   if ( res['matches'].length ) {
-  //     let node = graph.getNodeById(res['item']);
-  //     console.log(node.getFeatures());
-  //   }
-  // });
+  searchRes.forEach(res => {
+    if ( res['matches'].length ) {
+      let node = graph.getNodeById(res['item']);
+      console.log(node.getFeatures());
+    }
+  });
 
   return indexes;
 }
@@ -81,17 +84,21 @@ function createJSSearchIndex(graph: IGraph) {
   let toc = +new Date;
   console.log(`Building Indexes in JS-SEARCH took ${toc-tic} ms.`)
 
+  tic = +new Date;
   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
+  toc = +new Date;
+  console.log(`Executing search query in JS-SEARCH took ${toc-tic} ms.`)
+
   console.log(`JS-SEARCH search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
   
   console.log(searchRes);
   
-  // searchRes.forEach(res => {
-  //   if ( res['matches'].length ) {
-  //     let node = graph.getNodeById(res['item']);
-  //     console.log(node.getFeatures());
-  //   }
-  // });
+  searchRes.forEach(res => {
+    let node = graph.getNodeById(res['id']);
+    console.log(node.getFeatures());
+  });
+
+
 
   return indexes;
 }

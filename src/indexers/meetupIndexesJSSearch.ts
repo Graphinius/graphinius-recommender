@@ -70,7 +70,6 @@ function buildIndexesJSSearch(graph: IGraph) : MeetupIndexesJSSearch {
   indexes.groupIdx.addIndex('description');
   indexes.groupIdx.addIndex('organiserName');
   indexes.groupIdx.addDocuments(types.Groups);
-  console.log('Group Index', indexes.groupIdx);
 
   indexes.topicIdx = new JsSearch.Search('id');
   indexes.groupIdx.addIndex('name');
