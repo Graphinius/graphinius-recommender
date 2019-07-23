@@ -17,7 +17,7 @@ const meetupFile = `${testGraphDir}/${graphName}.${graphExt}`;
 let db : IDBPDatabase;
 let store   : IDBPObjectStore<unknown, ["graphs"], "graphs">;
 
-const SEARCH_TERM = 'artificial intelligence';
+const SEARCH_TERM = 'neo4j';
 /* Nope... */
 // const SEARCH_TERM = ['network storage', 'artificial intelligence'];
 
@@ -98,7 +98,15 @@ function createJSSearchIndex(graph: IGraph) {
     console.log(node.getFeatures());
   });
 
+  indexes.groupIdx.addDocuments([{
+    id              : Number.MAX_VALUE,
+    name            : 'client-side ML',
+    description     : 'The greatest client-side machine learning & graph recommender meetup group in Graz, Austria. Includes Graphinius, neo4J & Arango stuff...',
+    organiserName   : 'Bernd Malle'
+  }]);
 
+  searchRes = indexes.groupIdx.search(SEARCH_TERM);
+  console.log(searchRes);
 
   return indexes;
 }

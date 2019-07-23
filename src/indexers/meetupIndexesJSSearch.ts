@@ -22,7 +22,7 @@ function buildIndexesJSSearch(graph: IGraph) : MeetupIndexesJSSearch {
     topicIdx: null,
     memberIdx: null,
     eventIdx: null
-  }
+  };
 
   Object.values(graph.getNodes()).forEach( n => {
     switch(n.getLabel()) {
@@ -32,7 +32,7 @@ function buildIndexesJSSearch(graph: IGraph) : MeetupIndexesJSSearch {
           name            : n.getFeature('name'),
           description     : n.getFeature('description'),
           organiserName   : n.getFeature('organiserName')
-        }
+        };
         types.Groups.push(groupIdxEntry);
         break;
       case 'Topic':
@@ -40,14 +40,14 @@ function buildIndexesJSSearch(graph: IGraph) : MeetupIndexesJSSearch {
           id              : n.getID(),
           name            : n.getFeature('name'),
           urlkey          : n.getFeature('urlkey')
-        }
+        };
         types.Topics.push(topicIdxEntry);
         break;
       case 'Member':
         let memberIdxEntry = {
           id              : n.getID(),
           name            : n.getFeature('name')
-        }
+        };
         types.Members.push(memberIdxEntry);
         break;
       case 'Event':
@@ -55,7 +55,7 @@ function buildIndexesJSSearch(graph: IGraph) : MeetupIndexesJSSearch {
           id              : n.getID(),
           name            : n.getFeature('name'),
           description     : n.getFeature('description')
-        }
+        };
         types.Events.push(eventIdxEntry);
         break;
       default:

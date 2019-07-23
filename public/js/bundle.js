@@ -5344,7 +5344,7 @@
     var graphExt = "json";
     var graphName = "meetupGraph";
     var meetupFile = testGraphDir + "/" + graphName + "." + graphExt;
-    var SEARCH_TERM = 'artificial intelligence';
+    var SEARCH_TERM = 'neo4j';
     (function () { return __awaiter(_this, void 0, void 0, function () {
         var tic, mug, toc, indexesJSSearch;
         return __generator(this, function (_a) {
@@ -5377,6 +5377,14 @@
             var node = graph.getNodeById(res['id']);
             console.log(node.getFeatures());
         });
+        indexes.groupIdx.addDocuments([{
+                id: Number.MAX_VALUE,
+                name: 'client-side ML',
+                description: 'The greatest client-side machine learning & graph recommender meetup group in Graz, Austria. Includes Graphinius, neo4J & Arango stuff...',
+                organiserName: 'Bernd Malle'
+            }]);
+        searchRes = indexes.groupIdx.search(SEARCH_TERM);
+        console.log(searchRes);
         return indexes;
     }
     function getOrCreateGraph(graphName) {
