@@ -5,7 +5,8 @@ import { IndexConfig } from './interfaces';
 type Types = {[key: string]: any[]};
 type Indexes = {[key: string]: any};
 
-const JsSearch = JSSearch.default;
+// console.log(JSSearch);
+const JsSearch = (typeof window === 'undefined') ? JSSearch : JSSearch.default;
 
 
 function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
@@ -28,16 +29,16 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
 
     types[label].push(idxEntry);
   });
-  Object.keys(types).forEach(k => console.log(`${types[k].length} nodes of type ${k} registered.`));
+  // Object.keys(types).forEach(k => console.log(`${types[k].length} nodes of type ${k} registered.`));
 
   Object.values(idxConfig).forEach(model => {
     indexes[model.string] = new JsSearch.Search(model.id);
     model.fields.forEach(f => indexes[model.string].addIndex(f));
     indexes[model.string].addDocuments(types[model.string]);
   });
+
+  // console.log(indexes);
   
-  /* Hackety hack */
-  window.idxJSSearch = indexes;
   return indexes;
 }
 

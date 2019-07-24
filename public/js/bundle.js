@@ -5076,7 +5076,12 @@
 
     var index = unwrapExports(commonjs);
 
-    var JsSearch = index;
+    var JSSearch = /*#__PURE__*/Object.freeze({
+        'default': index,
+        __moduleExports: commonjs
+    });
+
+    var JsSearch = (typeof window === 'undefined') ? JSSearch : index;
     function buildIdxJSSearch(graph, idxConfig) {
         var types = {};
         Object.keys(idxConfig).forEach(function (k) { return types[k] = []; });
@@ -5093,16 +5098,13 @@
             idxObj.fields.forEach(function (f) { return idxEntry[f] = n.getFeature(f); });
             types[label].push(idxEntry);
         });
-        Object.keys(types).forEach(function (k) { return console.log(types[k].length + " nodes of type " + k + " registered."); });
         Object.values(idxConfig).forEach(function (model) {
             indexes[model.string] = new JsSearch.Search(model.id);
             model.fields.forEach(function (f) { return indexes[model.string].addIndex(f); });
             indexes[model.string].addDocuments(types[model.string]);
         });
-        window.idxJSSearch = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var beerModels;
     (function (beerModels) {
@@ -5201,6 +5203,7 @@
         console.log(searchRes);
         return searchRes;
     }
+    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map
