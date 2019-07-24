@@ -8,44 +8,72 @@ import { beerIdxConfig, beerModels } from './indexers/beer/interfaces';
 import { meetupIdxConfig, meetupModels } from './indexers/meetup/interfaces';
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
 
-const graphName = `meetupGraph`;
-// const graphName = `beerGraph`;
 
 const testGraphDir = `../test-data/graphs`;
 const graphExt = `json`;
-const graphFile = `${testGraphDir}/${graphName}.${graphExt}`;
 
-const SEARCH_TERM = 'neo4j';
-// const SEARCH_TERM = 'brau';
+interface AppConfig {
+  graphName       : string;
+  graphFile       : string;
+  searchTerm      : string;
+  idxConfig       : IndexConfig;
+  models          : any;
+  testSearchModel : any;
+}
+
+const beerConfig: AppConfig = {
+  graphName:  `beerGraph`,
+  graphFile: `${testGraphDir}/beerGraph.${graphExt}`,
+  searchTerm: `brauhaus`,
+  idxConfig: beerIdxConfig,
+  models: beerModels,
+  testSearchModel: beerModels.Brewery
+};
+
+const meetupConfig: AppConfig = {
+  graphName:  `meetupGraph`,
+  graphFile: `${testGraphDir}/meetupGraph.${graphExt}`,
+  searchTerm: `neo4j`,
+  idxConfig: meetupIdxConfig,
+  models: meetupModels,
+  testSearchModel: meetupModels.Group
+};
 
 
 
 (async () => {
-  console.log(`Loading ${graphName}...`);
-  let tic = +new Date;
-  const graph: IGraph = await getOrCreateGraph(graphFile);
-  let toc = +new Date;
-  console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);
-
-  const indexes = createJSSearchIndex(graph, meetupIdxConfig);
+  [beerConfig, meetupConfig].forEach(async config => {
+    const graph = await loadGraph(config);
+    const indexes = createJSSearchIndex(graph, config);
+  })
 })();
 
 
 
-function createJSSearchIndex(graph: IGraph, idxConfig: IndexConfig) {
+async function loadGraph(config: AppConfig) {
+  console.log(`Loading ${config.graphName}...`);
   let tic = +new Date;
-  const indexes = buildIdxJSSearch(graph, idxConfig);
+  const graph: IGraph = await getOrCreateGraph(config.graphFile);
+  let toc = +new Date;
+  console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);
+  return graph;
+}
+
+
+
+function createJSSearchIndex(graph: IGraph, config: AppConfig) {
+  let tic = +new Date;
+  const indexes = buildIdxJSSearch(graph, config.idxConfig);
   let toc = +new Date;
   console.log(`Building Indexes in JS-SEARCH took ${toc-tic} ms.`)
 
   
   tic = +new Date;
-  // let searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
-  let searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
+  let searchRes = indexes[config.testSearchModel].search(config.searchTerm);
   toc = +new Date;
   console.log(`Executing search query in JS-SEARCH took ${toc-tic} ms.`)
 
-  console.log(`JS-SEARCH search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
+  console.log(`JS-SEARCH search on '${config.searchTerm}' returned ${Object.keys(searchRes).length} results.`);
   
   console.log(searchRes);
   
@@ -53,15 +81,15 @@ function createJSSearchIndex(graph: IGraph, idxConfig: IndexConfig) {
   /**
    * @todo abstract out into test case
    */
-  indexes[meetupModels.Group].addDocuments([{
-    id              : Number.MAX_VALUE,
-    name            : "Bernies Meetup",
-    description     : 'You dont wanna know.... but: neo4JJJJ!!',
-    organiserName   : 'Bernie'
-  }]);
+  // indexes[meetupModels.Group].addDocuments([{
+  //   id              : Number.MAX_VALUE,
+  //   name            : "Bernies Meetup",
+  //   description     : 'You dont wanna know.... but: neo4JJJJ!!',
+  //   organiserName   : 'Bernie'
+  // }]);
 
-  searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
-  console.log(searchRes);
+  // searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
+  // console.log(searchRes);
 
 
   /**
@@ -85,7 +113,7 @@ function createJSSearchIndex(graph: IGraph, idxConfig: IndexConfig) {
 }
 
 
-async function getOrCreateGraph(graphName: string) {
+async function getOrCreateGraph(graphFile: string) {
   let graph = await importGraphFromURL(graphFile);
   /* HACKETY HACK */
   window.$G = $G.default;

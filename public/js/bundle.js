@@ -3609,6 +3609,56 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
+
+    var beerModels;
+    (function (beerModels) {
+        beerModels["Brewery"] = "Brewery";
+        beerModels["Beer"] = "Beer";
+        beerModels["Category"] = "Category";
+        beerModels["City"] = "City";
+        beerModels["State"] = "State";
+        beerModels["Country"] = "Country";
+        beerModels["Style"] = "Style";
+    })(beerModels || (beerModels = {}));
+    var beerIdxConfig = {
+        Brewery: {
+            string: 'Brewery',
+            id: 'id',
+            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
+        },
+        Beer: {
+            string: 'Beer',
+            id: 'id',
+            fields: ['name', 'abv']
+        },
+        Category: {
+            string: 'Category',
+            id: 'id',
+            fields: ['category']
+        },
+        City: {
+            string: 'City',
+            id: 'id',
+            fields: ['city', 'state', 'country']
+        },
+        State: {
+            string: 'State',
+            id: 'id',
+            fields: ['state']
+        },
+        Country: {
+            string: 'Country',
+            id: 'id',
+            fields: ['country']
+        },
+        Style: {
+            string: 'Style',
+            id: 'id',
+            fields: ['style']
+        }
+    };
+    //# sourceMappingURL=interfaces.js.map
 
     var meetupModels;
     (function (meetupModels) {
@@ -3639,6 +3689,7 @@
             fields: ['name', 'description']
         }
     };
+    //# sourceMappingURL=interfaces.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -3684,7 +3735,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-
+    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -3722,7 +3773,7 @@
 
       return ExactWordIndexStrategy;
     }();
-
+    //# sourceMappingURL=ExactWordIndexStrategy.js.map
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -3768,7 +3819,7 @@
 
       return PrefixIndexStrategy;
     }();
-
+    //# sourceMappingURL=PrefixIndexStrategy.js.map
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -3806,7 +3857,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(IndexStrategy);
@@ -3843,7 +3894,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-
+    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -3881,7 +3932,7 @@
 
       return LowerCaseSanitizer;
     }();
-
+    //# sourceMappingURL=LowerCaseSanitizer.js.map
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -3910,7 +3961,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Sanitizer);
@@ -3945,7 +3996,7 @@
 
       return value;
     }
-
+    //# sourceMappingURL=getNestedFieldValue.js.map
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -4122,7 +4173,7 @@
 
       return TfIdfSearchIndex;
     }();
-
+    //# sourceMappingURL=TfIdfSearchIndex.js.map
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -4221,7 +4272,7 @@
 
       return UnorderedSearchIndex;
     }();
-
+    //# sourceMappingURL=UnorderedSearchIndex.js.map
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -4250,7 +4301,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(SearchIndex);
@@ -4294,7 +4345,7 @@
 
       return SimpleTokenizer;
     }();
-
+    //# sourceMappingURL=SimpleTokenizer.js.map
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -4348,7 +4399,7 @@
 
       return StemmingTokenizer;
     }();
-
+    //# sourceMappingURL=StemmingTokenizer.js.map
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -4489,7 +4540,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-
+    //# sourceMappingURL=StopWordsMap.js.map
     });
 
     unwrapExports(StopWordsMap_1);
@@ -4542,7 +4593,7 @@
 
       return StopWordsTokenizer;
     }();
-
+    //# sourceMappingURL=StopWordsTokenizer.js.map
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -4580,7 +4631,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Tokenizer);
@@ -4835,7 +4886,7 @@
 
       return Search;
     }();
-
+    //# sourceMappingURL=Search.js.map
     });
 
     unwrapExports(Search_1);
@@ -4958,7 +5009,7 @@
 
       return TokenHighlighter;
     }();
-
+    //# sourceMappingURL=TokenHighlighter.js.map
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -5068,7 +5119,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     var index = unwrapExports(commonjs);
@@ -5099,52 +5150,77 @@
         window.idxJSSearch = indexes;
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var _this = undefined;
-    var graphName = "meetupGraph";
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
-    var graphFile = testGraphDir + "/" + graphName + "." + graphExt;
-    var SEARCH_TERM = 'neo4j';
+    var beerConfig = {
+        graphName: "beerGraph",
+        graphFile: testGraphDir + "/beerGraph." + graphExt,
+        searchTerm: "brauhaus",
+        idxConfig: beerIdxConfig,
+        models: beerModels,
+        testSearchModel: beerModels.Brewery
+    };
+    var meetupConfig = {
+        graphName: "meetupGraph",
+        graphFile: testGraphDir + "/meetupGraph." + graphExt,
+        searchTerm: "neo4j",
+        idxConfig: meetupIdxConfig,
+        models: meetupModels,
+        testSearchModel: meetupModels.Group
+    };
     (function () { return __awaiter(_this, void 0, void 0, function () {
-        var tic, graph, toc, indexes;
+        var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    console.log("Loading " + graphName + "...");
-                    tic = +new Date;
-                    return [4, getOrCreateGraph()];
-                case 1:
-                    graph = _a.sent();
-                    toc = +new Date;
-                    console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
-                    indexes = createJSSearchIndex(graph, meetupIdxConfig);
-                    return [2];
-            }
+            [beerConfig, meetupConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+                var graph, indexes;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, loadGraph(config)];
+                        case 1:
+                            graph = _a.sent();
+                            indexes = createJSSearchIndex(graph, config);
+                            return [2];
+                    }
+                });
+            }); });
+            return [2];
         });
     }); })();
-    function createJSSearchIndex(graph, idxConfig) {
+    function loadGraph(config) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tic, graph, toc;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("Loading " + config.graphName + "...");
+                        tic = +new Date;
+                        return [4, getOrCreateGraph(config.graphFile)];
+                    case 1:
+                        graph = _a.sent();
+                        toc = +new Date;
+                        console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                        return [2, graph];
+                }
+            });
+        });
+    }
+    function createJSSearchIndex(graph, config) {
         var tic = +new Date;
-        var indexes = buildIdxJSSearch(graph, idxConfig);
+        var indexes = buildIdxJSSearch(graph, config.idxConfig);
         var toc = +new Date;
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
         tic = +new Date;
-        var searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
+        var searchRes = indexes[config.testSearchModel].search(config.searchTerm);
         toc = +new Date;
         console.log("Executing search query in JS-SEARCH took " + (toc - tic) + " ms.");
-        console.log("JS-SEARCH search on '" + SEARCH_TERM + "' returned " + Object.keys(searchRes).length + " results.");
-        console.log(searchRes);
-        indexes[meetupModels.Group].addDocuments([{
-                id: Number.MAX_VALUE,
-                name: "Bernies Meetup",
-                description: 'You dont wanna know.... but: neo4JJJJ!!',
-                organiserName: 'Bernie'
-            }]);
-        searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
+        console.log("JS-SEARCH search on '" + config.searchTerm + "' returned " + Object.keys(searchRes).length + " results.");
         console.log(searchRes);
         return indexes;
     }
-    function getOrCreateGraph(graphName) {
+    function getOrCreateGraph(graphFile) {
         return __awaiter(this, void 0, void 0, function () {
             var graph;
             return __generator(this, function (_a) {

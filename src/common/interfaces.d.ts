@@ -24,11 +24,11 @@ declare global {
     $G                    : any;
     graph                 : IGraph;
     
-    idxLunr               : any;
-    idxFuse               : any;
+    // idxLunr               : any;
+    // idxFuse               : any;
     idxJSSearch           : any;
 
-    process               : any;
+    // process               : any;
     jsSearch              : any;
   }
 }

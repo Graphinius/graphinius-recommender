@@ -6,8 +6,8 @@ import { IndexConfig, IndexEntryBody } from '../interfaces';
  * @todo find more elegant solution (24/07/2019 -> too tired...)
  */
 export enum beerModels {
-  Beer        = 'Beer',
   Brewery     = 'Brewery',
+  Beer        = 'Beer',
   Category    = 'Category',
   City        = 'City',
   State       = 'State',
@@ -16,15 +16,15 @@ export enum beerModels {
 }
 
 const beerIdxConfig: IndexConfig = {
-	Beer: {
-    string: 'Beer',
-    id: 'id',
-		fields: ['name', 'abv']
-	},
 	Brewery: {
 		string: 'Brewery',
     id: 'id',
 		fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
+	},
+	Beer: {
+    string: 'Beer',
+    id: 'id',
+		fields: ['name', 'abv']
 	},
 	Category: {
 		string: 'Category',
