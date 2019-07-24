@@ -5,17 +5,19 @@ import { importGraphFromURL } from './common/importGraph';
 
 import { IndexConfig } from './indexers/interfaces';
 import { beerIdxConfig, beerModels } from './indexers/beer/interfaces';
+import { meetupIdxConfig, meetupModels } from './indexers/meetup/interfaces';
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
 
+const graphName = `meetupGraph`;
+// const graphName = `beerGraph`;
 
 const testGraphDir = `../test-data/graphs`;
 const graphExt = `json`;
-// const graphName = `meetupGraph`;
-const graphName = `beerGraph`;
 const graphFile = `${testGraphDir}/${graphName}.${graphExt}`;
 
+const SEARCH_TERM = 'neo4j';
+// const SEARCH_TERM = 'brau';
 
-const SEARCH_TERM = 'brau';
 
 
 (async () => {
@@ -25,7 +27,7 @@ const SEARCH_TERM = 'brau';
   let toc = +new Date;
   console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);
 
-  const indexes = createJSSearchIndex(graph, beerIdxConfig);
+  const indexes = createJSSearchIndex(graph, meetupIdxConfig);
 })();
 
 
@@ -38,7 +40,8 @@ function createJSSearchIndex(graph: IGraph, idxConfig: IndexConfig) {
 
   
   tic = +new Date;
-  let searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+  // let searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+  let searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
   toc = +new Date;
   console.log(`Executing search query in JS-SEARCH took ${toc-tic} ms.`)
 
@@ -46,24 +49,37 @@ function createJSSearchIndex(graph: IGraph, idxConfig: IndexConfig) {
   
   console.log(searchRes);
   
-  // searchRes.forEach(res => {
-  //   let node = graph.getNodeById(res['id']);
-  //   console.log(node.getFeatures());
-  // });
 
-  indexes[beerModels.Brewery].addDocuments([{
+  /**
+   * @todo abstract out into test case
+   */
+  indexes[meetupModels.Group].addDocuments([{
     id              : Number.MAX_VALUE,
-    name            : "Berndicio's Brauhaus extra schtoak",
-    address1        : 'Glacisstrasse 21, 8010 Graz',
-    phone           : 123456,
-    code            : 8010,
-    city            : 'Grats',
-    state           : 'Shire Mark',
-    country         : 'Her-stare-ike'
+    name            : "Bernies Meetup",
+    description     : 'You dont wanna know.... but: neo4JJJJ!!',
+    organiserName   : 'Bernie'
   }]);
 
-  searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+  searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
   console.log(searchRes);
+
+
+  /**
+   * @todo abstract out into test case
+   */
+  // indexes[beerModels.Brewery].addDocuments([{
+  //   id              : Number.MAX_VALUE,
+  //   name            : "Berndicio's Brauhaus extra schtoak",
+  //   address1        : 'Glacisstrasse 21, 8010 Graz',
+  //   phone           : 123456,
+  //   code            : 8010,
+  //   city            : 'Grats',
+  //   state           : 'Shire Mark',
+  //   country         : 'Her-stare-ike'
+  // }]);
+
+  // searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+  // console.log(searchRes);
 
   return indexes;
 }

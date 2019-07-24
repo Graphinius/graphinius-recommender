@@ -3609,56 +3609,36 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
-    var beerModels;
-    (function (beerModels) {
-        beerModels["Beer"] = "Beer";
-        beerModels["Brewery"] = "Brewery";
-        beerModels["Category"] = "Category";
-        beerModels["City"] = "City";
-        beerModels["State"] = "State";
-        beerModels["Country"] = "Country";
-        beerModels["Style"] = "Style";
-    })(beerModels || (beerModels = {}));
-    var beerIdxConfig = {
-        Beer: {
-            string: 'Beer',
+    var meetupModels;
+    (function (meetupModels) {
+        meetupModels["Group"] = "Group";
+        meetupModels["Topic"] = "Topic";
+        meetupModels["Member"] = "Member";
+        meetupModels["Event"] = "Event";
+    })(meetupModels || (meetupModels = {}));
+    var meetupIdxConfig = {
+        Group: {
+            string: 'Group',
             id: 'id',
-            fields: ['name', 'abv']
+            fields: ['name', 'description', 'organiserName']
         },
-        Brewery: {
-            string: 'Brewery',
+        Topic: {
+            string: 'Topic',
             id: 'id',
-            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
+            fields: ['name', 'urlkey']
         },
-        Category: {
-            string: 'Category',
+        Member: {
+            string: 'Member',
             id: 'id',
-            fields: ['category']
+            fields: ['name']
         },
-        City: {
-            string: 'City',
+        Event: {
+            string: 'Event',
             id: 'id',
-            fields: ['city', 'state', 'country']
-        },
-        State: {
-            string: 'State',
-            id: 'id',
-            fields: ['state']
-        },
-        Country: {
-            string: 'Country',
-            id: 'id',
-            fields: ['country']
-        },
-        Style: {
-            string: 'Style',
-            id: 'id',
-            fields: ['style']
+            fields: ['name', 'description']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -3704,7 +3684,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -3742,7 +3722,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -3788,7 +3768,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -3826,7 +3806,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -3863,7 +3843,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -3901,7 +3881,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -3930,7 +3910,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -3965,7 +3945,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -4142,7 +4122,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -4241,7 +4221,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -4270,7 +4250,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -4314,7 +4294,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -4368,7 +4348,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -4509,7 +4489,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -4562,7 +4542,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -4600,7 +4580,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -4855,7 +4835,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -4978,7 +4958,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -5088,7 +5068,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
@@ -5119,14 +5099,13 @@
         window.idxJSSearch = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var _this = undefined;
+    var graphName = "meetupGraph";
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
-    var graphName = "beerGraph";
     var graphFile = testGraphDir + "/" + graphName + "." + graphExt;
-    var SEARCH_TERM = 'brau';
+    var SEARCH_TERM = 'neo4j';
     (function () { return __awaiter(_this, void 0, void 0, function () {
         var tic, graph, toc, indexes;
         return __generator(this, function (_a) {
@@ -5139,7 +5118,7 @@
                     graph = _a.sent();
                     toc = +new Date;
                     console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
-                    indexes = createJSSearchIndex(graph, beerIdxConfig);
+                    indexes = createJSSearchIndex(graph, meetupIdxConfig);
                     return [2];
             }
         });
@@ -5150,22 +5129,18 @@
         var toc = +new Date;
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
         tic = +new Date;
-        var searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+        var searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
         toc = +new Date;
         console.log("Executing search query in JS-SEARCH took " + (toc - tic) + " ms.");
         console.log("JS-SEARCH search on '" + SEARCH_TERM + "' returned " + Object.keys(searchRes).length + " results.");
         console.log(searchRes);
-        indexes[beerModels.Brewery].addDocuments([{
+        indexes[meetupModels.Group].addDocuments([{
                 id: Number.MAX_VALUE,
-                name: "Berndicio's Brauhaus extra schtoak",
-                address1: 'Glacisstrasse 21, 8010 Graz',
-                phone: 123456,
-                code: 8010,
-                city: 'Grats',
-                state: 'Shire Mark',
-                country: 'Her-stare-ike'
+                name: "Bernies Meetup",
+                description: 'You dont wanna know.... but: neo4JJJJ!!',
+                organiserName: 'Bernie'
             }]);
-        searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
+        searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
         console.log(searchRes);
         return indexes;
     }
