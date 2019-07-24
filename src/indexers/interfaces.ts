@@ -4,4 +4,15 @@ export interface IndexEntryBody {
   fields  : string[];
 }
 
+
 export type IndexConfig = {[k: string]: IndexEntryBody}
+
+
+export interface AppConfig {
+  graphName       : string;
+  graphFile       : string;
+  searchTerm      : string;
+  idxConfig       : IndexConfig;
+  models          : any;
+  testSearchModel : any;
+}

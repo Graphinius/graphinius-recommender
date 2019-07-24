@@ -26,6 +26,7 @@
     "js-search": "^1.4.3"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.15",
     "@types/lunr": "^2.3.2",
     "@types/node": "^12.6.8",
     "jest": "^24.8.0",

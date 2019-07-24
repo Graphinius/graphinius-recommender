@@ -3591,6 +3591,38 @@
     var GraphiniusJS = out.$G;
 
     var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
+    function importGraph(config) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tic, graph, toc;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("Loading " + config.graphName + "...");
+                        tic = +new Date;
+                        return [4, getOrCreateGraph(config.graphFile)];
+                    case 1:
+                        graph = _a.sent();
+                        toc = +new Date;
+                        console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                        return [2, graph];
+                }
+            });
+        });
+    }
+    function getOrCreateGraph(graphFile) {
+        return __awaiter(this, void 0, void 0, function () {
+            var graph;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, importGraphFromURL(graphFile)];
+                    case 1:
+                        graph = _a.sent();
+                        window.graph = graph;
+                        return [2, graph];
+                }
+            });
+        });
+    }
     function importGraphFromURL(graphFile) {
         return __awaiter(this, void 0, void 0, function () {
             var graphBytes, graphString, graph;
@@ -3610,86 +3642,6 @@
         });
     }
     //# sourceMappingURL=importGraph.js.map
-
-    var beerModels;
-    (function (beerModels) {
-        beerModels["Brewery"] = "Brewery";
-        beerModels["Beer"] = "Beer";
-        beerModels["Category"] = "Category";
-        beerModels["City"] = "City";
-        beerModels["State"] = "State";
-        beerModels["Country"] = "Country";
-        beerModels["Style"] = "Style";
-    })(beerModels || (beerModels = {}));
-    var beerIdxConfig = {
-        Brewery: {
-            string: 'Brewery',
-            id: 'id',
-            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
-        },
-        Beer: {
-            string: 'Beer',
-            id: 'id',
-            fields: ['name', 'abv']
-        },
-        Category: {
-            string: 'Category',
-            id: 'id',
-            fields: ['category']
-        },
-        City: {
-            string: 'City',
-            id: 'id',
-            fields: ['city', 'state', 'country']
-        },
-        State: {
-            string: 'State',
-            id: 'id',
-            fields: ['state']
-        },
-        Country: {
-            string: 'Country',
-            id: 'id',
-            fields: ['country']
-        },
-        Style: {
-            string: 'Style',
-            id: 'id',
-            fields: ['style']
-        }
-    };
-    //# sourceMappingURL=interfaces.js.map
-
-    var meetupModels;
-    (function (meetupModels) {
-        meetupModels["Group"] = "Group";
-        meetupModels["Topic"] = "Topic";
-        meetupModels["Member"] = "Member";
-        meetupModels["Event"] = "Event";
-    })(meetupModels || (meetupModels = {}));
-    var meetupIdxConfig = {
-        Group: {
-            string: 'Group',
-            id: 'id',
-            fields: ['name', 'description', 'organiserName']
-        },
-        Topic: {
-            string: 'Topic',
-            id: 'id',
-            fields: ['name', 'urlkey']
-        },
-        Member: {
-            string: 'Member',
-            id: 'id',
-            fields: ['name']
-        },
-        Event: {
-            string: 'Event',
-            id: 'id',
-            fields: ['name', 'description']
-        }
-    };
-    //# sourceMappingURL=interfaces.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -5152,7 +5104,55 @@
     }
     //# sourceMappingURL=buildJSSearch.js.map
 
-    var _this = undefined;
+    var beerModels;
+    (function (beerModels) {
+        beerModels["Brewery"] = "Brewery";
+        beerModels["Beer"] = "Beer";
+        beerModels["Category"] = "Category";
+        beerModels["City"] = "City";
+        beerModels["State"] = "State";
+        beerModels["Country"] = "Country";
+        beerModels["Style"] = "Style";
+    })(beerModels || (beerModels = {}));
+    var beerIdxConfig = {
+        Brewery: {
+            string: 'Brewery',
+            id: 'id',
+            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
+        },
+        Beer: {
+            string: 'Beer',
+            id: 'id',
+            fields: ['name', 'abv']
+        },
+        Category: {
+            string: 'Category',
+            id: 'id',
+            fields: ['category']
+        },
+        City: {
+            string: 'City',
+            id: 'id',
+            fields: ['city', 'state', 'country']
+        },
+        State: {
+            string: 'State',
+            id: 'id',
+            fields: ['state']
+        },
+        Country: {
+            string: 'Country',
+            id: 'id',
+            fields: ['country']
+        },
+        Style: {
+            string: 'Style',
+            id: 'id',
+            fields: ['style']
+        }
+    };
+    //# sourceMappingURL=interfaces.js.map
+
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
     var beerConfig = {
@@ -5163,25 +5163,22 @@
         models: beerModels,
         testSearchModel: beerModels.Brewery
     };
-    var meetupConfig = {
-        graphName: "meetupGraph",
-        graphFile: testGraphDir + "/meetupGraph." + graphExt,
-        searchTerm: "neo4j",
-        idxConfig: meetupIdxConfig,
-        models: meetupModels,
-        testSearchModel: meetupModels.Group
-    };
+    //# sourceMappingURL=appConfig.js.map
+
+    var _this = undefined;
+    window.$G = GraphiniusJS;
     (function () { return __awaiter(_this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
-            [beerConfig, meetupConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
-                var graph, indexes;
+            [beerConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+                var graph, indexes, searchRes;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4, loadGraph(config)];
+                        case 0: return [4, importGraph(config)];
                         case 1:
                             graph = _a.sent();
                             indexes = createJSSearchIndex(graph, config);
+                            searchRes = executeSearch(indexes, config);
                             return [2];
                     }
                 });
@@ -5189,51 +5186,20 @@
             return [2];
         });
     }); })();
-    function loadGraph(config) {
-        return __awaiter(this, void 0, void 0, function () {
-            var tic, graph, toc;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        console.log("Loading " + config.graphName + "...");
-                        tic = +new Date;
-                        return [4, getOrCreateGraph(config.graphFile)];
-                    case 1:
-                        graph = _a.sent();
-                        toc = +new Date;
-                        console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
-                        return [2, graph];
-                }
-            });
-        });
-    }
     function createJSSearchIndex(graph, config) {
         var tic = +new Date;
         var indexes = buildIdxJSSearch(graph, config.idxConfig);
         var toc = +new Date;
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
-        tic = +new Date;
-        var searchRes = indexes[config.testSearchModel].search(config.searchTerm);
-        toc = +new Date;
-        console.log("Executing search query in JS-SEARCH took " + (toc - tic) + " ms.");
-        console.log("JS-SEARCH search on '" + config.searchTerm + "' returned " + Object.keys(searchRes).length + " results.");
-        console.log(searchRes);
         return indexes;
     }
-    function getOrCreateGraph(graphFile) {
-        return __awaiter(this, void 0, void 0, function () {
-            var graph;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, importGraphFromURL(graphFile)];
-                    case 1:
-                        graph = _a.sent();
-                        window.$G = GraphiniusJS;
-                        window.graph = graph;
-                        return [2, graph];
-                }
-            });
-        });
+    function executeSearch(indexes, config) {
+        var tic = +new Date;
+        var searchRes = indexes[config.testSearchModel].search(config.searchTerm);
+        var toc = +new Date;
+        console.log("executing search for '" + config.searchTerm + "' in JS-SEARCH took " + (toc - tic) + " ms.");
+        console.log(searchRes);
+        return searchRes;
     }
 
 }));

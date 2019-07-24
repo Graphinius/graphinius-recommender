@@ -1,219 +1,43 @@
 import * as $G from 'graphinius';
+/* HACKETY HACK */
+window.$G = $G.default;
 
-import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
-import { importGraphFromURL } from './common/importGraph';
+import { IGraph } from 'graphinius/lib/core/Graph';
+import { importGraph } from './common/importGraph';
 
-import { IndexConfig } from './indexers/interfaces';
-import { beerIdxConfig, beerModels } from './indexers/beer/interfaces';
-import { meetupIdxConfig, meetupModels } from './indexers/meetup/interfaces';
+import { AppConfig } from './indexers/interfaces';
+
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
-
-
-const testGraphDir = `../test-data/graphs`;
-const graphExt = `json`;
-
-interface AppConfig {
-  graphName       : string;
-  graphFile       : string;
-  searchTerm      : string;
-  idxConfig       : IndexConfig;
-  models          : any;
-  testSearchModel : any;
-}
-
-const beerConfig: AppConfig = {
-  graphName:  `beerGraph`,
-  graphFile: `${testGraphDir}/beerGraph.${graphExt}`,
-  searchTerm: `brauhaus`,
-  idxConfig: beerIdxConfig,
-  models: beerModels,
-  testSearchModel: beerModels.Brewery
-};
-
-const meetupConfig: AppConfig = {
-  graphName:  `meetupGraph`,
-  graphFile: `${testGraphDir}/meetupGraph.${graphExt}`,
-  searchTerm: `neo4j`,
-  idxConfig: meetupIdxConfig,
-  models: meetupModels,
-  testSearchModel: meetupModels.Group
-};
+import { beerConfig } from './indexers/beer/appConfig';
+import { meetupConfig } from './indexers/meetup/appConfig';
 
 
 
 (async () => {
-  [beerConfig, meetupConfig].forEach(async config => {
-    const graph = await loadGraph(config);
+  [beerConfig].forEach(async config => { // , meetupConfig
+    const graph = await importGraph(config);
     const indexes = createJSSearchIndex(graph, config);
+    const searchRes = executeSearch(indexes, config);
   })
 })();
-
-
-
-async function loadGraph(config: AppConfig) {
-  console.log(`Loading ${config.graphName}...`);
-  let tic = +new Date;
-  const graph: IGraph = await getOrCreateGraph(config.graphFile);
-  let toc = +new Date;
-  console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);
-  return graph;
-}
-
 
 
 function createJSSearchIndex(graph: IGraph, config: AppConfig) {
   let tic = +new Date;
   const indexes = buildIdxJSSearch(graph, config.idxConfig);
   let toc = +new Date;
-  console.log(`Building Indexes in JS-SEARCH took ${toc-tic} ms.`)
-
-  
-  tic = +new Date;
-  let searchRes = indexes[config.testSearchModel].search(config.searchTerm);
-  toc = +new Date;
-  console.log(`Executing search query in JS-SEARCH took ${toc-tic} ms.`)
-
-  console.log(`JS-SEARCH search on '${config.searchTerm}' returned ${Object.keys(searchRes).length} results.`);
-  
-  console.log(searchRes);
-  
-
-  /**
-   * @todo abstract out into test case
-   */
-  // indexes[meetupModels.Group].addDocuments([{
-  //   id              : Number.MAX_VALUE,
-  //   name            : "Bernies Meetup",
-  //   description     : 'You dont wanna know.... but: neo4JJJJ!!',
-  //   organiserName   : 'Bernie'
-  // }]);
-
-  // searchRes = indexes[meetupModels.Group].search(SEARCH_TERM);
-  // console.log(searchRes);
-
-
-  /**
-   * @todo abstract out into test case
-   */
-  // indexes[beerModels.Brewery].addDocuments([{
-  //   id              : Number.MAX_VALUE,
-  //   name            : "Berndicio's Brauhaus extra schtoak",
-  //   address1        : 'Glacisstrasse 21, 8010 Graz',
-  //   phone           : 123456,
-  //   code            : 8010,
-  //   city            : 'Grats',
-  //   state           : 'Shire Mark',
-  //   country         : 'Her-stare-ike'
-  // }]);
-
-  // searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
-  // console.log(searchRes);
-
+  console.log(`Building Indexes in JS-SEARCH took ${toc-tic} ms.`);
   return indexes;
 }
 
 
-async function getOrCreateGraph(graphFile: string) {
-  let graph = await importGraphFromURL(graphFile);
-  /* HACKETY HACK */
-  window.$G = $G.default;
-  window.graph = graph;
+function executeSearch(indexes, config: AppConfig) {
+  let tic = +new Date;
+  const searchRes = indexes[config.testSearchModel].search(config.searchTerm);
+  let toc = +new Date;
+  console.log(`executing search for '${config.searchTerm}' in JS-SEARCH took ${toc-tic} ms.`);
 
-  return graph;
+  console.log(searchRes);
+
+  return searchRes;
 }
-
-
-
-// import { similarGroupsRec } from './meetup/simpleGroupRecs';
-// import { initDB, GRAPH_DB_NAME, STORE_NAME } from './common/idb';
-// import { IDBPDatabase, IDBPObjectStore } from 'idb';
-
-
-// let db : IDBPDatabase;
-// let store   : IDBPObjectStore<unknown, ["graphs"], "graphs">;
-
-
-// let graph: IGraph = await getGraphFromIDB();
-// console.log('Graph vom IDB:', graph);
-
-// if ( graph ) {
-//   console.log(`RETRIEVED Meetup graph from IDB`);
-// }
-// else {
-//   graph = await importGraphFromURL(meetupFile);
-//   console.log(`CREATED Meetup graph from JSON`);
-//   // await addGraphToIDB(graph);
-// }
-
-
-/**
- * IDB (IndexedDB) helpers
- */
-// async function getGraphFromIDB() {
-//   const tx = db.transaction(STORE_NAME);
-//   const store = tx.objectStore(STORE_NAME);
-//   const graph: IGraph = await store.get(graphName);
-//   await tx.done;
-//   return graph;
-// }
-
-
-// async function addGraphToIDB(graph: IGraph) {
-//   const tx = db.transaction(STORE_NAME, 'readwrite');
-//   const store = tx.objectStore(STORE_NAME);
-//   await store.add(graph, graphName).catch(e => console.log(e));
-//   await tx.done;
-//   return graph;
-// }
-
-
-// db = await initDB();  
-// console.log(`IDB graph DB store initialized:`);
-// console.log(db);
-
-
-// const indexesLunr = createLunrIndex(graph);
-// const indexesFuse = createFuseIndex(graph);
-// const indexesJSSearch = createJSSearchIndex(graph);
-
-// function createLunrIndex(graph: IGraph) {
-//   let tic = +new Date;
-//   const indexes = buildIndexesLunr(graph);
-//   let toc = +new Date;
-//   console.log(`Building Indexes in LUNR took ${toc-tic} ms.`)
-
-//   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
-//   console.log(`LUNR search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
-
-//   console.log(searchRes);
-
-//   searchRes.forEach(res => {
-//     let node = graph.getNodeById(res.ref);
-//     console.log(node.getFeatures());
-//   });
-
-//   return indexes;
-// }
-
-
-// function createFuseIndex(graph: IGraph) {
-//   let tic = +new Date;
-//   const indexes = buildIndexesFuse(graph);
-//   let toc = +new Date;
-//   console.log(`Building Indexes in FUSE took ${toc-tic} ms.`)
-
-//   let searchRes = indexes.groupIdx.search(SEARCH_TERM);
-  
-//   console.log(`FUSE search on '${SEARCH_TERM}' returned ${Object.keys(searchRes).length} results.`);
-  
-//   console.log(searchRes);
-  
-//   searchRes.forEach(res => {
-//     if ( res['matches'].length ) {
-//       let node = graph.getNodeById(res['item']);
-//       console.log(node.getFeatures());
-//     }
-//   });
-
-//   return indexes;
-// }
