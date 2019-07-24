@@ -3611,20 +3611,54 @@
     }
     //# sourceMappingURL=importGraph.js.map
 
-    var fuse = createCommonjsModule(function (module, exports) {
-    /*!
-     * Fuse.js v3.4.5 - Lightweight fuzzy-search (http://fusejs.io)
-     * 
-     * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
-     * All Rights Reserved. Apache Software License 2.0
-     * 
-     * http://www.apache.org/licenses/LICENSE-2.0
-     */
-    !function(e,t){module.exports=t();}(commonjsGlobal,function(){return function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r});},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0});},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=1)}([function(e,t){e.exports=function(e){return Array.isArray?Array.isArray(e):"[object Array]"===Object.prototype.toString.call(e)};},function(e,t,n){function r(e){return (r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e})(e)}function o(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r);}}var i=n(2),a=n(8),s=n(0),c=function(){function e(t,n){var r=n.location,o=void 0===r?0:r,i=n.distance,s=void 0===i?100:i,c=n.threshold,h=void 0===c?.6:c,l=n.maxPatternLength,u=void 0===l?32:l,f=n.caseSensitive,d=void 0!==f&&f,v=n.tokenSeparator,p=void 0===v?/ +/g:v,g=n.findAllMatches,y=void 0!==g&&g,m=n.minMatchCharLength,k=void 0===m?1:m,S=n.id,x=void 0===S?null:S,b=n.keys,M=void 0===b?[]:b,_=n.shouldSort,L=void 0===_||_,w=n.getFn,A=void 0===w?a:w,C=n.sortFn,I=void 0===C?function(e,t){return e.score-t.score}:C,O=n.tokenize,j=void 0!==O&&O,P=n.matchAllTokens,F=void 0!==P&&P,T=n.includeMatches,z=void 0!==T&&T,E=n.includeScore,K=void 0!==E&&E,$=n.verbose,J=void 0!==$&&$;!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.options={location:o,distance:s,threshold:h,maxPatternLength:u,isCaseSensitive:d,tokenSeparator:p,findAllMatches:y,minMatchCharLength:k,id:x,keys:M,includeMatches:z,includeScore:K,shouldSort:L,getFn:A,sortFn:I,verbose:J,tokenize:j,matchAllTokens:F},this.setCollection(t);}var t,n;return t=e,(n=[{key:"setCollection",value:function(e){return this.list=e,e}},{key:"search",value:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{limit:!1};this._log('---------\nSearch pattern: "'.concat(e,'"'));var n=this._prepareSearchers(e),r=n.tokenSearchers,o=n.fullSearcher,i=this._search(r,o),a=i.weights,s=i.results;return this._computeScore(a,s),this.options.shouldSort&&this._sort(s),t.limit&&"number"==typeof t.limit&&(s=s.slice(0,t.limit)),this._format(s)}},{key:"_prepareSearchers",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"",t=[];if(this.options.tokenize)for(var n=e.split(this.options.tokenSeparator),r=0,o=n.length;r<o;r+=1)t.push(new i(n[r],this.options));return {tokenSearchers:t,fullSearcher:new i(e,this.options)}}},{key:"_search",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],t=arguments.length>1?arguments[1]:void 0,n=this.list,r={},o=[];if("string"==typeof n[0]){for(var i=0,a=n.length;i<a;i+=1)this._analyze({key:"",value:n[i],record:i,index:i},{resultMap:r,results:o,tokenSearchers:e,fullSearcher:t});return {weights:null,results:o}}for(var s={},c=0,h=n.length;c<h;c+=1)for(var l=n[c],u=0,f=this.options.keys.length;u<f;u+=1){var d=this.options.keys[u];if("string"!=typeof d){if(s[d.name]={weight:1-d.weight||1},d.weight<=0||d.weight>1)throw new Error("Key weight has to be > 0 and <= 1");d=d.name;}else s[d]={weight:1};this._analyze({key:d,value:this.options.getFn(l,d),record:l,index:c},{resultMap:r,results:o,tokenSearchers:e,fullSearcher:t});}return {weights:s,results:o}}},{key:"_analyze",value:function(e,t){var n=e.key,r=e.arrayIndex,o=void 0===r?-1:r,i=e.value,a=e.record,c=e.index,h=t.tokenSearchers,l=void 0===h?[]:h,u=t.fullSearcher,f=void 0===u?[]:u,d=t.resultMap,v=void 0===d?{}:d,p=t.results,g=void 0===p?[]:p;if(null!=i){var y=!1,m=-1,k=0;if("string"==typeof i){this._log("\nKey: ".concat(""===n?"-":n));var S=f.search(i);if(this._log('Full text: "'.concat(i,'", score: ').concat(S.score)),this.options.tokenize){for(var x=i.split(this.options.tokenSeparator),b=[],M=0;M<l.length;M+=1){var _=l[M];this._log('\nPattern: "'.concat(_.pattern,'"'));for(var L=!1,w=0;w<x.length;w+=1){var A=x[w],C=_.search(A),I={};C.isMatch?(I[A]=C.score,y=!0,L=!0,b.push(C.score)):(I[A]=1,this.options.matchAllTokens||b.push(1)),this._log('Token: "'.concat(A,'", score: ').concat(I[A]));}L&&(k+=1);}m=b[0];for(var O=b.length,j=1;j<O;j+=1)m+=b[j];m/=O,this._log("Token score average:",m);}var P=S.score;m>-1&&(P=(P+m)/2),this._log("Score average:",P);var F=!this.options.tokenize||!this.options.matchAllTokens||k>=l.length;if(this._log("\nCheck Matches: ".concat(F)),(y||S.isMatch)&&F){var T=v[c];T?T.output.push({key:n,arrayIndex:o,value:i,score:P,matchedIndices:S.matchedIndices}):(v[c]={item:a,output:[{key:n,arrayIndex:o,value:i,score:P,matchedIndices:S.matchedIndices}]},g.push(v[c]));}}else if(s(i))for(var z=0,E=i.length;z<E;z+=1)this._analyze({key:n,arrayIndex:z,value:i[z],record:a,index:c},{resultMap:v,results:g,tokenSearchers:l,fullSearcher:f});}}},{key:"_computeScore",value:function(e,t){this._log("\n\nComputing score:\n");for(var n=0,r=t.length;n<r;n+=1){for(var o=t[n].output,i=o.length,a=1,s=1,c=0;c<i;c+=1){var h=e?e[o[c].key].weight:1,l=(1===h?o[c].score:o[c].score||.001)*h;1!==h?s=Math.min(s,l):(o[c].nScore=l,a*=l);}t[n].score=1===s?a:s,this._log(t[n]);}}},{key:"_sort",value:function(e){this._log("\n\nSorting...."),e.sort(this.options.sortFn);}},{key:"_format",value:function(e){var t=[];if(this.options.verbose){var n=[];this._log("\n\nOutput:\n\n",JSON.stringify(e,function(e,t){if("object"===r(t)&&null!==t){if(-1!==n.indexOf(t))return;n.push(t);}return t})),n=null;}var o=[];this.options.includeMatches&&o.push(function(e,t){var n=e.output;t.matches=[];for(var r=0,o=n.length;r<o;r+=1){var i=n[r];if(0!==i.matchedIndices.length){var a={indices:i.matchedIndices,value:i.value};i.key&&(a.key=i.key),i.hasOwnProperty("arrayIndex")&&i.arrayIndex>-1&&(a.arrayIndex=i.arrayIndex),t.matches.push(a);}}}),this.options.includeScore&&o.push(function(e,t){t.score=e.score;});for(var i=0,a=e.length;i<a;i+=1){var s=e[i];if(this.options.id&&(s.item=this.options.getFn(s.item,this.options.id)[0]),o.length){for(var c={item:s.item},h=0,l=o.length;h<l;h+=1)o[h](s,c);t.push(c);}else t.push(s.item);}return t}},{key:"_log",value:function(){var e;this.options.verbose&&(e=console).log.apply(e,arguments);}}])&&o(t.prototype,n),e}();e.exports=c;},function(e,t,n){function r(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r);}}var o=n(3),i=n(4),a=n(7),s=function(){function e(t,n){var r=n.location,o=void 0===r?0:r,i=n.distance,s=void 0===i?100:i,c=n.threshold,h=void 0===c?.6:c,l=n.maxPatternLength,u=void 0===l?32:l,f=n.isCaseSensitive,d=void 0!==f&&f,v=n.tokenSeparator,p=void 0===v?/ +/g:v,g=n.findAllMatches,y=void 0!==g&&g,m=n.minMatchCharLength,k=void 0===m?1:m;!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.options={location:o,distance:s,threshold:h,maxPatternLength:u,isCaseSensitive:d,tokenSeparator:p,findAllMatches:y,minMatchCharLength:k},this.pattern=this.options.isCaseSensitive?t:t.toLowerCase(),this.pattern.length<=u&&(this.patternAlphabet=a(this.pattern));}var t,n;return t=e,(n=[{key:"search",value:function(e){if(this.options.isCaseSensitive||(e=e.toLowerCase()),this.pattern===e)return {isMatch:!0,score:0,matchedIndices:[[0,e.length-1]]};var t=this.options,n=t.maxPatternLength,r=t.tokenSeparator;if(this.pattern.length>n)return o(e,this.pattern,r);var a=this.options,s=a.location,c=a.distance,h=a.threshold,l=a.findAllMatches,u=a.minMatchCharLength;return i(e,this.pattern,this.patternAlphabet,{location:s,distance:c,threshold:h,findAllMatches:l,minMatchCharLength:u})}}])&&r(t.prototype,n),e}();e.exports=s;},function(e,t){var n=/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;e.exports=function(e,t){var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:/ +/g,o=new RegExp(t.replace(n,"\\$&").replace(r,"|")),i=e.match(o),a=!!i,s=[];if(a)for(var c=0,h=i.length;c<h;c+=1){var l=i[c];s.push([e.indexOf(l),l.length-1]);}return {score:a?.5:1,isMatch:a,matchedIndices:s}};},function(e,t,n){var r=n(5),o=n(6);e.exports=function(e,t,n,i){for(var a=i.location,s=void 0===a?0:a,c=i.distance,h=void 0===c?100:c,l=i.threshold,u=void 0===l?.6:l,f=i.findAllMatches,d=void 0!==f&&f,v=i.minMatchCharLength,p=void 0===v?1:v,g=s,y=e.length,m=u,k=e.indexOf(t,g),S=t.length,x=[],b=0;b<y;b+=1)x[b]=0;if(-1!==k){var M=r(t,{errors:0,currentLocation:k,expectedLocation:g,distance:h});if(m=Math.min(M,m),-1!==(k=e.lastIndexOf(t,g+S))){var _=r(t,{errors:0,currentLocation:k,expectedLocation:g,distance:h});m=Math.min(_,m);}}k=-1;for(var L=[],w=1,A=S+y,C=1<<S-1,I=0;I<S;I+=1){for(var O=0,j=A;O<j;){r(t,{errors:I,currentLocation:g+j,expectedLocation:g,distance:h})<=m?O=j:A=j,j=Math.floor((A-O)/2+O);}A=j;var P=Math.max(1,g-j+1),F=d?y:Math.min(g+j,y)+S,T=Array(F+2);T[F+1]=(1<<I)-1;for(var z=F;z>=P;z-=1){var E=z-1,K=n[e.charAt(E)];if(K&&(x[E]=1),T[z]=(T[z+1]<<1|1)&K,0!==I&&(T[z]|=(L[z+1]|L[z])<<1|1|L[z+1]),T[z]&C&&(w=r(t,{errors:I,currentLocation:E,expectedLocation:g,distance:h}))<=m){if(m=w,(k=E)<=g)break;P=Math.max(1,2*g-k);}}if(r(t,{errors:I+1,currentLocation:g,expectedLocation:g,distance:h})>m)break;L=T;}return {isMatch:k>=0,score:0===w?.001:w,matchedIndices:o(x,p)}};},function(e,t){e.exports=function(e,t){var n=t.errors,r=void 0===n?0:n,o=t.currentLocation,i=void 0===o?0:o,a=t.expectedLocation,s=void 0===a?0:a,c=t.distance,h=void 0===c?100:c,l=r/e.length,u=Math.abs(s-i);return h?l+u/h:u?1:l};},function(e,t){e.exports=function(){for(var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:1,n=[],r=-1,o=-1,i=0,a=e.length;i<a;i+=1){var s=e[i];s&&-1===r?r=i:s||-1===r||((o=i-1)-r+1>=t&&n.push([r,o]),r=-1);}return e[i-1]&&i-r>=t&&n.push([r,i-1]),n};},function(e,t){e.exports=function(e){for(var t={},n=e.length,r=0;r<n;r+=1)t[e.charAt(r)]=0;for(var o=0;o<n;o+=1)t[e.charAt(o)]|=1<<n-o-1;return t};},function(e,t,n){var r=n(0);e.exports=function(e,t){return function e(t,n,o){if(n){var i=n.indexOf("."),a=n,s=null;-1!==i&&(a=n.slice(0,i),s=n.slice(i+1));var c=t[a];if(null!=c)if(s||"string"!=typeof c&&"number"!=typeof c)if(r(c))for(var h=0,l=c.length;h<l;h+=1)e(c[h],s,o);else s&&e(c,s,o);else o.push(c.toString());}else o.push(t);return o}(e,t,[])};}])});
-    });
-
-    unwrapExports(fuse);
-    var fuse_1 = fuse.Fuse;
+    var beerModels;
+    (function (beerModels) {
+        beerModels["Beer"] = "Beer";
+        beerModels["Brewery"] = "Brewery";
+        beerModels["Category"] = "Category";
+        beerModels["City"] = "City";
+        beerModels["State"] = "State";
+        beerModels["Country"] = "Country";
+        beerModels["Style"] = "Style";
+    })(beerModels || (beerModels = {}));
+    var beerIdxConfig = {
+        Beer: {
+            string: 'Beer',
+            id: 'id',
+            fields: ['name', 'abv']
+        },
+        Brewery: {
+            string: 'Brewery',
+            id: 'id',
+            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
+        },
+        Category: {
+            string: 'Category',
+            id: 'id',
+            fields: ['category']
+        },
+        City: {
+            string: 'City',
+            id: 'id',
+            fields: ['city', 'state', 'country']
+        },
+        State: {
+            string: 'State',
+            id: 'id',
+            fields: ['state']
+        },
+        Country: {
+            string: 'Country',
+            id: 'id',
+            fields: ['country']
+        },
+        Style: {
+            string: 'Style',
+            id: 'id',
+            fields: ['style']
+        }
+    };
+    //# sourceMappingURL=interfaces.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -5060,330 +5094,78 @@
     var index = unwrapExports(commonjs);
 
     var JsSearch = index;
-    var types = {
-        Groups: [],
-        Topics: [],
-        Members: [],
-        Events: []
-    };
-    function buildIndexesJSSearch(graph) {
-        var indexes = {
-            groupIdx: null,
-            topicIdx: null,
-            memberIdx: null,
-            eventIdx: null
-        };
+    function buildIdxJSSearch(graph, idxConfig) {
+        var types = {};
+        Object.keys(idxConfig).forEach(function (k) { return types[k] = []; });
+        var indexes = {};
+        Object.keys(idxConfig).forEach(function (k) { return indexes[k] = null; });
         Object.values(graph.getNodes()).forEach(function (n) {
-            switch (n.getLabel()) {
-                case 'Group':
-                    var groupIdxEntry = {
-                        id: n.getID(),
-                        name: n.getFeature('name'),
-                        description: n.getFeature('description'),
-                        organiserName: n.getFeature('organiserName')
-                    };
-                    types.Groups.push(groupIdxEntry);
-                    break;
-                case 'Topic':
-                    var topicIdxEntry = {
-                        id: n.getID(),
-                        name: n.getFeature('name'),
-                        urlkey: n.getFeature('urlkey')
-                    };
-                    types.Topics.push(topicIdxEntry);
-                    break;
-                case 'Member':
-                    var memberIdxEntry = {
-                        id: n.getID(),
-                        name: n.getFeature('name')
-                    };
-                    types.Members.push(memberIdxEntry);
-                    break;
-                case 'Event':
-                    var eventIdxEntry = {
-                        id: n.getID(),
-                        name: n.getFeature('name'),
-                        description: n.getFeature('description')
-                    };
-                    types.Events.push(eventIdxEntry);
-                    break;
-                default:
-                    console.log("Node Type not supported in Meetup scenario...!");
-                    return false;
+            var label = n.getLabel();
+            var idxObj = idxConfig[label];
+            if (!idxObj) {
+                console.log("Node Type not supported in Meetup scenario...!");
+                return false;
             }
+            var idxEntry = { id: n.getID() };
+            idxObj.fields.forEach(function (f) { return idxEntry[f] = n.getFeature(f); });
+            types[label].push(idxEntry);
         });
         Object.keys(types).forEach(function (k) { return console.log(types[k].length + " nodes of type " + k + " registered."); });
-        indexes.groupIdx = new JsSearch.Search('id');
-        indexes.groupIdx.addIndex('name');
-        indexes.groupIdx.addIndex('description');
-        indexes.groupIdx.addIndex('organiserName');
-        indexes.groupIdx.addDocuments(types.Groups);
-        indexes.topicIdx = new JsSearch.Search('id');
-        indexes.groupIdx.addIndex('name');
-        indexes.groupIdx.addIndex('urlkey');
-        indexes.topicIdx.addDocuments(types.Topics);
-        indexes.memberIdx = new JsSearch.Search('id');
-        indexes.memberIdx.addIndex('name');
-        indexes.memberIdx.addDocuments(types.Members);
-        indexes.eventIdx = new JsSearch.Search('id');
-        indexes.groupIdx.addIndex('name');
-        indexes.groupIdx.addIndex('description');
-        indexes.eventIdx.addDocuments(types.Events);
+        Object.values(idxConfig).forEach(function (model) {
+            indexes[model.string] = new JsSearch.Search(model.id);
+            model.fields.forEach(function (f) { return indexes[model.string].addIndex(f); });
+            indexes[model.string].addDocuments(types[model.string]);
+        });
         window.idxJSSearch = indexes;
         return indexes;
     }
-    //# sourceMappingURL=meetupIndexesJSSearch.js.map
-
-    const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
-
-    let idbProxyableTypes;
-    let cursorAdvanceMethods;
-    // This is a function to prevent it throwing up in node environments.
-    function getIdbProxyableTypes() {
-        return idbProxyableTypes ||
-            (idbProxyableTypes = [IDBDatabase, IDBObjectStore, IDBIndex, IDBCursor, IDBTransaction]);
-    }
-    // This is a function to prevent it throwing up in node environments.
-    function getCursorAdvanceMethods() {
-        return cursorAdvanceMethods || (cursorAdvanceMethods = [
-            IDBCursor.prototype.advance,
-            IDBCursor.prototype.continue,
-            IDBCursor.prototype.continuePrimaryKey,
-        ]);
-    }
-    const cursorRequestMap = new WeakMap();
-    const transactionDoneMap = new WeakMap();
-    const transactionStoreNamesMap = new WeakMap();
-    const transformCache = new WeakMap();
-    const reverseTransformCache = new WeakMap();
-    function promisifyRequest(request) {
-        const promise = new Promise((resolve, reject) => {
-            const unlisten = () => {
-                request.removeEventListener('success', success);
-                request.removeEventListener('error', error);
-            };
-            const success = () => {
-                resolve(wrap(request.result));
-                unlisten();
-            };
-            const error = () => {
-                reject(request.error);
-                unlisten();
-            };
-            request.addEventListener('success', success);
-            request.addEventListener('error', error);
-        });
-        promise.then((value) => {
-            // Since cursoring reuses the IDBRequest (*sigh*), we cache it for later retrieval
-            // (see wrapFunction).
-            if (value instanceof IDBCursor) {
-                cursorRequestMap.set(value, request);
-            }
-            // Catching to avoid "Uncaught Promise exceptions"
-        }).catch(() => { });
-        // This mapping exists in reverseTransformCache but doesn't doesn't exist in transformCache. This
-        // is because we create many promises from a single IDBRequest.
-        reverseTransformCache.set(promise, request);
-        return promise;
-    }
-    function cacheDonePromiseForTransaction(tx) {
-        // Early bail if we've already created a done promise for this transaction.
-        if (transactionDoneMap.has(tx))
-            return;
-        const done = new Promise((resolve, reject) => {
-            const unlisten = () => {
-                tx.removeEventListener('complete', complete);
-                tx.removeEventListener('error', error);
-                tx.removeEventListener('abort', error);
-            };
-            const complete = () => {
-                resolve();
-                unlisten();
-            };
-            const error = () => {
-                reject(tx.error);
-                unlisten();
-            };
-            tx.addEventListener('complete', complete);
-            tx.addEventListener('error', error);
-            tx.addEventListener('abort', error);
-        });
-        // Cache it for later retrieval.
-        transactionDoneMap.set(tx, done);
-    }
-    let idbProxyTraps = {
-        get(target, prop, receiver) {
-            if (target instanceof IDBTransaction) {
-                // Special handling for transaction.done.
-                if (prop === 'done')
-                    return transactionDoneMap.get(target);
-                // Polyfill for objectStoreNames because of Edge.
-                if (prop === 'objectStoreNames') {
-                    return target.objectStoreNames || transactionStoreNamesMap.get(target);
-                }
-                // Make tx.store return the only store in the transaction, or undefined if there are many.
-                if (prop === 'store') {
-                    return receiver.objectStoreNames[1] ?
-                        undefined : receiver.objectStore(receiver.objectStoreNames[0]);
-                }
-            }
-            // Else transform whatever we get back.
-            return wrap(target[prop]);
-        },
-        has(target, prop) {
-            if (target instanceof IDBTransaction && (prop === 'done' || prop === 'store'))
-                return true;
-            return prop in target;
-        },
-    };
-    function addTraps(callback) {
-        idbProxyTraps = callback(idbProxyTraps);
-    }
-    function wrapFunction(func) {
-        // Due to expected object equality (which is enforced by the caching in `wrap`), we
-        // only create one new func per func.
-        // Edge doesn't support objectStoreNames (booo), so we polyfill it here.
-        if (func === IDBDatabase.prototype.transaction &&
-            !('objectStoreNames' in IDBTransaction.prototype)) {
-            return function (storeNames, ...args) {
-                const tx = func.call(unwrap(this), storeNames, ...args);
-                transactionStoreNamesMap.set(tx, storeNames.sort ? storeNames.sort() : [storeNames]);
-                return wrap(tx);
-            };
-        }
-        // Cursor methods are special, as the behaviour is a little more different to standard IDB. In
-        // IDB, you advance the cursor and wait for a new 'success' on the IDBRequest that gave you the
-        // cursor. It's kinda like a promise that can resolve with many values. That doesn't make sense
-        // with real promises, so each advance methods returns a new promise for the cursor object, or
-        // undefined if the end of the cursor has been reached.
-        if (getCursorAdvanceMethods().includes(func)) {
-            return function (...args) {
-                // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
-                // the original object.
-                func.apply(unwrap(this), args);
-                return wrap(cursorRequestMap.get(this));
-            };
-        }
-        return function (...args) {
-            // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
-            // the original object.
-            return wrap(func.apply(unwrap(this), args));
-        };
-    }
-    function transformCachableValue(value) {
-        if (typeof value === 'function')
-            return wrapFunction(value);
-        // This doesn't return, it just creates a 'done' promise for the transaction,
-        // which is later returned for transaction.done (see idbObjectHandler).
-        if (value instanceof IDBTransaction)
-            cacheDonePromiseForTransaction(value);
-        if (instanceOfAny(value, getIdbProxyableTypes()))
-            return new Proxy(value, idbProxyTraps);
-        // Return the same value back if we're not going to transform it.
-        return value;
-    }
-    function wrap(value) {
-        // We sometimes generate multiple promises from a single IDBRequest (eg when cursoring), because
-        // IDB is weird and a single IDBRequest can yield many responses, so these can't be cached.
-        if (value instanceof IDBRequest)
-            return promisifyRequest(value);
-        // If we've already transformed this value before, reuse the transformed value.
-        // This is faster, but it also provides object equality.
-        if (transformCache.has(value))
-            return transformCache.get(value);
-        const newValue = transformCachableValue(value);
-        // Not all types are transformed.
-        // These may be primitive types, so they can't be WeakMap keys.
-        if (newValue !== value) {
-            transformCache.set(value, newValue);
-            reverseTransformCache.set(newValue, value);
-        }
-        return newValue;
-    }
-    const unwrap = (value) => reverseTransformCache.get(value);
-
-    const readMethods = ['get', 'getKey', 'getAll', 'getAllKeys', 'count'];
-    const writeMethods = ['put', 'add', 'delete', 'clear'];
-    const cachedMethods = new Map();
-    function getMethod(target, prop) {
-        if (!(target instanceof IDBDatabase &&
-            !(prop in target) &&
-            typeof prop === 'string'))
-            return;
-        if (cachedMethods.get(prop))
-            return cachedMethods.get(prop);
-        const targetFuncName = prop.replace(/FromIndex$/, '');
-        const useIndex = prop !== targetFuncName;
-        const isWrite = writeMethods.includes(targetFuncName);
-        if (
-        // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
-        !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) ||
-            !(isWrite || readMethods.includes(targetFuncName)))
-            return;
-        const method = async function (storeName, ...args) {
-            // isWrite ? 'readwrite' : undefined gzipps better, but fails in Edge :(
-            const tx = this.transaction(storeName, isWrite ? 'readwrite' : 'readonly');
-            let target = tx.store;
-            if (useIndex)
-                target = target.index(args.shift());
-            const returnVal = target[targetFuncName](...args);
-            if (isWrite)
-                await tx.done;
-            return returnVal;
-        };
-        cachedMethods.set(prop, method);
-        return method;
-    }
-    addTraps(oldTraps => ({
-        get: (target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver),
-        has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop),
-    }));
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var _this = undefined;
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
-    var graphName = "meetupGraph";
-    var meetupFile = testGraphDir + "/" + graphName + "." + graphExt;
-    var SEARCH_TERM = 'neo4j';
+    var graphName = "beerGraph";
+    var graphFile = testGraphDir + "/" + graphName + "." + graphExt;
+    var SEARCH_TERM = 'brau';
     (function () { return __awaiter(_this, void 0, void 0, function () {
-        var tic, mug, toc, indexesJSSearch;
+        var tic, graph, toc, indexes;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log("Loading Meetup graph...");
+                    console.log("Loading " + graphName + "...");
                     tic = +new Date;
                     return [4, getOrCreateGraph()];
                 case 1:
-                    mug = _a.sent();
+                    graph = _a.sent();
                     toc = +new Date;
-                    console.log("Importing graph of |V|=" + mug.nrNodes() + " and |E_dir|=" + mug.nrDirEdges() + " took " + (toc - tic) + " ms.");
-                    indexesJSSearch = createJSSearchIndex(mug);
+                    console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                    indexes = createJSSearchIndex(graph, beerIdxConfig);
                     return [2];
             }
         });
     }); })();
-    function createJSSearchIndex(graph) {
+    function createJSSearchIndex(graph, idxConfig) {
         var tic = +new Date;
-        var indexes = buildIndexesJSSearch(graph);
+        var indexes = buildIdxJSSearch(graph, idxConfig);
         var toc = +new Date;
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
         tic = +new Date;
-        var searchRes = indexes.groupIdx.search(SEARCH_TERM);
+        var searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
         toc = +new Date;
         console.log("Executing search query in JS-SEARCH took " + (toc - tic) + " ms.");
         console.log("JS-SEARCH search on '" + SEARCH_TERM + "' returned " + Object.keys(searchRes).length + " results.");
         console.log(searchRes);
-        searchRes.forEach(function (res) {
-            var node = graph.getNodeById(res['id']);
-            console.log(node.getFeatures());
-        });
-        indexes.groupIdx.addDocuments([{
+        indexes[beerModels.Brewery].addDocuments([{
                 id: Number.MAX_VALUE,
-                name: 'client-side ML',
-                description: 'The greatest client-side machine learning & graph recommender meetup group in Graz, Austria. Includes Graphinius, neo4J & Arango stuff...',
-                organiserName: 'Bernd Malle'
+                name: "Berndicio's Brauhaus extra schtoak",
+                address1: 'Glacisstrasse 21, 8010 Graz',
+                phone: 123456,
+                code: 8010,
+                city: 'Grats',
+                state: 'Shire Mark',
+                country: 'Her-stare-ike'
             }]);
-        searchRes = indexes.groupIdx.search(SEARCH_TERM);
+        searchRes = indexes[beerModels.Brewery].search(SEARCH_TERM);
         console.log(searchRes);
         return indexes;
     }
@@ -5392,7 +5174,7 @@
             var graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, importGraphFromURL(meetupFile)];
+                    case 0: return [4, importGraphFromURL(graphFile)];
                     case 1:
                         graph = _a.sent();
                         window.$G = GraphiniusJS;

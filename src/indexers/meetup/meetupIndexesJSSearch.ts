@@ -1,4 +1,4 @@
-import { MeetupIndexesJSSearch } from '../common/interfaces';
+import { MeetupIndexesJSSearch } from '../../common/interfaces';
 import { IBaseNode } from 'graphinius/lib/core/Nodes';
 import { IGraph, BaseGraph } from 'graphinius/lib/core/Graph';
 import * as JSSearch from 'js-search';
