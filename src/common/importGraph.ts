@@ -27,8 +27,7 @@ async function getOrCreateGraph(graphFile: string) {
 async function importGraphFromURL(graphFile) {
   const graphBytes = await(await fetch(graphFile));
   const graphString = await graphBytes.json();
-  const graph = jsonIn.readFromJSON(graphString);  
-  return graph;
+  return jsonIn.readFromJSON(graphString);
 }
 
 

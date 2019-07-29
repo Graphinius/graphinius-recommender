@@ -1,5 +1,5 @@
 import { IGraph } from 'graphinius/lib/core/Graph';
-import { AppConfig } from '../../src/indexers/interfaces';
+import { AppConfig } from '../indexers/interfaces';
 import { openDB, deleteDB, wrap, unwrap } from 'idb';
 
 export const GRAPH_DB_NAME = 'graphdb';
@@ -11,7 +11,7 @@ let db      : IDBDatabase;
 
 async function initDB() {
 
-  const db = await openDB(GRAPH_DB_NAME, 1, {
+  return await openDB(GRAPH_DB_NAME, 1, {
     upgrade(db, oldVersion, newVersion, transaction) {
       const graphStore = db.createObjectStore(STORE_NAME, {keyPath: 'name'})
     },
@@ -23,7 +23,6 @@ async function initDB() {
     }
   });
 
-  return db;
 }
 
 

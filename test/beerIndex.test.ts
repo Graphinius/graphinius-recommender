@@ -64,6 +64,3 @@ describe('Meetup example index tests', () => {
 
 });
 
-  
-  
-

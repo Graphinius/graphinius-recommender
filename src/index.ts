@@ -18,7 +18,7 @@ import { meetupConfig } from './indexers/meetup/appConfig';
     const graph = await importGraph(config);
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config);
-  })
+  });
 })();
 
 

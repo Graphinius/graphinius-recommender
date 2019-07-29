@@ -80,7 +80,7 @@
         if (obj === null || typeof obj !== 'object') {
             return obj;
         }
-        if (obj instanceof Nodes.BaseNode || obj instanceof Edges.BaseEdge) {
+        if (obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
             return;
         }
         var cloneObj = obj.constructor ? obj.constructor() : {};
@@ -202,7 +202,7 @@
     var StructUtils_5 = StructUtils.findKey;
     var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
 
-    var Nodes = createCommonjsModule(function (module, exports) {
+    var BaseNode_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
     class BaseNode {
@@ -438,10 +438,10 @@
     exports.BaseNode = BaseNode;
     });
 
-    unwrapExports(Nodes);
-    var Nodes_1 = Nodes.BaseNode;
+    unwrapExports(BaseNode_1);
+    var BaseNode_2 = BaseNode_1.BaseNode;
 
-    var Edges = createCommonjsModule(function (module, exports) {
+    var BaseEdge_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
     class BaseEdge {
@@ -449,7 +449,7 @@
             this._id = _id;
             this._node_a = _node_a;
             this._node_b = _node_b;
-            if (!(_node_a instanceof Nodes.BaseNode) || !(_node_b instanceof Nodes.BaseNode)) {
+            if (!(_node_a instanceof BaseNode_1.BaseNode) || !(_node_b instanceof BaseNode_1.BaseNode)) {
                 throw new Error("cannot instantiate edge without two valid node objects");
             }
             options = options || {};
@@ -486,7 +486,7 @@
             return { a: this._node_a, b: this._node_b };
         }
         clone(new_node_a, new_node_b) {
-            if (!(new_node_a instanceof Nodes.BaseNode) || !(new_node_b instanceof Nodes.BaseNode)) {
+            if (!(new_node_a instanceof BaseNode_1.BaseNode) || !(new_node_b instanceof BaseNode_1.BaseNode)) {
                 throw new Error("refusing to clone edge if any new node is invalid");
             }
             return new BaseEdge(this._id, new_node_a, new_node_b, {
@@ -500,8 +500,8 @@
     exports.BaseEdge = BaseEdge;
     });
 
-    unwrapExports(Edges);
-    var Edges_1 = Edges.BaseEdge;
+    unwrapExports(BaseEdge_1);
+    var BaseEdge_2 = BaseEdge_1.BaseEdge;
 
     var CallbackUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -527,10 +527,10 @@
 
     function BFS(graph, v, config) {
         var config = config || prepareBFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === Graph.GraphMode.INIT) {
+        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === Graph.GraphMode.INIT) {
+        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var bfsScope = {
@@ -550,13 +550,13 @@
         var i = 0;
         while (i < bfsScope.queue.length) {
             bfsScope.current = bfsScope.queue[i++];
-            if (dir_mode === Graph.GraphMode.MIXED) {
+            if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
                 bfsScope.adj_nodes = bfsScope.current.reachNodes();
             }
-            else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+            else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.connNodes();
             }
-            else if (dir_mode === Graph.GraphMode.DIRECTED) {
+            else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.nextNodes();
             }
             else {
@@ -592,7 +592,7 @@
                 node_marked: [],
                 sort_nodes: undefined
             },
-            dir_mode: Graph.GraphMode.MIXED,
+            dir_mode: BaseGraph_1.GraphMode.MIXED,
             messages: {},
             filters: {}
         }, result = config.result, callbacks = config.callbacks;
@@ -646,10 +646,10 @@
             current_root: current_root
         };
         var config = config || prepareDFSVisitStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === Graph.GraphMode.INIT) {
+        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === Graph.GraphMode.INIT) {
+        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         if (callbacks.init_dfs_visit) {
@@ -671,13 +671,13 @@
                 if (callbacks.node_unmarked) {
                     CallbackUtils.execCallbacks(callbacks.node_unmarked, dfsVisitScope);
                 }
-                if (dir_mode === Graph.GraphMode.MIXED) {
+                if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.reachNodes();
                 }
-                else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+                else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.connNodes();
                 }
-                else if (dir_mode === Graph.GraphMode.DIRECTED) {
+                else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.nextNodes();
                 }
                 if (typeof callbacks.sort_nodes === 'function') {
@@ -705,10 +705,10 @@
     exports.DFSVisit = DFSVisit;
     function DFS(graph, root, config) {
         var config = config || prepareDFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === Graph.GraphMode.INIT) {
+        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === Graph.GraphMode.INIT) {
+        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var dfsScope = {
@@ -755,7 +755,7 @@
             callbacks: {},
             messages: {},
             dfs_visit_marked: {},
-            dir_mode: Graph.GraphMode.MIXED
+            dir_mode: BaseGraph_1.GraphMode.MIXED
         }, result = config.visit_result, callbacks = config.callbacks;
         var count = 0;
         var counter = function () {
@@ -970,15 +970,15 @@
     exports.DEFAULT_WEIGHT = 1;
     function PFS(graph, v, config) {
         var config = config || preparePFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
-        if (graph.getMode() === Graph.GraphMode.INIT) {
+        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === Graph.GraphMode.INIT) {
+        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var start_ne = {
             node: v,
-            edge: new Edges.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
+            edge: new BaseEdge_1.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
             best: 0
         };
         var scope = {
@@ -1007,13 +1007,13 @@
                 config.callbacks.goal_reached && CallbackUtils.execCallbacks(config.callbacks.goal_reached, scope);
                 return config.result;
             }
-            if (dir_mode === Graph.GraphMode.MIXED) {
+            if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
                 scope.adj_nodes = scope.current.node.reachNodes();
             }
-            else if (dir_mode === Graph.GraphMode.UNDIRECTED) {
+            else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
                 scope.adj_nodes = scope.current.node.connNodes();
             }
-            else if (dir_mode === Graph.GraphMode.DIRECTED) {
+            else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
                 scope.adj_nodes = scope.current.node.nextNodes();
             }
             else {
@@ -1072,7 +1072,7 @@
                 equal_path_msgs: [],
                 goal_reached_msgs: []
             },
-            dir_mode: Graph.GraphMode.MIXED,
+            dir_mode: BaseGraph_1.GraphMode.MIXED,
             goal_node: null,
             evalPriority: function (ne) {
                 return ne.best || exports.DEFAULT_WEIGHT;
@@ -1243,7 +1243,7 @@
         }
         let allNodes = graph.getNodes();
         if (graph.hasNegativeEdge()) {
-            var extraNode = new Nodes.BaseNode("extraNode");
+            var extraNode = new BaseNode_1.BaseNode("extraNode");
             graph = addExtraNandE(graph, extraNode);
             let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
             if (BFresult.neg_cycle) {
@@ -1350,110 +1350,7 @@
     var Johnsons_4 = Johnsons_1.reWeighGraph;
     var Johnsons_5 = Johnsons_1.PFSFromAllNodes;
 
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    let log_level = LOG_LEVELS.production;
-    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
-        log_level = process.env['G_LOG'];
-    }
-    const RUN_CONFIG = {
-        log_level
-    };
-    exports.RUN_CONFIG = RUN_CONFIG;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.LOG_LEVELS;
-    var run_config_2 = run_config.RUN_CONFIG;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var LogColors;
-    (function (LogColors) {
-        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
-        LogColors[LogColors["FgRed"] = 31] = "FgRed";
-        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
-        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
-        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
-        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
-        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
-        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
-        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
-        LogColors[LogColors["BgRed"] = 41] = "BgRed";
-        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
-        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
-        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
-        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
-        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
-        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    const DEFAULT_COLOR = 37;
-    class Logger {
-        constructor(config) {
-            this.config = null;
-            this.config = config || run_config.RUN_CONFIG;
-        }
-        log(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.log.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        error(err, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.error.call(console, this.colorize(color, err, bright));
-                return true;
-            }
-            return false;
-        }
-        dir(obj, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.dir.call(console, this.colorize(color, obj, bright));
-                return true;
-            }
-            return false;
-        }
-        info(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.info.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        warn(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.warn.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        write(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        colorize(color, output, bright) {
-            let out_bright = bright ? '\x1b[1m' : null;
-            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        }
-    }
-    exports.Logger = Logger;
-    });
-
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
-
-    var Graph = createCommonjsModule(function (module, exports) {
+    var BaseGraph_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
@@ -1461,8 +1358,6 @@
 
 
 
-
-    let logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     var GraphMode;
     (function (GraphMode) {
@@ -1485,7 +1380,7 @@
         reweighIfHasNegativeEdge(clone = false) {
             if (this.hasNegativeEdge()) {
                 let result_graph = clone ? this.cloneStructure() : this;
-                var extraNode = new Nodes.BaseNode("extraNode");
+                var extraNode = new BaseNode_1.BaseNode("extraNode");
                 result_graph = Johnsons_1.addExtraNandE(result_graph, extraNode);
                 let BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
                 if (BFresult.neg_cycle) {
@@ -1563,7 +1458,7 @@
             }
             return next;
         }
-        adjListArray(incoming = false) {
+        adjListArray(incoming = false, include_self = false, self_dist = 0) {
             let adjList = [], node_keys = Object.keys(this._nodes);
             const adjDict = this.adjListDict(incoming, true, 0);
             for (let i = 0; i < this._nr_nodes; ++i) {
@@ -1629,7 +1524,7 @@
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            var node = new Nodes.BaseNode(id, opts);
+            var node = new BaseNode_1.BaseNode(id, opts);
             return this.addNode(node) ? node : null;
         }
         addNode(node) {
@@ -1750,7 +1645,7 @@
             }
         }
         addEdgeByID(id, node_a, node_b, opts) {
-            let edge = new Edges.BaseEdge(id, node_a, node_b, opts || {});
+            let edge = new BaseEdge_1.BaseEdge(id, node_a, node_b, opts || {});
             return this.addEdge(edge);
         }
         addEdge(edge) {
@@ -1958,9 +1853,9 @@
     exports.BaseGraph = BaseGraph;
     });
 
-    unwrapExports(Graph);
-    var Graph_1 = Graph.GraphMode;
-    var Graph_2 = Graph.BaseGraph;
+    unwrapExports(BaseGraph_1);
+    var BaseGraph_2 = BaseGraph_1.GraphMode;
+    var BaseGraph_3 = BaseGraph_1.BaseGraph;
 
     var FloydWarshall = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2286,7 +2181,7 @@
                 throw new Error("Cowardly refusing to traverse graph without edges.");
             }
             if (this._graph.hasNegativeEdge()) {
-                var extraNode = new Nodes.BaseNode("extraNode");
+                var extraNode = new BaseNode_1.BaseNode("extraNode");
                 let graph = Johnsons_1.addExtraNandE(this._graph, extraNode);
                 let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
                 if (BFresult.neg_cycle) {
@@ -2638,6 +2533,109 @@
     var Degree_1 = Degree.DegreeMode;
     var Degree_2 = Degree.DegreeCentrality;
 
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    let log_level = LOG_LEVELS.production;
+    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
+        log_level = process.env['G_LOG'];
+    }
+    const RUN_CONFIG = {
+        log_level
+    };
+    exports.RUN_CONFIG = RUN_CONFIG;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.LOG_LEVELS;
+    var run_config_2 = run_config.RUN_CONFIG;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    const DEFAULT_COLOR = 37;
+    class Logger {
+        constructor(config) {
+            this.config = null;
+            this.config = config || run_config.RUN_CONFIG;
+        }
+        log(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.log.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        error(err, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.error.call(console, this.colorize(color, err, bright));
+                return true;
+            }
+            return false;
+        }
+        dir(obj, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.dir.call(console, this.colorize(color, obj, bright));
+                return true;
+            }
+            return false;
+        }
+        info(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.info.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        warn(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.warn.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        write(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        colorize(color, output, bright) {
+            let out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        }
+    }
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
+
     var Pagerank_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -2913,7 +2911,7 @@
             return func.apply(this, [input, graph_name]);
         }
         readFromAdjacencyList(input, graph_name) {
-            var graph = new Graph.BaseGraph(graph_name);
+            var graph = new BaseGraph_1.BaseGraph(graph_name);
             for (var idx in input) {
                 var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node, edge_array = elements.slice(1), edge, target_node_id, target_node, dir_char, directed, edge_id, edge_id_u2;
                 if (!node_id) {
@@ -2944,7 +2942,7 @@
             return graph;
         }
         readFromEdgeList(input, graph_name, weighted = false) {
-            var graph = new Graph.BaseGraph(graph_name);
+            var graph = new BaseGraph_1.BaseGraph(graph_name);
             for (var idx in input) {
                 var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
                 if (!elements) {
@@ -3080,7 +3078,7 @@
             });
         }
         readFromJSON(json) {
-            var graph = new Graph.BaseGraph(json.name), coords_json, coords, coord_idx, features;
+            var graph = new BaseGraph_1.BaseGraph(json.name), coords_json, coords, coord_idx, features;
             for (var node_id in json.data) {
                 var node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
                 let label = json.data[node_id]['label'];
@@ -3444,7 +3442,7 @@
             this._config = config || this.prepareKROLStandardConfig();
             this._genMat = this._config.genMat;
             this._cycles = this._config.cycles;
-            this._graph = new Graph.BaseGraph('synth');
+            this._graph = new BaseGraph_1.BaseGraph('synth');
         }
         generate() {
             var gen_dims = this._genMat[0].length;
@@ -3492,8 +3490,8 @@
     var KroneckerLeskovec_1 = KroneckerLeskovec.KROL;
 
     // CORE
-
-
+    const BaseEdge	      				= BaseEdge_1.BaseEdge;
+    const BaseNode 	      				= BaseNode_1.BaseNode;
 
     // CENTRALITIES
 
@@ -3537,10 +3535,10 @@
      */
     out.$G = {
     	core: {
-    		BaseEdge 									: Edges.BaseEdge,
-    		BaseNode 									: Nodes.BaseNode,
-    		BaseGraph 								: Graph.BaseGraph,
-    		GraphMode									: Graph.GraphMode
+    		BaseEdge 									: BaseEdge,
+    		BaseNode 									: BaseNode,
+    		BaseGraph 								: BaseGraph_1.BaseGraph,
+    		GraphMode									: BaseGraph_1.GraphMode
     	},
     	centralities: {
     		Betweenness								: Betweenness.betweennessCentrality,
@@ -3625,7 +3623,7 @@
     }
     function importGraphFromURL(graphFile) {
         return __awaiter(this, void 0, void 0, function () {
-            var graphBytes, graphString, graph;
+            var graphBytes, graphString;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4, fetch(graphFile)];
@@ -3635,8 +3633,7 @@
                         return [4, graphBytes.json()];
                     case 3:
                         graphString = _a.sent();
-                        graph = jsonIn.readFromJSON(graphString);
-                        return [2, graph];
+                        return [2, jsonIn.readFromJSON(graphString)];
                 }
             });
         });
@@ -5105,6 +5102,7 @@
         });
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var beerModels;
     (function (beerModels) {
