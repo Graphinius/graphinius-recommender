@@ -2,7 +2,7 @@ import * as $G from 'graphinius';
 /* HACKETY HACK */
 window.$G = $G.default;
 
-import { IGraph } from 'graphinius/lib/core/Graph';
+import { IGraph } from 'graphinius/lib/core/BaseGraph';
 import { importGraph } from './common/importGraph';
 
 import { AppConfig } from './indexers/interfaces';
@@ -20,6 +20,7 @@ import { meetupConfig } from './indexers/meetup/appConfig';
     const searchRes = executeSearch(indexes, config);
   });
 })();
+
 
 
 function createJSSearchIndex(graph: IGraph, config: AppConfig) {

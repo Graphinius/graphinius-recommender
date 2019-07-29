@@ -526,14 +526,16 @@
 
 
     function BFS(graph, v, config) {
-        var config = config || prepareBFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        config = config || prepareBFSStandardConfig();
+        let callbacks = config.callbacks;
+        let dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        var bfsScope = {
+        let bfsScope = {
             marked: {},
             nodes: graph.getNodes(),
             queue: [],
@@ -547,7 +549,7 @@
             CallbackUtils.execCallbacks(callbacks.init_bfs, bfsScope);
         }
         bfsScope.queue.push(v);
-        var i = 0;
+        let i = 0;
         while (i < bfsScope.queue.length) {
             bfsScope.current = bfsScope.queue[i++];
             if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
@@ -565,7 +567,7 @@
             if (typeof callbacks.sort_nodes === 'function') {
                 callbacks.sort_nodes(bfsScope);
             }
-            for (var adj_idx in bfsScope.adj_nodes) {
+            for (let adj_idx in bfsScope.adj_nodes) {
                 bfsScope.next_node = bfsScope.adj_nodes[adj_idx].node;
                 bfsScope.next_edge = bfsScope.adj_nodes[adj_idx].edge;
                 if (config.result[bfsScope.next_node.getID()].distance === Number.POSITIVE_INFINITY) {
@@ -584,7 +586,7 @@
     }
     exports.BFS = BFS;
     function prepareBFSStandardConfig() {
-        var config = {
+        let config = {
             result: {},
             callbacks: {
                 init_bfs: [],
@@ -596,12 +598,12 @@
             messages: {},
             filters: {}
         }, result = config.result, callbacks = config.callbacks;
-        var count = 0;
-        var counter = function () {
+        let count = 0;
+        let counter = function () {
             return count++;
         };
-        var initBFS = function (context) {
-            for (var key in context.nodes) {
+        let initBFS = function (context) {
+            for (let key in context.nodes) {
                 config.result[key] = {
                     distance: Number.POSITIVE_INFINITY,
                     parent: null,
@@ -615,7 +617,7 @@
             };
         };
         callbacks.init_bfs.push(initBFS);
-        var nodeUnmarked = function (context) {
+        let nodeUnmarked = function (context) {
             config.result[context.next_node.getID()] = {
                 distance: result[context.current.getID()].distance + 1,
                 parent: context.current,
@@ -638,14 +640,15 @@
 
 
     function DFSVisit(graph, current_root, config) {
-        var dfsVisitScope = {
+        let dfsVisitScope = {
             stack: [],
             adj_nodes: [],
             stack_entry: null,
             current: null,
             current_root: current_root
         };
-        var config = config || prepareDFSVisitStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        config = config || prepareDFSVisitStandardConfig();
+        let callbacks = config.callbacks, dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
@@ -683,7 +686,7 @@
                 if (typeof callbacks.sort_nodes === 'function') {
                     callbacks.sort_nodes(dfsVisitScope);
                 }
-                for (var adj_idx in dfsVisitScope.adj_nodes) {
+                for (let adj_idx in dfsVisitScope.adj_nodes) {
                     dfsVisitScope.stack.push({
                         node: dfsVisitScope.adj_nodes[adj_idx].node,
                         parent: dfsVisitScope.current,
@@ -704,14 +707,15 @@
     }
     exports.DFSVisit = DFSVisit;
     function DFS(graph, root, config) {
-        var config = config || prepareDFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode;
+        config = config || prepareDFSStandardConfig();
+        let callbacks = config.callbacks, dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        var dfsScope = {
+        let dfsScope = {
             marked: {},
             nodes: graph.getNodes()
         };
@@ -719,17 +723,17 @@
             CallbackUtils.execCallbacks(callbacks.init_dfs, dfsScope);
         }
         callbacks.adj_nodes_pushed = callbacks.adj_nodes_pushed || [];
-        var markNode = function (context) {
+        let markNode = function (context) {
             dfsScope.marked[context.current.getID()] = true;
         };
         callbacks.adj_nodes_pushed.push(markNode);
-        var dfs_result = [{}];
-        var dfs_idx = 0;
-        var count = 0;
-        var counter = function () {
+        let dfs_result = [{}];
+        let dfs_idx = 0;
+        let count = 0;
+        let counter = function () {
             return count++;
         };
-        var addToProperSegment = function (context) {
+        let addToProperSegment = function (context) {
             dfs_result[dfs_idx][context.current.getID()] = {
                 parent: context.stack_entry.parent,
                 counter: counter()
@@ -739,7 +743,7 @@
             callbacks.node_unmarked.push(addToProperSegment);
         }
         DFSVisit(graph, root, config);
-        for (var node_key in dfsScope.nodes) {
+        for (let node_key in dfsScope.nodes) {
             if (!dfsScope.marked[node_key]) {
                 dfs_idx++;
                 dfs_result.push({});
@@ -750,26 +754,26 @@
     }
     exports.DFS = DFS;
     function prepareDFSVisitStandardConfig() {
-        var config = {
+        let config = {
             visit_result: {},
             callbacks: {},
             messages: {},
             dfs_visit_marked: {},
             dir_mode: BaseGraph_1.GraphMode.MIXED
         }, result = config.visit_result, callbacks = config.callbacks;
-        var count = 0;
-        var counter = function () {
+        let count = 0;
+        let counter = function () {
             return count++;
         };
         callbacks.init_dfs_visit = callbacks.init_dfs_visit || [];
-        var initDFSVisit = function (context) {
+        let initDFSVisit = function (context) {
             result[context.current_root.getID()] = {
                 parent: context.current_root
             };
         };
         callbacks.init_dfs_visit.push(initDFSVisit);
         callbacks.node_unmarked = callbacks.node_unmarked || [];
-        var setResultEntry = function (context) {
+        let setResultEntry = function (context) {
             result[context.current.getID()] = {
                 parent: context.stack_entry.parent,
                 counter: counter()
@@ -780,9 +784,9 @@
     }
     exports.prepareDFSVisitStandardConfig = prepareDFSVisitStandardConfig;
     function prepareDFSStandardConfig() {
-        var config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
+        let config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
         callbacks.init_dfs = callbacks.init_dfs || [];
-        var setInitialResultEntries = function (context) {
+        let setInitialResultEntries = function (context) {
         };
         callbacks.init_dfs.push(setInitialResultEntries);
         return config;
@@ -969,19 +973,20 @@
 
     exports.DEFAULT_WEIGHT = 1;
     function PFS(graph, v, config) {
-        var config = config || preparePFSStandardConfig(), callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
+        config = config || preparePFSStandardConfig();
+        let callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        var start_ne = {
+        let start_ne = {
             node: v,
             edge: new BaseEdge_1.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
             best: 0
         };
-        var scope = {
+        let scope = {
             OPEN_HEAP: new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID),
             OPEN: {},
             CLOSED: {},
@@ -1019,7 +1024,7 @@
             else {
                 throw new Error('Unsupported traversal mode. Please use directed, undirected, or mixed');
             }
-            for (var adj_idx in scope.adj_nodes) {
+            for (let adj_idx in scope.adj_nodes) {
                 scope.next = scope.adj_nodes[adj_idx];
                 if (scope.CLOSED[scope.next.node.getID()]) {
                     config.callbacks.node_closed && CallbackUtils.execCallbacks(config.callbacks.node_closed, scope);
@@ -1082,12 +1087,12 @@
             }
         };
         let callbacks = config.callbacks;
-        var count = 0;
-        var counter = function () {
+        let count = 0;
+        let counter = function () {
             return count++;
         };
-        var initPFS = function (context) {
-            for (var key in context.nodes) {
+        let initPFS = function (context) {
+            for (let key in context.nodes) {
                 config.result[key] = {
                     distance: Number.POSITIVE_INFINITY,
                     parent: null,
@@ -1101,7 +1106,7 @@
             };
         };
         callbacks.init_pfs.push(initPFS);
-        var notEncountered = function (context) {
+        let notEncountered = function (context) {
             context.next.best = context.current.best + (isNaN(context.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : context.next.edge.getWeight());
             config.result[context.next.node.getID()] = {
                 distance: context.next.best,
@@ -1110,7 +1115,7 @@
             };
         };
         callbacks.not_encountered.push(notEncountered);
-        var betterPathFound = function (context) {
+        let betterPathFound = function (context) {
             config.result[context.next.node.getID()].distance = context.proposed_dist;
             config.result[context.next.node.getID()].parent = context.current.node;
         };
@@ -1243,7 +1248,7 @@
         }
         let allNodes = graph.getNodes();
         if (graph.hasNegativeEdge()) {
-            var extraNode = new BaseNode_1.BaseNode("extraNode");
+            let extraNode = new BaseNode_1.BaseNode("extraNode");
             graph = addExtraNandE(graph, extraNode);
             let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
             if (BFresult.neg_cycle) {
@@ -1275,19 +1280,15 @@
     function reWeighGraph(target, distDict, tempNode) {
         let edges = target.getDirEdgesArray().concat(target.getUndEdgesArray());
         for (let edge of edges) {
-            var a = edge.getNodes().a.getID();
-            var b = edge.getNodes().b.getID();
-            if (a == tempNode.getID()) {
-                continue;
-            }
-            else if (edge.isWeighted) {
+            let a = edge.getNodes().a.getID();
+            let b = edge.getNodes().b.getID();
+            if (a !== tempNode.getID() && edge.isWeighted) {
                 let oldWeight = edge.getWeight();
                 let newWeight = oldWeight + distDict[a] - distDict[b];
                 edge.setWeight(newWeight);
             }
             else {
-                let oldWeight = PFS_1.DEFAULT_WEIGHT;
-                let newWeight = oldWeight + distDict[a] - distDict[b];
+                let newWeight = PFS_1.DEFAULT_WEIGHT + distDict[a] - distDict[b];
                 let edgeID = edge.getID();
                 let dirNess = edge.isDirected();
                 target.deleteEdge(edge);
@@ -1307,7 +1308,7 @@
             nodeIDIdxMap[nodesDict[key].getID()] = i++;
         }
         let specialConfig = PFS_1.preparePFSStandardConfig();
-        var notEncounteredJohnsons = function (context) {
+        let notEncounteredJohnsons = function (context) {
             context.next.best =
                 context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
             let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
@@ -1321,7 +1322,7 @@
             }
         };
         specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredJohnsons);
-        var betterPathJohnsons = function (context) {
+        let betterPathJohnsons = function (context) {
             let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             dists[i][j] = context.proposed_dist;
             if (context.current.node !== context.root_node) {
@@ -1329,7 +1330,7 @@
             }
         };
         specialConfig.callbacks.better_path.splice(0, 1, betterPathJohnsons);
-        var equalPathJohnsons = function (context) {
+        let equalPathJohnsons = function (context) {
             let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             if (context.current.node !== context.root_node) {
                 next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], [nodeIDIdxMap[context.current.node.getID()]]);
@@ -1380,7 +1381,7 @@
         reweighIfHasNegativeEdge(clone = false) {
             if (this.hasNegativeEdge()) {
                 let result_graph = clone ? this.cloneStructure() : this;
-                var extraNode = new BaseNode_1.BaseNode("extraNode");
+                let extraNode = new BaseNode_1.BaseNode("extraNode");
                 result_graph = Johnsons_1.addExtraNandE(result_graph, extraNode);
                 let BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
                 if (BFresult.neg_cycle) {
@@ -1524,7 +1525,7 @@
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            var node = new BaseNode_1.BaseNode(id, opts);
+            let node = new BaseNode_1.BaseNode(id, opts);
             return this.addNode(node) ? node : null;
         }
         addNode(node) {
@@ -1548,13 +1549,13 @@
             return this.pickRandomProperty(this._nodes);
         }
         deleteNode(node) {
-            var rem_node = this._nodes[node.getID()];
+            let rem_node = this._nodes[node.getID()];
             if (!rem_node) {
-                throw new Error('Cannot remove un-added node.');
+                throw new Error('Cannot remove a foreign node.');
             }
-            var in_deg = node.inDegree();
-            var out_deg = node.outDegree();
-            var deg = node.degree();
+            let in_deg = node.inDegree();
+            let out_deg = node.outDegree();
+            let deg = node.degree();
             if (in_deg) {
                 this.deleteInEdgesOf(node);
             }
@@ -1571,13 +1572,13 @@
             return !!this._dir_edges[id] || !!this._und_edges[id];
         }
         getEdgeById(id) {
-            var edge = this._dir_edges[id] || this._und_edges[id];
+            let edge = this._dir_edges[id] || this._und_edges[id];
             if (!edge) {
                 throw new Error("cannot retrieve edge with non-existing ID.");
             }
             return edge;
         }
-        checkExistanceOfEdgeNodes(node_a, node_b) {
+        static checkExistanceOfEdgeNodes(node_a, node_b) {
             if (!node_a) {
                 throw new Error("Cannot find edge. Node A does not exist (in graph).");
             }
@@ -1588,10 +1589,10 @@
         getDirEdgeByNodeIDs(node_a_id, node_b_id) {
             const node_a = this.getNodeById(node_a_id);
             const node_b = this.getNodeById(node_b_id);
-            this.checkExistanceOfEdgeNodes(node_a, node_b);
+            BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
             let edges_dir = node_a.outEdges(), edges_dir_keys = Object.keys(edges_dir);
             for (let i = 0; i < edges_dir_keys.length; i++) {
-                var edge = edges_dir[edges_dir_keys[i]];
+                let edge = edges_dir[edges_dir_keys[i]];
                 if (edge.getNodes().b.getID() == node_b_id) {
                     return edge;
                 }
@@ -1601,11 +1602,11 @@
         getUndEdgeByNodeIDs(node_a_id, node_b_id) {
             const node_a = this.getNodeById(node_a_id);
             const node_b = this.getNodeById(node_b_id);
-            this.checkExistanceOfEdgeNodes(node_a, node_b);
+            BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
             let edges_und = node_a.undEdges(), edges_und_keys = Object.keys(edges_und);
             for (let i = 0; i < edges_und_keys.length; i++) {
-                var edge = edges_und[edges_und_keys[i]];
-                var b;
+                let edge = edges_und[edges_und_keys[i]];
+                let b;
                 (edge.getNodes().a.getID() == node_a_id) ? (b = edge.getNodes().b.getID()) : (b = edge.getNodes().a.getID());
                 if (b == node_b_id) {
                     return edge;
@@ -1633,7 +1634,7 @@
             return edges;
         }
         addEdgeByNodeIDs(label, node_a_id, node_b_id, opts) {
-            var node_a = this.getNodeById(node_a_id), node_b = this.getNodeById(node_b_id);
+            let node_a = this.getNodeById(node_a_id), node_b = this.getNodeById(node_b_id);
             if (!node_a) {
                 throw new Error("Cannot add edge. Node A does not exist");
             }
@@ -1646,7 +1647,7 @@
         }
         addEdgeByID(id, node_a, node_b, opts) {
             let edge = new BaseEdge_1.BaseEdge(id, node_a, node_b, opts || {});
-            return this.addEdge(edge);
+            return this.addEdge(edge) ? edge : null;
         }
         addEdge(edge) {
             let node_a = edge.getNodes().a, node_b = edge.getNodes().b;
@@ -1669,15 +1670,15 @@
                 this._nr_und_edges += 1;
                 this.updateGraphMode();
             }
-            return edge;
+            return true;
         }
         deleteEdge(edge) {
-            var dir_edge = this._dir_edges[edge.getID()];
-            var und_edge = this._und_edges[edge.getID()];
+            let dir_edge = this._dir_edges[edge.getID()];
+            let und_edge = this._und_edges[edge.getID()];
             if (!dir_edge && !und_edge) {
                 throw new Error('cannot remove non-existing edge.');
             }
-            var nodes = edge.getNodes();
+            let nodes = edge.getNodes();
             nodes.a.removeEdge(edge);
             if (nodes.a !== nodes.b) {
                 nodes.b.removeEdge(edge);
@@ -1694,8 +1695,8 @@
         }
         deleteInEdgesOf(node) {
             this.checkConnectedNodeOrThrow(node);
-            var in_edges = node.inEdges();
-            var key, edge;
+            let in_edges = node.inEdges();
+            let key, edge;
             for (key in in_edges) {
                 edge = in_edges[key];
                 edge.getNodes().a.removeEdge(edge);
@@ -1707,8 +1708,8 @@
         }
         deleteOutEdgesOf(node) {
             this.checkConnectedNodeOrThrow(node);
-            var out_edges = node.outEdges();
-            var key, edge;
+            let out_edges = node.outEdges();
+            let key, edge;
             for (key in out_edges) {
                 edge = out_edges[key];
                 edge.getNodes().b.removeEdge(edge);
@@ -1724,11 +1725,11 @@
         }
         deleteUndEdgesOf(node) {
             this.checkConnectedNodeOrThrow(node);
-            var und_edges = node.undEdges();
-            var key, edge;
+            let und_edges = node.undEdges();
+            let key, edge;
             for (key in und_edges) {
                 edge = und_edges[key];
-                var conns = edge.getNodes();
+                let conns = edge.getNodes();
                 conns.a.removeEdge(edge);
                 if (conns.a !== conns.b) {
                     conns.b.removeEdge(edge);
@@ -1744,12 +1745,12 @@
             this.deleteUndEdgesOf(node);
         }
         clearAllDirEdges() {
-            for (var edge in this._dir_edges) {
+            for (let edge in this._dir_edges) {
                 this.deleteEdge(this._dir_edges[edge]);
             }
         }
         clearAllUndEdges() {
-            for (var edge in this._und_edges) {
+            for (let edge in this._und_edges) {
                 this.deleteEdge(this._und_edges[edge]);
             }
         }
@@ -1781,7 +1782,7 @@
         cloneSubGraphStructure(root, cutoff) {
             let new_graph = new BaseGraph(this._label);
             let config = BFS_1.prepareBFSStandardConfig();
-            var bfsNodeUnmarkedTestCallback = function (context) {
+            let bfsNodeUnmarkedTestCallback = function (context) {
                 if (config.result[context.next_node.getID()].counter > cutoff) {
                     context.queue = [];
                 }
@@ -1804,13 +1805,13 @@
             return new_graph;
         }
         checkConnectedNodeOrThrow(node) {
-            var node = this._nodes[node.getID()];
-            if (!node) {
-                throw new Error('Cowardly refusing to delete edges of un-added node.');
+            let inGraphNode = this._nodes[node.getID()];
+            if (!inGraphNode) {
+                throw new Error('Cowardly refusing to delete edges of a foreign node.');
             }
         }
         updateGraphMode() {
-            var nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
+            let nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
             if (nr_dir && nr_und) {
                 this._mode = GraphMode.MIXED;
             }
@@ -1883,9 +1884,9 @@
         let dists = graph.adjListArray();
         let next = graph.nextArray();
         let N = dists.length;
-        for (var k = 0; k < N; ++k) {
-            for (var i = 0; i < N; ++i) {
-                for (var j = 0; j < N; ++j) {
+        for (let k = 0; k < N; ++k) {
+            for (let i = 0; i < N; ++i) {
+                for (let j = 0; j < N; ++j) {
                     if (k != i && k != j && i != j && dists[i][j] == (dists[i][k] + dists[k][j])) {
                         if (dists[i][j] !== Number.POSITIVE_INFINITY) {
                             next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], next[i][k]);
@@ -1907,9 +1908,9 @@
         }
         let dists = graph.adjListArray();
         let N = dists.length;
-        for (var k = 0; k < N; ++k) {
-            for (var i = 0; i < N; ++i) {
-                for (var j = 0; j < N; ++j) {
+        for (let k = 0; k < N; ++k) {
+            for (let i = 0; i < N; ++i) {
+                for (let j = 0; j < N; ++j) {
                     if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
                         dists[i][j] = dists[i][k] + dists[k][j];
                     }
@@ -1924,9 +1925,9 @@
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
         let dists = initializeDistsWithEdges(graph);
-        for (var k in dists) {
-            for (var i in dists) {
-                for (var j in dists) {
+        for (let k in dists) {
+            for (let i in dists) {
+                for (let j in dists) {
                     if (i === j) {
                         continue;
                     }
@@ -1953,10 +1954,9 @@
         }
         for (let a = 0; a < input.length; a++) {
             for (let b = 0; b < input.length; b++) {
-                if (input[a][b][0] == null) {
-                    continue;
-                }
-                else if (a != b && !(input[a][b].length === 1 && input[a][b][0] === b)) {
+                if (input[a][b][0] != null
+                    && a != b && !(input[a][b].length === 1
+                    && input[a][b][0] === b)) {
                     output[a][b] = [];
                     findDirectParents(a, b, input, output);
                 }
@@ -3048,13 +3048,25 @@
     unwrapExports(CSVOutput_1);
     var CSVOutput_2 = CSVOutput_1.CSVOutput;
 
+    var interfaces = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.abbs = {
+        coords: 'c',
+        label: 'l',
+        edges: 'e',
+        features: 'f'
+    };
+    });
+
+    unwrapExports(interfaces);
+    var interfaces_1 = interfaces.abbs;
+
     var JSONInput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
 
-    const logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     class JSONInput {
         constructor(config) {
@@ -3066,11 +3078,11 @@
         }
         readFromJSONFile(filepath) {
             RemoteUtils.checkNodeEnvironment();
-            var json = JSON.parse(fs.readFileSync(filepath).toString());
+            let json = JSON.parse(fs.readFileSync(filepath).toString());
             return this.readFromJSON(json);
         }
         readFromJSONURL(config, cb) {
-            var self = this, graph;
+            let self = this, graph;
             RemoteUtils.checkNodeEnvironment();
             RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
                 graph = self.readFromJSON(JSON.parse(raw_graph));
@@ -3078,26 +3090,26 @@
             });
         }
         readFromJSON(json) {
-            var graph = new BaseGraph_1.BaseGraph(json.name), coords_json, coords, coord_idx, features;
-            for (var node_id in json.data) {
-                var node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                let label = json.data[node_id]['label'];
+            let graph = new BaseGraph_1.BaseGraph(json.name), coords_json, coords, coord_idx, features;
+            for (let node_id in json.data) {
+                let node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
+                let label = json.data[node_id][interfaces.abbs.label];
                 if (label) {
                     node.setLabel(label);
                 }
-                if (features = json.data[node_id].features) {
+                if (features = json.data[node_id][interfaces.abbs.features]) {
                     node.setFeatures(features);
                 }
-                if (coords_json = json.data[node_id].coords) {
+                if (coords_json = json.data[node_id][interfaces.abbs.coords]) {
                     coords = {};
                     for (coord_idx in coords_json) {
                         coords[coord_idx] = +coords_json[coord_idx];
                     }
-                    node.setFeature('coords', coords);
+                    node.setFeature(interfaces.abbs.coords, coords);
                 }
-                var edges = json.data[node_id].edges;
+                let edges = json.data[node_id][interfaces.abbs.edges];
                 for (let e in edges) {
-                    let edge_input = edges[e], target_node_id = edge_input.to, directed = this._config.explicit_direction ? edge_input.directed : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = this.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                    let edge_input = edges[e], target_node_id = edge_input.to, directed = this._config.explicit_direction ? edge_input.directed : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
                     let edge_id = node_id + "_" + target_node_id + "_" + dir_char, edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
                     if (graph.hasEdgeID(edge_id)) {
                         continue;
@@ -3109,10 +3121,9 @@
                                 throw new Error('Input JSON flawed! Found duplicate edge with different weights!');
                             }
                         }
-                        continue;
                     }
                     else {
-                        var edge = graph.addEdgeByID(edge_id, node, target_node, {
+                        graph.addEdgeByID(edge_id, node, target_node, {
                             directed: directed,
                             weighted: this._config.weighted,
                             weight: edge_weight
@@ -3122,7 +3133,7 @@
             }
             return graph;
         }
-        handleEdgeWeights(edge_input) {
+        static handleEdgeWeights(edge_input) {
             switch (edge_input.weight) {
                 case "undefined":
                     return DEFAULT_WEIGHT;
@@ -3148,6 +3159,7 @@
     var JSONOutput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
+
     class JSONOutput {
         constructor() { }
         writeToJSONFile(filepath, graph) {
@@ -3158,25 +3170,25 @@
         }
         writeToJSONString(graph) {
             let nodes, node, node_struct, und_edges, dir_edges, edge, coords;
-            var result = {
+            let result = {
                 name: graph._label,
                 nodes: graph.nrNodes(),
-                dir_edges: graph.nrDirEdges(),
-                und_edges: graph.nrUndEdges(),
+                dir_e: graph.nrDirEdges(),
+                und_e: graph.nrUndEdges(),
                 data: {}
             };
             nodes = graph.getNodes();
             for (let node_key in nodes) {
                 node = nodes[node_key];
                 node_struct = result.data[node.getID()] = {
-                    label: node.getLabel(),
-                    edges: []
+                    [interfaces.abbs.label]: node.getLabel(),
+                    [interfaces.abbs.edges]: []
                 };
                 und_edges = node.undEdges();
                 for (let edge_key in und_edges) {
                     edge = und_edges[edge_key];
                     let connected_nodes = edge.getNodes();
-                    node_struct.edges.push({
+                    node_struct[interfaces.abbs.edges].push({
                         to: connected_nodes.a.getID() === node.getID() ? connected_nodes.b.getID() : connected_nodes.a.getID(),
                         directed: edge.isDirected(),
                         weight: edge.isWeighted() ? edge.getWeight() : undefined
@@ -3186,20 +3198,20 @@
                 for (let edge_key in dir_edges) {
                     edge = dir_edges[edge_key];
                     let connected_nodes = edge.getNodes();
-                    node_struct.edges.push({
+                    node_struct[interfaces.abbs.edges].push({
                         to: connected_nodes.b.getID(),
                         directed: edge.isDirected(),
-                        weight: this.handleEdgeWeight(edge)
+                        weight: JSONOutput.handleEdgeWeight(edge)
                     });
                 }
-                node_struct.features = node.getFeatures();
-                if ((coords = node.getFeature('coords')) != null) {
-                    node_struct['coords'] = coords;
+                node_struct[interfaces.abbs.features] = node.getFeatures();
+                if ((coords = node.getFeature(interfaces.abbs.coords)) != null) {
+                    node_struct[interfaces.abbs.coords] = coords;
                 }
             }
             return JSON.stringify(result);
         }
-        handleEdgeWeight(edge) {
+        static handleEdgeWeight(edge) {
             if (!edge.isWeighted()) {
                 return undefined;
             }
@@ -5201,7 +5213,6 @@
         console.log(searchRes);
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map
