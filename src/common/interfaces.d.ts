@@ -1,5 +1,5 @@
-import { IBaseNode } from 'graphinius/lib/core/Nodes';
-import { IGraph } from 'graphinius/lib/core/Graph';
+import { IBaseNode } from 'graphinius/lib/core/BaseNode';
+import { IGraph } from 'graphinius/lib/core/BaseGraph';
 import * as JsSearch from 'js-search';
 
 

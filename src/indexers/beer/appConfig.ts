@@ -13,6 +13,7 @@ const beerConfig: AppConfig = {
   testSearchModel: beerModels.Brewery
 };
 
+
 export {
   beerConfig
 }

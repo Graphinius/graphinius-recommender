@@ -1,5 +1,5 @@
 import * as JSSearch from 'js-search';
-import { IGraph } from 'graphinius/lib/core/Graph';
+import { IGraph } from 'graphinius/lib/core/BaseGraph';
 import { IndexConfig } from './interfaces';
 
 type Types = {[key: string]: any[]};

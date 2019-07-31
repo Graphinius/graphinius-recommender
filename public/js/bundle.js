@@ -206,7 +206,7 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
     class BaseNode {
-        constructor(_id, features) {
+        constructor(_id, config = {}) {
             this._id = _id;
             this._in_degree = 0;
             this._out_degree = 0;
@@ -214,8 +214,8 @@
             this._in_edges = {};
             this._out_edges = {};
             this._und_edges = {};
-            this._features = typeof features !== 'undefined' ? StructUtils.clone(features) : {};
-            this._label = this._features["label"] || this._id;
+            this._label = config.label || _id;
+            this._features = config.features != null ? StructUtils.clone(config.features) : {};
         }
         getID() {
             return this._id;
@@ -260,18 +260,18 @@
             if (nodes.a !== this && nodes.b !== this) {
                 throw new Error("Cannot add edge that does not connect to this node");
             }
-            var edge_id = edge.getID();
+            var edgeID = edge.getID();
             if (edge.isDirected()) {
-                if (nodes.a === this && !this._out_edges[edge_id]) {
-                    this._out_edges[edge_id] = edge;
+                if (nodes.a === this && !this._out_edges[edgeID]) {
+                    this._out_edges[edgeID] = edge;
                     this._out_degree += 1;
-                    if (nodes.b === this && !this._in_edges[edge_id]) {
-                        this._in_edges[edge.getID()] = edge;
+                    if (nodes.b === this && !this._in_edges[edgeID]) {
+                        this._in_edges[edgeID] = edge;
                         this._in_degree += 1;
                     }
                 }
-                else if (!this._in_edges[edge_id]) {
-                    this._in_edges[edge.getID()] = edge;
+                else if (!this._in_edges[edgeID]) {
+                    this._in_edges[edgeID] = edge;
                     this._in_degree += 1;
                 }
             }
@@ -3050,16 +3050,20 @@
 
     var interfaces = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.abbs = {
+    exports.labelKeys = {
         coords: 'c',
         label: 'l',
+        features: 'f',
         edges: 'e',
-        features: 'f'
+        e_to: 't',
+        e_dir: 'd',
+        e_weight: 'w',
+        e_label: 'l'
     };
     });
 
     unwrapExports(interfaces);
-    var interfaces_1 = interfaces.abbs;
+    var interfaces_1 = interfaces.labelKeys;
 
     var JSONInput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3067,6 +3071,8 @@
 
 
 
+
+    const logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     class JSONInput {
         constructor(config) {
@@ -3076,65 +3082,72 @@
                 weighted: config && config.weighted || false
             };
         }
-        readFromJSONFile(filepath) {
+        readFromJSONFile(filepath, graph) {
             RemoteUtils.checkNodeEnvironment();
             let json = JSON.parse(fs.readFileSync(filepath).toString());
-            return this.readFromJSON(json);
+            return this.readFromJSON(json, graph);
         }
-        readFromJSONURL(config, cb) {
-            let self = this, graph;
+        readFromJSONURL(config, cb, graph) {
+            const self = this;
             RemoteUtils.checkNodeEnvironment();
             RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
-                graph = self.readFromJSON(JSON.parse(raw_graph));
+                graph = self.readFromJSON(JSON.parse(raw_graph), graph);
                 cb(graph, undefined);
             });
         }
-        readFromJSON(json) {
-            let graph = new BaseGraph_1.BaseGraph(json.name), coords_json, coords, coord_idx, features;
+        readFromJSON(json, graph) {
+            graph = graph || new BaseGraph_1.BaseGraph(json.name);
+            let coords_json, coords, coord_idx, features;
             for (let node_id in json.data) {
                 let node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                let label = json.data[node_id][interfaces.abbs.label];
+                let label = json.data[node_id][interfaces.labelKeys.label];
                 if (label) {
                     node.setLabel(label);
                 }
-                if (features = json.data[node_id][interfaces.abbs.features]) {
+                if (features = json.data[node_id][interfaces.labelKeys.features]) {
                     node.setFeatures(features);
                 }
-                if (coords_json = json.data[node_id][interfaces.abbs.coords]) {
+                if (coords_json = json.data[node_id][interfaces.labelKeys.coords]) {
                     coords = {};
                     for (coord_idx in coords_json) {
                         coords[coord_idx] = +coords_json[coord_idx];
                     }
-                    node.setFeature(interfaces.abbs.coords, coords);
+                    node.setFeature(interfaces.labelKeys.coords, coords);
                 }
-                let edges = json.data[node_id][interfaces.abbs.edges];
+                let edges = json.data[node_id][interfaces.labelKeys.edges];
                 for (let e in edges) {
-                    let edge_input = edges[e], target_node_id = edge_input.to, directed = this._config.explicit_direction ? edge_input.directed : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                    let edge_input = edges[e], edge_label = edge_input[interfaces.labelKeys.e_label], target_node_id = edge_input[interfaces.labelKeys.e_to], directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
                     let edge_id = node_id + "_" + target_node_id + "_" + dir_char, edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
                     if (graph.hasEdgeID(edge_id)) {
                         continue;
                     }
-                    if ((!directed && graph.hasEdgeID(edge_id_u2))) {
+                    let edge2 = null;
+                    if (graph.hasEdgeID(edge_id_u2)) {
+                        edge2 = graph.getEdgeById(edge_id_u2);
+                    }
+                    if (!directed && edge2) {
                         if (this._config.weighted) {
-                            let edge = graph.getEdgeById(edge_id_u2);
-                            if (edge_weight != edge.getWeight()) {
-                                throw new Error('Input JSON flawed! Found duplicate edge with different weights!');
+                            if (edge_weight != edge2.getWeight()) {
+                                throw new Error('Input JSON flawed! Found duplicate UNdirected edge of different weights!');
                             }
                         }
                     }
                     else {
-                        graph.addEdgeByID(edge_id, node, target_node, {
+                        const edge = graph.addEdgeByID(edge_id, node, target_node, {
                             directed: directed,
                             weighted: this._config.weighted,
                             weight: edge_weight
                         });
+                        if (edge_label) {
+                            edge.setLabel(edge_label);
+                        }
                     }
                 }
             }
             return graph;
         }
         static handleEdgeWeights(edge_input) {
-            switch (edge_input.weight) {
+            switch (edge_input[interfaces.labelKeys.e_weight]) {
                 case "undefined":
                     return DEFAULT_WEIGHT;
                 case "Infinity":
@@ -3146,7 +3159,7 @@
                 case "MIN":
                     return Number.MIN_VALUE;
                 default:
-                    return parseFloat(edge_input.weight);
+                    return parseFloat(edge_input[interfaces.labelKeys.e_weight]);
             }
         }
     }
@@ -3181,32 +3194,42 @@
             for (let node_key in nodes) {
                 node = nodes[node_key];
                 node_struct = result.data[node.getID()] = {
-                    [interfaces.abbs.label]: node.getLabel(),
-                    [interfaces.abbs.edges]: []
+                    [interfaces.labelKeys.edges]: []
                 };
+                if (node.getID() !== node.getLabel()) {
+                    node_struct[interfaces.labelKeys.label] = node.getLabel();
+                }
                 und_edges = node.undEdges();
                 for (let edge_key in und_edges) {
                     edge = und_edges[edge_key];
-                    let connected_nodes = edge.getNodes();
-                    node_struct[interfaces.abbs.edges].push({
-                        to: connected_nodes.a.getID() === node.getID() ? connected_nodes.b.getID() : connected_nodes.a.getID(),
-                        directed: edge.isDirected(),
-                        weight: edge.isWeighted() ? edge.getWeight() : undefined
-                    });
+                    let endPoints = edge.getNodes();
+                    let edgeStruct = {
+                        [interfaces.labelKeys.e_to]: endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
+                        [interfaces.labelKeys.e_dir]: edge.isDirected() ? 1 : 0,
+                        [interfaces.labelKeys.e_weight]: edge.isWeighted() ? edge.getWeight() : undefined
+                    };
+                    if (edge.getID() !== edge.getLabel()) {
+                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                    }
+                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
                 dir_edges = node.outEdges();
                 for (let edge_key in dir_edges) {
                     edge = dir_edges[edge_key];
-                    let connected_nodes = edge.getNodes();
-                    node_struct[interfaces.abbs.edges].push({
-                        to: connected_nodes.b.getID(),
-                        directed: edge.isDirected(),
-                        weight: JSONOutput.handleEdgeWeight(edge)
-                    });
+                    let endPoints = edge.getNodes();
+                    let edgeStruct = {
+                        [interfaces.labelKeys.e_to]: endPoints.b.getID(),
+                        [interfaces.labelKeys.e_dir]: edge.isDirected() ? 1 : 0,
+                        [interfaces.labelKeys.e_weight]: JSONOutput.handleEdgeWeight(edge),
+                    };
+                    if (edge.getID() !== edge.getLabel()) {
+                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                    }
+                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
-                node_struct[interfaces.abbs.features] = node.getFeatures();
-                if ((coords = node.getFeature(interfaces.abbs.coords)) != null) {
-                    node_struct[interfaces.abbs.coords] = coords;
+                node_struct[interfaces.labelKeys.features] = node.getFeatures();
+                if ((coords = node.getFeature(interfaces.labelKeys.coords)) != null) {
+                    node_struct[interfaces.labelKeys.coords] = coords;
                 }
             }
             return JSON.stringify(result);
@@ -3547,10 +3570,12 @@
      */
     out.$G = {
     	core: {
-    		BaseEdge 									: BaseEdge,
-    		BaseNode 									: BaseNode,
-    		BaseGraph 								: BaseGraph_1.BaseGraph,
-    		GraphMode									: BaseGraph_1.GraphMode
+    		base: {
+    			BaseEdge 									: BaseEdge,
+    			BaseNode 									: BaseNode,
+    			BaseGraph 								: BaseGraph_1.BaseGraph,
+    			GraphMode									: BaseGraph_1.GraphMode
+    		}
     	},
     	centralities: {
     		Betweenness								: Betweenness.betweennessCentrality,
@@ -3558,11 +3583,11 @@
     		Closeness									: Closeness.ClosenessCentrality,
     		Degree										: Degree.DegreeCentrality,
     		Pagerank									: Pagerank_1.Pagerank
-    	},							
-    	input: {							
+    	},
+    	input: {
     		CSVInput 									: CSVInput_1.CSVInput,
     		JSONInput 								: JSONInput_1.JSONInput
-    	},							
+    	},
     	output: {							
     		CSVOutput									: CSVOutput_1.CSVOutput,
     		JSONOutput								: JSONOutput_1.JSONOutput
@@ -3575,7 +3600,7 @@
     		BellmanFord								: BellmanFord,
     		FloydWarshall							: FloydWarshall,
     		Johnsons									: Johnsons_1
-    	},						
+    	},
       utils: {						
         Struct        						: StructUtils,
     		Remote        						: RemoteUtils,
@@ -3600,6 +3625,112 @@
      */
     var GraphiniusJS = out.$G;
 
+    var TypedGraph_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    exports.GENERIC_TYPE = "GENERIC";
+    class TypedGraph extends BaseGraph_1.BaseGraph {
+        constructor(_label) {
+            super(_label);
+            this._label = _label;
+            this._typedNodes = new Map();
+            this._typedEdges = new Map();
+            this._typedNodes.set(exports.GENERIC_TYPE, new Map());
+            this._typedEdges.set(exports.GENERIC_TYPE, new Map());
+        }
+        nodeTypes() {
+            return Array.from(this._typedNodes.keys());
+        }
+        edgeTypes() {
+            return Array.from(this._typedEdges.keys());
+        }
+        nrTypedNodes(type) {
+            type = type.toUpperCase();
+            return this._typedNodes.get(type) ? this._typedNodes.get(type).size : null;
+        }
+        nrTypedEdges(type) {
+            type = type.toUpperCase();
+            return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
+        }
+        addNode(node) {
+            if (!super.addNode(node)) {
+                return false;
+            }
+            const id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
+            if (!type) {
+                this._typedNodes.get(exports.GENERIC_TYPE).set(id, node);
+            }
+            else {
+                if (!this._typedNodes.get(type)) {
+                    this._typedNodes.set(type, new Map());
+                }
+                this._typedNodes.get(type).set(id, node);
+            }
+            return true;
+        }
+        deleteNode(node) {
+            const id = node.getID(), type = node.type ? node.type.toUpperCase() : exports.GENERIC_TYPE;
+            if (!this._typedNodes.get(type)) {
+                throw Error('Node type does not exist on this TypedGraph.');
+            }
+            const removeNode = this._typedNodes.get(type).get(id);
+            if (!removeNode) {
+                throw Error('This particular node is nowhere to be found in its typed set.');
+            }
+            this._typedNodes.get(type).delete(id);
+            if (this.nrTypedNodes(type) === 0) {
+                this._typedNodes.delete(type);
+            }
+            super.deleteNode(node);
+        }
+        addEdge(edge) {
+            if (!super.addEdge(edge)) {
+                return false;
+            }
+            const id = edge.getID(), label = edge.getLabel().toUpperCase();
+            if (id === label) {
+                this._typedEdges.get(exports.GENERIC_TYPE).set(id, edge);
+            }
+            else {
+                if (!this._typedEdges.get(label)) {
+                    this._typedEdges.set(label, new Map());
+                }
+                this._typedEdges.get(label).set(id, edge);
+            }
+            return true;
+        }
+        deleteEdge(edge) {
+            const id = edge.getID(), label = edge.getLabel() === id ? exports.GENERIC_TYPE : edge.getLabel().toUpperCase();
+            if (!this._typedEdges.get(label)) {
+                throw Error('Edge type does not exist on this TypedGraph.');
+            }
+            const removeEdge = this._typedEdges.get(label).get(id);
+            if (!removeEdge) {
+                throw Error('This particular edge is nowhere to be found in its typed set.');
+            }
+            this._typedEdges.get(label).delete(id);
+            if (this.nrTypedEdges(label) === 0) {
+                this._typedEdges.delete(label);
+            }
+            super.deleteEdge(edge);
+        }
+        getStats() {
+            let typed_nodes = {}, typed_edges = {};
+            this._typedNodes.forEach((k, v) => typed_nodes[v] = k.size);
+            this._typedEdges.forEach((k, v) => typed_edges[v] = k.size);
+            return Object.assign({}, super.getStats(), { node_types: this.nodeTypes(), edge_types: this.edgeTypes(), typed_nodes,
+                typed_edges });
+        }
+    }
+    exports.TypedGraph = TypedGraph;
+    });
+
+    unwrapExports(TypedGraph_1);
+    var TypedGraph_2 = TypedGraph_1.GENERIC_TYPE;
+    var TypedGraph_3 = TypedGraph_1.TypedGraph;
+
     var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
     function importGraph(config) {
         return __awaiter(this, void 0, void 0, function () {
@@ -3609,7 +3740,7 @@
                     case 0:
                         console.log("Loading " + config.graphName + "...");
                         tic = +new Date;
-                        return [4, getOrCreateGraph(config.graphFile)];
+                        return [4, importGraphFromURL(config)];
                     case 1:
                         graph = _a.sent();
                         toc = +new Date;
@@ -3619,33 +3750,22 @@
             });
         });
     }
-    function getOrCreateGraph(graphFile) {
+    function importGraphFromURL(config) {
         return __awaiter(this, void 0, void 0, function () {
-            var graph;
+            var graphBytes, graphString, graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, importGraphFromURL(graphFile)];
-                    case 1:
-                        graph = _a.sent();
-                        window.graph = graph;
-                        return [2, graph];
-                }
-            });
-        });
-    }
-    function importGraphFromURL(graphFile) {
-        return __awaiter(this, void 0, void 0, function () {
-            var graphBytes, graphString;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, fetch(graphFile)];
+                    case 0: return [4, fetch(config.graphFile)];
                     case 1: return [4, (_a.sent())];
                     case 2:
                         graphBytes = _a.sent();
                         return [4, graphBytes.json()];
                     case 3:
                         graphString = _a.sent();
-                        return [2, jsonIn.readFromJSON(graphString)];
+                        graph = new TypedGraph_3(config.graphName);
+                        graph = jsonIn.readFromJSON(graphString, graph);
+                        window.graph = graph;
+                        return [2, graph];
                 }
             });
         });
@@ -5213,6 +5333,7 @@
         console.log(searchRes);
         return searchRes;
     }
+    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map
