@@ -2,7 +2,8 @@ import * as $G from 'graphinius';
 /* HACKETY HACK */
 window.$G = $G.default;
 
-import { IGraph } from 'graphinius/lib/core/BaseGraph';
+import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
+import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
 import { importGraph } from './common/importGraph';
 
 import { AppConfig } from './indexers/interfaces';
@@ -15,9 +16,9 @@ import { meetupConfig } from './indexers/meetup/appConfig';
 
 (async () => {
   [beerConfig].forEach(async config => { // , meetupConfig
-    const graph = await importGraph(config);
+    const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
-    const searchRes = executeSearch(indexes, config);
+    const searchRes = executeSearch(indexes, config, graph);
   });
 })();
 
@@ -32,13 +33,17 @@ function createJSSearchIndex(graph: IGraph, config: AppConfig) {
 }
 
 
-function executeSearch(indexes, config: AppConfig) {
+function executeSearch(indexes, config: AppConfig, graph: TypedGraph) {
   let tic = +new Date;
   const searchRes = indexes[config.testSearchModel].search(config.searchTerm);
   let toc = +new Date;
   console.log(`executing search for '${config.searchTerm}' in JS-SEARCH took ${toc-tic} ms.`);
 
   console.log(searchRes);
+
+  searchRes.forEach(res => {
+    console.log(graph.getNodeById(res.id));
+  });
 
   return searchRes;
 }

@@ -445,18 +445,18 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
     class BaseEdge {
-        constructor(_id, _node_a, _node_b, options) {
+        constructor(_id, _node_a, _node_b, config) {
             this._id = _id;
             this._node_a = _node_a;
             this._node_b = _node_b;
             if (!(_node_a instanceof BaseNode_1.BaseNode) || !(_node_b instanceof BaseNode_1.BaseNode)) {
                 throw new Error("cannot instantiate edge without two valid node objects");
             }
-            options = options || {};
-            this._directed = options.directed || false;
-            this._weighted = options.weighted || false;
-            this._weight = this._weighted ? (isNaN(options.weight) ? 1 : options.weight) : undefined;
-            this._label = options.label || this._id;
+            config = config || {};
+            this._directed = config.directed || false;
+            this._weighted = config.weighted || false;
+            this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
+            this._label = config.label || this._id;
         }
         getID() {
             return this._id;
@@ -5310,7 +5310,7 @@
                         case 1:
                             graph = _a.sent();
                             indexes = createJSSearchIndex(graph, config);
-                            searchRes = executeSearch(indexes, config);
+                            searchRes = executeSearch(indexes, config, graph);
                             return [2];
                     }
                 });
@@ -5325,15 +5325,17 @@
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
         return indexes;
     }
-    function executeSearch(indexes, config) {
+    function executeSearch(indexes, config, graph) {
         var tic = +new Date;
         var searchRes = indexes[config.testSearchModel].search(config.searchTerm);
         var toc = +new Date;
         console.log("executing search for '" + config.searchTerm + "' in JS-SEARCH took " + (toc - tic) + " ms.");
         console.log(searchRes);
+        searchRes.forEach(function (res) {
+            console.log(graph.getNodeById(res.id));
+        });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map
