@@ -13,6 +13,7 @@ async function importGraph(config: AppConfig) {
   const graph: IGraph = await importGraphFromURL(config);
   let toc = +new Date;
   console.log(`Importing graph of |V|=${graph.nrNodes()} and |E_dir|=${graph.nrDirEdges()} took ${toc-tic} ms.`);
+  console.log(graph.stats);
   return graph;
 }
 

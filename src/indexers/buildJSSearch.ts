@@ -1,5 +1,6 @@
 import * as JSSearch from 'js-search';
-import { IGraph } from 'graphinius/lib/core/BaseGraph';
+import { IGraph, BaseGraph } from 'graphinius/lib/core/base/BaseGraph';
+import { TypedNode } from 'graphinius/lib/core/typed/TypedNode';
 import { IndexConfig } from './interfaces';
 
 type Types = {[key: string]: any[]};
@@ -9,6 +10,7 @@ type Indexes = {[key: string]: any};
 const JsSearch = (typeof window === 'undefined') ? JSSearch : JSSearch.default;
 
 
+
 function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
   const types: Types = {};
   Object.keys(idxConfig).forEach(k => types[k] = []);
@@ -16,10 +18,14 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
   Object.keys(idxConfig).forEach(k => indexes[k] = null);
 
   Object.values(graph.getNodes()).forEach( n => {
-    const label = n.getLabel();
-    const idxObj = idxConfig[label];
+    if ( BaseGraph.isTyped(n) === false ) {
+      throw Error(`Node Type not supported in this scenario...!`)
+    }
+    const type = (n as TypedNode).type;
+
+    const idxObj = idxConfig[type];
     if ( !idxObj ) {
-      console.log(`Node Type not supported in Meetup scenario...!`);
+      console.log();
       return false;
     }
     let idxEntry = {id: n.getID()};
@@ -27,7 +33,7 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
 
     // console.log(idxEntry);
 
-    types[label].push(idxEntry);
+    types[type].push(idxEntry);
   });
   // Object.keys(types).forEach(k => console.log(`${types[k].length} nodes of type ${k} registered.`));
 

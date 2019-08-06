@@ -217,6 +217,18 @@
             this._label = config.label || _id;
             this._features = config.features != null ? StructUtils.clone(config.features) : {};
         }
+        static isTyped(arg) {
+            return !!arg.typed;
+        }
+        get id() {
+            return this._id;
+        }
+        get label() {
+            return this._label;
+        }
+        get features() {
+            return this._features;
+        }
         getID() {
             return this._id;
         }
@@ -458,6 +470,12 @@
             this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
             this._label = config.label || this._id;
         }
+        get id() {
+            return this._id;
+        }
+        get label() {
+            return this._label;
+        }
         getID() {
             return this._id;
         }
@@ -495,6 +513,9 @@
                 weight: this._weight,
                 label: this._label
             });
+        }
+        static isTyped(arg) {
+            return !!arg.typed;
         }
     }
     exports.BaseEdge = BaseEdge;
@@ -1351,6 +1372,109 @@
     var Johnsons_4 = Johnsons_1.reWeighGraph;
     var Johnsons_5 = Johnsons_1.PFSFromAllNodes;
 
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    let log_level = LOG_LEVELS.production;
+    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
+        log_level = process.env['G_LOG'];
+    }
+    const RUN_CONFIG = {
+        log_level
+    };
+    exports.RUN_CONFIG = RUN_CONFIG;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.LOG_LEVELS;
+    var run_config_2 = run_config.RUN_CONFIG;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    const DEFAULT_COLOR = 37;
+    class Logger {
+        constructor(config) {
+            this.config = null;
+            this.config = config || run_config.RUN_CONFIG;
+        }
+        log(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.log.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        error(err, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.error.call(console, this.colorize(color, err, bright));
+                return true;
+            }
+            return false;
+        }
+        dir(obj, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.dir.call(console, this.colorize(color, obj, bright));
+                return true;
+            }
+            return false;
+        }
+        info(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.info.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        warn(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                console.warn.call(console, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        write(msg, color = DEFAULT_COLOR, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
+                return true;
+            }
+            return false;
+        }
+        colorize(color, output, bright) {
+            let out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        }
+    }
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
+
     var BaseGraph_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -1359,6 +1483,8 @@
 
 
 
+
+    let logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     var GraphMode;
     (function (GraphMode) {
@@ -1377,6 +1503,18 @@
             this._nodes = {};
             this._dir_edges = {};
             this._und_edges = {};
+        }
+        static isTyped(arg) {
+            return !!arg.typed;
+        }
+        get label() {
+            return this._label;
+        }
+        get mode() {
+            return this._mode;
+        }
+        get stats() {
+            return this.getStats();
         }
         reweighIfHasNegativeEdge(clone = false) {
             if (this.hasNegativeEdge()) {
@@ -1534,7 +1672,7 @@
             }
             this._nodes[node.getID()] = node;
             this._nr_nodes += 1;
-            return true;
+            return node;
         }
         hasNodeID(id) {
             return !!this._nodes[id];
@@ -1580,7 +1718,7 @@
         }
         static checkExistanceOfEdgeNodes(node_a, node_b) {
             if (!node_a) {
-                throw new Error("Cannot find edge. Node A does not exist (in graph).");
+                throw new Error(`Cannot find edge. Node A does not exist (in graph).`);
             }
             if (!node_b) {
                 throw new Error("Cannot find edge. Node B does not exist (in graph).");
@@ -1670,7 +1808,7 @@
                 this._nr_und_edges += 1;
                 this.updateGraphMode();
             }
-            return true;
+            return edge;
         }
         deleteEdge(edge) {
             let dir_edge = this._dir_edges[edge.getID()];
@@ -2533,109 +2671,6 @@
     var Degree_1 = Degree.DegreeMode;
     var Degree_2 = Degree.DegreeCentrality;
 
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    let log_level = LOG_LEVELS.production;
-    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
-        log_level = process.env['G_LOG'];
-    }
-    const RUN_CONFIG = {
-        log_level
-    };
-    exports.RUN_CONFIG = RUN_CONFIG;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.LOG_LEVELS;
-    var run_config_2 = run_config.RUN_CONFIG;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var LogColors;
-    (function (LogColors) {
-        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
-        LogColors[LogColors["FgRed"] = 31] = "FgRed";
-        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
-        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
-        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
-        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
-        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
-        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
-        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
-        LogColors[LogColors["BgRed"] = 41] = "BgRed";
-        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
-        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
-        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
-        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
-        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
-        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    const DEFAULT_COLOR = 37;
-    class Logger {
-        constructor(config) {
-            this.config = null;
-            this.config = config || run_config.RUN_CONFIG;
-        }
-        log(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.log.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        error(err, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.error.call(console, this.colorize(color, err, bright));
-                return true;
-            }
-            return false;
-        }
-        dir(obj, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.dir.call(console, this.colorize(color, obj, bright));
-                return true;
-            }
-            return false;
-        }
-        info(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.info.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        warn(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.warn.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        write(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        colorize(color, output, bright) {
-            let out_bright = bright ? '\x1b[1m' : null;
-            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        }
-    }
-    exports.Logger = Logger;
-    });
-
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
-
     var Pagerank_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -3052,25 +3087,69 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.labelKeys = {
         coords: 'c',
-        label: 'l',
-        features: 'f',
+        n_label: 'l',
+        n_type: 'x',
+        n_features: 'f',
         edges: 'e',
         e_to: 't',
         e_dir: 'd',
         e_weight: 'w',
-        e_label: 'l'
+        e_label: 'l',
+        e_type: 'y'
     };
     });
 
     unwrapExports(interfaces);
     var interfaces_1 = interfaces.labelKeys;
 
+    var rngBrowser = createCommonjsModule(function (module) {
+    // Unique ID creation requires a high quality random # generator.  In the
+    // browser this is a little complicated due to unknown quality of Math.random()
+    // and inconsistent support for the `crypto` API.  We do the best we can via
+    // feature-detection
+
+    // getRandomValues needs to be invoked in a context where "this" is a Crypto
+    // implementation. Also, find the complete implementation of crypto on IE11.
+    var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                          (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+    if (getRandomValues) {
+      // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+      var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+      module.exports = function whatwgRNG() {
+        getRandomValues(rnds8);
+        return rnds8;
+      };
+    } else {
+      // Math.random()-based (RNG)
+      //
+      // If all else fails, use Math.random().  It's fast, but is of unspecified
+      // quality.
+      var rnds = new Array(16);
+
+      module.exports = function mathRNG() {
+        for (var i = 0, r; i < 16; i++) {
+          if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+          rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+        }
+
+        return rnds;
+      };
+    }
+    });
+
+    /**
+     * Convert array of 16 byte values to UUID string format of the form:
+     * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+     */
+    var byteToHex = [];
+    for (var i = 0; i < 256; ++i) {
+      byteToHex[i] = (i + 0x100).toString(16).substr(1);
+    }
+
     var JSONInput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
 
     const logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
@@ -3097,26 +3176,30 @@
         }
         readFromJSON(json, graph) {
             graph = graph || new BaseGraph_1.BaseGraph(json.name);
+            const typedGraph = BaseGraph_1.BaseGraph.isTyped(graph);
             let coords_json, coords, coord_idx, features;
             for (let node_id in json.data) {
-                let node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                let label = json.data[node_id][interfaces.labelKeys.label];
-                if (label) {
-                    node.setLabel(label);
-                }
-                if (features = json.data[node_id][interfaces.labelKeys.features]) {
+                const type = typedGraph ? json.data[node_id][interfaces.labelKeys.n_type] : null;
+                const label = json.data[node_id][interfaces.labelKeys.n_label];
+                const node = graph.addNodeByID(node_id, { label, type });
+                features = json.data[node_id][interfaces.labelKeys.n_features];
+                if (features) {
                     node.setFeatures(features);
                 }
-                if (coords_json = json.data[node_id][interfaces.labelKeys.coords]) {
+                coords_json = json.data[node_id][interfaces.labelKeys.coords];
+                if (coords_json) {
                     coords = {};
                     for (coord_idx in coords_json) {
                         coords[coord_idx] = +coords_json[coord_idx];
                     }
                     node.setFeature(interfaces.labelKeys.coords, coords);
                 }
+            }
+            for (let node_id in json.data) {
+                let node = graph.getNodeById(node_id);
                 let edges = json.data[node_id][interfaces.labelKeys.edges];
                 for (let e in edges) {
-                    let edge_input = edges[e], edge_label = edge_input[interfaces.labelKeys.e_label], target_node_id = edge_input[interfaces.labelKeys.e_to], directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
+                    let edge_input = edges[e], edge_label = edge_input[interfaces.labelKeys.e_label], edge_type = edge_input[interfaces.labelKeys.e_type], target_node_id = edge_input[interfaces.labelKeys.e_to], directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
                     let edge_id = node_id + "_" + target_node_id + "_" + dir_char, edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
                     if (graph.hasEdgeID(edge_id)) {
                         continue;
@@ -3134,9 +3217,12 @@
                     }
                     else {
                         const edge = graph.addEdgeByID(edge_id, node, target_node, {
+                            label: edge_label,
                             directed: directed,
                             weighted: this._config.weighted,
-                            weight: edge_weight
+                            weight: edge_weight,
+                            typed: true,
+                            type: edge_type
                         });
                         if (edge_label) {
                             edge.setLabel(edge_label);
@@ -3173,6 +3259,10 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
+
+
+
+    const logger = new Logger_1.Logger();
     class JSONOutput {
         constructor() { }
         writeToJSONFile(filepath, graph) {
@@ -3184,7 +3274,7 @@
         writeToJSONString(graph) {
             let nodes, node, node_struct, und_edges, dir_edges, edge, coords;
             let result = {
-                name: graph._label,
+                name: graph.label,
                 nodes: graph.nrNodes(),
                 dir_e: graph.nrDirEdges(),
                 und_e: graph.nrUndEdges(),
@@ -3197,7 +3287,11 @@
                     [interfaces.labelKeys.edges]: []
                 };
                 if (node.getID() !== node.getLabel()) {
-                    node_struct[interfaces.labelKeys.label] = node.getLabel();
+                    node_struct[interfaces.labelKeys.n_label] = node.label;
+                }
+                if (BaseNode_1.BaseNode.isTyped(node)) {
+                    logger.log(`Got TYPED node`);
+                    node_struct[interfaces.labelKeys.n_type] = node.type;
                 }
                 und_edges = node.undEdges();
                 for (let edge_key in und_edges) {
@@ -3206,10 +3300,13 @@
                     let edgeStruct = {
                         [interfaces.labelKeys.e_to]: endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
                         [interfaces.labelKeys.e_dir]: edge.isDirected() ? 1 : 0,
-                        [interfaces.labelKeys.e_weight]: edge.isWeighted() ? edge.getWeight() : undefined
+                        [interfaces.labelKeys.e_weight]: JSONOutput.handleEdgeWeight(edge),
                     };
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                    }
+                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
+                        edgeStruct[interfaces.labelKeys.e_type] = edge.type;
                     }
                     node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
@@ -3225,9 +3322,12 @@
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
                     }
+                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
+                        edgeStruct[interfaces.labelKeys.e_type] = edge.type;
+                    }
                     node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
-                node_struct[interfaces.labelKeys.features] = node.getFeatures();
+                node_struct[interfaces.labelKeys.n_features] = node.getFeatures();
                 if ((coords = node.getFeature(interfaces.labelKeys.coords)) != null) {
                     node_struct[interfaces.labelKeys.coords] = coords;
                 }
@@ -3625,8 +3725,61 @@
      */
     var GraphiniusJS = out.$G;
 
+    var TypedNode_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    class TypedNode extends BaseNode_1.BaseNode {
+        constructor(_id, config = {}) {
+            super(_id, config);
+            this._id = _id;
+            this._type = config.type;
+        }
+        get type() {
+            return this._type;
+        }
+        get typed() {
+            return true;
+        }
+    }
+    exports.TypedNode = TypedNode;
+    });
+
+    unwrapExports(TypedNode_1);
+    var TypedNode_2 = TypedNode_1.TypedNode;
+
+    var TypedEdge_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    class TypedEdge extends BaseEdge_1.BaseEdge {
+        constructor(_id, _node_a, _node_b, config = {}) {
+            super(_id, _node_a, _node_b, config);
+            this._id = _id;
+            this._node_a = _node_a;
+            this._node_b = _node_b;
+            this._type = config.type;
+        }
+        get type() {
+            return this._type;
+        }
+        get typed() {
+            return true;
+        }
+    }
+    exports.TypedEdge = TypedEdge;
+    });
+
+    unwrapExports(TypedEdge_1);
+    var TypedEdge_2 = TypedEdge_1.TypedEdge;
+
     var TypedGraph_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
 
 
     const logger = new Logger_1.Logger();
@@ -3639,6 +3792,9 @@
             this._typedEdges = new Map();
             this._typedNodes.set(exports.GENERIC_TYPE, new Map());
             this._typedEdges.set(exports.GENERIC_TYPE, new Map());
+        }
+        get typed() {
+            return true;
         }
         nodeTypes() {
             return Array.from(this._typedNodes.keys());
@@ -3654,9 +3810,16 @@
             type = type.toUpperCase();
             return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
         }
+        addNodeByID(id, opts) {
+            if (this.hasNodeID(id)) {
+                throw new Error("Won't add node with duplicate ID.");
+            }
+            let node = new TypedNode_1.TypedNode(id, opts);
+            return this.addNode(node) ? node : null;
+        }
         addNode(node) {
             if (!super.addNode(node)) {
-                return false;
+                return null;
             }
             const id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
             if (!type) {
@@ -3668,7 +3831,7 @@
                 }
                 this._typedNodes.get(type).set(id, node);
             }
-            return true;
+            return node;
         }
         deleteNode(node) {
             const id = node.getID(), type = node.type ? node.type.toUpperCase() : exports.GENERIC_TYPE;
@@ -3685,34 +3848,46 @@
             }
             super.deleteNode(node);
         }
+        addEdgeByID(id, a, b, opts) {
+            let edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
+            return this.addEdge(edge);
+        }
         addEdge(edge) {
             if (!super.addEdge(edge)) {
-                return false;
+                return undefined;
             }
-            const id = edge.getID(), label = edge.getLabel().toUpperCase();
-            if (id === label) {
+            const id = edge.getID();
+            let type = exports.GENERIC_TYPE;
+            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+                type = edge.type.toUpperCase();
+            }
+            if (id === type) {
                 this._typedEdges.get(exports.GENERIC_TYPE).set(id, edge);
             }
             else {
-                if (!this._typedEdges.get(label)) {
-                    this._typedEdges.set(label, new Map());
+                if (!this._typedEdges.get(type)) {
+                    this._typedEdges.set(type, new Map());
                 }
-                this._typedEdges.get(label).set(id, edge);
+                this._typedEdges.get(type).set(id, edge);
             }
-            return true;
+            return edge;
         }
         deleteEdge(edge) {
-            const id = edge.getID(), label = edge.getLabel() === id ? exports.GENERIC_TYPE : edge.getLabel().toUpperCase();
-            if (!this._typedEdges.get(label)) {
+            const id = edge.getID();
+            let type = exports.GENERIC_TYPE;
+            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+                type = edge.type.toUpperCase();
+            }
+            if (!this._typedEdges.get(type)) {
                 throw Error('Edge type does not exist on this TypedGraph.');
             }
-            const removeEdge = this._typedEdges.get(label).get(id);
+            const removeEdge = this._typedEdges.get(type).get(id);
             if (!removeEdge) {
                 throw Error('This particular edge is nowhere to be found in its typed set.');
             }
-            this._typedEdges.get(label).delete(id);
-            if (this.nrTypedEdges(label) === 0) {
-                this._typedEdges.delete(label);
+            this._typedEdges.get(type).delete(id);
+            if (this.nrTypedEdges(type) === 0) {
+                this._typedEdges.delete(type);
             }
             super.deleteEdge(edge);
         }
@@ -3720,7 +3895,7 @@
             let typed_nodes = {}, typed_edges = {};
             this._typedNodes.forEach((k, v) => typed_nodes[v] = k.size);
             this._typedEdges.forEach((k, v) => typed_edges[v] = k.size);
-            return Object.assign({}, super.getStats(), { node_types: this.nodeTypes(), edge_types: this.edgeTypes(), typed_nodes,
+            return Object.assign({}, super.getStats(), { typed_nodes,
                 typed_edges });
         }
     }
@@ -3745,6 +3920,7 @@
                         graph = _a.sent();
                         toc = +new Date;
                         console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
+                        console.log(graph.stats);
                         return [2, graph];
                 }
             });
@@ -5217,15 +5393,18 @@
         var indexes = {};
         Object.keys(idxConfig).forEach(function (k) { return indexes[k] = null; });
         Object.values(graph.getNodes()).forEach(function (n) {
-            var label = n.getLabel();
-            var idxObj = idxConfig[label];
+            if (BaseGraph_3.isTyped(n) === false) {
+                throw Error("Node Type not supported in this scenario...!");
+            }
+            var type = n.type;
+            var idxObj = idxConfig[type];
             if (!idxObj) {
-                console.log("Node Type not supported in Meetup scenario...!");
+                console.log();
                 return false;
             }
             var idxEntry = { id: n.getID() };
             idxObj.fields.forEach(function (f) { return idxEntry[f] = n.getFeature(f); });
-            types[label].push(idxEntry);
+            types[type].push(idxEntry);
         });
         Object.values(idxConfig).forEach(function (model) {
             indexes[model.string] = new JsSearch.Search(model.id);
@@ -5283,7 +5462,6 @@
             fields: ['style']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -5295,7 +5473,6 @@
         models: beerModels,
         testSearchModel: beerModels.Brewery
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = GraphiniusJS;
