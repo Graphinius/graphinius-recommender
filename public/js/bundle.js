@@ -83,8 +83,8 @@
         if (obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
             return;
         }
-        var cloneObj = obj.constructor ? obj.constructor() : {};
-        for (var attribute in obj) {
+        let cloneObj = obj.constructor ? obj.constructor() : {};
+        for (let attribute in obj) {
             if (!obj.hasOwnProperty(attribute)) {
                 continue;
             }
@@ -99,9 +99,9 @@
     }
     exports.clone = clone;
     function shuffleArray(arr) {
-        for (var i = arr.length - 1; i >= 0; i--) {
-            var randomIndex = Math.floor(Math.random() * (i + 1));
-            var itemAtIndex = arr[randomIndex];
+        for (let i = arr.length - 1; i >= 0; i--) {
+            let randomIndex = Math.floor(Math.random() * (i + 1));
+            let itemAtIndex = arr[randomIndex];
             arr[randomIndex] = arr[i];
             arr[i] = itemAtIndex;
         }
@@ -109,14 +109,14 @@
     }
     exports.shuffleArray = shuffleArray;
     function mergeArrays(args, cb = undefined) {
-        for (var arg_idx in args) {
+        for (let arg_idx in args) {
             if (!Array.isArray(args[arg_idx])) {
                 throw new Error('Will only mergeArrays arrays');
             }
         }
-        var seen = {}, result = [], identity;
-        for (var i = 0; i < args.length; i++) {
-            for (var j = 0; j < args[i].length; j++) {
+        let seen = {}, result = [], identity;
+        for (let i = 0; i < args.length; i++) {
+            for (let j = 0; j < args[i].length; j++) {
                 identity = typeof cb !== 'undefined' ? cb(args[i][j]) : args[i][j];
                 if (seen[identity] !== true) {
                     result.push(args[i][j]);
@@ -128,14 +128,14 @@
     }
     exports.mergeArrays = mergeArrays;
     function mergeObjects(args) {
-        for (var i = 0; i < args.length; i++) {
+        for (let i = 0; i < args.length; i++) {
             if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
                 throw new Error('Will only take objects as inputs');
             }
         }
-        var result = {};
-        for (var i = 0; i < args.length; i++) {
-            for (var key in args[i]) {
+        let result = {};
+        for (let i = 0; i < args.length; i++) {
+            for (let key in args[i]) {
                 if (args[i].hasOwnProperty(key)) {
                     result[key] = args[i][key];
                 }
@@ -145,7 +145,7 @@
     }
     exports.mergeObjects = mergeObjects;
     function findKey(obj, cb) {
-        for (var key in obj) {
+        for (let key in obj) {
             if (obj.hasOwnProperty(key) && cb(obj[key])) {
                 return key;
             }
@@ -202,9 +202,153 @@
     var StructUtils_5 = StructUtils.findKey;
     var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
 
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const CMD_ENV_LOG = 'G_LOG';
+    const GENERIC_TYPES = {
+        Node: 'GENERIC',
+        Edge: 'GENERIC',
+        Graph: 'GENERIC'
+    };
+    exports.GENERIC_TYPES = GENERIC_TYPES;
+    const LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    function runLevel() {
+        let log_level = LOG_LEVELS.production;
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
+            log_level = process.env[CMD_ENV_LOG];
+        }
+        return log_level;
+    }
+    exports.runLevel = runLevel;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.GENERIC_TYPES;
+    var run_config_2 = run_config.LOG_LEVELS;
+    var run_config_3 = run_config.runLevel;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    const DEFAULT_COLOR = 37;
+    class Logger {
+        constructor(config) {
+            this.config = config || {
+                log_level: run_config.runLevel()
+            };
+        }
+        log(msg, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.log.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        }
+        error(err, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.error.call(console, Logger.colorize(color, err, bright));
+                }
+                else {
+                    console.error.call(console, err);
+                }
+                return true;
+            }
+            return false;
+        }
+        dir(obj, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
+                }
+                else {
+                    console.dir.call(console, obj);
+                }
+                return true;
+            }
+            return false;
+        }
+        info(msg, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.info.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        }
+        warn(msg, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.warn.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        }
+        write(msg, color, bright = false) {
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    process.stdout.write.call(process.stdout, msg);
+                }
+                return true;
+            }
+            return false;
+        }
+        static colorize(color, output, bright) {
+            let out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        }
+    }
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
+
     var BaseNode_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
+
+    const logger = new Logger_1.Logger();
     class BaseNode {
         constructor(_id, config = {}) {
             this._id = _id;
@@ -218,7 +362,7 @@
             this._features = config.features != null ? StructUtils.clone(config.features) : {};
         }
         static isTyped(arg) {
-            return !!arg.typed;
+            return !!arg.type;
         }
         get id() {
             return this._id;
@@ -251,7 +395,7 @@
             this._features[key] = value;
         }
         deleteFeature(key) {
-            var feat = this._features[key];
+            let feat = this._features[key];
             delete this._features[key];
             return feat;
         }
@@ -268,11 +412,11 @@
             return this._und_degree;
         }
         addEdge(edge) {
-            var nodes = edge.getNodes();
+            let nodes = edge.getNodes();
             if (nodes.a !== this && nodes.b !== this) {
                 throw new Error("Cannot add edge that does not connect to this node");
             }
-            var edgeID = edge.getID();
+            let edgeID = edge.getID();
             if (edge.isDirected()) {
                 if (nodes.a === this && !this._out_edges[edgeID]) {
                     this._out_edges[edgeID] = edge;
@@ -294,6 +438,7 @@
                 this._und_edges[edge.getID()] = edge;
                 this._und_degree += 1;
             }
+            return edge;
         }
         hasEdge(edge) {
             return !!this._in_edges[edge.getID()] || !!this._out_edges[edge.getID()] || !!this._und_edges[edge.getID()];
@@ -302,7 +447,7 @@
             return !!this._in_edges[id] || !!this._out_edges[id] || !!this._und_edges[id];
         }
         getEdge(id) {
-            var edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
+            let edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
             if (!edge) {
                 throw new Error("Cannot retrieve non-existing edge.");
             }
@@ -327,8 +472,8 @@
             if (!this.hasEdge(edge)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            var id = edge.getID();
-            var e = this._und_edges[id];
+            let id = edge.getID();
+            let e = this._und_edges[id];
             if (e) {
                 delete this._und_edges[id];
                 this._und_degree -= 1;
@@ -344,11 +489,11 @@
                 this._out_degree -= 1;
             }
         }
-        removeEdgeID(id) {
+        removeEdgeByID(id) {
             if (!this.hasEdgeID(id)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            var e = this._und_edges[id];
+            let e = this._und_edges[id];
             if (e) {
                 delete this._und_edges[id];
                 this._und_degree -= 1;
@@ -382,8 +527,8 @@
             this.clearUndEdges();
         }
         prevNodes() {
-            var prevs = [];
-            var key, edge;
+            let prevs = [];
+            let key, edge;
             for (key in this._in_edges) {
                 if (this._in_edges.hasOwnProperty(key)) {
                     edge = this._in_edges[key];
@@ -396,8 +541,8 @@
             return prevs;
         }
         nextNodes() {
-            var nexts = [];
-            var key, edge;
+            let nexts = [];
+            let key, edge;
             for (key in this._out_edges) {
                 if (this._out_edges.hasOwnProperty(key)) {
                     edge = this._out_edges[key];
@@ -410,12 +555,12 @@
             return nexts;
         }
         connNodes() {
-            var conns = [];
-            var key, edge;
+            let conns = [];
+            let key, edge;
             for (key in this._und_edges) {
                 if (this._und_edges.hasOwnProperty(key)) {
                     edge = this._und_edges[key];
-                    var nodes = edge.getNodes();
+                    let nodes = edge.getNodes();
                     if (nodes.a === this) {
                         conns.push({
                             node: edge.getNodes().b,
@@ -433,11 +578,11 @@
             return conns;
         }
         reachNodes(identityFunc) {
-            var identity = 0;
+            let identity = 0;
             return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (ne => identity++));
         }
         allNeighbors(identityFunc) {
-            var identity = 0;
+            let identity = 0;
             return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
         }
         clone() {
@@ -515,7 +660,7 @@
             });
         }
         static isTyped(arg) {
-            return !!arg.typed;
+            return !!arg.type;
         }
     }
     exports.BaseEdge = BaseEdge;
@@ -1330,8 +1475,7 @@
         }
         let specialConfig = PFS_1.preparePFSStandardConfig();
         let notEncounteredJohnsons = function (context) {
-            context.next.best =
-                context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
+            context.next.best = context.current.best + context.next.edge.getWeight();
             let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             if (context.current.node == context.root_node) {
                 dists[i][j] = context.next.best;
@@ -1372,109 +1516,6 @@
     var Johnsons_4 = Johnsons_1.reWeighGraph;
     var Johnsons_5 = Johnsons_1.PFSFromAllNodes;
 
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    let log_level = LOG_LEVELS.production;
-    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env) {
-        log_level = process.env['G_LOG'];
-    }
-    const RUN_CONFIG = {
-        log_level
-    };
-    exports.RUN_CONFIG = RUN_CONFIG;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.LOG_LEVELS;
-    var run_config_2 = run_config.RUN_CONFIG;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var LogColors;
-    (function (LogColors) {
-        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
-        LogColors[LogColors["FgRed"] = 31] = "FgRed";
-        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
-        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
-        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
-        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
-        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
-        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
-        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
-        LogColors[LogColors["BgRed"] = 41] = "BgRed";
-        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
-        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
-        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
-        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
-        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
-        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    const DEFAULT_COLOR = 37;
-    class Logger {
-        constructor(config) {
-            this.config = null;
-            this.config = config || run_config.RUN_CONFIG;
-        }
-        log(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.log.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        error(err, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.error.call(console, this.colorize(color, err, bright));
-                return true;
-            }
-            return false;
-        }
-        dir(obj, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.dir.call(console, this.colorize(color, obj, bright));
-                return true;
-            }
-            return false;
-        }
-        info(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.info.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        warn(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                console.warn.call(console, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        write(msg, color = DEFAULT_COLOR, bright = false) {
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                process.stdout.write.call(process.stdout, this.colorize(color, msg, bright));
-                return true;
-            }
-            return false;
-        }
-        colorize(color, output, bright) {
-            let out_bright = bright ? '\x1b[1m' : null;
-            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        }
-    }
-    exports.Logger = Logger;
-    });
-
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
-
     var BaseGraph_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -1505,7 +1546,7 @@
             this._und_edges = {};
         }
         static isTyped(arg) {
-            return !!arg.typed;
+            return !!arg.type;
         }
         get label() {
             return this._label;
@@ -1998,23 +2039,6 @@
 
     var FloydWarshall = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
-
-    function initializeDistsWithEdges(graph) {
-        let dists = {}, edges = StructUtils.mergeObjects([graph.getDirEdges(), graph.getUndEdges()]);
-        for (let edge in edges) {
-            let a = edges[edge].getNodes().a.getID();
-            let b = edges[edge].getNodes().b.getID();
-            if (dists[a] == null)
-                dists[a] = {};
-            dists[a][b] = (isNaN(edges[edge].getWeight()) ? 1 : edges[edge].getWeight());
-            if (!edges[edge].isDirected()) {
-                if (dists[b] == null)
-                    dists[b] = {};
-                dists[b][a] = (isNaN(edges[edge].getWeight()) ? 1 : edges[edge].getWeight());
-            }
-        }
-        return dists;
-    }
     function FloydWarshallAPSP(graph) {
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
@@ -2058,29 +2082,6 @@
         return dists;
     }
     exports.FloydWarshallArray = FloydWarshallArray;
-    function FloydWarshallDict(graph) {
-        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
-            throw new Error("Cowardly refusing to traverse graph without edges.");
-        }
-        let dists = initializeDistsWithEdges(graph);
-        for (let k in dists) {
-            for (let i in dists) {
-                for (let j in dists) {
-                    if (i === j) {
-                        continue;
-                    }
-                    if (dists[i][k] == null || dists[k][j] == null) {
-                        continue;
-                    }
-                    if ((!dists[i][j] && dists[i][j] != 0) || (dists[i][j] > dists[i][k] + dists[k][j])) {
-                        dists[i][j] = dists[i][k] + dists[k][j];
-                    }
-                }
-            }
-        }
-        return dists;
-    }
-    exports.FloydWarshallDict = FloydWarshallDict;
     function changeNextToDirectParents(input) {
         let output = [];
         for (let a = 0; a < input.length; a++) {
@@ -2132,8 +2133,7 @@
     unwrapExports(FloydWarshall);
     var FloydWarshall_1 = FloydWarshall.FloydWarshallAPSP;
     var FloydWarshall_2 = FloydWarshall.FloydWarshallArray;
-    var FloydWarshall_3 = FloydWarshall.FloydWarshallDict;
-    var FloydWarshall_4 = FloydWarshall.changeNextToDirectParents;
+    var FloydWarshall_3 = FloydWarshall.changeNextToDirectParents;
 
     var Betweenness = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2910,12 +2910,12 @@
     let logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     class CSVInput {
-        constructor(config) {
-            this._config = config || {
-                separator: config && config.separator || ',',
-                explicit_direction: config && config.explicit_direction || true,
-                direction_mode: config && config.direction_mode || false,
-                weighted: config && config.weighted || false
+        constructor(config = {}) {
+            this._config = {
+                separator: config.separator != null ? config.separator : ',',
+                explicit_direction: config.explicit_direction != null ? config.explicit_direction : true,
+                direction_mode: config.direction_mode != null ? config.direction_mode : false,
+                weighted: config.weighted != null ? config.weighted : false
             };
         }
         readFromAdjacencyListURL(config, cb) {
@@ -2925,10 +2925,10 @@
             this.readGraphFromURL(config, cb, this.readFromEdgeList);
         }
         readGraphFromURL(config, cb, localFun) {
-            var self = this, graph_name = config.file_name, graph;
+            let self = this, graph_name = config.file_name, graph;
             RemoteUtils.checkNodeEnvironment();
             RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
-                var input = raw_graph.toString().split('\n');
+                let input = raw_graph.toString().split('\n');
                 graph = localFun.apply(self, [input, graph_name]);
                 cb(graph, undefined);
             });
@@ -2941,19 +2941,19 @@
         }
         readFileAndReturn(filepath, func) {
             RemoteUtils.checkNodeEnvironment();
-            var graph_name = path.basename(filepath);
-            var input = fs.readFileSync(filepath).toString().split('\n');
+            let graph_name = path.basename(filepath);
+            let input = fs.readFileSync(filepath).toString().split('\n');
             return func.apply(this, [input, graph_name]);
         }
         readFromAdjacencyList(input, graph_name) {
-            var graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (var idx in input) {
-                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node, edge_array = elements.slice(1), edge, target_node_id, target_node, dir_char, directed, edge_id, edge_id_u2;
+            let graph = new BaseGraph_1.BaseGraph(graph_name);
+            for (let idx in input) {
+                let line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node, edge_array = elements.slice(1), edge, target_node_id, target_node, dir_char, directed, edge_id, edge_id_u2;
                 if (!node_id) {
                     continue;
                 }
                 node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                for (var e = 0; e < edge_array.length;) {
+                for (let e = 0; e < edge_array.length;) {
                     if (this._config.explicit_direction && (!edge_array || edge_array.length % 2)) {
                         throw new Error('Every edge entry has to contain its direction info in explicit mode.');
                     }
@@ -2977,9 +2977,9 @@
             return graph;
         }
         readFromEdgeList(input, graph_name, weighted = false) {
-            var graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (var idx in input) {
-                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
+            let graph = new BaseGraph_1.BaseGraph(graph_name);
+            for (let idx in input) {
+                let line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
                 if (!elements) {
                     continue;
                 }
@@ -2987,7 +2987,7 @@
                     logger.log(elements);
                     throw new Error('Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)');
                 }
-                var node_id = elements[0], node, target_node, edge, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed, edge_id, edge_id_u2, parse_weight, edge_weight;
+                let node_id = elements[0], node, target_node, edge, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed, edge_id, edge_id_u2, parse_weight, edge_weight;
                 node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
                 target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
                 if (dir_char !== 'd' && dir_char !== 'u') {
@@ -3102,6 +3102,59 @@
     unwrapExports(interfaces);
     var interfaces_1 = interfaces.labelKeys;
 
+    var Dupes = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    const logger = new Logger_1.Logger();
+    class EdgeDupeChecker {
+        constructor(_graph) {
+            this._graph = _graph;
+        }
+        isDupe(e) {
+            let pds = this.potentialEndpoints(e);
+            if (!pds.size) {
+                return false;
+            }
+            for (let pd of pds.values()) {
+                if (!EdgeDupeChecker.checkTypeWeightEquality(e, pd)
+                    || !EdgeDupeChecker.typeWeightDupe(e, pd)) {
+                    pds.delete(pd);
+                }
+            }
+            return !!pds.size;
+        }
+        potentialEndpoints(e) {
+            const result = new Set();
+            if (e.dir) {
+                e.a.nextNodes().forEach(ne => {
+                    (ne.node === e.b) && result.add(ne.edge);
+                });
+            }
+            else {
+                e.a.connNodes().forEach(ne => {
+                    (ne.node === e.b) && result.add(ne.edge);
+                });
+            }
+            return result;
+        }
+        static checkTypeWeightEquality(e, oe) {
+            return BaseEdge_1.BaseEdge.isTyped(oe) === e.typed && e.weighted === oe.isWeighted();
+        }
+        static typeWeightDupe(e, oe) {
+            const neitherTypedNorWeighted = !e.typed && !e.weighted;
+            const notTypedButWeighted = !e.typed && e.weighted;
+            const weightEqual = e.weight === oe.getWeight();
+            const typeEqual = e.typed && BaseEdge_1.BaseEdge.isTyped(oe) && e.type === oe.type;
+            return (neitherTypedNorWeighted || notTypedButWeighted && weightEqual || typeEqual);
+        }
+    }
+    exports.EdgeDupeChecker = EdgeDupeChecker;
+    });
+
+    unwrapExports(Dupes);
+    var Dupes_1 = Dupes.EdgeDupeChecker;
+
     var rngBrowser = createCommonjsModule(function (module) {
     // Unique ID creation requires a high quality random # generator.  In the
     // browser this is a little complicated due to unknown quality of Math.random()
@@ -3154,11 +3207,12 @@
     const logger = new Logger_1.Logger();
     const DEFAULT_WEIGHT = 1;
     class JSONInput {
-        constructor(config) {
-            this._config = config || {
-                explicit_direction: config && config.explicit_direction || true,
-                directed: config && config.directed || false,
-                weighted: config && config.weighted || false
+        constructor(config = {}) {
+            this._config = {
+                explicit_direction: config.explicit_direction != null ? config.explicit_direction : true,
+                directed: config.directed != null ? config.directed : false,
+                weighted: config.weighted != null ? config.weighted : false,
+                dupeCheck: config.dupeCheck != null ? config.dupeCheck : true
             };
         }
         readFromJSONFile(filepath, graph) {
@@ -3176,10 +3230,53 @@
         }
         readFromJSON(json, graph) {
             graph = graph || new BaseGraph_1.BaseGraph(json.name);
-            const typedGraph = BaseGraph_1.BaseGraph.isTyped(graph);
+            const edc = new Dupes.EdgeDupeChecker(graph);
+            this.addNodesToGraph(json, graph);
+            for (let node_id in json.data) {
+                let node = graph.getNodeById(node_id);
+                let edges = json.data[node_id][interfaces.labelKeys.edges];
+                for (let e in edges) {
+                    const edge_input = edges[e];
+                    const target_node = this.getTargetNode(graph, edge_input);
+                    const edge_label = edge_input[interfaces.labelKeys.e_label];
+                    const edge_type = edge_input[interfaces.labelKeys.e_type];
+                    const directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed;
+                    const weight_float = JSONInput.handleEdgeWeights(edge_input);
+                    const weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
+                    const edge_weight = this._config.weighted ? weight_info : undefined;
+                    const target_node_id = edge_input[interfaces.labelKeys.e_to];
+                    const dir_char = directed ? 'd' : 'u';
+                    const edge_id = node_id + "_" + target_node_id + "_" + dir_char;
+                    const newEdge = {
+                        a: node,
+                        b: target_node,
+                        label: edge_label,
+                        dir: directed,
+                        weighted: this._config.weighted,
+                        weight: edge_weight,
+                        typed: !!edge_type,
+                        type: edge_type
+                    };
+                    if (this._config.dupeCheck && edc.isDupe(newEdge)) {
+                        logger.log(`Edge ${edge_label} is a duplicate according to assumptions... omitting.`);
+                        continue;
+                    }
+                    graph.addEdgeByID(edge_id, node, target_node, {
+                        label: edge_label,
+                        directed: directed,
+                        weighted: this._config.weighted,
+                        weight: edge_weight,
+                        typed: !!edge_type,
+                        type: edge_type
+                    });
+                }
+            }
+            return graph;
+        }
+        addNodesToGraph(json, graph) {
             let coords_json, coords, coord_idx, features;
             for (let node_id in json.data) {
-                const type = typedGraph ? json.data[node_id][interfaces.labelKeys.n_type] : null;
+                const type = BaseGraph_1.BaseGraph.isTyped(graph) ? json.data[node_id][interfaces.labelKeys.n_type] : null;
                 const label = json.data[node_id][interfaces.labelKeys.n_label];
                 const node = graph.addNodeByID(node_id, { label, type });
                 features = json.data[node_id][interfaces.labelKeys.n_features];
@@ -3195,42 +3292,14 @@
                     node.setFeature(interfaces.labelKeys.coords, coords);
                 }
             }
-            for (let node_id in json.data) {
-                let node = graph.getNodeById(node_id);
-                let edges = json.data[node_id][interfaces.labelKeys.edges];
-                for (let e in edges) {
-                    let edge_input = edges[e], edge_label = edge_input[interfaces.labelKeys.e_label], edge_type = edge_input[interfaces.labelKeys.e_type], target_node_id = edge_input[interfaces.labelKeys.e_to], directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed, dir_char = directed ? 'd' : 'u', weight_float = JSONInput.handleEdgeWeights(edge_input), weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT, edge_weight = this._config.weighted ? weight_info : undefined, target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
-                    let edge_id = node_id + "_" + target_node_id + "_" + dir_char, edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
-                    if (graph.hasEdgeID(edge_id)) {
-                        continue;
-                    }
-                    let edge2 = null;
-                    if (graph.hasEdgeID(edge_id_u2)) {
-                        edge2 = graph.getEdgeById(edge_id_u2);
-                    }
-                    if (!directed && edge2) {
-                        if (this._config.weighted) {
-                            if (edge_weight != edge2.getWeight()) {
-                                throw new Error('Input JSON flawed! Found duplicate UNdirected edge of different weights!');
-                            }
-                        }
-                    }
-                    else {
-                        const edge = graph.addEdgeByID(edge_id, node, target_node, {
-                            label: edge_label,
-                            directed: directed,
-                            weighted: this._config.weighted,
-                            weight: edge_weight,
-                            typed: true,
-                            type: edge_type
-                        });
-                        if (edge_label) {
-                            edge.setLabel(edge_label);
-                        }
-                    }
-                }
+        }
+        getTargetNode(graph, edge_input) {
+            const target_node_id = edge_input[interfaces.labelKeys.e_to];
+            const target_node = graph.getNodeById(target_node_id);
+            if (!target_node) {
+                throw new Error('Node referenced by edge does not exist');
             }
-            return graph;
+            return target_node;
         }
         static handleEdgeWeights(edge_input) {
             switch (edge_input[interfaces.labelKeys.e_weight]) {
@@ -3290,7 +3359,6 @@
                     node_struct[interfaces.labelKeys.n_label] = node.label;
                 }
                 if (BaseNode_1.BaseNode.isTyped(node)) {
-                    logger.log(`Got TYPED node`);
                     node_struct[interfaces.labelKeys.n_type] = node.type;
                 }
                 und_edges = node.undEdges();
@@ -3723,10 +3791,11 @@
     /**
      * For NodeJS / CommonJS global object
      */
-    var GraphiniusJS = out.$G;
+    var graphinius = out.$G;
 
     var TypedNode_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
+
 
 
     const logger = new Logger_1.Logger();
@@ -3734,13 +3803,86 @@
         constructor(_id, config = {}) {
             super(_id, config);
             this._id = _id;
-            this._type = config.type;
+            this._type = config.type || run_config.GENERIC_TYPES.Node;
+            this._typedAdjSets = {
+                [run_config.GENERIC_TYPES.Edge]: {
+                    ins: new Set(),
+                    outs: new Set(),
+                    conns: new Set()
+                }
+            };
         }
         get type() {
             return this._type;
         }
-        get typed() {
-            return true;
+        addEdge(edge) {
+            if (!super.addEdge(edge)) {
+                return null;
+            }
+            const type = edge.type || run_config.GENERIC_TYPES.Edge;
+            const dir = edge.isDirected();
+            const uid = this.uniqueNID(edge);
+            if (!this._typedAdjSets[type]) {
+                this._typedAdjSets[type] = {};
+            }
+            if (!dir) {
+                if (!this._typedAdjSets[type].conns) {
+                    this._typedAdjSets[type].conns = new Set();
+                }
+                this._typedAdjSets[type].conns.add(uid);
+            }
+            else if (edge.getNodes().a === this) {
+                if (!this._typedAdjSets[type].outs) {
+                    this._typedAdjSets[type].outs = new Set();
+                }
+                this._typedAdjSets[type].outs.add(uid);
+            }
+            else {
+                if (!this._typedAdjSets[type].ins) {
+                    this._typedAdjSets[type].ins = new Set();
+                }
+                this._typedAdjSets[type].ins.add(uid);
+            }
+            return edge;
+        }
+        removeEdge(edge) {
+            super.removeEdge(edge);
+            const type = edge.type || run_config.GENERIC_TYPES.Edge;
+            const dir = edge.isDirected();
+            const uid = this.uniqueNID(edge);
+            if (!dir) {
+                this._typedAdjSets[type].conns.delete(uid);
+            }
+            else if (edge.getNodes().a === this) {
+                this._typedAdjSets[type].outs.delete(uid);
+            }
+            else {
+                this._typedAdjSets[type].ins.delete(uid);
+            }
+            if (type !== run_config.GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
+                delete this._typedAdjSets[type];
+            }
+        }
+        removeEdgeByID(id) {
+        }
+        ins(type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
+        }
+        outs(type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].outs : undefined;
+        }
+        conns(type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
+        }
+        uniqueNID(e) {
+            const conn = e.getNodes();
+            const node = conn.a === this ? conn.b : conn.a;
+            return `${node.id}#${e.id}#${e.isWeighted() ? 'w' : 'u'}`;
+        }
+        noEdgesOfTypeLeft(type) {
+            return (!this._typedAdjSets[type].ins || !this._typedAdjSets[type].ins.size)
+                && (!this._typedAdjSets[type].outs || !this._typedAdjSets[type].outs.size)
+                && (!this._typedAdjSets[type].conns || !this._typedAdjSets[type].conns.size);
         }
     }
     exports.TypedNode = TypedNode;
@@ -3753,6 +3895,7 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
+
     const logger = new Logger_1.Logger();
     class TypedEdge extends BaseEdge_1.BaseEdge {
         constructor(_id, _node_a, _node_b, config = {}) {
@@ -3760,13 +3903,10 @@
             this._id = _id;
             this._node_a = _node_a;
             this._node_b = _node_b;
-            this._type = config.type;
+            this._type = config.type || run_config.GENERIC_TYPES.Edge;
         }
         get type() {
             return this._type;
-        }
-        get typed() {
-            return true;
         }
     }
     exports.TypedEdge = TypedEdge;
@@ -3782,19 +3922,20 @@
 
 
 
+
     const logger = new Logger_1.Logger();
-    exports.GENERIC_TYPE = "GENERIC";
     class TypedGraph extends BaseGraph_1.BaseGraph {
         constructor(_label) {
             super(_label);
             this._label = _label;
             this._typedNodes = new Map();
             this._typedEdges = new Map();
-            this._typedNodes.set(exports.GENERIC_TYPE, new Map());
-            this._typedEdges.set(exports.GENERIC_TYPE, new Map());
+            this._type = run_config.GENERIC_TYPES.Graph;
+            this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
+            this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
         }
-        get typed() {
-            return true;
+        get type() {
+            return this._type;
         }
         nodeTypes() {
             return Array.from(this._typedNodes.keys());
@@ -3823,7 +3964,7 @@
             }
             const id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
             if (!type) {
-                this._typedNodes.get(exports.GENERIC_TYPE).set(id, node);
+                this._typedNodes.get(run_config.GENERIC_TYPES.Node).set(id, node);
             }
             else {
                 if (!this._typedNodes.get(type)) {
@@ -3833,8 +3974,11 @@
             }
             return node;
         }
+        getNodeById(id) {
+            return super.getNodeById(id);
+        }
         deleteNode(node) {
-            const id = node.getID(), type = node.type ? node.type.toUpperCase() : exports.GENERIC_TYPE;
+            const id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
             if (!this._typedNodes.get(type)) {
                 throw Error('Node type does not exist on this TypedGraph.');
             }
@@ -3854,15 +3998,15 @@
         }
         addEdge(edge) {
             if (!super.addEdge(edge)) {
-                return undefined;
+                return null;
             }
             const id = edge.getID();
-            let type = exports.GENERIC_TYPE;
+            let type = run_config.GENERIC_TYPES.Edge;
             if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
             if (id === type) {
-                this._typedEdges.get(exports.GENERIC_TYPE).set(id, edge);
+                this._typedEdges.get(run_config.GENERIC_TYPES.Edge).set(id, edge);
             }
             else {
                 if (!this._typedEdges.get(type)) {
@@ -3874,7 +4018,7 @@
         }
         deleteEdge(edge) {
             const id = edge.getID();
-            let type = exports.GENERIC_TYPE;
+            let type = run_config.GENERIC_TYPES.Edge;
             if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
@@ -3903,8 +4047,7 @@
     });
 
     unwrapExports(TypedGraph_1);
-    var TypedGraph_2 = TypedGraph_1.GENERIC_TYPE;
-    var TypedGraph_3 = TypedGraph_1.TypedGraph;
+    var TypedGraph_2 = TypedGraph_1.TypedGraph;
 
     var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
     function importGraph(config) {
@@ -3938,7 +4081,7 @@
                         return [4, graphBytes.json()];
                     case 3:
                         graphString = _a.sent();
-                        graph = new TypedGraph_3(config.graphName);
+                        graph = new TypedGraph_2(config.graphName);
                         graph = jsonIn.readFromJSON(graphString, graph);
                         window.graph = graph;
                         return [2, graph];
@@ -5462,6 +5605,7 @@
             fields: ['style']
         }
     };
+    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -5473,9 +5617,10 @@
         models: beerModels,
         testSearchModel: beerModels.Brewery
     };
+    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
-    window.$G = GraphiniusJS;
+    window.$G = graphinius;
     (function () { return __awaiter(_this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
@@ -5513,6 +5658,7 @@
         });
         return searchRes;
     }
+    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map
