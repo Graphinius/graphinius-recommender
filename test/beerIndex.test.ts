@@ -6,7 +6,7 @@ import {buildIdxJSSearch} from '../src/indexers/buildJSSearch';
 import {beerIdxConfig, beerModels} from '../src/indexers/beer/interfaces';
 import {beerConfig} from '../src/indexers/beer/appConfig';
 
-const graphFile = path.join(__dirname, '../public/test-data/graphs/beerGraph.json');
+const graphFile = path.join(__dirname, '../public/test-data/graphs/beer.json');
 
 
 describe('Meetup example index tests', () => {
@@ -77,11 +77,6 @@ describe('Meetup example index tests', () => {
 			expect(c.ins('BREWED_AT').size).toBe(1);
 			expect(c.outs('LOC_CITY').size).toBe(1);
 		});
-
-
-		it('', () => {
-
-    });
 
 	});
 

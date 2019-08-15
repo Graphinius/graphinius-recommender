@@ -5,8 +5,8 @@ const testGraphDir = `../test-data/graphs`;
 const graphExt = `json`;
 
 const beerConfig: AppConfig = {
-  graphName:  `beerGraph`,
-  graphFile: `${testGraphDir}/beerGraph.${graphExt}`,
+  graphName:  `beer`,
+  graphFile: `${testGraphDir}/beer.${graphExt}`,
   searchTerm: `brauhaus`,
   idxConfig: beerIdxConfig,
   models: beerModels,

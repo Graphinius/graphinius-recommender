@@ -5,8 +5,8 @@ const testGraphDir = `../test-data/graphs`;
 const graphExt = `json`;
 
 const meetupConfig: AppConfig = {
-  graphName:  `meetupGraph`,
-  graphFile: `${testGraphDir}/meetupGraph.${graphExt}`,
+  graphName:  `meetup`,
+  graphFile: `${testGraphDir}/meetup.${graphExt}`,
   searchTerm: `neo4j`,
   idxConfig: meetupIdxConfig,
   models: meetupModels,

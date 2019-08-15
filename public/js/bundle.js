@@ -83,8 +83,8 @@
         if (obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
             return;
         }
-        let cloneObj = obj.constructor ? obj.constructor() : {};
-        for (let attribute in obj) {
+        var cloneObj = obj.constructor ? obj.constructor() : {};
+        for (var attribute in obj) {
             if (!obj.hasOwnProperty(attribute)) {
                 continue;
             }
@@ -99,24 +99,25 @@
     }
     exports.clone = clone;
     function shuffleArray(arr) {
-        for (let i = arr.length - 1; i >= 0; i--) {
-            let randomIndex = Math.floor(Math.random() * (i + 1));
-            let itemAtIndex = arr[randomIndex];
+        for (var i = arr.length - 1; i >= 0; i--) {
+            var randomIndex = Math.floor(Math.random() * (i + 1));
+            var itemAtIndex = arr[randomIndex];
             arr[randomIndex] = arr[i];
             arr[i] = itemAtIndex;
         }
         return arr;
     }
     exports.shuffleArray = shuffleArray;
-    function mergeArrays(args, cb = undefined) {
-        for (let arg_idx in args) {
+    function mergeArrays(args, cb) {
+        if (cb === void 0) { cb = undefined; }
+        for (var arg_idx in args) {
             if (!Array.isArray(args[arg_idx])) {
                 throw new Error('Will only mergeArrays arrays');
             }
         }
-        let seen = {}, result = [], identity;
-        for (let i = 0; i < args.length; i++) {
-            for (let j = 0; j < args[i].length; j++) {
+        var seen = {}, result = [], identity;
+        for (var i = 0; i < args.length; i++) {
+            for (var j = 0; j < args[i].length; j++) {
                 identity = typeof cb !== 'undefined' ? cb(args[i][j]) : args[i][j];
                 if (seen[identity] !== true) {
                     result.push(args[i][j]);
@@ -128,14 +129,14 @@
     }
     exports.mergeArrays = mergeArrays;
     function mergeObjects(args) {
-        for (let i = 0; i < args.length; i++) {
+        for (var i = 0; i < args.length; i++) {
             if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
                 throw new Error('Will only take objects as inputs');
             }
         }
-        let result = {};
-        for (let i = 0; i < args.length; i++) {
-            for (let key in args[i]) {
+        var result = {};
+        for (var i = 0; i < args.length; i++) {
+            for (var key in args[i]) {
                 if (args[i].hasOwnProperty(key)) {
                     result[key] = args[i][key];
                 }
@@ -145,7 +146,7 @@
     }
     exports.mergeObjects = mergeObjects;
     function findKey(obj, cb) {
-        for (let key in obj) {
+        for (var key in obj) {
             if (obj.hasOwnProperty(key) && cb(obj[key])) {
                 return key;
             }
@@ -154,9 +155,9 @@
     }
     exports.findKey = findKey;
     function mergeOrderedArraysNoDups(a, b) {
-        let ret = [];
-        let idx_a = 0;
-        let idx_b = 0;
+        var ret = [];
+        var idx_a = 0;
+        var idx_b = 0;
         if (a[0] != null && b[0] != null) {
             while (true) {
                 if (idx_a >= a.length || idx_b >= b.length)
@@ -204,20 +205,20 @@
 
     var run_config = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
-    const CMD_ENV_LOG = 'G_LOG';
-    const GENERIC_TYPES = {
+    var CMD_ENV_LOG = 'G_LOG';
+    var GENERIC_TYPES = {
         Node: 'GENERIC',
         Edge: 'GENERIC',
         Graph: 'GENERIC'
     };
     exports.GENERIC_TYPES = GENERIC_TYPES;
-    const LOG_LEVELS = {
+    var LOG_LEVELS = {
         debug: 'debug',
         production: 'production'
     };
     exports.LOG_LEVELS = LOG_LEVELS;
     function runLevel() {
-        let log_level = LOG_LEVELS.production;
+        var log_level = LOG_LEVELS.production;
         if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
             log_level = process.env[CMD_ENV_LOG];
         }
@@ -253,14 +254,15 @@
         LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
         LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
     })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    const DEFAULT_COLOR = 37;
-    class Logger {
-        constructor(config) {
+    var DEFAULT_COLOR = 37;
+    var Logger = (function () {
+        function Logger(config) {
             this.config = config || {
                 log_level: run_config.runLevel()
             };
         }
-        log(msg, color, bright = false) {
+        Logger.prototype.log = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
@@ -271,8 +273,9 @@
                 return true;
             }
             return false;
-        }
-        error(err, color, bright = false) {
+        };
+        Logger.prototype.error = function (err, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     console.error.call(console, Logger.colorize(color, err, bright));
@@ -283,8 +286,9 @@
                 return true;
             }
             return false;
-        }
-        dir(obj, color, bright = false) {
+        };
+        Logger.prototype.dir = function (obj, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
@@ -295,8 +299,9 @@
                 return true;
             }
             return false;
-        }
-        info(msg, color, bright = false) {
+        };
+        Logger.prototype.info = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
@@ -307,8 +312,9 @@
                 return true;
             }
             return false;
-        }
-        warn(msg, color, bright = false) {
+        };
+        Logger.prototype.warn = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
@@ -319,8 +325,9 @@
                 return true;
             }
             return false;
-        }
-        write(msg, color, bright = false) {
+        };
+        Logger.prototype.write = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
             if (this.config.log_level === run_config.LOG_LEVELS.debug) {
                 if (color) {
                     process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
@@ -331,12 +338,13 @@
                 return true;
             }
             return false;
-        }
-        static colorize(color, output, bright) {
-            let out_bright = bright ? '\x1b[1m' : null;
+        };
+        Logger.colorize = function (color, output, bright) {
+            var out_bright = bright ? '\x1b[1m' : null;
             return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        }
-    }
+        };
+        return Logger;
+    }());
     exports.Logger = Logger;
     });
 
@@ -348,9 +356,10 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-    const logger = new Logger_1.Logger();
-    class BaseNode {
-        constructor(_id, config = {}) {
+    var logger = new Logger_1.Logger();
+    var BaseNode = (function () {
+        function BaseNode(_id, config) {
+            if (config === void 0) { config = {}; }
             this._id = _id;
             this._in_degree = 0;
             this._out_degree = 0;
@@ -361,62 +370,74 @@
             this._label = config.label || _id;
             this._features = config.features != null ? StructUtils.clone(config.features) : {};
         }
-        static isTyped(arg) {
+        BaseNode.isTyped = function (arg) {
             return !!arg.type;
-        }
-        get id() {
+        };
+        Object.defineProperty(BaseNode.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "features", {
+            get: function () {
+                return this._features;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseNode.prototype.getID = function () {
             return this._id;
-        }
-        get label() {
+        };
+        BaseNode.prototype.getLabel = function () {
             return this._label;
-        }
-        get features() {
-            return this._features;
-        }
-        getID() {
-            return this._id;
-        }
-        getLabel() {
-            return this._label;
-        }
-        setLabel(label) {
+        };
+        BaseNode.prototype.setLabel = function (label) {
             this._label = label;
-        }
-        getFeatures() {
+        };
+        BaseNode.prototype.getFeatures = function () {
             return this._features;
-        }
-        getFeature(key) {
+        };
+        BaseNode.prototype.getFeature = function (key) {
             return this._features[key];
-        }
-        setFeatures(features) {
+        };
+        BaseNode.prototype.setFeatures = function (features) {
             this._features = StructUtils.clone(features);
-        }
-        setFeature(key, value) {
+        };
+        BaseNode.prototype.setFeature = function (key, value) {
             this._features[key] = value;
-        }
-        deleteFeature(key) {
-            let feat = this._features[key];
+        };
+        BaseNode.prototype.deleteFeature = function (key) {
+            var feat = this._features[key];
             delete this._features[key];
             return feat;
-        }
-        clearFeatures() {
+        };
+        BaseNode.prototype.clearFeatures = function () {
             this._features = {};
-        }
-        inDegree() {
+        };
+        BaseNode.prototype.inDegree = function () {
             return this._in_degree;
-        }
-        outDegree() {
+        };
+        BaseNode.prototype.outDegree = function () {
             return this._out_degree;
-        }
-        degree() {
+        };
+        BaseNode.prototype.degree = function () {
             return this._und_degree;
-        }
-        addEdge(edge) {
-            let nodes = edge.getNodes();
+        };
+        BaseNode.prototype.addEdge = function (edge) {
+            var nodes = edge.getNodes();
             if (nodes.a !== this && nodes.b !== this) {
                 throw new Error("Cannot add edge that does not connect to this node");
             }
-            let edgeID = edge.getID();
+            var edgeID = edge.getID();
             if (edge.isDirected()) {
                 if (nodes.a === this && !this._out_edges[edgeID]) {
                     this._out_edges[edgeID] = edge;
@@ -439,41 +460,41 @@
                 this._und_degree += 1;
             }
             return edge;
-        }
-        hasEdge(edge) {
+        };
+        BaseNode.prototype.hasEdge = function (edge) {
             return !!this._in_edges[edge.getID()] || !!this._out_edges[edge.getID()] || !!this._und_edges[edge.getID()];
-        }
-        hasEdgeID(id) {
+        };
+        BaseNode.prototype.hasEdgeID = function (id) {
             return !!this._in_edges[id] || !!this._out_edges[id] || !!this._und_edges[id];
-        }
-        getEdge(id) {
-            let edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
+        };
+        BaseNode.prototype.getEdge = function (id) {
+            var edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
             if (!edge) {
                 throw new Error("Cannot retrieve non-existing edge.");
             }
             return edge;
-        }
-        inEdges() {
+        };
+        BaseNode.prototype.inEdges = function () {
             return this._in_edges;
-        }
-        outEdges() {
+        };
+        BaseNode.prototype.outEdges = function () {
             return this._out_edges;
-        }
-        undEdges() {
+        };
+        BaseNode.prototype.undEdges = function () {
             return this._und_edges;
-        }
-        dirEdges() {
+        };
+        BaseNode.prototype.dirEdges = function () {
             return StructUtils.mergeObjects([this._in_edges, this._out_edges]);
-        }
-        allEdges() {
+        };
+        BaseNode.prototype.allEdges = function () {
             return StructUtils.mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
-        }
-        removeEdge(edge) {
+        };
+        BaseNode.prototype.removeEdge = function (edge) {
             if (!this.hasEdge(edge)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            let id = edge.getID();
-            let e = this._und_edges[id];
+            var id = edge.getID();
+            var e = this._und_edges[id];
             if (e) {
                 delete this._und_edges[id];
                 this._und_degree -= 1;
@@ -488,12 +509,12 @@
                 delete this._out_edges[id];
                 this._out_degree -= 1;
             }
-        }
-        removeEdgeByID(id) {
+        };
+        BaseNode.prototype.removeEdgeByID = function (id) {
             if (!this.hasEdgeID(id)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            let e = this._und_edges[id];
+            var e = this._und_edges[id];
             if (e) {
                 delete this._und_edges[id];
                 this._und_degree -= 1;
@@ -508,27 +529,27 @@
                 delete this._out_edges[id];
                 this._out_degree -= 1;
             }
-        }
-        clearOutEdges() {
+        };
+        BaseNode.prototype.clearOutEdges = function () {
             this._out_edges = {};
             this._out_degree = 0;
-        }
-        clearInEdges() {
+        };
+        BaseNode.prototype.clearInEdges = function () {
             this._in_edges = {};
             this._in_degree = 0;
-        }
-        clearUndEdges() {
+        };
+        BaseNode.prototype.clearUndEdges = function () {
             this._und_edges = {};
             this._und_degree = 0;
-        }
-        clearEdges() {
+        };
+        BaseNode.prototype.clearEdges = function () {
             this.clearInEdges();
             this.clearOutEdges();
             this.clearUndEdges();
-        }
-        prevNodes() {
-            let prevs = [];
-            let key, edge;
+        };
+        BaseNode.prototype.prevNodes = function () {
+            var prevs = [];
+            var key, edge;
             for (key in this._in_edges) {
                 if (this._in_edges.hasOwnProperty(key)) {
                     edge = this._in_edges[key];
@@ -539,10 +560,10 @@
                 }
             }
             return prevs;
-        }
-        nextNodes() {
-            let nexts = [];
-            let key, edge;
+        };
+        BaseNode.prototype.nextNodes = function () {
+            var nexts = [];
+            var key, edge;
             for (key in this._out_edges) {
                 if (this._out_edges.hasOwnProperty(key)) {
                     edge = this._out_edges[key];
@@ -553,14 +574,14 @@
                 }
             }
             return nexts;
-        }
-        connNodes() {
-            let conns = [];
-            let key, edge;
+        };
+        BaseNode.prototype.connNodes = function () {
+            var conns = [];
+            var key, edge;
             for (key in this._und_edges) {
                 if (this._und_edges.hasOwnProperty(key)) {
                     edge = this._und_edges[key];
-                    let nodes = edge.getNodes();
+                    var nodes = edge.getNodes();
                     if (nodes.a === this) {
                         conns.push({
                             node: edge.getNodes().b,
@@ -576,22 +597,23 @@
                 }
             }
             return conns;
-        }
-        reachNodes(identityFunc) {
-            let identity = 0;
-            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (ne => identity++));
-        }
-        allNeighbors(identityFunc) {
-            let identity = 0;
+        };
+        BaseNode.prototype.reachNodes = function (identityFunc) {
+            var identity = 0;
+            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (function (ne) { return identity++; }));
+        };
+        BaseNode.prototype.allNeighbors = function (identityFunc) {
+            var identity = 0;
             return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
-        }
-        clone() {
-            let new_node = new BaseNode(this._id);
+        };
+        BaseNode.prototype.clone = function () {
+            var new_node = new BaseNode(this._id);
             new_node._label = this._label;
             new_node.setFeatures(StructUtils.clone(this.getFeatures()));
             return new_node;
-        }
-    }
+        };
+        return BaseNode;
+    }());
     exports.BaseNode = BaseNode;
     });
 
@@ -601,8 +623,8 @@
     var BaseEdge_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-    class BaseEdge {
-        constructor(_id, _node_a, _node_b, config) {
+    var BaseEdge = (function () {
+        function BaseEdge(_id, _node_a, _node_b, config) {
             this._id = _id;
             this._node_a = _node_a;
             this._node_b = _node_b;
@@ -615,40 +637,48 @@
             this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
             this._label = config.label || this._id;
         }
-        get id() {
+        Object.defineProperty(BaseEdge.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseEdge.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseEdge.prototype.getID = function () {
             return this._id;
-        }
-        get label() {
+        };
+        BaseEdge.prototype.getLabel = function () {
             return this._label;
-        }
-        getID() {
-            return this._id;
-        }
-        getLabel() {
-            return this._label;
-        }
-        setLabel(label) {
+        };
+        BaseEdge.prototype.setLabel = function (label) {
             this._label = label;
-        }
-        isDirected() {
+        };
+        BaseEdge.prototype.isDirected = function () {
             return this._directed;
-        }
-        isWeighted() {
+        };
+        BaseEdge.prototype.isWeighted = function () {
             return this._weighted;
-        }
-        getWeight() {
+        };
+        BaseEdge.prototype.getWeight = function () {
             return this._weight;
-        }
-        setWeight(w) {
+        };
+        BaseEdge.prototype.setWeight = function (w) {
             if (!this._weighted) {
                 throw new Error("Cannot set weight on unweighted edge.");
             }
             this._weight = w;
-        }
-        getNodes() {
+        };
+        BaseEdge.prototype.getNodes = function () {
             return { a: this._node_a, b: this._node_b };
-        }
-        clone(new_node_a, new_node_b) {
+        };
+        BaseEdge.prototype.clone = function (new_node_a, new_node_b) {
             if (!(new_node_a instanceof BaseNode_1.BaseNode) || !(new_node_b instanceof BaseNode_1.BaseNode)) {
                 throw new Error("refusing to clone edge if any new node is invalid");
             }
@@ -658,11 +688,12 @@
                 weight: this._weight,
                 label: this._label
             });
-        }
-        static isTyped(arg) {
+        };
+        BaseEdge.isTyped = function (arg) {
             return !!arg.type;
-        }
-    }
+        };
+        return BaseEdge;
+    }());
     exports.BaseEdge = BaseEdge;
     });
 
@@ -693,15 +724,15 @@
 
     function BFS(graph, v, config) {
         config = config || prepareBFSStandardConfig();
-        let callbacks = config.callbacks;
-        let dir_mode = config.dir_mode;
+        var callbacks = config.callbacks;
+        var dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        let bfsScope = {
+        var bfsScope = {
             marked: {},
             nodes: graph.getNodes(),
             queue: [],
@@ -715,7 +746,7 @@
             CallbackUtils.execCallbacks(callbacks.init_bfs, bfsScope);
         }
         bfsScope.queue.push(v);
-        let i = 0;
+        var i = 0;
         while (i < bfsScope.queue.length) {
             bfsScope.current = bfsScope.queue[i++];
             if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
@@ -733,7 +764,7 @@
             if (typeof callbacks.sort_nodes === 'function') {
                 callbacks.sort_nodes(bfsScope);
             }
-            for (let adj_idx in bfsScope.adj_nodes) {
+            for (var adj_idx in bfsScope.adj_nodes) {
                 bfsScope.next_node = bfsScope.adj_nodes[adj_idx].node;
                 bfsScope.next_edge = bfsScope.adj_nodes[adj_idx].edge;
                 if (config.result[bfsScope.next_node.getID()].distance === Number.POSITIVE_INFINITY) {
@@ -752,7 +783,7 @@
     }
     exports.BFS = BFS;
     function prepareBFSStandardConfig() {
-        let config = {
+        var config = {
             result: {},
             callbacks: {
                 init_bfs: [],
@@ -764,12 +795,12 @@
             messages: {},
             filters: {}
         }, result = config.result, callbacks = config.callbacks;
-        let count = 0;
-        let counter = function () {
+        var count = 0;
+        var counter = function () {
             return count++;
         };
-        let initBFS = function (context) {
-            for (let key in context.nodes) {
+        var initBFS = function (context) {
+            for (var key in context.nodes) {
                 config.result[key] = {
                     distance: Number.POSITIVE_INFINITY,
                     parent: null,
@@ -783,7 +814,7 @@
             };
         };
         callbacks.init_bfs.push(initBFS);
-        let nodeUnmarked = function (context) {
+        var nodeUnmarked = function (context) {
             config.result[context.next_node.getID()] = {
                 distance: result[context.current.getID()].distance + 1,
                 parent: context.current,
@@ -806,7 +837,7 @@
 
 
     function DFSVisit(graph, current_root, config) {
-        let dfsVisitScope = {
+        var dfsVisitScope = {
             stack: [],
             adj_nodes: [],
             stack_entry: null,
@@ -814,7 +845,7 @@
             current_root: current_root
         };
         config = config || prepareDFSVisitStandardConfig();
-        let callbacks = config.callbacks, dir_mode = config.dir_mode;
+        var callbacks = config.callbacks, dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
@@ -852,7 +883,7 @@
                 if (typeof callbacks.sort_nodes === 'function') {
                     callbacks.sort_nodes(dfsVisitScope);
                 }
-                for (let adj_idx in dfsVisitScope.adj_nodes) {
+                for (var adj_idx in dfsVisitScope.adj_nodes) {
                     dfsVisitScope.stack.push({
                         node: dfsVisitScope.adj_nodes[adj_idx].node,
                         parent: dfsVisitScope.current,
@@ -874,14 +905,14 @@
     exports.DFSVisit = DFSVisit;
     function DFS(graph, root, config) {
         config = config || prepareDFSStandardConfig();
-        let callbacks = config.callbacks, dir_mode = config.dir_mode;
+        var callbacks = config.callbacks, dir_mode = config.dir_mode;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        let dfsScope = {
+        var dfsScope = {
             marked: {},
             nodes: graph.getNodes()
         };
@@ -889,17 +920,17 @@
             CallbackUtils.execCallbacks(callbacks.init_dfs, dfsScope);
         }
         callbacks.adj_nodes_pushed = callbacks.adj_nodes_pushed || [];
-        let markNode = function (context) {
+        var markNode = function (context) {
             dfsScope.marked[context.current.getID()] = true;
         };
         callbacks.adj_nodes_pushed.push(markNode);
-        let dfs_result = [{}];
-        let dfs_idx = 0;
-        let count = 0;
-        let counter = function () {
+        var dfs_result = [{}];
+        var dfs_idx = 0;
+        var count = 0;
+        var counter = function () {
             return count++;
         };
-        let addToProperSegment = function (context) {
+        var addToProperSegment = function (context) {
             dfs_result[dfs_idx][context.current.getID()] = {
                 parent: context.stack_entry.parent,
                 counter: counter()
@@ -909,7 +940,7 @@
             callbacks.node_unmarked.push(addToProperSegment);
         }
         DFSVisit(graph, root, config);
-        for (let node_key in dfsScope.nodes) {
+        for (var node_key in dfsScope.nodes) {
             if (!dfsScope.marked[node_key]) {
                 dfs_idx++;
                 dfs_result.push({});
@@ -920,26 +951,26 @@
     }
     exports.DFS = DFS;
     function prepareDFSVisitStandardConfig() {
-        let config = {
+        var config = {
             visit_result: {},
             callbacks: {},
             messages: {},
             dfs_visit_marked: {},
             dir_mode: BaseGraph_1.GraphMode.MIXED
         }, result = config.visit_result, callbacks = config.callbacks;
-        let count = 0;
-        let counter = function () {
+        var count = 0;
+        var counter = function () {
             return count++;
         };
         callbacks.init_dfs_visit = callbacks.init_dfs_visit || [];
-        let initDFSVisit = function (context) {
+        var initDFSVisit = function (context) {
             result[context.current_root.getID()] = {
                 parent: context.current_root
             };
         };
         callbacks.init_dfs_visit.push(initDFSVisit);
         callbacks.node_unmarked = callbacks.node_unmarked || [];
-        let setResultEntry = function (context) {
+        var setResultEntry = function (context) {
             result[context.current.getID()] = {
                 parent: context.stack_entry.parent,
                 counter: counter()
@@ -950,9 +981,9 @@
     }
     exports.prepareDFSVisitStandardConfig = prepareDFSVisitStandardConfig;
     function prepareDFSStandardConfig() {
-        let config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
+        var config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
         callbacks.init_dfs = callbacks.init_dfs || [];
-        let setInitialResultEntries = function (context) {
+        var setInitialResultEntries = function (context) {
         };
         callbacks.init_dfs.push(setInitialResultEntries);
         return config;
@@ -973,18 +1004,21 @@
         BinaryHeapMode[BinaryHeapMode["MIN"] = 0] = "MIN";
         BinaryHeapMode[BinaryHeapMode["MAX"] = 1] = "MAX";
     })(BinaryHeapMode = exports.BinaryHeapMode || (exports.BinaryHeapMode = {}));
-    class BinaryHeap {
-        constructor(_mode = BinaryHeapMode.MIN, _evalPriority = (obj) => {
-            if (typeof obj !== 'number' && typeof obj !== 'string') {
-                return NaN;
-            }
-            if (typeof obj === 'number') {
-                return obj | 0;
-            }
-            return parseInt(obj);
-        }, _evalObjID = (obj) => {
-            return obj;
-        }) {
+    var BinaryHeap = (function () {
+        function BinaryHeap(_mode, _evalPriority, _evalObjID) {
+            if (_mode === void 0) { _mode = BinaryHeapMode.MIN; }
+            if (_evalPriority === void 0) { _evalPriority = function (obj) {
+                if (typeof obj !== 'number' && typeof obj !== 'string') {
+                    return NaN;
+                }
+                if (typeof obj === 'number') {
+                    return obj | 0;
+                }
+                return parseInt(obj);
+            }; }
+            if (_evalObjID === void 0) { _evalObjID = function (obj) {
+                return obj;
+            }; }
             this._mode = _mode;
             this._evalPriority = _evalPriority;
             this._evalObjID = _evalObjID;
@@ -992,56 +1026,55 @@
             this._array = [];
             this._positions = {};
         }
-        getMode() {
+        BinaryHeap.prototype.getMode = function () {
             return this._mode;
-        }
-        getArray() {
+        };
+        BinaryHeap.prototype.getArray = function () {
             return this._array;
-        }
-        getPositions() {
+        };
+        BinaryHeap.prototype.getPositions = function () {
             return this._positions;
-        }
-        size() {
+        };
+        BinaryHeap.prototype.size = function () {
             return this._array.length;
-        }
-        getEvalPriorityFun() {
+        };
+        BinaryHeap.prototype.getEvalPriorityFun = function () {
             return this._evalPriority;
-        }
-        evalInputScore(obj) {
+        };
+        BinaryHeap.prototype.evalInputScore = function (obj) {
             return this._evalPriority(obj);
-        }
-        getEvalObjIDFun() {
+        };
+        BinaryHeap.prototype.getEvalObjIDFun = function () {
             return this._evalObjID;
-        }
-        evalInputObjID(obj) {
+        };
+        BinaryHeap.prototype.evalInputObjID = function (obj) {
             return this._evalObjID(obj);
-        }
-        peek() {
+        };
+        BinaryHeap.prototype.peek = function () {
             return this._array[0];
-        }
-        pop() {
+        };
+        BinaryHeap.prototype.pop = function () {
             if (this.size()) {
                 return this.remove(this._array[0]);
             }
-        }
-        find(obj) {
+        };
+        BinaryHeap.prototype.find = function (obj) {
             var pos = this.getNodePosition(obj);
             return this._array[pos];
-        }
-        insert(obj) {
+        };
+        BinaryHeap.prototype.insert = function (obj) {
             if (isNaN(this._evalPriority(obj))) {
                 throw new Error("Cannot insert object without numeric priority.");
             }
             this._array.push(obj);
             this.setNodePosition(obj, this.size() - 1);
             this.trickleUp(this.size() - 1);
-        }
-        remove(obj) {
+        };
+        BinaryHeap.prototype.remove = function (obj) {
             this._nr_removes++;
             if (isNaN(this._evalPriority(obj))) {
                 throw new Error('Object invalid.');
             }
-            var objID = this._evalObjID(obj), found = null;
             var pos = this.getNodePosition(obj), found = this._array[pos] != null ? this._array[pos] : null;
             if (found === null) {
                 return undefined;
@@ -1055,8 +1088,8 @@
                 this.trickleDown(pos);
             }
             return found;
-        }
-        trickleDown(i) {
+        };
+        BinaryHeap.prototype.trickleDown = function (i) {
             var parent = this._array[i];
             while (true) {
                 var right_child_idx = (i + 1) * 2, left_child_idx = right_child_idx - 1, right_child = this._array[right_child_idx], left_child = this._array[left_child_idx], swap = null;
@@ -1076,24 +1109,24 @@
                 this.setNodePosition(this._array[swap], swap);
                 i = swap;
             }
-        }
-        trickleUp(i) {
+        };
+        BinaryHeap.prototype.trickleUp = function (i) {
             var child = this._array[i];
             while (i) {
-                var parent_idx = Math.floor((i + 1) / 2) - 1, parent = this._array[parent_idx];
-                if (this.orderCorrect(parent, child)) {
+                var parent_idx = Math.floor((i + 1) / 2) - 1, parent_1 = this._array[parent_idx];
+                if (this.orderCorrect(parent_1, child)) {
                     break;
                 }
                 else {
                     this._array[parent_idx] = child;
-                    this._array[i] = parent;
+                    this._array[i] = parent_1;
                     this.setNodePosition(child, parent_idx);
-                    this.setNodePosition(parent, i);
+                    this.setNodePosition(parent_1, i);
                     i = parent_idx;
                 }
             }
-        }
-        orderCorrect(obj_a, obj_b) {
+        };
+        BinaryHeap.prototype.orderCorrect = function (obj_a, obj_b) {
             var obj_a_pr = this._evalPriority(obj_a);
             var obj_b_pr = this._evalPriority(obj_b);
             if (this._mode === BinaryHeapMode.MIN) {
@@ -1102,8 +1135,8 @@
             else {
                 return obj_a_pr >= obj_b_pr;
             }
-        }
-        setNodePosition(obj, pos) {
+        };
+        BinaryHeap.prototype.setNodePosition = function (obj, pos) {
             if (obj == null || pos == null || pos !== (pos | 0)) {
                 throw new Error('minium required arguments are obj and new_pos');
             }
@@ -1113,17 +1146,18 @@
             };
             var obj_key = this.evalInputObjID(obj);
             this._positions[obj_key] = pos_obj;
-        }
-        getNodePosition(obj) {
+        };
+        BinaryHeap.prototype.getNodePosition = function (obj) {
             var obj_key = this.evalInputObjID(obj);
             var occurrence = this._positions[obj_key];
             return occurrence ? occurrence.position : null;
-        }
-        removeNodePosition(obj) {
+        };
+        BinaryHeap.prototype.removeNodePosition = function (obj) {
             var obj_key = this.evalInputObjID(obj);
             delete this._positions[obj_key];
-        }
-    }
+        };
+        return BinaryHeap;
+    }());
     exports.BinaryHeap = BinaryHeap;
     });
 
@@ -1140,19 +1174,19 @@
     exports.DEFAULT_WEIGHT = 1;
     function PFS(graph, v, config) {
         config = config || preparePFSStandardConfig();
-        let callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
+        var callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
         if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
         if (dir_mode === BaseGraph_1.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
-        let start_ne = {
+        var start_ne = {
             node: v,
             edge: new BaseEdge_1.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
             best: 0
         };
-        let scope = {
+        var scope = {
             OPEN_HEAP: new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID),
             OPEN: {},
             CLOSED: {},
@@ -1190,7 +1224,7 @@
             else {
                 throw new Error('Unsupported traversal mode. Please use directed, undirected, or mixed');
             }
-            for (let adj_idx in scope.adj_nodes) {
+            for (var adj_idx in scope.adj_nodes) {
                 scope.next = scope.adj_nodes[adj_idx];
                 if (scope.CLOSED[scope.next.node.getID()]) {
                     config.callbacks.node_closed && CallbackUtils.execCallbacks(config.callbacks.node_closed, scope);
@@ -1221,7 +1255,7 @@
     }
     exports.PFS = PFS;
     function preparePFSStandardConfig() {
-        let config = {
+        var config = {
             result: {},
             callbacks: {
                 init_pfs: [],
@@ -1252,13 +1286,13 @@
                 return ne.node.getID();
             }
         };
-        let callbacks = config.callbacks;
-        let count = 0;
-        let counter = function () {
+        var callbacks = config.callbacks;
+        var count = 0;
+        var counter = function () {
             return count++;
         };
-        let initPFS = function (context) {
-            for (let key in context.nodes) {
+        var initPFS = function (context) {
+            for (var key in context.nodes) {
                 config.result[key] = {
                     distance: Number.POSITIVE_INFINITY,
                     parent: null,
@@ -1272,7 +1306,7 @@
             };
         };
         callbacks.init_pfs.push(initPFS);
-        let notEncountered = function (context) {
+        var notEncountered = function (context) {
             context.next.best = context.current.best + (isNaN(context.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : context.next.edge.getWeight());
             config.result[context.next.node.getID()] = {
                 distance: context.next.best,
@@ -1281,7 +1315,7 @@
             };
         };
         callbacks.not_encountered.push(notEncountered);
-        let betterPathFound = function (context) {
+        var betterPathFound = function (context) {
             config.result[context.next.node.getID()].distance = context.proposed_dist;
             config.result[context.next.node.getID()].parent = context.current.node;
         };
@@ -1312,31 +1346,31 @@
     }
     function BellmanFordArray(graph, start) {
         BFSanityChecks(graph, start);
-        let distances = [], nodes = graph.getNodes(), edge, node_keys = Object.keys(nodes), node, id_idx_map = {}, new_weight, neg_cycle = false;
-        for (let n_idx = 0; n_idx < node_keys.length; ++n_idx) {
+        var distances = [], nodes = graph.getNodes(), edge, node_keys = Object.keys(nodes), node, id_idx_map = {}, new_weight, neg_cycle = false;
+        for (var n_idx = 0; n_idx < node_keys.length; ++n_idx) {
             node = nodes[node_keys[n_idx]];
             distances[n_idx] = (node === start) ? 0 : Number.POSITIVE_INFINITY;
             id_idx_map[node.getID()] = n_idx;
         }
-        let graph_edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
-        let bf_edges = [];
-        for (let e_idx = 0; e_idx < graph_edges.length; ++e_idx) {
+        var graph_edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
+        var bf_edges = [];
+        for (var e_idx = 0; e_idx < graph_edges.length; ++e_idx) {
             edge = graph_edges[e_idx];
-            let bf_edge_entry = bf_edges.push([
+            var bf_edge_entry_1 = bf_edges.push([
                 id_idx_map[edge.getNodes().a.getID()],
                 id_idx_map[edge.getNodes().b.getID()],
                 isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT,
                 edge.isDirected()
             ]);
         }
-        for (let i = 0; i < node_keys.length - 1; ++i) {
-            for (let e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
+        for (var i = 0; i < node_keys.length - 1; ++i) {
+            for (var e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
                 edge = bf_edges[e_idx];
                 updateDist(edge[0], edge[1], edge[2]);
                 !edge[3] && updateDist(edge[1], edge[0], edge[2]);
             }
         }
-        for (let e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
+        for (var e_idx = 0; e_idx < bf_edges.length; ++e_idx) {
             edge = bf_edges[e_idx];
             if (betterDist(edge[0], edge[1], edge[2]) || (!edge[3] && betterDist(edge[1], edge[0], edge[2]))) {
                 neg_cycle = true;
@@ -1352,21 +1386,21 @@
         function betterDist(u, v, weight) {
             return (distances[v] > distances[u] + weight);
         }
-        return { distances, neg_cycle };
+        return { distances: distances, neg_cycle: neg_cycle };
     }
     exports.BellmanFordArray = BellmanFordArray;
     function BellmanFordDict(graph, start) {
         BFSanityChecks(graph, start);
-        let distances = {}, edges, edge, a, b, weight, new_weight, nodes_size, neg_cycle = false;
+        var distances = {}, edges, edge, a, b, weight, new_weight, nodes_size, neg_cycle = false;
         distances = {};
         edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
         nodes_size = graph.nrNodes();
-        for (let node in graph.getNodes()) {
+        for (var node in graph.getNodes()) {
             distances[node] = Number.POSITIVE_INFINITY;
         }
         distances[start.getID()] = 0;
-        for (let i = 0; i < nodes_size - 1; ++i) {
-            for (let e_idx = 0; e_idx < edges.length; ++e_idx) {
+        for (var i = 0; i < nodes_size - 1; ++i) {
+            for (var e_idx = 0; e_idx < edges.length; ++e_idx) {
                 edge = edges[e_idx];
                 a = edge.getNodes().a.getID();
                 b = edge.getNodes().b.getID();
@@ -1375,7 +1409,7 @@
                 !edge.isDirected() && updateDist(b, a, weight);
             }
         }
-        for (let edgeID in edges) {
+        for (var edgeID in edges) {
             edge = edges[edgeID];
             a = edge.getNodes().a.getID();
             b = edge.getNodes().b.getID();
@@ -1393,7 +1427,7 @@
         function betterDist(u, v, weight) {
             return (distances[v] > distances[u] + weight);
         }
-        return { distances, neg_cycle };
+        return { distances: distances, neg_cycle: neg_cycle };
     }
     exports.BellmanFordDict = BellmanFordDict;
     });
@@ -1403,6 +1437,16 @@
     var BellmanFord_2 = BellmanFord.BellmanFordDict;
 
     var Johnsons_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
@@ -1412,16 +1456,15 @@
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
-        let allNodes = graph.getNodes();
         if (graph.hasNegativeEdge()) {
-            let extraNode = new BaseNode_1.BaseNode("extraNode");
+            var extraNode = new BaseNode_1.BaseNode("extraNode");
             graph = addExtraNandE(graph, extraNode);
-            let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
+            var BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
             if (BFresult.neg_cycle) {
                 throw new Error("The graph contains a negative cycle, thus it can not be processed");
             }
             else {
-                let newWeights = BFresult.distances;
+                var newWeights = BFresult.distances;
                 graph = reWeighGraph(graph, newWeights, extraNode);
                 graph.deleteNode(extraNode);
                 return PFSFromAllNodes(graph);
@@ -1431,10 +1474,10 @@
     }
     exports.Johnsons = Johnsons;
     function addExtraNandE(target, nodeToAdd) {
-        let allNodes = target.getNodes();
+        var allNodes = target.getNodes();
         target.addNode(nodeToAdd);
-        let tempCounter = 0;
-        for (let nodeKey in allNodes) {
+        var tempCounter = 0;
+        for (var nodeKey in allNodes) {
             if (allNodes[nodeKey].getID() != nodeToAdd.getID()) {
                 target.addEdgeByNodeIDs("temp" + tempCounter, nodeToAdd.getID(), allNodes[nodeKey].getID(), { directed: true, weighted: true, weight: 0 });
                 tempCounter++;
@@ -1444,39 +1487,50 @@
     }
     exports.addExtraNandE = addExtraNandE;
     function reWeighGraph(target, distDict, tempNode) {
-        let edges = target.getDirEdgesArray().concat(target.getUndEdgesArray());
-        for (let edge of edges) {
-            let a = edge.getNodes().a.getID();
-            let b = edge.getNodes().b.getID();
-            if (a !== tempNode.getID() && edge.isWeighted) {
-                let oldWeight = edge.getWeight();
-                let newWeight = oldWeight + distDict[a] - distDict[b];
-                edge.setWeight(newWeight);
+        var e_1, _a;
+        var edges = target.getDirEdgesArray().concat(target.getUndEdgesArray());
+        try {
+            for (var edges_1 = __values(edges), edges_1_1 = edges_1.next(); !edges_1_1.done; edges_1_1 = edges_1.next()) {
+                var edge = edges_1_1.value;
+                var a = edge.getNodes().a.getID();
+                var b = edge.getNodes().b.getID();
+                if (a !== tempNode.getID() && edge.isWeighted) {
+                    var oldWeight = edge.getWeight();
+                    var newWeight = oldWeight + distDict[a] - distDict[b];
+                    edge.setWeight(newWeight);
+                }
+                else {
+                    var newWeight = PFS_1.DEFAULT_WEIGHT + distDict[a] - distDict[b];
+                    var edgeID = edge.getID();
+                    var dirNess = edge.isDirected();
+                    target.deleteEdge(edge);
+                    target.addEdgeByNodeIDs(edgeID, a, b, { directed: dirNess, weighted: true, weight: newWeight });
+                }
             }
-            else {
-                let newWeight = PFS_1.DEFAULT_WEIGHT + distDict[a] - distDict[b];
-                let edgeID = edge.getID();
-                let dirNess = edge.isDirected();
-                target.deleteEdge(edge);
-                target.addEdgeByNodeIDs(edgeID, a, b, { directed: dirNess, weighted: true, weight: newWeight });
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (edges_1_1 && !edges_1_1.done && (_a = edges_1.return)) _a.call(edges_1);
             }
+            finally { if (e_1) throw e_1.error; }
         }
         return target;
     }
     exports.reWeighGraph = reWeighGraph;
     function PFSFromAllNodes(graph) {
-        let dists = graph.adjListArray();
-        let next = graph.nextArray();
-        let nodesDict = graph.getNodes();
-        let nodeIDIdxMap = {};
-        let i = 0;
-        for (let key in nodesDict) {
+        var dists = graph.adjListArray();
+        var next = graph.nextArray();
+        var nodesDict = graph.getNodes();
+        var nodeIDIdxMap = {};
+        var i = 0;
+        for (var key in nodesDict) {
             nodeIDIdxMap[nodesDict[key].getID()] = i++;
         }
-        let specialConfig = PFS_1.preparePFSStandardConfig();
-        let notEncounteredJohnsons = function (context) {
+        var specialConfig = PFS_1.preparePFSStandardConfig();
+        var notEncounteredJohnsons = function (context) {
             context.next.best = context.current.best + context.next.edge.getWeight();
-            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             if (context.current.node == context.root_node) {
                 dists[i][j] = context.next.best;
                 next[i][j][0] = j;
@@ -1487,22 +1541,22 @@
             }
         };
         specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredJohnsons);
-        let betterPathJohnsons = function (context) {
-            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+        var betterPathJohnsons = function (context) {
+            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             dists[i][j] = context.proposed_dist;
             if (context.current.node !== context.root_node) {
                 next[i][j].splice(0, next[i][j].length, nodeIDIdxMap[context.current.node.getID()]);
             }
         };
         specialConfig.callbacks.better_path.splice(0, 1, betterPathJohnsons);
-        let equalPathJohnsons = function (context) {
-            let i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
+        var equalPathJohnsons = function (context) {
+            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
             if (context.current.node !== context.root_node) {
                 next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], [nodeIDIdxMap[context.current.node.getID()]]);
             }
         };
         specialConfig.callbacks.equal_path.push(equalPathJohnsons);
-        for (let key in nodesDict) {
+        for (var key in nodesDict) {
             PFS_1.PFS(graph, nodesDict[key], specialConfig);
         }
         return [dists, next];
@@ -1525,8 +1579,8 @@
 
 
 
-    let logger = new Logger_1.Logger();
-    const DEFAULT_WEIGHT = 1;
+    var logger = new Logger_1.Logger();
+    var DEFAULT_WEIGHT = 1;
     var GraphMode;
     (function (GraphMode) {
         GraphMode[GraphMode["INIT"] = 0] = "INIT";
@@ -1534,8 +1588,8 @@
         GraphMode[GraphMode["UNDIRECTED"] = 2] = "UNDIRECTED";
         GraphMode[GraphMode["MIXED"] = 3] = "MIXED";
     })(GraphMode = exports.GraphMode || (exports.GraphMode = {}));
-    class BaseGraph {
-        constructor(_label) {
+    var BaseGraph = (function () {
+        function BaseGraph(_label) {
             this._label = _label;
             this._nr_nodes = 0;
             this._nr_dir_edges = 0;
@@ -1545,48 +1599,62 @@
             this._dir_edges = {};
             this._und_edges = {};
         }
-        static isTyped(arg) {
+        BaseGraph.isTyped = function (arg) {
             return !!arg.type;
-        }
-        get label() {
-            return this._label;
-        }
-        get mode() {
-            return this._mode;
-        }
-        get stats() {
-            return this.getStats();
-        }
-        reweighIfHasNegativeEdge(clone = false) {
+        };
+        Object.defineProperty(BaseGraph.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseGraph.prototype, "mode", {
+            get: function () {
+                return this._mode;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseGraph.prototype, "stats", {
+            get: function () {
+                return this.getStats();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseGraph.prototype.reweighIfHasNegativeEdge = function (clone) {
+            if (clone === void 0) { clone = false; }
             if (this.hasNegativeEdge()) {
-                let result_graph = clone ? this.cloneStructure() : this;
-                let extraNode = new BaseNode_1.BaseNode("extraNode");
+                var result_graph = clone ? this.cloneStructure() : this;
+                var extraNode = new BaseNode_1.BaseNode("extraNode");
                 result_graph = Johnsons_1.addExtraNandE(result_graph, extraNode);
-                let BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
+                var BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
                 if (BFresult.neg_cycle) {
                     throw new Error("The graph contains a negative cycle, thus it can not be processed");
                 }
                 else {
-                    let newWeights = BFresult.distances;
+                    var newWeights = BFresult.distances;
                     result_graph = Johnsons_1.reWeighGraph(result_graph, newWeights, extraNode);
                     result_graph.deleteNode(extraNode);
                 }
                 return result_graph;
             }
-        }
-        toDirectedGraph(copy = false) {
-            let result_graph = copy ? this.cloneStructure() : this;
+        };
+        BaseGraph.prototype.toDirectedGraph = function (copy) {
+            if (copy === void 0) { copy = false; }
+            var result_graph = copy ? this.cloneStructure() : this;
             if (this._nr_dir_edges === 0 && this._nr_und_edges === 0) {
                 throw new Error("Cowardly refusing to re-interpret an empty graph.");
             }
             return result_graph;
-        }
-        toUndirectedGraph() {
+        };
+        BaseGraph.prototype.toUndirectedGraph = function () {
             return this;
-        }
-        hasNegativeEdge() {
-            let has_neg_edge = false, edge;
-            for (let edge_id in this._und_edges) {
+        };
+        BaseGraph.prototype.hasNegativeEdge = function () {
+            var has_neg_edge = false, edge;
+            for (var edge_id in this._und_edges) {
                 edge = this._und_edges[edge_id];
                 if (!edge.isWeighted()) {
                     continue;
@@ -1595,7 +1663,7 @@
                     return true;
                 }
             }
-            for (let edge_id in this._dir_edges) {
+            for (var edge_id in this._dir_edges) {
                 edge = this._dir_edges[edge_id];
                 if (!edge.isWeighted()) {
                     continue;
@@ -1606,51 +1674,57 @@
                 }
             }
             return has_neg_edge;
-        }
-        hasNegativeCycles(node) {
+        };
+        BaseGraph.prototype.hasNegativeCycles = function (node) {
+            var _this = this;
             if (!this.hasNegativeEdge()) {
                 return false;
             }
-            let negative_cycle = false, start = node ? node : this.getRandomNode();
-            DFS_1.DFS(this, start).forEach(comp => {
-                let min_count = Number.POSITIVE_INFINITY, comp_start_node;
-                Object.keys(comp).forEach(node_id => {
+            var negative_cycle = false, start = node ? node : this.getRandomNode();
+            DFS_1.DFS(this, start).forEach(function (comp) {
+                var min_count = Number.POSITIVE_INFINITY, comp_start_node;
+                Object.keys(comp).forEach(function (node_id) {
                     if (min_count > comp[node_id].counter) {
                         min_count = comp[node_id].counter;
                         comp_start_node = node_id;
                     }
                 });
-                if (BellmanFord.BellmanFordArray(this, this._nodes[comp_start_node]).neg_cycle) {
+                if (BellmanFord.BellmanFordArray(_this, _this._nodes[comp_start_node]).neg_cycle) {
                     negative_cycle = true;
                 }
             });
             return negative_cycle;
-        }
-        nextArray(incoming = false) {
-            let next = [], node_keys = Object.keys(this._nodes);
-            const adjDict = this.adjListDict(incoming, true, 0);
-            for (let i = 0; i < this._nr_nodes; ++i) {
+        };
+        BaseGraph.prototype.nextArray = function (incoming) {
+            if (incoming === void 0) { incoming = false; }
+            var next = [], node_keys = Object.keys(this._nodes);
+            var adjDict = this.adjListDict(incoming, true, 0);
+            for (var i = 0; i < this._nr_nodes; ++i) {
                 next.push([]);
-                for (let j = 0; j < this._nr_nodes; ++j) {
+                for (var j = 0; j < this._nr_nodes; ++j) {
                     next[i].push([]);
                     next[i][j].push(i === j ? j : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? j : null);
                 }
             }
             return next;
-        }
-        adjListArray(incoming = false, include_self = false, self_dist = 0) {
-            let adjList = [], node_keys = Object.keys(this._nodes);
-            const adjDict = this.adjListDict(incoming, true, 0);
-            for (let i = 0; i < this._nr_nodes; ++i) {
+        };
+        BaseGraph.prototype.adjListArray = function (incoming, include_self, self_dist) {
+            if (incoming === void 0) { incoming = false; }
+            var adjList = [], node_keys = Object.keys(this._nodes);
+            var adjDict = this.adjListDict(incoming, true, 0);
+            for (var i = 0; i < this._nr_nodes; ++i) {
                 adjList.push([]);
-                for (let j = 0; j < this._nr_nodes; ++j) {
+                for (var j = 0; j < this._nr_nodes; ++j) {
                     adjList[i].push(i === j ? 0 : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? adjDict[node_keys[i]][node_keys[j]] : Number.POSITIVE_INFINITY);
                 }
             }
             return adjList;
-        }
-        adjListDict(incoming = false, include_self = false, self_dist = 0) {
-            let adj_list_dict = {}, nodes = this.getNodes(), cur_dist, key, cur_edge_weight;
+        };
+        BaseGraph.prototype.adjListDict = function (incoming, include_self, self_dist) {
+            if (incoming === void 0) { incoming = false; }
+            if (include_self === void 0) { include_self = false; }
+            if (self_dist === void 0) { self_dist = 0; }
+            var adj_list_dict = {}, nodes = this.getNodes(), cur_dist, key, cur_edge_weight;
             for (key in nodes) {
                 adj_list_dict[key] = {};
                 if (include_self) {
@@ -1658,8 +1732,8 @@
                 }
             }
             for (key in nodes) {
-                let neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
-                neighbors.forEach((ne) => {
+                var neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
+                neighbors.forEach(function (ne) {
                     cur_dist = adj_list_dict[key][ne.node.getID()] || Number.POSITIVE_INFINITY;
                     cur_edge_weight = isNaN(ne.edge.getWeight()) ? DEFAULT_WEIGHT : ne.edge.getWeight();
                     if (cur_edge_weight < cur_dist) {
@@ -1677,11 +1751,11 @@
                 });
             }
             return adj_list_dict;
-        }
-        getMode() {
+        };
+        BaseGraph.prototype.getMode = function () {
             return this._mode;
-        }
-        getStats() {
+        };
+        BaseGraph.prototype.getStats = function () {
             return {
                 mode: this._mode,
                 nr_nodes: this._nr_nodes,
@@ -1690,51 +1764,51 @@
                 density_dir: this._nr_dir_edges / (this._nr_nodes * (this._nr_nodes - 1)),
                 density_und: 2 * this._nr_und_edges / (this._nr_nodes * (this._nr_nodes - 1))
             };
-        }
-        nrNodes() {
+        };
+        BaseGraph.prototype.nrNodes = function () {
             return this._nr_nodes;
-        }
-        nrDirEdges() {
+        };
+        BaseGraph.prototype.nrDirEdges = function () {
             return this._nr_dir_edges;
-        }
-        nrUndEdges() {
+        };
+        BaseGraph.prototype.nrUndEdges = function () {
             return this._nr_und_edges;
-        }
-        addNodeByID(id, opts) {
+        };
+        BaseGraph.prototype.addNodeByID = function (id, opts) {
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            let node = new BaseNode_1.BaseNode(id, opts);
+            var node = new BaseNode_1.BaseNode(id, opts);
             return this.addNode(node) ? node : null;
-        }
-        addNode(node) {
+        };
+        BaseGraph.prototype.addNode = function (node) {
             if (this.hasNodeID(node.getID())) {
                 throw new Error("Won't add node with duplicate ID.");
             }
             this._nodes[node.getID()] = node;
             this._nr_nodes += 1;
             return node;
-        }
-        hasNodeID(id) {
+        };
+        BaseGraph.prototype.hasNodeID = function (id) {
             return !!this._nodes[id];
-        }
-        getNodeById(id) {
+        };
+        BaseGraph.prototype.getNodeById = function (id) {
             return this._nodes[id];
-        }
-        getNodes() {
+        };
+        BaseGraph.prototype.getNodes = function () {
             return this._nodes;
-        }
-        getRandomNode() {
+        };
+        BaseGraph.prototype.getRandomNode = function () {
             return this.pickRandomProperty(this._nodes);
-        }
-        deleteNode(node) {
-            let rem_node = this._nodes[node.getID()];
+        };
+        BaseGraph.prototype.deleteNode = function (node) {
+            var rem_node = this._nodes[node.getID()];
             if (!rem_node) {
                 throw new Error('Cannot remove a foreign node.');
             }
-            let in_deg = node.inDegree();
-            let out_deg = node.outDegree();
-            let deg = node.degree();
+            var in_deg = node.inDegree();
+            var out_deg = node.outDegree();
+            var deg = node.degree();
             if (in_deg) {
                 this.deleteInEdgesOf(node);
             }
@@ -1746,74 +1820,74 @@
             }
             delete this._nodes[node.getID()];
             this._nr_nodes -= 1;
-        }
-        hasEdgeID(id) {
+        };
+        BaseGraph.prototype.hasEdgeID = function (id) {
             return !!this._dir_edges[id] || !!this._und_edges[id];
-        }
-        getEdgeById(id) {
-            let edge = this._dir_edges[id] || this._und_edges[id];
+        };
+        BaseGraph.prototype.getEdgeById = function (id) {
+            var edge = this._dir_edges[id] || this._und_edges[id];
             if (!edge) {
                 throw new Error("cannot retrieve edge with non-existing ID.");
             }
             return edge;
-        }
-        static checkExistanceOfEdgeNodes(node_a, node_b) {
+        };
+        BaseGraph.checkExistanceOfEdgeNodes = function (node_a, node_b) {
             if (!node_a) {
-                throw new Error(`Cannot find edge. Node A does not exist (in graph).`);
+                throw new Error("Cannot find edge. Node A does not exist (in graph).");
             }
             if (!node_b) {
                 throw new Error("Cannot find edge. Node B does not exist (in graph).");
             }
-        }
-        getDirEdgeByNodeIDs(node_a_id, node_b_id) {
-            const node_a = this.getNodeById(node_a_id);
-            const node_b = this.getNodeById(node_b_id);
+        };
+        BaseGraph.prototype.getDirEdgeByNodeIDs = function (node_a_id, node_b_id) {
+            var node_a = this.getNodeById(node_a_id);
+            var node_b = this.getNodeById(node_b_id);
             BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
-            let edges_dir = node_a.outEdges(), edges_dir_keys = Object.keys(edges_dir);
-            for (let i = 0; i < edges_dir_keys.length; i++) {
-                let edge = edges_dir[edges_dir_keys[i]];
+            var edges_dir = node_a.outEdges(), edges_dir_keys = Object.keys(edges_dir);
+            for (var i = 0; i < edges_dir_keys.length; i++) {
+                var edge = edges_dir[edges_dir_keys[i]];
                 if (edge.getNodes().b.getID() == node_b_id) {
                     return edge;
                 }
             }
-            throw new Error(`Cannot find edge. There is no edge between Node ${node_a_id} and ${node_b_id}.`);
-        }
-        getUndEdgeByNodeIDs(node_a_id, node_b_id) {
-            const node_a = this.getNodeById(node_a_id);
-            const node_b = this.getNodeById(node_b_id);
+            throw new Error("Cannot find edge. There is no edge between Node " + node_a_id + " and " + node_b_id + ".");
+        };
+        BaseGraph.prototype.getUndEdgeByNodeIDs = function (node_a_id, node_b_id) {
+            var node_a = this.getNodeById(node_a_id);
+            var node_b = this.getNodeById(node_b_id);
             BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
-            let edges_und = node_a.undEdges(), edges_und_keys = Object.keys(edges_und);
-            for (let i = 0; i < edges_und_keys.length; i++) {
-                let edge = edges_und[edges_und_keys[i]];
-                let b;
+            var edges_und = node_a.undEdges(), edges_und_keys = Object.keys(edges_und);
+            for (var i = 0; i < edges_und_keys.length; i++) {
+                var edge = edges_und[edges_und_keys[i]];
+                var b = void 0;
                 (edge.getNodes().a.getID() == node_a_id) ? (b = edge.getNodes().b.getID()) : (b = edge.getNodes().a.getID());
                 if (b == node_b_id) {
                     return edge;
                 }
             }
-        }
-        getDirEdges() {
+        };
+        BaseGraph.prototype.getDirEdges = function () {
             return this._dir_edges;
-        }
-        getUndEdges() {
+        };
+        BaseGraph.prototype.getUndEdges = function () {
             return this._und_edges;
-        }
-        getDirEdgesArray() {
-            let edges = [];
-            for (let e_id in this._dir_edges) {
+        };
+        BaseGraph.prototype.getDirEdgesArray = function () {
+            var edges = [];
+            for (var e_id in this._dir_edges) {
                 edges.push(this._dir_edges[e_id]);
             }
             return edges;
-        }
-        getUndEdgesArray() {
-            let edges = [];
-            for (let e_id in this._und_edges) {
+        };
+        BaseGraph.prototype.getUndEdgesArray = function () {
+            var edges = [];
+            for (var e_id in this._und_edges) {
                 edges.push(this._und_edges[e_id]);
             }
             return edges;
-        }
-        addEdgeByNodeIDs(label, node_a_id, node_b_id, opts) {
-            let node_a = this.getNodeById(node_a_id), node_b = this.getNodeById(node_b_id);
+        };
+        BaseGraph.prototype.addEdgeByNodeIDs = function (label, node_a_id, node_b_id, opts) {
+            var node_a = this.getNodeById(node_a_id), node_b = this.getNodeById(node_b_id);
             if (!node_a) {
                 throw new Error("Cannot add edge. Node A does not exist");
             }
@@ -1823,13 +1897,13 @@
             else {
                 return this.addEdgeByID(label, node_a, node_b, opts);
             }
-        }
-        addEdgeByID(id, node_a, node_b, opts) {
-            let edge = new BaseEdge_1.BaseEdge(id, node_a, node_b, opts || {});
+        };
+        BaseGraph.prototype.addEdgeByID = function (id, node_a, node_b, opts) {
+            var edge = new BaseEdge_1.BaseEdge(id, node_a, node_b, opts || {});
             return this.addEdge(edge) ? edge : null;
-        }
-        addEdge(edge) {
-            let node_a = edge.getNodes().a, node_b = edge.getNodes().b;
+        };
+        BaseGraph.prototype.addEdge = function (edge) {
+            var node_a = edge.getNodes().a, node_b = edge.getNodes().b;
             if (!this.hasNodeID(node_a.getID()) || !this.hasNodeID(node_b.getID())
                 || this._nodes[node_a.getID()] !== node_a || this._nodes[node_b.getID()] !== node_b) {
                 throw new Error("can only add edge between two nodes existing in graph");
@@ -1850,14 +1924,14 @@
                 this.updateGraphMode();
             }
             return edge;
-        }
-        deleteEdge(edge) {
-            let dir_edge = this._dir_edges[edge.getID()];
-            let und_edge = this._und_edges[edge.getID()];
+        };
+        BaseGraph.prototype.deleteEdge = function (edge) {
+            var dir_edge = this._dir_edges[edge.getID()];
+            var und_edge = this._und_edges[edge.getID()];
             if (!dir_edge && !und_edge) {
                 throw new Error('cannot remove non-existing edge.');
             }
-            let nodes = edge.getNodes();
+            var nodes = edge.getNodes();
             nodes.a.removeEdge(edge);
             if (nodes.a !== nodes.b) {
                 nodes.b.removeEdge(edge);
@@ -1871,11 +1945,11 @@
                 this._nr_und_edges -= 1;
             }
             this.updateGraphMode();
-        }
-        deleteInEdgesOf(node) {
+        };
+        BaseGraph.prototype.deleteInEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
-            let in_edges = node.inEdges();
-            let key, edge;
+            var in_edges = node.inEdges();
+            var key, edge;
             for (key in in_edges) {
                 edge = in_edges[key];
                 edge.getNodes().a.removeEdge(edge);
@@ -1884,11 +1958,11 @@
             }
             node.clearInEdges();
             this.updateGraphMode();
-        }
-        deleteOutEdgesOf(node) {
+        };
+        BaseGraph.prototype.deleteOutEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
-            let out_edges = node.outEdges();
-            let key, edge;
+            var out_edges = node.outEdges();
+            var key, edge;
             for (key in out_edges) {
                 edge = out_edges[key];
                 edge.getNodes().b.removeEdge(edge);
@@ -1897,18 +1971,18 @@
             }
             node.clearOutEdges();
             this.updateGraphMode();
-        }
-        deleteDirEdgesOf(node) {
+        };
+        BaseGraph.prototype.deleteDirEdgesOf = function (node) {
             this.deleteInEdgesOf(node);
             this.deleteOutEdgesOf(node);
-        }
-        deleteUndEdgesOf(node) {
+        };
+        BaseGraph.prototype.deleteUndEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
-            let und_edges = node.undEdges();
-            let key, edge;
+            var und_edges = node.undEdges();
+            var key, edge;
             for (key in und_edges) {
                 edge = und_edges[key];
-                let conns = edge.getNodes();
+                var conns = edge.getNodes();
                 conns.a.removeEdge(edge);
                 if (conns.a !== conns.b) {
                     conns.b.removeEdge(edge);
@@ -1918,38 +1992,38 @@
             }
             node.clearUndEdges();
             this.updateGraphMode();
-        }
-        deleteAllEdgesOf(node) {
+        };
+        BaseGraph.prototype.deleteAllEdgesOf = function (node) {
             this.deleteDirEdgesOf(node);
             this.deleteUndEdgesOf(node);
-        }
-        clearAllDirEdges() {
-            for (let edge in this._dir_edges) {
+        };
+        BaseGraph.prototype.clearAllDirEdges = function () {
+            for (var edge in this._dir_edges) {
                 this.deleteEdge(this._dir_edges[edge]);
             }
-        }
-        clearAllUndEdges() {
-            for (let edge in this._und_edges) {
+        };
+        BaseGraph.prototype.clearAllUndEdges = function () {
+            for (var edge in this._und_edges) {
                 this.deleteEdge(this._und_edges[edge]);
             }
-        }
-        clearAllEdges() {
+        };
+        BaseGraph.prototype.clearAllEdges = function () {
             this.clearAllDirEdges();
             this.clearAllUndEdges();
-        }
-        getRandomDirEdge() {
+        };
+        BaseGraph.prototype.getRandomDirEdge = function () {
             return this.pickRandomProperty(this._dir_edges);
-        }
-        getRandomUndEdge() {
+        };
+        BaseGraph.prototype.getRandomUndEdge = function () {
             return this.pickRandomProperty(this._und_edges);
-        }
-        cloneStructure() {
-            let new_graph = new BaseGraph(this._label), old_nodes = this.getNodes(), old_edge, new_node_a = null, new_node_b = null;
-            for (let node_id in old_nodes) {
+        };
+        BaseGraph.prototype.cloneStructure = function () {
+            var new_graph = new BaseGraph(this._label), old_nodes = this.getNodes(), old_edge, new_node_a = null, new_node_b = null;
+            for (var node_id in old_nodes) {
                 new_graph.addNode(old_nodes[node_id].clone());
             }
-            [this.getDirEdges(), this.getUndEdges()].forEach((old_edges) => {
-                for (let edge_id in old_edges) {
+            [this.getDirEdges(), this.getUndEdges()].forEach(function (old_edges) {
+                for (var edge_id in old_edges) {
                     old_edge = old_edges[edge_id];
                     new_node_a = new_graph.getNodeById(old_edge.getNodes().a.getID());
                     new_node_b = new_graph.getNodeById(old_edge.getNodes().b.getID());
@@ -1957,11 +2031,11 @@
                 }
             });
             return new_graph;
-        }
-        cloneSubGraphStructure(root, cutoff) {
-            let new_graph = new BaseGraph(this._label);
-            let config = BFS_1.prepareBFSStandardConfig();
-            let bfsNodeUnmarkedTestCallback = function (context) {
+        };
+        BaseGraph.prototype.cloneSubGraphStructure = function (root, cutoff) {
+            var new_graph = new BaseGraph(this._label);
+            var config = BFS_1.prepareBFSStandardConfig();
+            var bfsNodeUnmarkedTestCallback = function (context) {
                 if (config.result[context.next_node.getID()].counter > cutoff) {
                     context.queue = [];
                 }
@@ -1971,9 +2045,9 @@
             };
             config.callbacks.node_unmarked.push(bfsNodeUnmarkedTestCallback);
             BFS_1.BFS(this, root, config);
-            let old_edge, new_node_a = null, new_node_b = null;
-            [this.getDirEdges(), this.getUndEdges()].forEach((old_edges) => {
-                for (let edge_id in old_edges) {
+            var old_edge, new_node_a = null, new_node_b = null;
+            [this.getDirEdges(), this.getUndEdges()].forEach(function (old_edges) {
+                for (var edge_id in old_edges) {
                     old_edge = old_edges[edge_id];
                     new_node_a = new_graph.getNodeById(old_edge.getNodes().a.getID());
                     new_node_b = new_graph.getNodeById(old_edge.getNodes().b.getID());
@@ -1982,15 +2056,15 @@
                 }
             });
             return new_graph;
-        }
-        checkConnectedNodeOrThrow(node) {
-            let inGraphNode = this._nodes[node.getID()];
+        };
+        BaseGraph.prototype.checkConnectedNodeOrThrow = function (node) {
+            var inGraphNode = this._nodes[node.getID()];
             if (!inGraphNode) {
                 throw new Error('Cowardly refusing to delete edges of a foreign node.');
             }
-        }
-        updateGraphMode() {
-            let nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
+        };
+        BaseGraph.prototype.updateGraphMode = function () {
+            var nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
             if (nr_dir && nr_und) {
                 this._mode = GraphMode.MIXED;
             }
@@ -2003,33 +2077,34 @@
             else {
                 this._mode = GraphMode.INIT;
             }
-        }
-        pickRandomProperty(propList) {
-            let tmpList = Object.keys(propList);
-            let randomPropertyName = tmpList[Math.floor(Math.random() * tmpList.length)];
+        };
+        BaseGraph.prototype.pickRandomProperty = function (propList) {
+            var tmpList = Object.keys(propList);
+            var randomPropertyName = tmpList[Math.floor(Math.random() * tmpList.length)];
             return propList[randomPropertyName];
-        }
-        pickRandomProperties(propList, amount) {
-            let ids = [];
-            let keys = Object.keys(propList);
-            let fraction = amount / keys.length;
-            let used_keys = {};
-            for (let i = 0; ids.length < amount && i < keys.length; i++) {
+        };
+        BaseGraph.prototype.pickRandomProperties = function (propList, amount) {
+            var ids = [];
+            var keys = Object.keys(propList);
+            var fraction = amount / keys.length;
+            var used_keys = {};
+            for (var i = 0; ids.length < amount && i < keys.length; i++) {
                 if (Math.random() < fraction) {
                     ids.push(keys[i]);
                     used_keys[keys[i]] = i;
                 }
             }
-            let diff = amount - ids.length;
-            for (let i = 0; i < keys.length && diff; i++) {
+            var diff = amount - ids.length;
+            for (var i = 0; i < keys.length && diff; i++) {
                 if (used_keys[keys[i]] == null) {
                     ids.push(keys[i]);
                     diff--;
                 }
             }
             return ids;
-        }
-    }
+        };
+        return BaseGraph;
+    }());
     exports.BaseGraph = BaseGraph;
     });
 
@@ -2043,12 +2118,12 @@
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
-        let dists = graph.adjListArray();
-        let next = graph.nextArray();
-        let N = dists.length;
-        for (let k = 0; k < N; ++k) {
-            for (let i = 0; i < N; ++i) {
-                for (let j = 0; j < N; ++j) {
+        var dists = graph.adjListArray();
+        var next = graph.nextArray();
+        var N = dists.length;
+        for (var k = 0; k < N; ++k) {
+            for (var i = 0; i < N; ++i) {
+                for (var j = 0; j < N; ++j) {
                     if (k != i && k != j && i != j && dists[i][j] == (dists[i][k] + dists[k][j])) {
                         if (dists[i][j] !== Number.POSITIVE_INFINITY) {
                             next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], next[i][k]);
@@ -2068,11 +2143,11 @@
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
-        let dists = graph.adjListArray();
-        let N = dists.length;
-        for (let k = 0; k < N; ++k) {
-            for (let i = 0; i < N; ++i) {
-                for (let j = 0; j < N; ++j) {
+        var dists = graph.adjListArray();
+        var N = dists.length;
+        for (var k = 0; k < N; ++k) {
+            for (var i = 0; i < N; ++i) {
+                for (var j = 0; j < N; ++j) {
                     if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
                         dists[i][j] = dists[i][k] + dists[k][j];
                     }
@@ -2083,16 +2158,16 @@
     }
     exports.FloydWarshallArray = FloydWarshallArray;
     function changeNextToDirectParents(input) {
-        let output = [];
-        for (let a = 0; a < input.length; a++) {
+        var output = [];
+        for (var a = 0; a < input.length; a++) {
             output.push([]);
-            for (let b = 0; b < input.length; b++) {
+            for (var b = 0; b < input.length; b++) {
                 output[a].push([]);
                 output[a][b] = input[a][b];
             }
         }
-        for (let a = 0; a < input.length; a++) {
-            for (let b = 0; b < input.length; b++) {
+        for (var a = 0; a < input.length; a++) {
+            for (var b = 0; b < input.length; b++) {
                 if (input[a][b][0] != null
                     && a != b && !(input[a][b].length === 1
                     && input[a][b][0] === b)) {
@@ -2105,15 +2180,15 @@
     }
     exports.changeNextToDirectParents = changeNextToDirectParents;
     function findDirectParents(u, v, inNext, outNext) {
-        let nodesInTracking = [u];
-        let counter = 0;
+        var nodesInTracking = [u];
+        var counter = 0;
         while (nodesInTracking.length > 0) {
-            let currNode = nodesInTracking.pop();
+            var currNode = nodesInTracking.pop();
             if (currNode == u && counter > 0) {
                 continue;
             }
             else {
-                for (let e = 0; e < inNext[currNode][v].length; e++) {
+                for (var e = 0; e < inNext[currNode][v].length; e++) {
                     if (inNext[currNode][v][e] == v && counter == 0) {
                         outNext[u][v] = StructUtils.mergeOrderedArraysNoDups(outNext[u][v], [v]);
                     }
@@ -2140,7 +2215,7 @@
 
 
     function betweennessCentrality(graph, directed, sparse) {
-        let paths;
+        var paths;
         var sparse = sparse || false;
         if (sparse) {
             paths = Johnsons_1.Johnsons(graph)[1];
@@ -2148,26 +2223,26 @@
         else {
             paths = FloydWarshall.changeNextToDirectParents(FloydWarshall.FloydWarshallAPSP(graph)[1]);
         }
-        let nodes = graph.getNodes();
-        let nodeKeys = Object.keys(nodes);
-        let map = {};
-        for (let key in nodes) {
+        var nodes = graph.getNodes();
+        var nodeKeys = Object.keys(nodes);
+        var map = {};
+        for (var key in nodes) {
             map[key] = 0;
         }
-        let N = paths.length;
+        var N = paths.length;
         for (var a = 0; a < N; ++a) {
             for (var b = 0; b < N; ++b) {
                 if (a != b && !(paths[a][b].length == 1 && paths[a][b][0] == b) && paths[a][b][0] != null) {
-                    let tempMap = {};
-                    let leadArray = [];
-                    let pathCount = 0;
+                    var tempMap = {};
+                    var leadArray = [];
+                    var pathCount = 0;
                     do {
-                        let tracer = b;
-                        let leadCounter = 0;
+                        var tracer = b;
+                        var leadCounter = 0;
                         pathCount++;
                         while (true) {
-                            let previous = paths[a][tracer];
-                            let terminate = false;
+                            var previous = paths[a][tracer];
+                            var terminate = false;
                             if (previous.length == 1 && previous[0] == tracer) {
                                 break;
                             }
@@ -2188,7 +2263,7 @@
                                     leadCounter++;
                                 }
                                 else if (leadCounter < leadArray.length) {
-                                    let choice = leadArray[leadCounter][0];
+                                    var choice = leadArray[leadCounter][0];
                                     if (previous[choice] == tracer) {
                                         terminate = true;
                                     }
@@ -2225,8 +2300,8 @@
                             }
                         }
                     } while (leadArray.length != 0);
-                    for (let key in tempMap) {
-                        let mapKey = nodeKeys[key];
+                    for (var key in tempMap) {
+                        var mapKey = nodeKeys[key];
                         map[mapKey] += tempMap[key] / pathCount;
                     }
                 }
@@ -2241,26 +2316,39 @@
     var Betweenness_1 = Betweenness.betweennessCentrality;
 
     var Brandes_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
 
 
-    class Brandes {
-        constructor(_graph) {
+    var Brandes = (function () {
+        function Brandes(_graph) {
             this._graph = _graph;
         }
-        computeUnweighted(normalize = false, directed = false) {
+        Brandes.prototype.computeUnweighted = function (normalize, directed) {
+            if (normalize === void 0) { normalize = false; }
+            if (directed === void 0) { directed = false; }
+            var e_1, _a;
             if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
                 throw new Error("Cowardly refusing to traverse graph without edges.");
             }
-            let nodes = this._graph.getNodes();
-            let adjList = this._graph.adjListDict();
-            let s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, Q = [], S = [], CB = {};
-            let closedNodes = {};
-            for (let n in nodes) {
-                let node_id = nodes[n].getID();
+            var nodes = this._graph.getNodes();
+            var adjList = this._graph.adjListDict();
+            var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, Q = [], S = [], CB = {};
+            var closedNodes = {};
+            for (var n in nodes) {
+                var node_id = nodes[n].getID();
                 CB[node_id] = 0;
                 dist[node_id] = Number.POSITIVE_INFINITY;
                 sigma[node_id] = 0;
@@ -2268,9 +2356,9 @@
                 Pred[node_id] = [];
                 closedNodes[node_id] = false;
             }
-            for (let i in nodes) {
+            for (var i in nodes) {
                 s = nodes[i];
-                let id = s.getID();
+                var id = s.getID();
                 dist[id] = 0;
                 sigma[id] = 1;
                 Q.push(id);
@@ -2278,26 +2366,36 @@
                 while (Q.length) {
                     v = Q.shift();
                     S.push(v);
-                    let neighbors = adjList[v];
+                    var neighbors = adjList[v];
                     closedNodes[v] = true;
-                    for (let w in neighbors) {
-                        if (closedNodes[w]) {
+                    for (var w_1 in neighbors) {
+                        if (closedNodes[w_1]) {
                             continue;
                         }
-                        if (dist[w] === Number.POSITIVE_INFINITY) {
-                            Q.push(w);
-                            dist[w] = dist[v] + 1;
+                        if (dist[w_1] === Number.POSITIVE_INFINITY) {
+                            Q.push(w_1);
+                            dist[w_1] = dist[v] + 1;
                         }
-                        if (dist[w] === dist[v] + 1) {
-                            sigma[w] += sigma[v];
-                            Pred[w].push(v);
+                        if (dist[w_1] === dist[v] + 1) {
+                            sigma[w_1] += sigma[v];
+                            Pred[w_1].push(v);
                         }
                     }
                 }
                 while (S.length >= 1) {
                     w = S.pop();
-                    for (let parent of Pred[w]) {
-                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    try {
+                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
+                            var parent_1 = _c.value;
+                            delta[parent_1] += (sigma[parent_1] / sigma[w] * (1 + delta[w]));
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        }
+                        finally { if (e_1) throw e_1.error; }
                     }
                     if (w != s.getID()) {
                         CB[w] += delta[w];
@@ -2313,33 +2411,34 @@
                 this.normalizeScores(CB, this._graph.nrNodes(), directed);
             }
             return CB;
-        }
-        computeWeighted(normalize, directed) {
+        };
+        Brandes.prototype.computeWeighted = function (normalize, directed) {
+            var e_2, _a;
             if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
                 throw new Error("Cowardly refusing to traverse graph without edges.");
             }
             if (this._graph.hasNegativeEdge()) {
                 var extraNode = new BaseNode_1.BaseNode("extraNode");
-                let graph = Johnsons_1.addExtraNandE(this._graph, extraNode);
-                let BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
+                var graph = Johnsons_1.addExtraNandE(this._graph, extraNode);
+                var BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
                 if (BFresult.neg_cycle) {
                     throw new Error("The graph contains a negative cycle, thus it can not be processed");
                 }
                 else {
-                    let newWeights = BFresult.distances;
+                    var newWeights = BFresult.distances;
                     graph = Johnsons_1.reWeighGraph(graph, newWeights, extraNode);
                     graph.deleteNode(extraNode);
                 }
                 this._graph = graph;
             }
-            let nodes = this._graph.getNodes();
-            let N = Object.keys(nodes).length;
-            let adjList = this._graph.adjListDict();
-            const evalPriority = (nb) => nb.best;
-            const evalObjID = (nb) => nb.id;
-            let s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, S = [], CB = {}, closedNodes = {}, Q = new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID);
-            for (let n in nodes) {
-                let currID = nodes[n].getID();
+            var nodes = this._graph.getNodes();
+            var N = Object.keys(nodes).length;
+            var adjList = this._graph.adjListDict();
+            var evalPriority = function (nb) { return nb.best; };
+            var evalObjID = function (nb) { return nb.id; };
+            var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, S = [], CB = {}, closedNodes = {}, Q = new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID);
+            for (var n in nodes) {
+                var currID = nodes[n].getID();
                 CB[currID] = 0;
                 dist[currID] = Number.POSITIVE_INFINITY;
                 sigma[currID] = 0;
@@ -2347,29 +2446,29 @@
                 Pred[currID] = [];
                 closedNodes[currID] = false;
             }
-            for (let i in nodes) {
+            for (var i in nodes) {
                 s = nodes[i];
-                let id_s = s.getID();
+                var id_s = s.getID();
                 dist[id_s] = 0;
                 sigma[id_s] = 1;
-                let source = { id: id_s, best: 0 };
+                var source = { id: id_s, best: 0 };
                 Q.insert(source);
                 closedNodes[id_s] = true;
                 while (Q.size() > 0) {
                     v = Q.pop();
-                    let current_id = v.id;
+                    var current_id = v.id;
                     S.push(current_id);
                     closedNodes[current_id] = true;
-                    let neighbors = adjList[current_id];
-                    for (let w in neighbors) {
-                        if (closedNodes[w]) {
+                    var neighbors = adjList[current_id];
+                    for (var w_2 in neighbors) {
+                        if (closedNodes[w_2]) {
                             continue;
                         }
-                        let new_dist = dist[current_id] + neighbors[w];
-                        let nextNode = { id: w, best: dist[w] };
-                        if (dist[w] > new_dist) {
-                            if (isFinite(dist[w])) {
-                                let x = Q.remove(nextNode);
+                        var new_dist = dist[current_id] + neighbors[w_2];
+                        var nextNode = { id: w_2, best: dist[w_2] };
+                        if (dist[w_2] > new_dist) {
+                            if (isFinite(dist[w_2])) {
+                                var x = Q.remove(nextNode);
                                 nextNode.best = new_dist;
                                 Q.insert(nextNode);
                             }
@@ -2377,20 +2476,30 @@
                                 nextNode.best = new_dist;
                                 Q.insert(nextNode);
                             }
-                            sigma[w] = 0;
-                            dist[w] = new_dist;
-                            Pred[w] = [];
+                            sigma[w_2] = 0;
+                            dist[w_2] = new_dist;
+                            Pred[w_2] = [];
                         }
-                        if (dist[w] === new_dist) {
-                            sigma[w] += sigma[current_id];
-                            Pred[w].push(current_id);
+                        if (dist[w_2] === new_dist) {
+                            sigma[w_2] += sigma[current_id];
+                            Pred[w_2].push(current_id);
                         }
                     }
                 }
                 while (S.length >= 1) {
                     w = S.pop();
-                    for (let parent of Pred[w]) {
-                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    try {
+                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
+                            var parent_2 = _c.value;
+                            delta[parent_2] += (sigma[parent_2] / sigma[w] * (1 + delta[w]));
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        }
+                        finally { if (e_2) throw e_2.error; }
                     }
                     if (w != s.getID()) {
                         CB[w] += delta[w];
@@ -2406,24 +2515,25 @@
                 this.normalizeScores(CB, N, directed);
             }
             return CB;
-        }
-        computePFSbased(normalize, directed) {
-            let nodes = this._graph.getNodes();
-            let adjList = this._graph.adjListDict();
-            let Pred = {}, sigma = {}, delta = {}, S = [], CB = {};
-            for (let n in nodes) {
-                let currID = nodes[n].getID();
+        };
+        Brandes.prototype.computePFSbased = function (normalize, directed) {
+            var e_3, _a;
+            var nodes = this._graph.getNodes();
+            var adjList = this._graph.adjListDict();
+            var Pred = {}, sigma = {}, delta = {}, S = [], CB = {};
+            for (var n in nodes) {
+                var currID = nodes[n].getID();
                 CB[currID] = 0;
                 sigma[currID] = 0;
                 delta[currID] = 0;
                 Pred[currID] = [];
             }
-            let specialConfig = PFS_1.preparePFSStandardConfig();
+            var specialConfig = PFS_1.preparePFSStandardConfig();
             var notEncounteredBrandes = function (context) {
                 context.next.best =
                     context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
-                let next_id = context.next.node.getID();
-                let current_id = context.current.node.getID();
+                var next_id = context.next.node.getID();
+                var current_id = context.current.node.getID();
                 Pred[next_id] = [current_id];
                 sigma[next_id] += sigma[current_id];
             };
@@ -2433,8 +2543,8 @@
             };
             specialConfig.callbacks.new_current.push(newCurrentBrandes);
             var betterPathBrandes = function (context) {
-                let next_id = context.next.node.getID();
-                let current_id = context.current.node.getID();
+                var next_id = context.next.node.getID();
+                var current_id = context.current.node.getID();
                 sigma[next_id] = 0;
                 sigma[next_id] += sigma[current_id];
                 Pred[next_id] = [];
@@ -2442,22 +2552,32 @@
             };
             specialConfig.callbacks.better_path.splice(0, 1, betterPathBrandes);
             var equalPathBrandes = function (context) {
-                let next_id = context.next.node.getID();
-                let current_id = context.current.node.getID();
+                var next_id = context.next.node.getID();
+                var current_id = context.current.node.getID();
                 sigma[next_id] += sigma[current_id];
                 if (Pred[next_id].indexOf(current_id) === -1) {
                     Pred[next_id].push(current_id);
                 }
             };
             specialConfig.callbacks.equal_path.push(equalPathBrandes);
-            for (let i in nodes) {
-                let s = nodes[i];
+            for (var i in nodes) {
+                var s = nodes[i];
                 sigma[s.getID()] = 1;
                 PFS_1.PFS(this._graph, s, specialConfig);
                 while (S.length >= 1) {
-                    let w = S.pop();
-                    for (let parent of Pred[w]) {
-                        delta[parent] += (sigma[parent] / sigma[w] * (1 + delta[w]));
+                    var w = S.pop();
+                    try {
+                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
+                            var parent_3 = _c.value;
+                            delta[parent_3] += (sigma[parent_3] / sigma[w] * (1 + delta[w]));
+                        }
+                    }
+                    catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                    finally {
+                        try {
+                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        }
+                        finally { if (e_3) throw e_3.error; }
                     }
                     if (w != s.getID()) {
                         CB[w] += delta[w];
@@ -2471,14 +2591,15 @@
                 this.normalizeScores(CB, this._graph.nrNodes(), directed);
             }
             return CB;
-        }
-        normalizeScores(CB, N, directed) {
-            let factor = directed ? ((N - 1) * (N - 2)) : ((N - 1) * (N - 2) / 2);
-            for (let node in CB) {
+        };
+        Brandes.prototype.normalizeScores = function (CB, N, directed) {
+            var factor = directed ? ((N - 1) * (N - 2)) : ((N - 1) * (N - 2) / 2);
+            for (var node in CB) {
                 CB[node] /= factor;
             }
-        }
-    }
+        };
+        return Brandes;
+    }());
     exports.Brandes = Brandes;
     });
 
@@ -2489,38 +2610,39 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-    class ClosenessCentrality {
-        constructor() { }
-        getCentralityMapFW(graph) {
-            let dists = FloydWarshall.FloydWarshallArray(graph);
-            let ret = [];
-            let N = dists.length;
-            for (let a = 0; a < N; ++a) {
-                let sum = 0;
-                for (let b = 0; b < N; ++b) {
+    var ClosenessCentrality = (function () {
+        function ClosenessCentrality() {
+        }
+        ClosenessCentrality.prototype.getCentralityMapFW = function (graph) {
+            var dists = FloydWarshall.FloydWarshallArray(graph);
+            var ret = [];
+            var N = dists.length;
+            for (var a = 0; a < N; ++a) {
+                var sum = 0;
+                for (var b = 0; b < N; ++b) {
                     if (dists[a][b] != Number.POSITIVE_INFINITY)
                         sum += dists[a][b];
                 }
                 ret[a] = 1 / sum;
             }
             return ret;
-        }
-        getCentralityMap(graph) {
-            let pfs_config = PFS_1.preparePFSStandardConfig();
-            let accumulated_distance = 0;
-            let not_encountered = function (context) {
+        };
+        ClosenessCentrality.prototype.getCentralityMap = function (graph) {
+            var pfs_config = PFS_1.preparePFSStandardConfig();
+            var accumulated_distance = 0;
+            var not_encountered = function (context) {
                 accumulated_distance += context.current.best + (isNaN(context.next.edge.getWeight()) ? 1 : context.next.edge.getWeight());
             };
             var betterPathFound = function (context) {
                 accumulated_distance -= pfs_config.result[context.next.node.getID()].distance - context.proposed_dist;
             };
-            let bp = pfs_config.callbacks.better_path.pop();
+            var bp = pfs_config.callbacks.better_path.pop();
             pfs_config.callbacks.better_path.push(betterPathFound);
             pfs_config.callbacks.better_path.push(bp);
             pfs_config.callbacks.not_encountered.push(not_encountered);
-            let ret = {};
-            for (let key in graph.getNodes()) {
-                let node = graph.getNodeById(key);
+            var ret = {};
+            for (var key in graph.getNodes()) {
+                var node = graph.getNodeById(key);
                 if (node != null) {
                     accumulated_distance = 0;
                     PFS_1.PFS(graph, node, pfs_config);
@@ -2528,8 +2650,9 @@
                 }
             }
             return ret;
-        }
-    }
+        };
+        return ClosenessCentrality;
+    }());
     exports.ClosenessCentrality = ClosenessCentrality;
     });
 
@@ -2547,23 +2670,24 @@
         DegreeMode[DegreeMode["dir"] = 3] = "dir";
         DegreeMode[DegreeMode["all"] = 4] = "all";
     })(DegreeMode = exports.DegreeMode || (exports.DegreeMode = {}));
-    class DegreeCentrality {
-        constructor() { }
-        getCentralityMap(graph, weighted, conf) {
+    var DegreeCentrality = (function () {
+        function DegreeCentrality() {
+        }
+        DegreeCentrality.prototype.getCentralityMap = function (graph, weighted, conf) {
             weighted = (weighted != null) ? !!weighted : true;
             conf = (conf == null) ? DegreeMode.all : conf;
-            let ret = {};
+            var ret = {};
             switch (conf) {
                 case DegreeMode.in:
-                    for (let key in graph.getNodes()) {
-                        let node = graph.getNodeById(key);
+                    for (var key in graph.getNodes()) {
+                        var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
                                 ret[key] = node.inDegree();
                             }
                             else {
                                 ret[key] = ret[key] || 0;
-                                for (let k in node.inEdges()) {
+                                for (var k in node.inEdges()) {
                                     ret[key] += node.inEdges()[k].getWeight();
                                 }
                             }
@@ -2571,15 +2695,15 @@
                     }
                     break;
                 case DegreeMode.out:
-                    for (let key in graph.getNodes()) {
-                        let node = graph.getNodeById(key);
+                    for (var key in graph.getNodes()) {
+                        var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
                                 ret[key] = node.outDegree();
                             }
                             else {
                                 ret[key] = ret[key] || 0;
-                                for (let k in node.outEdges()) {
+                                for (var k in node.outEdges()) {
                                     ret[key] += node.outEdges()[k].getWeight();
                                 }
                             }
@@ -2587,15 +2711,15 @@
                     }
                     break;
                 case DegreeMode.und:
-                    for (let key in graph.getNodes()) {
-                        let node = graph.getNodeById(key);
+                    for (var key in graph.getNodes()) {
+                        var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
                                 ret[key] = node.degree();
                             }
                             else {
                                 ret[key] = ret[key] || 0;
-                                for (let k in node.undEdges()) {
+                                for (var k in node.undEdges()) {
                                     ret[key] += node.undEdges()[k].getWeight();
                                 }
                             }
@@ -2603,16 +2727,16 @@
                     }
                     break;
                 case DegreeMode.dir:
-                    for (let key in graph.getNodes()) {
-                        let node = graph.getNodeById(key);
+                    for (var key in graph.getNodes()) {
+                        var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
                                 ret[key] = node.inDegree() + node.outDegree();
                             }
                             else {
                                 ret[key] = ret[key] || 0;
-                                let comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges()]);
-                                for (let k in comb) {
+                                var comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges()]);
+                                for (var k in comb) {
                                     ret[key] += comb[k].getWeight();
                                 }
                             }
@@ -2620,16 +2744,16 @@
                     }
                     break;
                 case DegreeMode.all:
-                    for (let key in graph.getNodes()) {
-                        let node = graph.getNodeById(key);
+                    for (var key in graph.getNodes()) {
+                        var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
                                 ret[key] = node.degree() + node.inDegree() + node.outDegree();
                             }
                             else {
                                 ret[key] = ret[key] || 0;
-                                let comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges(), node.undEdges()]);
-                                for (let k in comb) {
+                                var comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges(), node.undEdges()]);
+                                for (var k in comb) {
                                     ret[key] += comb[k].getWeight();
                                 }
                             }
@@ -2638,8 +2762,8 @@
                     break;
             }
             return ret;
-        }
-        degreeDistribution(graph) {
+        };
+        DegreeCentrality.prototype.degreeDistribution = function (graph) {
             var max_deg = 0, key, nodes = graph.getNodes(), node, all_deg;
             for (key in nodes) {
                 node = nodes[key];
@@ -2662,8 +2786,9 @@
                 deg_dist.all[node.inDegree() + node.outDegree() + node.degree()]++;
             }
             return deg_dist;
-        }
-    }
+        };
+        return DegreeCentrality;
+    }());
     exports.DegreeCentrality = DegreeCentrality;
     });
 
@@ -2672,18 +2797,48 @@
     var Degree_2 = Degree.DegreeCentrality;
 
     var Pagerank_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-    const logger = new Logger_1.Logger();
-    const DEFAULT_WEIGHTED = false;
-    const DEFAULT_ALPHA = 0.15;
-    const DEFAULT_MAX_ITERATIONS = 1e3;
-    const DEFAULT_EPSILON = 1e-6;
-    const DEFAULT_NORMALIZE = false;
-    const defaultInit = (graph) => 1 / graph.nrNodes();
-    class Pagerank {
-        constructor(_graph, config) {
+    var logger = new Logger_1.Logger();
+    var DEFAULT_WEIGHTED = false;
+    var DEFAULT_ALPHA = 0.15;
+    var DEFAULT_MAX_ITERATIONS = 1e3;
+    var DEFAULT_EPSILON = 1e-6;
+    var DEFAULT_NORMALIZE = false;
+    var defaultInit = function (graph) { return 1 / graph.nrNodes(); };
+    var Pagerank = (function () {
+        function Pagerank(_graph, config) {
             this._graph = _graph;
             config = config || {};
             this._weighted = config.weighted || DEFAULT_WEIGHTED;
@@ -2709,7 +2864,7 @@
             };
             config.PRArrays || this.constructPRArrayDataStructs(config);
         }
-        getConfig() {
+        Pagerank.prototype.getConfig = function () {
             return {
                 _weighted: this._weighted,
                 _alpha: this._alpha,
@@ -2717,24 +2872,24 @@
                 _epsilon: this._epsilon,
                 _normalize: this._normalize,
             };
-        }
-        getDSs() {
+        };
+        Pagerank.prototype.getDSs = function () {
             return this._PRArrayDS;
-        }
-        constructPRArrayDataStructs(config) {
-            let tic = +new Date;
-            let nodes = this._graph.getNodes();
-            let i = 0;
-            let teleport_prob_sum = 0;
-            let init_sum = 0;
-            for (let key in nodes) {
-                let node = this._graph.getNodeById(key);
+        };
+        Pagerank.prototype.constructPRArrayDataStructs = function (config) {
+            var tic = +new Date;
+            var nodes = this._graph.getNodes();
+            var i = 0;
+            var teleport_prob_sum = 0;
+            var init_sum = 0;
+            for (var key in nodes) {
+                var node = this._graph.getNodeById(key);
                 node.setFeature('PR_index', i);
                 if (config.init_map) {
                     if (config.init_map[key] == null) {
                         throw Error("initial value must be given for each node in the graph.");
                     }
-                    let val = config.init_map[key];
+                    var val = config.init_map[key];
                     this._PRArrayDS.curr[i] = val;
                     this._PRArrayDS.old[i] = val;
                     init_sum += val;
@@ -2745,7 +2900,7 @@
                 }
                 this._PRArrayDS.out_deg[i] = node.outDegree() + node.degree();
                 if (this._personalized) {
-                    let tele_prob_node = config.tele_set[node.getID()] || 0;
+                    var tele_prob_node = config.tele_set[node.getID()] || 0;
                     this._PRArrayDS.teleport[i] = tele_prob_node;
                     teleport_prob_sum += tele_prob_node;
                     tele_prob_node && this._PRArrayDS.tele_size++;
@@ -2753,25 +2908,25 @@
                 ++i;
             }
             if (config.init_map && init_sum !== 1) {
-                this._PRArrayDS.curr = this._PRArrayDS.curr.map(n => n /= init_sum);
-                this._PRArrayDS.old = this._PRArrayDS.old.map(n => n /= init_sum);
+                this._PRArrayDS.curr = this._PRArrayDS.curr.map(function (n) { return n /= init_sum; });
+                this._PRArrayDS.old = this._PRArrayDS.old.map(function (n) { return n /= init_sum; });
             }
             if (this._personalized && teleport_prob_sum !== 1) {
-                this._PRArrayDS.teleport = this._PRArrayDS.teleport.map(n => n /= teleport_prob_sum);
+                this._PRArrayDS.teleport = this._PRArrayDS.teleport.map(function (n) { return n /= teleport_prob_sum; });
             }
-            for (let key in nodes) {
-                let node = this._graph.getNodeById(key);
-                let node_idx = node.getFeature('PR_index');
-                let pull_i = [];
-                let pull_weight_i = [];
-                let incoming_edges = StructUtils.mergeObjects([node.inEdges(), node.undEdges()]);
-                for (let edge_key in incoming_edges) {
-                    let edge = incoming_edges[edge_key];
-                    let source = edge.getNodes().a;
+            for (var key in nodes) {
+                var node = this._graph.getNodeById(key);
+                var node_idx = node.getFeature('PR_index');
+                var pull_i = [];
+                var pull_weight_i = [];
+                var incoming_edges = StructUtils.mergeObjects([node.inEdges(), node.undEdges()]);
+                for (var edge_key in incoming_edges) {
+                    var edge = incoming_edges[edge_key];
+                    var source = edge.getNodes().a;
                     if (edge.getNodes().a.getID() == node.getID()) {
                         source = edge.getNodes().b;
                     }
-                    let parent_idx = source.getFeature('PR_index');
+                    var parent_idx = source.getFeature('PR_index');
                     if (this._weighted) {
                         pull_weight_i.push(edge.getWeight());
                     }
@@ -2782,58 +2937,83 @@
                     this._PRArrayDS.pull_weight[node_idx] = pull_weight_i;
                 }
             }
-            let toc = +new Date;
-            logger.log(`PR Array DS init took ${toc - tic} ms.`);
-        }
-        getRankMapFromArray() {
-            let result = {};
-            let nodes = this._graph.getNodes();
+            var toc = +new Date;
+            logger.log("PR Array DS init took " + (toc - tic) + " ms.");
+        };
+        Pagerank.prototype.getRankMapFromArray = function () {
+            var result = {};
+            var nodes = this._graph.getNodes();
             if (this._normalize) {
                 this.normalizePR();
             }
-            for (let key in nodes) {
-                let node_val = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
+            for (var key in nodes) {
+                var node_val = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
                 result[key] = node_val;
             }
             return result;
-        }
-        normalizePR() {
-            let pr_sum = this._PRArrayDS.curr.reduce((i, j) => i + j, 0);
+        };
+        Pagerank.prototype.normalizePR = function () {
+            var pr_sum = this._PRArrayDS.curr.reduce(function (i, j) { return i + j; }, 0);
             if (pr_sum !== 1) {
-                this._PRArrayDS.curr = this._PRArrayDS.curr.map(n => n / pr_sum);
+                this._PRArrayDS.curr = this._PRArrayDS.curr.map(function (n) { return n / pr_sum; });
             }
-        }
-        pull2DTo1D() {
-            let p1d = [];
-            let p2d = this._PRArrayDS.pull;
-            for (let n in p2d) {
-                for (let i of p2d[n]) {
-                    p1d.push(i);
+        };
+        Pagerank.prototype.pull2DTo1D = function () {
+            var e_1, _a;
+            var p1d = [];
+            var p2d = this._PRArrayDS.pull;
+            for (var n in p2d) {
+                try {
+                    for (var _b = __values(p2d[n]), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var i = _c.value;
+                        p1d.push(i);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
                 }
                 +n !== p2d.length - 1 && p1d.push(-1);
             }
             return p1d;
-        }
-        computePR() {
-            const ds = this._PRArrayDS;
-            const N = this._graph.nrNodes();
-            for (let i = 0; i < this._maxIterations; ++i) {
-                let delta_iter = 0.0;
-                for (let node in ds.curr) {
-                    let pull_rank = 0;
-                    let idx = 0;
-                    for (let source of ds.pull[node]) {
-                        if (ds.out_deg[source] === 0) {
-                            logger.log(`Node: ${node}`);
-                            logger.log(`Source: ${source} `);
-                            throw ('Encountered zero divisor!');
+        };
+        Pagerank.prototype.computePR = function () {
+            var e_2, _a;
+            var ds = this._PRArrayDS;
+            var N = this._graph.nrNodes();
+            var visits = 0;
+            for (var i = 0; i < this._maxIterations; ++i) {
+                var delta_iter = 0.0;
+                for (var node in ds.curr) {
+                    var pull_rank = 0;
+                    visits++;
+                    var idx = 0;
+                    try {
+                        for (var _b = __values(ds.pull[node]), _c = _b.next(); !_c.done; _c = _b.next()) {
+                            var source = _c.value;
+                            visits++;
+                            if (ds.out_deg[source] === 0) {
+                                logger.log("Node: " + node);
+                                logger.log("Source: " + source + " ");
+                                throw ('Encountered zero divisor!');
+                            }
+                            var weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
+                            pull_rank += ds.old[source] * weight / ds.out_deg[source];
                         }
-                        let weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
-                        pull_rank += ds.old[source] * weight / ds.out_deg[source];
                     }
-                    let link_pr = (1 - this._alpha) * pull_rank;
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                    var link_pr = (1 - this._alpha) * pull_rank;
                     if (this._personalized) {
-                        let jump_chance = ds.teleport[node] / ds.tele_size;
+                        var jump_chance = ds.teleport[node] / ds.tele_size;
                         ds.curr[node] = link_pr + jump_chance;
                     }
                     else {
@@ -2844,11 +3024,12 @@
                 if (delta_iter <= this._epsilon) {
                     return this.getRankMapFromArray();
                 }
-                ds.old = [...ds.curr];
+                ds.old = __spread(ds.curr);
             }
             return this.getRankMapFromArray();
-        }
-    }
+        };
+        return Pagerank;
+    }());
     exports.Pagerank = Pagerank;
     });
 
@@ -2859,20 +3040,20 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-    const logger = new Logger_1.Logger();
-    const SSL_PORT = '443';
+    var logger = new Logger_1.Logger();
+    var SSL_PORT = '443';
     function retrieveRemoteFile(config, cb) {
         if (typeof cb !== 'function') {
             throw new Error('Provided callback is not a function.');
         }
-        logger.log(`Requesting file via NodeJS request: ${config.remote_host}${config.remote_path}${config.file_name}`);
-        let options = {
+        logger.log("Requesting file via NodeJS request: " + config.remote_host + config.remote_path + config.file_name);
+        var options = {
             host: config.remote_host,
             port: SSL_PORT,
             path: config.remote_path + config.file_name,
             method: 'GET'
         };
-        let req = https.get(options, response => {
+        var req = https.get(options, function (response) {
             var body = '';
             response.setEncoding('utf8');
             response.on('data', function (d) {
@@ -2882,8 +3063,8 @@
                 cb(body);
             });
         });
-        req.on('error', e => {
-            logger.log(`Request error: ${e.message}`);
+        req.on('error', function (e) {
+            logger.log("Request error: " + e.message);
         });
         return req;
     }
@@ -2907,10 +3088,11 @@
 
 
 
-    let logger = new Logger_1.Logger();
-    const DEFAULT_WEIGHT = 1;
-    class CSVInput {
-        constructor(config = {}) {
+    var logger = new Logger_1.Logger();
+    var DEFAULT_WEIGHT = 1;
+    var CSVInput = (function () {
+        function CSVInput(config) {
+            if (config === void 0) { config = {}; }
             this._config = {
                 separator: config.separator != null ? config.separator : ',',
                 explicit_direction: config.explicit_direction != null ? config.explicit_direction : true,
@@ -2918,42 +3100,42 @@
                 weighted: config.weighted != null ? config.weighted : false
             };
         }
-        readFromAdjacencyListURL(config, cb) {
+        CSVInput.prototype.readFromAdjacencyListURL = function (config, cb) {
             this.readGraphFromURL(config, cb, this.readFromAdjacencyList);
-        }
-        readFromEdgeListURL(config, cb) {
+        };
+        CSVInput.prototype.readFromEdgeListURL = function (config, cb) {
             this.readGraphFromURL(config, cb, this.readFromEdgeList);
-        }
-        readGraphFromURL(config, cb, localFun) {
-            let self = this, graph_name = config.file_name, graph;
+        };
+        CSVInput.prototype.readGraphFromURL = function (config, cb, localFun) {
+            var self = this, graph_name = config.file_name, graph;
             RemoteUtils.checkNodeEnvironment();
             RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
-                let input = raw_graph.toString().split('\n');
+                var input = raw_graph.toString().split('\n');
                 graph = localFun.apply(self, [input, graph_name]);
                 cb(graph, undefined);
             });
-        }
-        readFromAdjacencyListFile(filepath) {
+        };
+        CSVInput.prototype.readFromAdjacencyListFile = function (filepath) {
             return this.readFileAndReturn(filepath, this.readFromAdjacencyList);
-        }
-        readFromEdgeListFile(filepath) {
+        };
+        CSVInput.prototype.readFromEdgeListFile = function (filepath) {
             return this.readFileAndReturn(filepath, this.readFromEdgeList);
-        }
-        readFileAndReturn(filepath, func) {
+        };
+        CSVInput.prototype.readFileAndReturn = function (filepath, func) {
             RemoteUtils.checkNodeEnvironment();
-            let graph_name = path.basename(filepath);
-            let input = fs.readFileSync(filepath).toString().split('\n');
+            var graph_name = path.basename(filepath);
+            var input = fs.readFileSync(filepath).toString().split('\n');
             return func.apply(this, [input, graph_name]);
-        }
-        readFromAdjacencyList(input, graph_name) {
-            let graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (let idx in input) {
-                let line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node, edge_array = elements.slice(1), edge, target_node_id, target_node, dir_char, directed, edge_id, edge_id_u2;
+        };
+        CSVInput.prototype.readFromAdjacencyList = function (input, graph_name) {
+            var graph = new BaseGraph_1.BaseGraph(graph_name);
+            for (var idx in input) {
+                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node = void 0, edge_array = elements.slice(1), edge = void 0, target_node_id = void 0, target_node = void 0, dir_char = void 0, directed = void 0, edge_id = void 0, edge_id_u2 = void 0;
                 if (!node_id) {
                     continue;
                 }
                 node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                for (let e = 0; e < edge_array.length;) {
+                for (var e = 0; e < edge_array.length;) {
                     if (this._config.explicit_direction && (!edge_array || edge_array.length % 2)) {
                         throw new Error('Every edge entry has to contain its direction info in explicit mode.');
                     }
@@ -2975,11 +3157,11 @@
                 }
             }
             return graph;
-        }
-        readFromEdgeList(input, graph_name, weighted = false) {
-            let graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (let idx in input) {
-                let line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
+        };
+        CSVInput.prototype.readFromEdgeList = function (input, graph_name, weighted) {
+            var graph = new BaseGraph_1.BaseGraph(graph_name);
+            for (var idx in input) {
+                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
                 if (!elements) {
                     continue;
                 }
@@ -2987,7 +3169,7 @@
                     logger.log(elements);
                     throw new Error('Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)');
                 }
-                let node_id = elements[0], node, target_node, edge, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed, edge_id, edge_id_u2, parse_weight, edge_weight;
+                var node_id = elements[0], node = void 0, target_node = void 0, edge = void 0, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed = void 0, edge_id = void 0, edge_id_u2 = void 0, parse_weight = void 0, edge_weight = void 0;
                 node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
                 target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
                 if (dir_char !== 'd' && dir_char !== 'u') {
@@ -3009,8 +3191,9 @@
                 }
             }
             return graph;
-        }
-    }
+        };
+        return CSVInput;
+    }());
     exports.CSVInput = CSVInput;
     });
 
@@ -3020,47 +3203,49 @@
     var CSVOutput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-    class CSVOutput {
-        constructor(config) {
+    var CSVOutput = (function () {
+        function CSVOutput(config) {
             this._config = config || {
                 separator: config && config.separator || ',',
                 explicit_direction: config && config.explicit_direction || true,
                 direction_mode: config && config.direction_mode || false
             };
         }
-        writeToAdjacencyListFile(filepath, graph) {
+        CSVOutput.prototype.writeToAdjacencyListFile = function (filepath, graph) {
             if (typeof window !== 'undefined' && window !== null) {
                 throw new Error('cannot write to File inside of Browser');
             }
             fs.writeFileSync(filepath, this.writeToAdjacencyList(graph));
-        }
-        writeToAdjacencyList(graph) {
-            let graphString = "";
-            let nodes = graph.getNodes(), node = null, adj_nodes = null, adj_node = null;
-            for (let node_key in nodes) {
+        };
+        CSVOutput.prototype.writeToAdjacencyList = function (graph) {
+            var graphString = "";
+            var nodes = graph.getNodes(), node = null, adj_nodes = null, adj_node = null;
+            for (var node_key in nodes) {
                 node = nodes[node_key];
                 graphString += node.getID();
                 adj_nodes = node.reachNodes(this.mergeFunc);
-                for (let adj_idx in adj_nodes) {
+                for (var adj_idx in adj_nodes) {
                     adj_node = adj_nodes[adj_idx].node;
                     graphString += this._config.separator + adj_node.getID();
                 }
                 graphString += "\n";
             }
             return graphString;
-        }
-        writeToEdgeListFile(filepath, graph, weighted = false) {
+        };
+        CSVOutput.prototype.writeToEdgeListFile = function (filepath, graph, weighted) {
+            if (weighted === void 0) { weighted = false; }
             if (typeof window !== 'undefined' && window !== null) {
                 throw new Error('cannot write to File inside of Browser');
             }
             fs.writeFileSync(filepath, this.writeToEdgeList(graph, weighted));
-        }
-        writeToEdgeList(graph, weighted = false) {
-            let graphString = "", nodes = graph.getNodes(), node = null, adj_nodes = null, adj_entry, adj_node = null, weight_str;
-            for (let node_key in nodes) {
+        };
+        CSVOutput.prototype.writeToEdgeList = function (graph, weighted) {
+            if (weighted === void 0) { weighted = false; }
+            var graphString = "", nodes = graph.getNodes(), node = null, adj_nodes = null, adj_entry, adj_node = null, weight_str;
+            for (var node_key in nodes) {
                 node = nodes[node_key];
                 adj_nodes = node.reachNodes(this.mergeFunc);
-                for (let adj_idx in adj_nodes) {
+                for (var adj_idx in adj_nodes) {
                     adj_entry = adj_nodes[adj_idx];
                     adj_node = adj_entry.node;
                     weight_str = '';
@@ -3072,11 +3257,12 @@
                 }
             }
             return graphString;
-        }
-        mergeFunc(ne) {
+        };
+        CSVOutput.prototype.mergeFunc = function (ne) {
             return ne.node.getID();
-        }
-    }
+        };
+        return CSVOutput;
+    }());
     exports.CSVOutput = CSVOutput;
     });
 
@@ -3103,52 +3289,74 @@
     var interfaces_1 = interfaces.labelKeys;
 
     var Dupes = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-    const logger = new Logger_1.Logger();
-    class EdgeDupeChecker {
-        constructor(_graph) {
+    var logger = new Logger_1.Logger();
+    var EdgeDupeChecker = (function () {
+        function EdgeDupeChecker(_graph) {
             this._graph = _graph;
         }
-        isDupe(e) {
-            let pds = this.potentialEndpoints(e);
+        EdgeDupeChecker.prototype.isDupe = function (e) {
+            var e_1, _a;
+            var pds = this.potentialEndpoints(e);
             if (!pds.size) {
                 return false;
             }
-            for (let pd of pds.values()) {
-                if (!EdgeDupeChecker.checkTypeWeightEquality(e, pd)
-                    || !EdgeDupeChecker.typeWeightDupe(e, pd)) {
-                    pds.delete(pd);
+            try {
+                for (var _b = __values(pds.values()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var pd = _c.value;
+                    if (!EdgeDupeChecker.checkTypeWeightEquality(e, pd)
+                        || !EdgeDupeChecker.typeWeightDupe(e, pd)) {
+                        pds.delete(pd);
+                    }
                 }
             }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
             return !!pds.size;
-        }
-        potentialEndpoints(e) {
-            const result = new Set();
+        };
+        EdgeDupeChecker.prototype.potentialEndpoints = function (e) {
+            var result = new Set();
             if (e.dir) {
-                e.a.nextNodes().forEach(ne => {
+                e.a.nextNodes().forEach(function (ne) {
                     (ne.node === e.b) && result.add(ne.edge);
                 });
             }
             else {
-                e.a.connNodes().forEach(ne => {
+                e.a.connNodes().forEach(function (ne) {
                     (ne.node === e.b) && result.add(ne.edge);
                 });
             }
             return result;
-        }
-        static checkTypeWeightEquality(e, oe) {
+        };
+        EdgeDupeChecker.checkTypeWeightEquality = function (e, oe) {
             return BaseEdge_1.BaseEdge.isTyped(oe) === e.typed && e.weighted === oe.isWeighted();
-        }
-        static typeWeightDupe(e, oe) {
-            const neitherTypedNorWeighted = !e.typed && !e.weighted;
-            const notTypedButWeighted = !e.typed && e.weighted;
-            const weightEqual = e.weight === oe.getWeight();
-            const typeEqual = e.typed && BaseEdge_1.BaseEdge.isTyped(oe) && e.type === oe.type;
+        };
+        EdgeDupeChecker.typeWeightDupe = function (e, oe) {
+            var neitherTypedNorWeighted = !e.typed && !e.weighted;
+            var notTypedButWeighted = !e.typed && e.weighted;
+            var weightEqual = e.weight === oe.getWeight();
+            var typeEqual = e.typed && BaseEdge_1.BaseEdge.isTyped(oe) && e.type === oe.type;
             return (neitherTypedNorWeighted || notTypedButWeighted && weightEqual || typeEqual);
-        }
-    }
+        };
+        return EdgeDupeChecker;
+    }());
     exports.EdgeDupeChecker = EdgeDupeChecker;
     });
 
@@ -3201,13 +3409,170 @@
       byteToHex[i] = (i + 0x100).toString(16).substr(1);
     }
 
+    function bytesToUuid(buf, offset) {
+      var i = offset || 0;
+      var bth = byteToHex;
+      // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+      return ([bth[buf[i++]], bth[buf[i++]], 
+    	bth[buf[i++]], bth[buf[i++]], '-',
+    	bth[buf[i++]], bth[buf[i++]], '-',
+    	bth[buf[i++]], bth[buf[i++]], '-',
+    	bth[buf[i++]], bth[buf[i++]], '-',
+    	bth[buf[i++]], bth[buf[i++]],
+    	bth[buf[i++]], bth[buf[i++]],
+    	bth[buf[i++]], bth[buf[i++]]]).join('');
+    }
+
+    var bytesToUuid_1 = bytesToUuid;
+
+    // **`v1()` - Generate time-based UUID**
+    //
+    // Inspired by https://github.com/LiosK/UUID.js
+    // and http://docs.python.org/library/uuid.html
+
+    var _nodeId;
+    var _clockseq;
+
+    // Previous uuid creation time
+    var _lastMSecs = 0;
+    var _lastNSecs = 0;
+
+    // See https://github.com/broofa/node-uuid for API details
+    function v1(options, buf, offset) {
+      var i = buf && offset || 0;
+      var b = buf || [];
+
+      options = options || {};
+      var node = options.node || _nodeId;
+      var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+      // node and clockseq need to be initialized to random values if they're not
+      // specified.  We do this lazily to minimize issues related to insufficient
+      // system entropy.  See #189
+      if (node == null || clockseq == null) {
+        var seedBytes = rngBrowser();
+        if (node == null) {
+          // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+          node = _nodeId = [
+            seedBytes[0] | 0x01,
+            seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+          ];
+        }
+        if (clockseq == null) {
+          // Per 4.2.2, randomize (14 bit) clockseq
+          clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+        }
+      }
+
+      // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+      // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+      // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+      // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+      var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+      // Per 4.2.1.2, use count of uuid's generated during the current clock
+      // cycle to simulate higher resolution clock
+      var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+      // Time since last uuid creation (in msecs)
+      var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+      // Per 4.2.1.2, Bump clockseq on clock regression
+      if (dt < 0 && options.clockseq === undefined) {
+        clockseq = clockseq + 1 & 0x3fff;
+      }
+
+      // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+      // time interval
+      if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+        nsecs = 0;
+      }
+
+      // Per 4.2.1.2 Throw error if too many uuids are requested
+      if (nsecs >= 10000) {
+        throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+      }
+
+      _lastMSecs = msecs;
+      _lastNSecs = nsecs;
+      _clockseq = clockseq;
+
+      // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+      msecs += 12219292800000;
+
+      // `time_low`
+      var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+      b[i++] = tl >>> 24 & 0xff;
+      b[i++] = tl >>> 16 & 0xff;
+      b[i++] = tl >>> 8 & 0xff;
+      b[i++] = tl & 0xff;
+
+      // `time_mid`
+      var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+      b[i++] = tmh >>> 8 & 0xff;
+      b[i++] = tmh & 0xff;
+
+      // `time_high_and_version`
+      b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+      b[i++] = tmh >>> 16 & 0xff;
+
+      // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+      b[i++] = clockseq >>> 8 | 0x80;
+
+      // `clock_seq_low`
+      b[i++] = clockseq & 0xff;
+
+      // `node`
+      for (var n = 0; n < 6; ++n) {
+        b[i + n] = node[n];
+      }
+
+      return buf ? buf : bytesToUuid_1(b);
+    }
+
+    var v1_1 = v1;
+
+    function v4(options, buf, offset) {
+      var i = buf && offset || 0;
+
+      if (typeof(options) == 'string') {
+        buf = options === 'binary' ? new Array(16) : null;
+        options = null;
+      }
+      options = options || {};
+
+      var rnds = options.random || (options.rng || rngBrowser)();
+
+      // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+      rnds[6] = (rnds[6] & 0x0f) | 0x40;
+      rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+      // Copy bytes to buffer, if provided
+      if (buf) {
+        for (var ii = 0; ii < 16; ++ii) {
+          buf[i + ii] = rnds[ii];
+        }
+      }
+
+      return buf || bytesToUuid_1(rnds);
+    }
+
+    var v4_1 = v4;
+
+    var uuid = v4_1;
+    uuid.v1 = v1_1;
+    uuid.v4 = v4_1;
+
+    var uuid_1 = uuid;
+
     var JSONInput_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-    const logger = new Logger_1.Logger();
-    const DEFAULT_WEIGHT = 1;
-    class JSONInput {
-        constructor(config = {}) {
+    var logger = new Logger_1.Logger();
+    var DEFAULT_WEIGHT = 1;
+    var JSONInput = (function () {
+        function JSONInput(config) {
+            if (config === void 0) { config = {}; }
             this._config = {
                 explicit_direction: config.explicit_direction != null ? config.explicit_direction : true,
                 directed: config.directed != null ? config.directed : false,
@@ -3215,39 +3580,39 @@
                 dupeCheck: config.dupeCheck != null ? config.dupeCheck : true
             };
         }
-        readFromJSONFile(filepath, graph) {
+        JSONInput.prototype.readFromJSONFile = function (filepath, graph) {
             RemoteUtils.checkNodeEnvironment();
-            let json = JSON.parse(fs.readFileSync(filepath).toString());
+            var json = JSON.parse(fs.readFileSync(filepath).toString());
             return this.readFromJSON(json, graph);
-        }
-        readFromJSONURL(config, cb, graph) {
-            const self = this;
+        };
+        JSONInput.prototype.readFromJSONURL = function (config, cb, graph) {
+            var self = this;
             RemoteUtils.checkNodeEnvironment();
             RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
                 graph = self.readFromJSON(JSON.parse(raw_graph), graph);
                 cb(graph, undefined);
             });
-        }
-        readFromJSON(json, graph) {
+        };
+        JSONInput.prototype.readFromJSON = function (json, graph) {
             graph = graph || new BaseGraph_1.BaseGraph(json.name);
-            const edc = new Dupes.EdgeDupeChecker(graph);
+            var edc = new Dupes.EdgeDupeChecker(graph);
             this.addNodesToGraph(json, graph);
-            for (let node_id in json.data) {
-                let node = graph.getNodeById(node_id);
-                let edges = json.data[node_id][interfaces.labelKeys.edges];
-                for (let e in edges) {
-                    const edge_input = edges[e];
-                    const target_node = this.getTargetNode(graph, edge_input);
-                    const edge_label = edge_input[interfaces.labelKeys.e_label];
-                    const edge_type = edge_input[interfaces.labelKeys.e_type];
-                    const directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed;
-                    const weight_float = JSONInput.handleEdgeWeights(edge_input);
-                    const weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
-                    const edge_weight = this._config.weighted ? weight_info : undefined;
-                    const target_node_id = edge_input[interfaces.labelKeys.e_to];
-                    const dir_char = directed ? 'd' : 'u';
-                    const edge_id = node_id + "_" + target_node_id + "_" + dir_char;
-                    const newEdge = {
+            for (var node_id in json.data) {
+                var node = graph.getNodeById(node_id);
+                var edges = json.data[node_id][interfaces.labelKeys.edges];
+                for (var e in edges) {
+                    var edge_input = edges[e];
+                    var target_node = this.getTargetNode(graph, edge_input);
+                    var edge_label = edge_input[interfaces.labelKeys.e_label];
+                    var edge_type = edge_input[interfaces.labelKeys.e_type];
+                    var directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed;
+                    var weight_float = JSONInput.handleEdgeWeights(edge_input);
+                    var weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
+                    var edge_weight = this._config.weighted ? weight_info : undefined;
+                    var target_node_id = edge_input[interfaces.labelKeys.e_to];
+                    var dir_char = directed ? 'd' : 'u';
+                    var edge_id = node_id + "_" + target_node_id + "_" + dir_char;
+                    var newEdge = {
                         a: node,
                         b: target_node,
                         label: edge_label,
@@ -3258,7 +3623,7 @@
                         type: edge_type
                     };
                     if (this._config.dupeCheck && edc.isDupe(newEdge)) {
-                        logger.log(`Edge ${edge_label} is a duplicate according to assumptions... omitting.`);
+                        logger.log("Edge " + edge_label + " is a duplicate according to assumptions... omitting.");
                         continue;
                     }
                     graph.addEdgeByID(edge_id, node, target_node, {
@@ -3272,13 +3637,13 @@
                 }
             }
             return graph;
-        }
-        addNodesToGraph(json, graph) {
-            let coords_json, coords, coord_idx, features;
-            for (let node_id in json.data) {
-                const type = BaseGraph_1.BaseGraph.isTyped(graph) ? json.data[node_id][interfaces.labelKeys.n_type] : null;
-                const label = json.data[node_id][interfaces.labelKeys.n_label];
-                const node = graph.addNodeByID(node_id, { label, type });
+        };
+        JSONInput.prototype.addNodesToGraph = function (json, graph) {
+            var coords_json, coords, coord_idx, features;
+            for (var node_id in json.data) {
+                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? json.data[node_id][interfaces.labelKeys.n_type] : null;
+                var label = json.data[node_id][interfaces.labelKeys.n_label];
+                var node = graph.addNodeByID(node_id, { label: label, type: type });
                 features = json.data[node_id][interfaces.labelKeys.n_features];
                 if (features) {
                     node.setFeatures(features);
@@ -3292,16 +3657,16 @@
                     node.setFeature(interfaces.labelKeys.coords, coords);
                 }
             }
-        }
-        getTargetNode(graph, edge_input) {
-            const target_node_id = edge_input[interfaces.labelKeys.e_to];
-            const target_node = graph.getNodeById(target_node_id);
+        };
+        JSONInput.prototype.getTargetNode = function (graph, edge_input) {
+            var target_node_id = edge_input[interfaces.labelKeys.e_to];
+            var target_node = graph.getNodeById(target_node_id);
             if (!target_node) {
                 throw new Error('Node referenced by edge does not exist');
             }
             return target_node;
-        }
-        static handleEdgeWeights(edge_input) {
+        };
+        JSONInput.handleEdgeWeights = function (edge_input) {
             switch (edge_input[interfaces.labelKeys.e_weight]) {
                 case "undefined":
                     return DEFAULT_WEIGHT;
@@ -3316,8 +3681,9 @@
                 default:
                     return parseFloat(edge_input[interfaces.labelKeys.e_weight]);
             }
-        }
-    }
+        };
+        return JSONInput;
+    }());
     exports.JSONInput = JSONInput;
     });
 
@@ -3331,18 +3697,20 @@
 
 
 
-    const logger = new Logger_1.Logger();
-    class JSONOutput {
-        constructor() { }
-        writeToJSONFile(filepath, graph) {
+    var logger = new Logger_1.Logger();
+    var JSONOutput = (function () {
+        function JSONOutput() {
+        }
+        JSONOutput.prototype.writeToJSONFile = function (filepath, graph) {
             if (typeof window !== 'undefined' && window !== null) {
                 throw new Error('cannot write to File inside of Browser');
             }
             fs.writeFileSync(filepath, this.writeToJSONString(graph));
-        }
-        writeToJSONString(graph) {
-            let nodes, node, node_struct, und_edges, dir_edges, edge, coords;
-            let result = {
+        };
+        JSONOutput.prototype.writeToJSONString = function (graph) {
+            var _a, _b, _c;
+            var nodes, node, node_struct, und_edges, dir_edges, edge, coords;
+            var result = {
                 name: graph.label,
                 nodes: graph.nrNodes(),
                 dir_e: graph.nrDirEdges(),
@@ -3350,11 +3718,11 @@
                 data: {}
             };
             nodes = graph.getNodes();
-            for (let node_key in nodes) {
+            for (var node_key in nodes) {
                 node = nodes[node_key];
-                node_struct = result.data[node.getID()] = {
-                    [interfaces.labelKeys.edges]: []
-                };
+                node_struct = result.data[node.getID()] = (_a = {},
+                    _a[interfaces.labelKeys.edges] = [],
+                    _a);
                 if (node.getID() !== node.getLabel()) {
                     node_struct[interfaces.labelKeys.n_label] = node.label;
                 }
@@ -3362,14 +3730,14 @@
                     node_struct[interfaces.labelKeys.n_type] = node.type;
                 }
                 und_edges = node.undEdges();
-                for (let edge_key in und_edges) {
+                for (var edge_key in und_edges) {
                     edge = und_edges[edge_key];
-                    let endPoints = edge.getNodes();
-                    let edgeStruct = {
-                        [interfaces.labelKeys.e_to]: endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
-                        [interfaces.labelKeys.e_dir]: edge.isDirected() ? 1 : 0,
-                        [interfaces.labelKeys.e_weight]: JSONOutput.handleEdgeWeight(edge),
-                    };
+                    var endPoints = edge.getNodes();
+                    var edgeStruct = (_b = {},
+                        _b[interfaces.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
+                        _b[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _b[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _b);
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
                     }
@@ -3379,14 +3747,14 @@
                     node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
                 dir_edges = node.outEdges();
-                for (let edge_key in dir_edges) {
+                for (var edge_key in dir_edges) {
                     edge = dir_edges[edge_key];
-                    let endPoints = edge.getNodes();
-                    let edgeStruct = {
-                        [interfaces.labelKeys.e_to]: endPoints.b.getID(),
-                        [interfaces.labelKeys.e_dir]: edge.isDirected() ? 1 : 0,
-                        [interfaces.labelKeys.e_weight]: JSONOutput.handleEdgeWeight(edge),
-                    };
+                    var endPoints = edge.getNodes();
+                    var edgeStruct = (_c = {},
+                        _c[interfaces.labelKeys.e_to] = endPoints.b.getID(),
+                        _c[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _c[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _c);
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
                     }
@@ -3401,8 +3769,8 @@
                 }
             }
             return JSON.stringify(result);
-        }
-        static handleEdgeWeight(edge) {
+        };
+        JSONOutput.handleEdgeWeight = function (edge) {
             if (!edge.isWeighted()) {
                 return undefined;
             }
@@ -3418,8 +3786,9 @@
                 default:
                     return edge.getWeight();
             }
-        }
-    }
+        };
+        return JSONOutput;
+    }());
     exports.JSONOutput = JSONOutput;
     });
 
@@ -3430,7 +3799,7 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
     function Dijkstra(graph, source, target) {
-        let config = PFS_1.preparePFSStandardConfig();
+        var config = PFS_1.preparePFSStandardConfig();
         if (target) {
             config.goal_node = target;
         }
@@ -3445,83 +3814,88 @@
     var SimplePerturbations = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-    let logger = new Logger_1.Logger();
-    class SimplePerturber {
-        constructor(_graph) {
+    var v4 = uuid_1.v4;
+
+    var logger = new Logger_1.Logger();
+    var SimplePerturber = (function () {
+        function SimplePerturber(_graph) {
             this._graph = _graph;
         }
-        randomlyDeleteNodesPercentage(percentage) {
+        SimplePerturber.prototype.deleteNodesPercentage = function (percentage) {
+            if (percentage < 0) {
+                throw new Error('Cowardly refusing to remove a negative amount of nodes');
+            }
             if (percentage > 100) {
                 percentage = 100;
             }
-            let nr_nodes_to_delete = Math.ceil(this._graph.nrNodes() * percentage / 100);
-            this.randomlyDeleteNodesAmount(nr_nodes_to_delete);
-        }
-        randomlyDeleteUndEdgesPercentage(percentage) {
+            var nr_nodes_to_delete = Math.ceil(this._graph.nrNodes() * percentage / 100);
+            this.deleteNodesAmount(nr_nodes_to_delete);
+        };
+        SimplePerturber.prototype.deleteUndEdgesPercentage = function (percentage) {
             if (percentage > 100) {
                 percentage = 100;
             }
-            let nr_edges_to_delete = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
-            this.randomlyDeleteUndEdgesAmount(nr_edges_to_delete);
-        }
-        randomlyDeleteDirEdgesPercentage(percentage) {
+            var nr_edges_to_delete = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
+            this.deleteUndEdgesAmount(nr_edges_to_delete);
+        };
+        SimplePerturber.prototype.deleteDirEdgesPercentage = function (percentage) {
             if (percentage > 100) {
                 percentage = 100;
             }
-            let nr_edges_to_delete = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
-            this.randomlyDeleteDirEdgesAmount(nr_edges_to_delete);
-        }
-        randomlyDeleteNodesAmount(amount) {
+            var nr_edges_to_delete = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
+            this.deleteDirEdgesAmount(nr_edges_to_delete);
+        };
+        SimplePerturber.prototype.deleteNodesAmount = function (amount) {
             if (amount < 0) {
                 throw 'Cowardly refusing to remove a negative amount of nodes';
             }
             if (this._graph.nrNodes() === 0) {
                 return;
             }
-            for (let nodeID = 0, randomNodes = this._graph.pickRandomProperties(this._graph.getNodes(), amount); nodeID < randomNodes.length; nodeID++) {
+            for (var nodeID = 0, randomNodes = this._graph.pickRandomProperties(this._graph.getNodes(), amount); nodeID < randomNodes.length; nodeID++) {
                 this._graph.deleteNode(this._graph.getNodes()[randomNodes[nodeID]]);
             }
-        }
-        randomlyDeleteUndEdgesAmount(amount) {
+        };
+        SimplePerturber.prototype.deleteUndEdgesAmount = function (amount) {
             if (amount < 0) {
                 throw 'Cowardly refusing to remove a negative amount of edges';
             }
             if (this._graph.nrUndEdges() === 0) {
                 return;
             }
-            for (let edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getUndEdges(), amount); edgeID < randomEdges.length; edgeID++) {
+            for (var edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getUndEdges(), amount); edgeID < randomEdges.length; edgeID++) {
                 this._graph.deleteEdge(this._graph.getUndEdges()[randomEdges[edgeID]]);
             }
-        }
-        randomlyDeleteDirEdgesAmount(amount) {
+        };
+        SimplePerturber.prototype.deleteDirEdgesAmount = function (amount) {
             if (amount < 0) {
                 throw 'Cowardly refusing to remove a negative amount of edges';
             }
             if (this._graph.nrDirEdges() === 0) {
                 return;
             }
-            for (let edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getDirEdges(), amount); edgeID < randomEdges.length; edgeID++) {
+            for (var edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getDirEdges(), amount); edgeID < randomEdges.length; edgeID++) {
                 this._graph.deleteEdge(this._graph.getDirEdges()[randomEdges[edgeID]]);
             }
-        }
-        randomlyAddUndEdgesPercentage(percentage) {
-            let nr_und_edges_to_add = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
-            this.randomlyAddEdgesAmount(nr_und_edges_to_add, { directed: false });
-        }
-        randomlyAddDirEdgesPercentage(percentage) {
-            let nr_dir_edges_to_add = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
-            this.randomlyAddEdgesAmount(nr_dir_edges_to_add, { directed: true });
-        }
-        randomlyAddEdgesAmount(amount, config) {
+        };
+        SimplePerturber.prototype.addUndEdgesPercentage = function (percentage) {
+            var nr_und_edges_to_add = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
+            this.addEdgesAmount(nr_und_edges_to_add, { directed: false });
+        };
+        SimplePerturber.prototype.addDirEdgesPercentage = function (percentage) {
+            var nr_dir_edges_to_add = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
+            this.addEdgesAmount(nr_dir_edges_to_add, { directed: true });
+        };
+        SimplePerturber.prototype.addEdgesAmount = function (amount, config) {
             if (amount <= 0) {
                 throw new Error('Cowardly refusing to add a non-positive amount of edges');
             }
-            let node_a, node_b;
-            let direction = (config && config.directed) ? config.directed : false, dir = direction ? "_d" : "_u";
-            while (amount) {
+            var node_a, node_b;
+            var direction = (config && config.directed) ? config.directed : false, dir = direction ? "_d" : "_u";
+            while (amount > 0) {
                 node_a = this._graph.getRandomNode();
                 while ((node_b = this._graph.getRandomNode()) === node_a) { }
-                let edge_id = `${node_a.getID()}_${node_b.getID()}${dir}`;
+                var edge_id = node_a.getID() + "_" + node_b.getID() + dir;
                 if (node_a.hasEdgeID(edge_id)) {
                     continue;
                 }
@@ -3530,18 +3904,21 @@
                     --amount;
                 }
             }
-        }
-        randomlyAddNodesPercentage(percentage, config) {
-            let nr_nodes_to_add = Math.ceil(this._graph.nrNodes() * percentage / 100);
-            this.randomlyAddNodesAmount(nr_nodes_to_add, config);
-        }
-        randomlyAddNodesAmount(amount, config) {
+        };
+        SimplePerturber.prototype.addNodesPercentage = function (percentage, config) {
+            if (percentage < 0) {
+                throw 'Cowardly refusing to add a negative amount of nodes';
+            }
+            var nr_nodes_to_add = Math.ceil(this._graph.nrNodes() * percentage / 100);
+            this.addNodesAmount(nr_nodes_to_add, config);
+        };
+        SimplePerturber.prototype.addNodesAmount = function (amount, config) {
             if (amount < 0) {
                 throw 'Cowardly refusing to add a negative amount of nodes';
             }
-            let new_nodes = {};
-            while (amount--) {
-                let new_node_id = (Math.random() + 1).toString(36).substr(2, 32) + (Math.random() + 1).toString(36).substr(2, 32);
+            var new_nodes = {};
+            while (--amount >= 0) {
+                var new_node_id = v4();
                 new_nodes[new_node_id] = this._graph.addNodeByID(new_node_id);
             }
             if (config == null) {
@@ -3550,57 +3927,54 @@
             else {
                 this.createEdgesByConfig(config, new_nodes);
             }
-        }
-        createEdgesByConfig(config, new_nodes) {
-            let degree, min_degree, max_degree;
+        };
+        SimplePerturber.prototype.createEdgesByConfig = function (config, new_nodes) {
+            var degree, min_degree, max_degree;
             if (config.und_degree != null ||
                 config.dir_degree != null ||
                 config.min_und_degree != null && config.max_und_degree != null ||
                 config.min_dir_degree != null && config.max_dir_degree != null) {
                 if ((degree = config.und_degree) != null) {
-                    this.createRandomEdgesSpan(degree, degree, false, new_nodes);
+                    this.createEdgesSpan(degree, degree, false, new_nodes);
                 }
                 else if ((min_degree = config.min_und_degree) != null
                     && (max_degree = config.max_und_degree) != null) {
-                    this.createRandomEdgesSpan(min_degree, max_degree, false, new_nodes);
+                    this.createEdgesSpan(min_degree, max_degree, false, new_nodes);
                 }
                 if (degree = config.dir_degree) {
-                    this.createRandomEdgesSpan(degree, degree, true, new_nodes);
+                    this.createEdgesSpan(degree, degree, true, new_nodes);
                 }
                 else if ((min_degree = config.min_dir_degree) != null
                     && (max_degree = config.max_dir_degree) != null) {
-                    this.createRandomEdgesSpan(min_degree, max_degree, true, new_nodes);
+                    this.createEdgesSpan(min_degree, max_degree, true, new_nodes);
                 }
             }
             else {
                 if (config.probability_dir != null) {
-                    this.createRandomEdgesProb(config.probability_dir, true, new_nodes);
+                    this.createEdgesProb(config.probability_dir, true, new_nodes);
                 }
                 if (config.probability_und != null) {
-                    this.createRandomEdgesProb(config.probability_und, false, new_nodes);
+                    this.createEdgesProb(config.probability_und, false, new_nodes);
                 }
             }
-        }
-        createRandomEdgesProb(probability, directed, new_nodes) {
+        };
+        SimplePerturber.prototype.createEdgesProb = function (probability, directed, new_nodes) {
             if (0 > probability || 1 < probability) {
                 throw new Error("Probability out of range.");
             }
             directed = directed || false;
             new_nodes = new_nodes || this._graph.getNodes();
-            let all_nodes = this._graph.getNodes(), node_a, node_b, edge_id, dir = directed ? '_d' : '_u';
+            var all_nodes = this._graph.getNodes(), node_a, node_b, edge_id, dir = directed ? '_d' : '_u';
             for (node_a in new_nodes) {
                 for (node_b in all_nodes) {
                     if (node_a !== node_b && Math.random() <= probability) {
                         edge_id = all_nodes[node_a].getID() + "_" + all_nodes[node_b].getID() + dir;
-                        if (this._graph.getNodes()[node_a].hasEdgeID(edge_id)) {
-                            continue;
-                        }
                         this._graph.addEdgeByID(edge_id, all_nodes[node_a], all_nodes[node_b], { directed: directed });
                     }
                 }
             }
-        }
-        createRandomEdgesSpan(min, max, directed, setOfNodes) {
+        };
+        SimplePerturber.prototype.createEdgesSpan = function (min, max, directed, setOfNodes) {
             if (min < 0) {
                 throw new Error('Minimum degree cannot be negative.');
             }
@@ -3629,8 +4003,9 @@
                     }
                 }
             }
-        }
-    }
+        };
+        return SimplePerturber;
+    }());
     exports.SimplePerturber = SimplePerturber;
     });
 
@@ -3640,21 +4015,21 @@
     var KroneckerLeskovec = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-    class KROL {
-        constructor(config) {
+    var KROL = (function () {
+        function KROL(config) {
             this._config = config || this.prepareKROLStandardConfig();
             this._genMat = this._config.genMat;
             this._cycles = this._config.cycles;
             this._graph = new BaseGraph_1.BaseGraph('synth');
         }
-        generate() {
+        KROL.prototype.generate = function () {
             var gen_dims = this._genMat[0].length;
             var res_dims = Math.pow(gen_dims, this._cycles + 1);
-            for (let index = 0; index < res_dims; index++) {
+            for (var index = 0; index < res_dims; index++) {
                 this._graph.addNodeByID(index.toString());
             }
-            for (let node1 = 0; node1 < res_dims; node1++) {
-                for (let node2 = 0; node2 < res_dims; node2++) {
+            for (var node1 = 0; node1 < res_dims; node1++) {
+                for (var node2 = 0; node2 < res_dims; node2++) {
                     if (this.addEdge(node1, node2, gen_dims)) {
                         this._graph.addEdgeByNodeIDs(node1 + '_' + node2, node1.toString(), node2.toString());
                     }
@@ -3664,11 +4039,11 @@
                 graph: this._graph
             };
             return result;
-        }
-        addEdge(node1, node2, dims) {
+        };
+        KROL.prototype.addEdge = function (node1, node2, dims) {
             var rprob = Math.random();
             var prob = 1.0;
-            for (let level = 0; level < this._cycles; level++) {
+            for (var level = 0; level < this._cycles; level++) {
                 var id_1 = Math.floor(node1 / Math.pow(dims, level + 1)) % dims;
                 var id_2 = Math.floor(node2 / Math.pow(dims, level + 1)) % dims;
                 prob *= this._genMat[id_1][id_2];
@@ -3677,15 +4052,16 @@
                 }
             }
             return true;
-        }
-        prepareKROLStandardConfig() {
+        };
+        KROL.prototype.prepareKROLStandardConfig = function () {
             var genMat = [[0.9, 0.5], [0.5, 0.1]];
             return {
                 genMat: genMat,
                 cycles: 5
             };
-        }
-    }
+        };
+        return KROL;
+    }());
     exports.KROL = KROL;
     });
 
@@ -3794,34 +4170,55 @@
     var graphinius = out.$G;
 
     var TypedNode_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
-    const logger = new Logger_1.Logger();
-    class TypedNode extends BaseNode_1.BaseNode {
-        constructor(_id, config = {}) {
-            super(_id, config);
-            this._id = _id;
-            this._type = config.type || run_config.GENERIC_TYPES.Node;
-            this._typedAdjSets = {
-                [run_config.GENERIC_TYPES.Edge]: {
+    var logger = new Logger_1.Logger();
+    var TypedNode = (function (_super) {
+        __extends(TypedNode, _super);
+        function TypedNode(_id, config) {
+            var _a;
+            if (config === void 0) { config = {}; }
+            var _this = _super.call(this, _id, config) || this;
+            _this._id = _id;
+            _this._type = config.type || run_config.GENERIC_TYPES.Node;
+            _this._typedAdjSets = (_a = {},
+                _a[run_config.GENERIC_TYPES.Edge] = {
                     ins: new Set(),
                     outs: new Set(),
                     conns: new Set()
-                }
-            };
+                },
+                _a);
+            return _this;
         }
-        get type() {
-            return this._type;
-        }
-        addEdge(edge) {
-            if (!super.addEdge(edge)) {
+        Object.defineProperty(TypedNode.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TypedNode.prototype.addEdge = function (edge) {
+            if (!_super.prototype.addEdge.call(this, edge)) {
                 return null;
             }
-            const type = edge.type || run_config.GENERIC_TYPES.Edge;
-            const dir = edge.isDirected();
-            const uid = this.uniqueNID(edge);
+            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var dir = edge.isDirected();
+            var uid = this.uniqueNID(edge);
             if (!this._typedAdjSets[type]) {
                 this._typedAdjSets[type] = {};
             }
@@ -3844,12 +4241,12 @@
                 this._typedAdjSets[type].ins.add(uid);
             }
             return edge;
-        }
-        removeEdge(edge) {
-            super.removeEdge(edge);
-            const type = edge.type || run_config.GENERIC_TYPES.Edge;
-            const dir = edge.isDirected();
-            const uid = this.uniqueNID(edge);
+        };
+        TypedNode.prototype.removeEdge = function (edge) {
+            _super.prototype.removeEdge.call(this, edge);
+            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var dir = edge.isDirected();
+            var uid = this.uniqueNID(edge);
             if (!dir) {
                 this._typedAdjSets[type].conns.delete(uid);
             }
@@ -3862,29 +4259,30 @@
             if (type !== run_config.GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
                 delete this._typedAdjSets[type];
             }
-        }
-        removeEdgeByID(id) {
-        }
-        ins(type) {
+        };
+        TypedNode.prototype.removeEdgeByID = function (id) {
+        };
+        TypedNode.prototype.ins = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
-        }
-        outs(type) {
+        };
+        TypedNode.prototype.outs = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].outs : undefined;
-        }
-        conns(type) {
+        };
+        TypedNode.prototype.conns = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
-        }
-        uniqueNID(e) {
-            const conn = e.getNodes();
-            const node = conn.a === this ? conn.b : conn.a;
-            return `${node.id}#${e.id}#${e.isWeighted() ? 'w' : 'u'}`;
-        }
-        noEdgesOfTypeLeft(type) {
+        };
+        TypedNode.prototype.uniqueNID = function (e) {
+            var conn = e.getNodes();
+            var node = conn.a === this ? conn.b : conn.a;
+            return node.id + "#" + e.id + "#" + (e.isWeighted() ? 'w' : 'u');
+        };
+        TypedNode.prototype.noEdgesOfTypeLeft = function (type) {
             return (!this._typedAdjSets[type].ins || !this._typedAdjSets[type].ins.size)
                 && (!this._typedAdjSets[type].outs || !this._typedAdjSets[type].outs.size)
                 && (!this._typedAdjSets[type].conns || !this._typedAdjSets[type].conns.size);
-        }
-    }
+        };
+        return TypedNode;
+    }(BaseNode_1.BaseNode));
     exports.TypedNode = TypedNode;
     });
 
@@ -3892,23 +4290,44 @@
     var TypedNode_2 = TypedNode_1.TypedNode;
 
     var TypedEdge_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
-    const logger = new Logger_1.Logger();
-    class TypedEdge extends BaseEdge_1.BaseEdge {
-        constructor(_id, _node_a, _node_b, config = {}) {
-            super(_id, _node_a, _node_b, config);
-            this._id = _id;
-            this._node_a = _node_a;
-            this._node_b = _node_b;
-            this._type = config.type || run_config.GENERIC_TYPES.Edge;
+    var logger = new Logger_1.Logger();
+    var TypedEdge = (function (_super) {
+        __extends(TypedEdge, _super);
+        function TypedEdge(_id, _node_a, _node_b, config) {
+            if (config === void 0) { config = {}; }
+            var _this = _super.call(this, _id, _node_a, _node_b, config) || this;
+            _this._id = _id;
+            _this._node_a = _node_a;
+            _this._node_b = _node_b;
+            _this._type = config.type || run_config.GENERIC_TYPES.Edge;
+            return _this;
         }
-        get type() {
-            return this._type;
-        }
-    }
+        Object.defineProperty(TypedEdge.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return TypedEdge;
+    }(BaseEdge_1.BaseEdge));
     exports.TypedEdge = TypedEdge;
     });
 
@@ -3916,6 +4335,30 @@
     var TypedEdge_2 = TypedEdge_1.TypedEdge;
 
     var TypedGraph_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                    t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
@@ -3923,46 +4366,52 @@
 
 
 
-    const logger = new Logger_1.Logger();
-    class TypedGraph extends BaseGraph_1.BaseGraph {
-        constructor(_label) {
-            super(_label);
-            this._label = _label;
-            this._typedNodes = new Map();
-            this._typedEdges = new Map();
-            this._type = run_config.GENERIC_TYPES.Graph;
-            this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
-            this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
+    var logger = new Logger_1.Logger();
+    var TypedGraph = (function (_super) {
+        __extends(TypedGraph, _super);
+        function TypedGraph(_label) {
+            var _this = _super.call(this, _label) || this;
+            _this._label = _label;
+            _this._typedNodes = new Map();
+            _this._typedEdges = new Map();
+            _this._type = run_config.GENERIC_TYPES.Graph;
+            _this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
+            _this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
+            return _this;
         }
-        get type() {
-            return this._type;
-        }
-        nodeTypes() {
+        Object.defineProperty(TypedGraph.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TypedGraph.prototype.nodeTypes = function () {
             return Array.from(this._typedNodes.keys());
-        }
-        edgeTypes() {
+        };
+        TypedGraph.prototype.edgeTypes = function () {
             return Array.from(this._typedEdges.keys());
-        }
-        nrTypedNodes(type) {
+        };
+        TypedGraph.prototype.nrTypedNodes = function (type) {
             type = type.toUpperCase();
             return this._typedNodes.get(type) ? this._typedNodes.get(type).size : null;
-        }
-        nrTypedEdges(type) {
+        };
+        TypedGraph.prototype.nrTypedEdges = function (type) {
             type = type.toUpperCase();
             return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
-        }
-        addNodeByID(id, opts) {
+        };
+        TypedGraph.prototype.addNodeByID = function (id, opts) {
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            let node = new TypedNode_1.TypedNode(id, opts);
+            var node = new TypedNode_1.TypedNode(id, opts);
             return this.addNode(node) ? node : null;
-        }
-        addNode(node) {
-            if (!super.addNode(node)) {
+        };
+        TypedGraph.prototype.addNode = function (node) {
+            if (!_super.prototype.addNode.call(this, node)) {
                 return null;
             }
-            const id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
+            var id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
             if (!type) {
                 this._typedNodes.get(run_config.GENERIC_TYPES.Node).set(id, node);
             }
@@ -3973,16 +4422,16 @@
                 this._typedNodes.get(type).set(id, node);
             }
             return node;
-        }
-        getNodeById(id) {
-            return super.getNodeById(id);
-        }
-        deleteNode(node) {
-            const id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
+        };
+        TypedGraph.prototype.getNodeById = function (id) {
+            return _super.prototype.getNodeById.call(this, id);
+        };
+        TypedGraph.prototype.deleteNode = function (node) {
+            var id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
             if (!this._typedNodes.get(type)) {
                 throw Error('Node type does not exist on this TypedGraph.');
             }
-            const removeNode = this._typedNodes.get(type).get(id);
+            var removeNode = this._typedNodes.get(type).get(id);
             if (!removeNode) {
                 throw Error('This particular node is nowhere to be found in its typed set.');
             }
@@ -3990,18 +4439,18 @@
             if (this.nrTypedNodes(type) === 0) {
                 this._typedNodes.delete(type);
             }
-            super.deleteNode(node);
-        }
-        addEdgeByID(id, a, b, opts) {
-            let edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
+            _super.prototype.deleteNode.call(this, node);
+        };
+        TypedGraph.prototype.addEdgeByID = function (id, a, b, opts) {
+            var edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
             return this.addEdge(edge);
-        }
-        addEdge(edge) {
-            if (!super.addEdge(edge)) {
+        };
+        TypedGraph.prototype.addEdge = function (edge) {
+            if (!_super.prototype.addEdge.call(this, edge)) {
                 return null;
             }
-            const id = edge.getID();
-            let type = run_config.GENERIC_TYPES.Edge;
+            var id = edge.getID();
+            var type = run_config.GENERIC_TYPES.Edge;
             if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
@@ -4015,17 +4464,17 @@
                 this._typedEdges.get(type).set(id, edge);
             }
             return edge;
-        }
-        deleteEdge(edge) {
-            const id = edge.getID();
-            let type = run_config.GENERIC_TYPES.Edge;
+        };
+        TypedGraph.prototype.deleteEdge = function (edge) {
+            var id = edge.getID();
+            var type = run_config.GENERIC_TYPES.Edge;
             if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
             if (!this._typedEdges.get(type)) {
                 throw Error('Edge type does not exist on this TypedGraph.');
             }
-            const removeEdge = this._typedEdges.get(type).get(id);
+            var removeEdge = this._typedEdges.get(type).get(id);
             if (!removeEdge) {
                 throw Error('This particular edge is nowhere to be found in its typed set.');
             }
@@ -4033,16 +4482,17 @@
             if (this.nrTypedEdges(type) === 0) {
                 this._typedEdges.delete(type);
             }
-            super.deleteEdge(edge);
-        }
-        getStats() {
-            let typed_nodes = {}, typed_edges = {};
-            this._typedNodes.forEach((k, v) => typed_nodes[v] = k.size);
-            this._typedEdges.forEach((k, v) => typed_edges[v] = k.size);
-            return Object.assign({}, super.getStats(), { typed_nodes,
-                typed_edges });
-        }
-    }
+            _super.prototype.deleteEdge.call(this, edge);
+        };
+        TypedGraph.prototype.getStats = function () {
+            var typed_nodes = {}, typed_edges = {};
+            this._typedNodes.forEach(function (k, v) { return typed_nodes[v] = k.size; });
+            this._typedEdges.forEach(function (k, v) { return typed_edges[v] = k.size; });
+            return __assign({}, _super.prototype.getStats.call(this), { typed_nodes: typed_nodes,
+                typed_edges: typed_edges });
+        };
+        return TypedGraph;
+    }(BaseGraph_1.BaseGraph));
     exports.TypedGraph = TypedGraph;
     });
 
@@ -5558,64 +6008,46 @@
     }
     //# sourceMappingURL=buildJSSearch.js.map
 
-    var beerModels;
-    (function (beerModels) {
-        beerModels["Brewery"] = "Brewery";
-        beerModels["Beer"] = "Beer";
-        beerModels["Category"] = "Category";
-        beerModels["City"] = "City";
-        beerModels["State"] = "State";
-        beerModels["Country"] = "Country";
-        beerModels["Style"] = "Style";
-    })(beerModels || (beerModels = {}));
-    var beerIdxConfig = {
-        Brewery: {
-            string: 'Brewery',
+    var skillsModels;
+    (function (skillsModels) {
+        skillsModels["Person"] = "Person";
+        skillsModels["Company"] = "Company";
+        skillsModels["Country"] = "Country";
+        skillsModels["Skill"] = "Skill";
+    })(skillsModels || (skillsModels = {}));
+    var skillsIdxConfig = {
+        Company: {
+            string: 'Company',
             id: 'id',
-            fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
-        },
-        Beer: {
-            string: 'Beer',
-            id: 'id',
-            fields: ['name', 'abv']
-        },
-        Category: {
-            string: 'Category',
-            id: 'id',
-            fields: ['category']
-        },
-        City: {
-            string: 'City',
-            id: 'id',
-            fields: ['city', 'state', 'country']
-        },
-        State: {
-            string: 'State',
-            id: 'id',
-            fields: ['state']
+            fields: ['name', 'desc']
         },
         Country: {
             string: 'Country',
             id: 'id',
-            fields: ['country']
+            fields: ['name']
         },
-        Style: {
-            string: 'Style',
+        Person: {
+            string: 'Person',
             id: 'id',
-            fields: ['style']
+            fields: ['name', 'age']
+        },
+        Skill: {
+            string: 'Skill',
+            id: 'id',
+            fields: ['name']
         }
     };
     //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
-    var beerConfig = {
-        graphName: "beerGraph",
-        graphFile: testGraphDir + "/beerGraph." + graphExt,
-        searchTerm: "brauhaus",
-        idxConfig: beerIdxConfig,
-        models: beerModels,
-        testSearchModel: beerModels.Brewery
+    var skillsConfig = {
+        graphName: "skills",
+        graphFile: testGraphDir + "/skills." + graphExt,
+        searchTerm: "TypeScript",
+        idxConfig: skillsIdxConfig,
+        models: skillsModels,
+        testSearchModel: skillsModels.Skill
     };
     //# sourceMappingURL=appConfig.js.map
 
@@ -5624,7 +6056,7 @@
     (function () { return __awaiter(_this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
-            [beerConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+            [skillsConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
                 var graph, indexes, searchRes;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -5658,7 +6090,6 @@
         });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

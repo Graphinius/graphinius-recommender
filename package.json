@@ -8,7 +8,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "prod": "NODE_ENV=production rollup -cw",
-    "dev": "ts-node-dev src/meetup/simpleGroupRecs.ts",
+    "dev": "ts-node-dev src/recs/simpleGroupRecs.ts",
     "test": "jest"
   },
   "repository": {

@@ -7,21 +7,21 @@ import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
 import { importGraph } from './common/importGraph';
 
 import { AppConfig } from './indexers/interfaces';
-
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
+
 import { beerConfig } from './indexers/beer/appConfig';
+import { skillsConfig } from './indexers/skills/appConfig';
 import { meetupConfig } from './indexers/meetup/appConfig';
 
 
 
 (async () => {
-  [beerConfig].forEach(async config => { // , meetupConfig
+  [skillsConfig].forEach(async config => { // , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
   });
 })();
-
 
 
 function createJSSearchIndex(graph: IGraph, config: AppConfig) {
