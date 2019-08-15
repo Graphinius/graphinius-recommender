@@ -14,5 +14,5 @@ export interface AppConfig {
   searchTerm      : string;
   idxConfig       : IndexConfig;
   models          : any;
-  testSearchModel : any;
+  searchModel     : any;
 }

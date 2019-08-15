@@ -10,13 +10,13 @@ import { AppConfig } from './indexers/interfaces';
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
 
 import { beerConfig } from './indexers/beer/appConfig';
-import { skillsConfig } from './indexers/skills/appConfig';
+import { jobsConfig } from './indexers/jobs/appConfig';
 import { meetupConfig } from './indexers/meetup/appConfig';
 
 
 
 (async () => {
-  [skillsConfig].forEach(async config => { // , beerConfig , meetupConfig
+  [jobsConfig].forEach(async config => { // , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
@@ -35,7 +35,7 @@ function createJSSearchIndex(graph: IGraph, config: AppConfig) {
 
 function executeSearch(indexes, config: AppConfig, graph: TypedGraph) {
   let tic = +new Date;
-  const searchRes = indexes[config.testSearchModel].search(config.searchTerm);
+  const searchRes = indexes[config.searchModel].search(config.searchTerm);
   let toc = +new Date;
   console.log(`executing search for '${config.searchTerm}' in JS-SEARCH took ${toc-tic} ms.`);
 

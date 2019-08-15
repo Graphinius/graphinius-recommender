@@ -10,7 +10,7 @@ const meetupConfig: AppConfig = {
   searchTerm: `neo4j`,
   idxConfig: meetupIdxConfig,
   models: meetupModels,
-  testSearchModel: meetupModels.Group
+  searchModel: meetupModels.Group
 };
 
 export {

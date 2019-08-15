@@ -1,13 +1,13 @@
 import {IndexConfig} from '../interfaces';
 
-export enum skillsModels {
+export enum jobsModels {
 	Person 	= 'Person',
 	Company = 'Company',
 	Country = 'Country',
 	Skill 	= 'Skill'
 }
 
-const skillsIdxConfig: IndexConfig = {
+const jobsIdxConfig: IndexConfig = {
 	Company: {
 		string: 'Company',
 		id: 'id',
@@ -31,5 +31,5 @@ const skillsIdxConfig: IndexConfig = {
 };
 
 export {
-	skillsIdxConfig
+	jobsIdxConfig
 }
