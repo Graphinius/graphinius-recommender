@@ -1,13 +1,14 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import {TypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../src/indexers/buildJSSearch';
-import {jobsIdxConfig, jobsModels} from '../src/indexers/jobs/interfaces';
-import {jobsConfig} from '../src/indexers/jobs/appConfig';
+import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
+import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
+import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
+import {jobsConfig} from '../../src/indexers/jobs/appConfig';
 
 const
-	graphFile = path.join(__dirname, '../public/test-data/graphs/jobs.json'),
+	graphFile = path.join(__dirname, '../../public/test-data/graphs/jobs.json'),
 	NR_NODES = 305,
 	NR_EDGES_DIR = 7628,
 	NR_EDGES_UND = 0;
@@ -17,17 +18,20 @@ describe('jobs example tests - ', () => {
 
 	let jobsGraph: TypedGraph = null;
 	let jobsIdxs: any = null;
+	let json: JSONGraph = null;
 	const jsonIn = new JSONInput();
 
 
 	beforeAll(() => {
-		jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
+		json = JSON.parse(fs.readFileSync(graphFile).toString());
+		jobsGraph = jsonIn.readFromJSON(json, new TypedGraph('')) as TypedGraph;
+		// jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
 		jobsIdxs = buildIdxJSSearch(jobsGraph, jobsIdxConfig);
 	});
 
 
 	beforeEach(async () => {
-		jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
+		// jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
 		expect(jobsGraph.nrNodes()).toBe(NR_NODES);
 		expect(jobsGraph.nrDirEdges()).toBe(NR_EDGES_DIR);
 		expect(jobsGraph.nrUndEdges()).toBe(NR_EDGES_UND);
@@ -61,10 +65,12 @@ describe('jobs example tests - ', () => {
 
 		it('gets the correct amount of IN & OUT links for Skill `Typescript`', () => {
 			const
+				searchRes = jobsIdxs[jobsModels.Skill].search(jobsConfig.searchTerm),
 				id_a = '243',
 				id_b = '260',
-				a: TypedNode = jobsGraph.getNodeById(id_a),
-				b: TypedNode = jobsGraph.getNodeById(id_b);
+				a: TypedNode = jobsGraph.getNodeById(searchRes[0].id),
+				b: TypedNode = jobsGraph.getNodeById(searchRes[1].id);
+
 
 			expect(a.ins('HAS_SKILL').size).toBe(106);
 			expect(a.ins('LOOKS_FOR_SKILL').size).toBe(23);

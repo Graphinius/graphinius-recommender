@@ -3,12 +3,15 @@ import { IGraph, BaseGraph } from 'graphinius/lib/core/base/BaseGraph';
 import { TypedNode } from 'graphinius/lib/core/typed/TypedNode';
 import { IndexConfig } from './interfaces';
 
+namespace window {};
+
 type Types = {[key: string]: any[]};
 type Indexes = {[key: string]: any};
 
-// console.log(JSSearch);
-const JsSearch = (typeof window === 'undefined') ? JSSearch : JSSearch.default;
-
+/**
+ * Why does the import statement above work differently in TS / Bundled...
+ */
+const JsSearch = JSSearch.default || JSSearch;
 
 
 function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
@@ -43,6 +46,10 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
     indexes[model.string].addDocuments(types[model.string]);
   });
 
+
+  if ( typeof window != null ) {
+    (<any>window)['idx'] = indexes;
+  }
   // console.log(indexes);
   
   return indexes;

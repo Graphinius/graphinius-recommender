@@ -16,6 +16,6 @@
 		"strict": false
 	},
 	"compileOnSave": false,
-	"include": ["src"],
+	"include": ["src", "test/meetupGroupRecs.test.ts"],
   "exclude": ["node_modules", "**/test/*"]
 }

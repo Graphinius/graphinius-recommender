@@ -1,15 +1,16 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import {TypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../src/indexers/buildJSSearch';
-import {beerIdxConfig, beerModels} from '../src/indexers/beer/interfaces';
-import {beerConfig} from '../src/indexers/beer/appConfig';
+import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
+import {beerIdxConfig, beerModels} from '../../src/indexers/beer/interfaces';
+import {beerConfig} from '../../src/indexers/beer/appConfig';
 
-const graphFile = path.join(__dirname, '../public/test-data/graphs/beer.json');
+const graphFile = path.join(__dirname, '../../public/test-data/graphs/jobs.json');
 
 
-describe('Meetup example index tests', () => {
+describe('BEER example index tests', () => {
 
 	let beerGraph: TypedGraph = null;
 	let beerIdxs: any = null;
@@ -49,7 +50,7 @@ describe('Meetup example index tests', () => {
 			code: 8010,
 			city: 'Grats',
 			state: 'Shire Mark',
-			country: 'Her-stare-ike'
+			country: 'Her stare ike'
 		};
 		beerIdxs[beerModels.Brewery].addDocuments([newDoc]);
 		let searchRes = beerIdxs[beerModels.Brewery].search(beerConfig.searchTerm);

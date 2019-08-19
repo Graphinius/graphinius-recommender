@@ -4183,6 +4183,36 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
@@ -4208,6 +4238,33 @@
         Object.defineProperty(TypedNode.prototype, "type", {
             get: function () {
                 return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TypedNode.prototype, "stats", {
+            get: function () {
+                var e_1, _a;
+                var result = {
+                    typed_edges: {}
+                };
+                try {
+                    for (var _b = __values(Object.keys(this._typedAdjSets)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var type = _c.value;
+                        result.typed_edges[type] = { ins: 0, outs: 0, conns: 0 };
+                        result.typed_edges[type].ins = this._typedAdjSets[type].ins ? this._typedAdjSets[type].ins.size : 0;
+                        result.typed_edges[type].outs = this._typedAdjSets[type].outs ? this._typedAdjSets[type].outs.size : 0;
+                        result.typed_edges[type].conns = this._typedAdjSets[type].conns ? this._typedAdjSets[type].conns.size : 0;
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                return result;
             },
             enumerable: true,
             configurable: true
@@ -4260,8 +4317,6 @@
                 delete this._typedAdjSets[type];
             }
         };
-        TypedNode.prototype.removeEdgeByID = function (id) {
-        };
         TypedNode.prototype.ins = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
         };
@@ -4270,6 +4325,15 @@
         };
         TypedNode.prototype.conns = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
+        };
+        TypedNode.prototype.all = function (type) {
+            var result = new Set();
+            if (this._typedAdjSets[type]) {
+                this._typedAdjSets[type].ins && result.add(__spread(this._typedAdjSets[type].ins));
+                this._typedAdjSets[type].outs && result.add(__spread(this._typedAdjSets[type].outs));
+                this._typedAdjSets[type].conns && result.add(__spread(this._typedAdjSets[type].conns));
+            }
+            return result;
         };
         TypedNode.prototype.uniqueNID = function (e) {
             var conn = e.getNodes();
@@ -4539,6 +4603,7 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -4584,7 +4649,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-
+    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -4622,7 +4687,7 @@
 
       return ExactWordIndexStrategy;
     }();
-
+    //# sourceMappingURL=ExactWordIndexStrategy.js.map
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -4668,7 +4733,7 @@
 
       return PrefixIndexStrategy;
     }();
-
+    //# sourceMappingURL=PrefixIndexStrategy.js.map
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -4706,7 +4771,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(IndexStrategy);
@@ -4743,7 +4808,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-
+    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -4781,7 +4846,7 @@
 
       return LowerCaseSanitizer;
     }();
-
+    //# sourceMappingURL=LowerCaseSanitizer.js.map
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -4810,7 +4875,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Sanitizer);
@@ -4845,7 +4910,7 @@
 
       return value;
     }
-
+    //# sourceMappingURL=getNestedFieldValue.js.map
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -5022,7 +5087,7 @@
 
       return TfIdfSearchIndex;
     }();
-
+    //# sourceMappingURL=TfIdfSearchIndex.js.map
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -5121,7 +5186,7 @@
 
       return UnorderedSearchIndex;
     }();
-
+    //# sourceMappingURL=UnorderedSearchIndex.js.map
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -5150,7 +5215,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(SearchIndex);
@@ -5194,7 +5259,7 @@
 
       return SimpleTokenizer;
     }();
-
+    //# sourceMappingURL=SimpleTokenizer.js.map
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -5248,7 +5313,7 @@
 
       return StemmingTokenizer;
     }();
-
+    //# sourceMappingURL=StemmingTokenizer.js.map
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -5389,7 +5454,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-
+    //# sourceMappingURL=StopWordsMap.js.map
     });
 
     unwrapExports(StopWordsMap_1);
@@ -5442,7 +5507,7 @@
 
       return StopWordsTokenizer;
     }();
-
+    //# sourceMappingURL=StopWordsTokenizer.js.map
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -5480,7 +5545,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Tokenizer);
@@ -5735,7 +5800,7 @@
 
       return Search;
     }();
-
+    //# sourceMappingURL=Search.js.map
     });
 
     unwrapExports(Search_1);
@@ -5858,7 +5923,7 @@
 
       return TokenHighlighter;
     }();
-
+    //# sourceMappingURL=TokenHighlighter.js.map
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -5968,7 +6033,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     var index = unwrapExports(commonjs);
@@ -5978,7 +6043,7 @@
         __moduleExports: commonjs
     });
 
-    var JsSearch = (typeof window === 'undefined') ? JSSearch : index;
+    var JsSearch = index || JSSearch;
     function buildIdxJSSearch(graph, idxConfig) {
         var types = {};
         Object.keys(idxConfig).forEach(function (k) { return types[k] = []; });
@@ -6003,6 +6068,9 @@
             model.fields.forEach(function (f) { return indexes[model.string].addIndex(f); });
             indexes[model.string].addDocuments(types[model.string]);
         });
+        if (typeof window != null) {
+            window['idx'] = indexes;
+        }
         return indexes;
     }
 
@@ -6035,6 +6103,7 @@
             fields: ['name']
         }
     };
+    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -6046,6 +6115,7 @@
         models: jobsModels,
         searchModel: jobsModels.Skill
     };
+    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = graphinius;
@@ -6086,6 +6156,7 @@
         });
         return searchRes;
     }
+    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

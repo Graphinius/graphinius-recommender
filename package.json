@@ -9,7 +9,7 @@
     "watch": "rollup -cw",
     "prod": "NODE_ENV=production rollup -cw",
     "dev": "ts-node-dev src/recs/simpleGroupRecs.ts",
-    "test": "jest"
+    "test:jobs": "G_LOG=debug jest --watch jobs.test"
   },
   "repository": {
     "type": "git",

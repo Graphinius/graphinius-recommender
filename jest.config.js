@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   verbose: true,
   collectCoverage: false,
 
@@ -9,4 +9,8 @@ module.exports = {
   //   "!**/node_modules/**",
   //   "!**/vendor/**"
   // ]
+
+  "globals": {
+    // "window": {}
+  }
 };

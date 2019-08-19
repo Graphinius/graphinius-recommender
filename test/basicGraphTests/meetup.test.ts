@@ -1,9 +1,9 @@
-import { meetupConfig } from '../src/indexers/meetup/appConfig';
+import { meetupConfig } from '../../src/indexers/meetup/appConfig';
 
   // indexes[meetupModels.Group].addDocuments([{
   //   id              : Number.MAX_VALUE,
   //   name            : "Bernies Meetup",
-  //   description     : 'You dont wanna know.... but: neo4JJJJ!!',
+  //   description     : 'You dont wanna know.... but: neo4J!!',
   //   organiserName   : 'Bernie'
   // }]);
 
