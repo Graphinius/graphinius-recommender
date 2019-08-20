@@ -27,7 +27,7 @@ export default {
     }),
     typescript({
       target: "es5",
-      lib: ["es5", "es6", "dom"]}
+      lib: ["es6", "dom"]}
     ),
     serve({
       contentBase: 'public',

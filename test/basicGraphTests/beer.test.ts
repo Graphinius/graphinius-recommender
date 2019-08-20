@@ -2,23 +2,25 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {TypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
+import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {beerIdxConfig, beerModels} from '../../src/indexers/beer/interfaces';
 import {beerConfig} from '../../src/indexers/beer/appConfig';
 
-const graphFile = path.join(__dirname, '../../public/test-data/graphs/jobs.json');
+const graphFile = path.join(__dirname, '../../public/test-data/graphs/beer.json');
 
 
 describe('BEER example index tests', () => {
 
 	let beerGraph: TypedGraph = null;
 	let beerIdxs: any = null;
+	let json: JSONGraph = null;
 	const jsonIn = new JSONInput();
 
 
 	beforeEach(async () => {
-		beerGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('Bier her!')) as TypedGraph;
+		json = JSON.parse(fs.readFileSync(graphFile).toString());
+		beerGraph = jsonIn.readFromJSON(json, new TypedGraph('')) as TypedGraph;
 		// console.log(beerGraph.getStats());
 		expect(beerGraph.nrNodes()).toBe(577);
 		expect(beerGraph.nrDirEdges()).toBe(870);

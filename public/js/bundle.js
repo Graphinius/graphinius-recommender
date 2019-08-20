@@ -1623,6 +1623,51 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(BaseGraph.prototype, "inHist", {
+            get: function () {
+                return this.degreeHist('in');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseGraph.prototype, "outHist", {
+            get: function () {
+                return this.degreeHist('out');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseGraph.prototype, "connHist", {
+            get: function () {
+                return this.degreeHist('conn');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseGraph.prototype.degreeHist = function (dir) {
+            var result = [];
+            for (var nid in this._nodes) {
+                var node = this._nodes[nid];
+                var deg = void 0;
+                switch (dir) {
+                    case 'in':
+                        deg = node.inDegree();
+                        break;
+                    case 'out':
+                        deg = node.outDegree();
+                        break;
+                    default:
+                        deg = node.degree();
+                }
+                if (!result[deg]) {
+                    result[deg] = new Set([node]);
+                }
+                else {
+                    result[deg].add(node);
+                }
+            }
+            return result;
+        };
         BaseGraph.prototype.reweighIfHasNegativeEdge = function (clone) {
             if (clone === void 0) { clone = false; }
             if (this.hasNegativeEdge()) {
@@ -1794,6 +1839,9 @@
         };
         BaseGraph.prototype.getNodeById = function (id) {
             return this._nodes[id];
+        };
+        BaseGraph.prototype.n = function (id) {
+            return this.getNodeById(id);
         };
         BaseGraph.prototype.getNodes = function () {
             return this._nodes;
@@ -6073,6 +6121,7 @@
         }
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
