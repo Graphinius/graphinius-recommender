@@ -5,7 +5,8 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 
-const isProduction = !!(process.env.NODE_ENV === "production");
+
+const isProduction = process.env.NODE_ENV === "production";
 
 
 export default {

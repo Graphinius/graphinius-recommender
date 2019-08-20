@@ -3,8 +3,6 @@ import { IGraph, BaseGraph } from 'graphinius/lib/core/base/BaseGraph';
 import { TypedNode } from 'graphinius/lib/core/typed/TypedNode';
 import { IndexConfig } from './interfaces';
 
-namespace window {};
-
 type Types = {[key: string]: any[]};
 type Indexes = {[key: string]: any};
 
@@ -47,9 +45,13 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
   });
 
 
-  if ( typeof window != null ) {
-    (<any>window)['idx'] = indexes;
-  }
+  /**
+   * In `jsdom` environment, we can use the first variant...
+   */
+  window['idx'] = indexes;
+  // if ( typeof window != null ) {
+  //   (<any>window)['idx'] = indexes;
+  // }
   // console.log(indexes);
   
   return indexes;

@@ -1581,6 +1581,12 @@
 
     var logger = new Logger_1.Logger();
     var DEFAULT_WEIGHT = 1;
+    var DIR;
+    (function (DIR) {
+        DIR["in"] = "IN";
+        DIR["out"] = "OUT";
+        DIR["conn"] = "CONN";
+    })(DIR = exports.DIR || (exports.DIR = {}));
     var GraphMode;
     (function (GraphMode) {
         GraphMode[GraphMode["INIT"] = 0] = "INIT";
@@ -1625,21 +1631,21 @@
         });
         Object.defineProperty(BaseGraph.prototype, "inHist", {
             get: function () {
-                return this.degreeHist('in');
+                return this.degreeHist(DIR.in);
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "outHist", {
             get: function () {
-                return this.degreeHist('out');
+                return this.degreeHist(DIR.out);
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "connHist", {
             get: function () {
-                return this.degreeHist('conn');
+                return this.degreeHist(DIR.conn);
             },
             enumerable: true,
             configurable: true
@@ -1650,10 +1656,10 @@
                 var node = this._nodes[nid];
                 var deg = void 0;
                 switch (dir) {
-                    case 'in':
+                    case DIR.in:
                         deg = node.inDegree();
                         break;
-                    case 'out':
+                    case DIR.out:
                         deg = node.outDegree();
                         break;
                     default:
@@ -1727,7 +1733,7 @@
             }
             var negative_cycle = false, start = node ? node : this.getRandomNode();
             DFS_1.DFS(this, start).forEach(function (comp) {
-                var min_count = Number.POSITIVE_INFINITY, comp_start_node;
+                var min_count = Number.POSITIVE_INFINITY, comp_start_node = "";
                 Object.keys(comp).forEach(function (node_id) {
                     if (min_count > comp[node_id].counter) {
                         min_count = comp[node_id].counter;
@@ -2157,8 +2163,9 @@
     });
 
     unwrapExports(BaseGraph_1);
-    var BaseGraph_2 = BaseGraph_1.GraphMode;
-    var BaseGraph_3 = BaseGraph_1.BaseGraph;
+    var BaseGraph_2 = BaseGraph_1.DIR;
+    var BaseGraph_3 = BaseGraph_1.GraphMode;
+    var BaseGraph_4 = BaseGraph_1.BaseGraph;
 
     var FloydWarshall = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -4471,6 +4478,32 @@
         };
         return __assign.apply(this, arguments);
     };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
@@ -4511,6 +4544,49 @@
         TypedGraph.prototype.nrTypedEdges = function (type) {
             type = type.toUpperCase();
             return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
+        };
+        TypedGraph.prototype.inHistT = function (nType, eType) {
+            return this.degreeHistTyped(BaseGraph_1.DIR.in, nType, eType);
+        };
+        TypedGraph.prototype.outHistT = function (nType, eType) {
+            return this.degreeHistTyped(BaseGraph_1.DIR.out, nType, eType);
+        };
+        TypedGraph.prototype.connHistT = function (nType, eType) {
+            return this.degreeHistTyped(BaseGraph_1.DIR.conn, nType, eType);
+        };
+        TypedGraph.prototype.degreeHistTyped = function (dir, nType, eType) {
+            var e_1, _a;
+            var result = [];
+            try {
+                for (var _b = __values(this._typedNodes.get(nType)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var _d = __read(_c.value, 2), node_id = _d[0], node = _d[1];
+                    var deg = void 0;
+                    switch (dir) {
+                        case BaseGraph_1.DIR.in:
+                            deg = node.ins(eType) ? node.ins(eType).size : 0;
+                            break;
+                        case BaseGraph_1.DIR.out:
+                            deg = node.outs(eType) ? node.outs(eType).size : 0;
+                            break;
+                        default:
+                            deg = node.conns(eType) ? node.conns(eType).size : 0;
+                    }
+                    if (!result[deg]) {
+                        result[deg] = new Set([node]);
+                    }
+                    else {
+                        result[deg].add(node);
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return result;
         };
         TypedGraph.prototype.addNodeByID = function (id, opts) {
             if (this.hasNodeID(id)) {
@@ -4645,13 +4721,12 @@
                         graphString = _a.sent();
                         graph = new TypedGraph_2(config.graphName);
                         graph = jsonIn.readFromJSON(graphString, graph);
-                        window.graph = graph;
+                        window.g = graph;
                         return [2, graph];
                 }
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -4697,7 +4772,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -4735,7 +4810,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -4781,7 +4856,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -4819,7 +4894,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -4856,7 +4931,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -4894,7 +4969,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -4923,7 +4998,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -4958,7 +5033,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -5135,7 +5210,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -5234,7 +5309,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -5263,7 +5338,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -5307,7 +5382,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -5361,7 +5436,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -5502,7 +5577,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -5555,7 +5630,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -5593,7 +5668,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -5848,7 +5923,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -5971,7 +6046,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -6081,7 +6156,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
@@ -6098,7 +6173,7 @@
         var indexes = {};
         Object.keys(idxConfig).forEach(function (k) { return indexes[k] = null; });
         Object.values(graph.getNodes()).forEach(function (n) {
-            if (BaseGraph_3.isTyped(n) === false) {
+            if (BaseGraph_4.isTyped(n) === false) {
                 throw Error("Node Type not supported in this scenario...!");
             }
             var type = n.type;
@@ -6116,12 +6191,9 @@
             model.fields.forEach(function (f) { return indexes[model.string].addIndex(f); });
             indexes[model.string].addDocuments(types[model.string]);
         });
-        if (typeof window != null) {
-            window['idx'] = indexes;
-        }
+        window['idx'] = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -6152,7 +6224,6 @@
             fields: ['name']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -6164,7 +6235,6 @@
         models: jobsModels,
         searchModel: jobsModels.Skill
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = graphinius;
@@ -6205,7 +6275,6 @@
         });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

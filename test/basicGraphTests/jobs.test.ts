@@ -6,6 +6,26 @@ import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
 import {jobsConfig} from '../../src/indexers/jobs/appConfig';
+import { BaseGraph } from 'graphinius/lib/core/base/BaseGraph';
+
+// import {Logger} from 'graphinius/lib/utils/Logger';
+// const logger = new Logger();
+
+
+enum NODE_TYPES {
+	Person = "PERSON",
+	Company = "COMPANY",
+	Country = "COUNTRY",
+	Skill = "SKILL"
+}
+
+enum EDGE_TYPES {
+	HasSkill = "HAS_SKILL",
+	WorksFor = "WORKS_FOR",
+	Knows = "KNOWS",
+	LooksForSkill = "LOOKS_FOR_SKILL"
+}
+
 
 const
 	graphFile = path.join(__dirname, '../../public/test-data/graphs/jobs.json'),
@@ -16,45 +36,42 @@ const
 
 describe('jobs example tests - ', () => {
 
-	let jobsGraph: TypedGraph = null;
-	let jobsIdxs: any = null;
+	let g: TypedGraph = null;
+	let idx: any = null;
 	let json: JSONGraph = null;
 	const jsonIn = new JSONInput();
 
 
 	beforeAll(() => {
 		json = JSON.parse(fs.readFileSync(graphFile).toString());
-		jobsGraph = jsonIn.readFromJSON(json, new TypedGraph('')) as TypedGraph;
-		// jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
-		jobsIdxs = buildIdxJSSearch(jobsGraph, jobsIdxConfig);
+		g = jsonIn.readFromJSON(json, new TypedGraph('')) as TypedGraph;
+		idx = buildIdxJSSearch(g, jobsIdxConfig);
 	});
 
 
 	beforeEach(async () => {
 		// jobsGraph = jsonIn.readFromJSONFile(graphFile, new TypedGraph('')) as TypedGraph;
-		expect(jobsGraph.nrNodes()).toBe(NR_NODES);
-		expect(jobsGraph.nrDirEdges()).toBe(NR_EDGES_DIR);
-		expect(jobsGraph.nrUndEdges()).toBe(NR_EDGES_UND);
+		expect(g.nrNodes()).toBe(NR_NODES);
+		expect(g.nrDirEdges()).toBe(NR_EDGES_DIR);
+		expect(g.nrUndEdges()).toBe(NR_EDGES_UND);
 	});
 
 
 	it('should have built the right index', () => {
 		for (let model in jobsModels) {
-			expect(jobsIdxs[model]).toBeDefined;
+			expect(idx[model]).toBeDefined;
 		}
-		expect(jobsIdxs[jobsModels.Company]._documents.length).toBe(50);
-		expect(jobsIdxs[jobsModels.Country]._documents.length).toBe(25);
-		expect(jobsIdxs[jobsModels.Person]._documents.length).toBe(200);
-		expect(jobsIdxs[jobsModels.Skill]._documents.length).toBe(30);
+		expect(idx[jobsModels.Company]._documents.length).toBe(50);
+		expect(idx[jobsModels.Country]._documents.length).toBe(25);
+		expect(idx[jobsModels.Person]._documents.length).toBe(200);
+		expect(idx[jobsModels.Skill]._documents.length).toBe(30);
 	});
 
 
 	it('gets the correct initial search results (IDs)', () => {
-		let searchRes = jobsIdxs[jobsModels.Skill].search(jobsConfig.searchTerm);
+		let searchRes = idx[jobsModels.Skill].search(jobsConfig.searchTerm);
 		expect(searchRes.length).toBe(2);
-		// expect(searchRes[0].name).toBe('Allguer Brauhaus AG Kempten');
-		// expect(searchRes[1].name).toBe('Allguer Brauhaus AG Kempten, Brausttte Leuterschach');
-		// expect(searchRes[2].name).toBe('Arcobrau Grafliches Brauhaus');
+		searchRes.forEach(item => expect(item.name).toBe('TypeScript'));
 	});
 
 
@@ -65,22 +82,53 @@ describe('jobs example tests - ', () => {
 
 		it('gets the correct amount of IN & OUT links for Skill `Typescript`', () => {
 			const
-				searchRes = jobsIdxs[jobsModels.Skill].search(jobsConfig.searchTerm),
-				id_a = '243',
-				id_b = '260',
-				a: TypedNode = jobsGraph.getNodeById(searchRes[0].id),
-				b: TypedNode = jobsGraph.getNodeById(searchRes[1].id);
+				searchRes = idx[jobsModels.Skill].search(jobsConfig.searchTerm),
+				a: TypedNode = g.getNodeById(searchRes[0].id),
+				b: TypedNode = g.getNodeById(searchRes[1].id);
 
+			expect(a.ins(EDGE_TYPES.HasSkill).size).toBe(106);
+			expect(a.ins(EDGE_TYPES.LooksForSkill).size).toBe(23);
 
-			expect(a.ins('HAS_SKILL').size).toBe(106);
-			expect(a.ins('LOOKS_FOR_SKILL').size).toBe(23);
-
-			expect(b.ins('HAS_SKILL').size).toBe(98);
-			expect(b.ins('LOOKS_FOR_SKILL').size).toBe(25);
+			expect(b.ins(EDGE_TYPES.HasSkill).size).toBe(98);
+			expect(b.ins(EDGE_TYPES.LooksForSkill).size).toBe(25);
 		});
 
 
-		it.todo('should find the least skilled person');
+		it('should find the two task-oriented companies', () => {
+			const term = 'task';
+			const res = idx[jobsModels.Company].search(term);
+			expect(res.length).toBe(2);
+			res.forEach(item => expect(item.desc).toContain(term));
+		});
+
+
+		/**
+		 * @description {least employees: 0} 2 companies -> 9, 17
+		 * 							{most employees: 11} 1 company -> 302
+		 */
+		it('should find the companies with the least / most #employees', () => {
+			// console.log(`Graph is typed: ${BaseGraph.isTyped(g)}`);
+			const employeeDist = g.inHistT(NODE_TYPES.Company, EDGE_TYPES.WorksFor);
+			expect(employeeDist[0].size).toBe(2);
+			/**
+			 * @todo weird...
+			 */
+			employeeDist[0].forEach(n => expect(['9', '17']).toContain((<any>n).id));
+			employeeDist[11].forEach(n => expect(['302']).toContain((<any>n).id));
+		});
+
+
+		/**
+		 * @description {least skills: 10} 1 person -> 199
+		 * 							{most skills: 19} 1 person -> 175
+		 */
+		it('should find the least / most skilled person', () => {
+			const skillDist = g.outHistT(NODE_TYPES.Person, EDGE_TYPES.HasSkill);
+			expect(skillDist[10].size).toBe(1);
+			expect(skillDist[10].forEach(p => expect(['199']).toContain((<any>p).id)));
+			expect(skillDist[19].size).toBe(1);
+			expect(skillDist[19].forEach(p => expect(['175']).toContain((<any>p).id)));
+		});
 
 	});
 

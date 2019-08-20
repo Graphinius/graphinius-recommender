@@ -23,7 +23,7 @@ declare global {
     msIDBKeyRange         : any;
 
     $G                    : any;
-    graph                 : IGraph;
+    g                     : IGraph;
     
     // idxLunr               : any;
     // idxFuse               : any;

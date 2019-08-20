@@ -23,7 +23,7 @@ async function importGraphFromURL(config: AppConfig) {
   const graphString = await graphBytes.json();
   let graph: IGraph = new TypedGraph(config.graphName);
   graph = jsonIn.readFromJSON(graphString, graph);
-  window.graph = graph;
+  window.g = graph;
   return graph;
 }
 
