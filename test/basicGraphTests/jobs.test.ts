@@ -7,6 +7,7 @@ import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
 import {jobsConfig} from '../../src/indexers/jobs/appConfig';
 import {BaseGraph} from 'graphinius/lib/core/base/BaseGraph';
+import getOwnPropertyDescriptor = Reflect.getOwnPropertyDescriptor;
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
@@ -109,9 +110,10 @@ describe('jobs dataset tests - ', () => {
 		it('should find the 6 people are working for the Kohler Group', () => {
 			const kG = g.n(idx[jobsModels.Company].search('Kohler Group')[0].id);
 			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
-			expect(employees.length).toBe(6);
-			expect(employees.map(e => (<any>e).id)).toEqual(['43', '63', '196', '208', '212', '222']);
-			expect(employees.map(e => (<any>e).getFeature('name'))).toEqual([
+			expect(employees.size).toBe(6);
+			expect(Array.from(employees).map(e => (<any>e).id)).toEqual(['43', '63', '196', '208', '212', '222']);
+			expect(Array.from(employees).map(e => (<any>e).getFeature('age'))).toEqual([45, 77, 35, 20, 77, 33]);
+			expect(Array.from(employees).map(e => (<any>e).getFeature('name'))).toEqual([
 				"Joannie Bartoletti",
 				"Judy Brekke",
 				"Alfreda Kovacek",
@@ -130,8 +132,8 @@ describe('jobs dataset tests - ', () => {
 			// console.log(`Graph is typed: ${BaseGraph.isTyped(g)}`);
 			const employeeDist = g.inHistT(NODE_TYPES.Company, EDGE_TYPES.WorksFor);
 			expect(employeeDist[0].size).toBe(2);
-			employeeDist[0].forEach(n => expect(['9', '17']).toContain((<any>n).id));
-			employeeDist[11].forEach(n => expect(['302']).toContain((<any>n).id));
+			expect(Array.from(employeeDist[0]).map(n => (<any> n).id)).toEqual(['9', '17']);
+			expect(Array.from(employeeDist[11]).map(n => (<any> n).id)).toEqual(['302']);
 		});
 
 
@@ -142,9 +144,9 @@ describe('jobs dataset tests - ', () => {
 		it('should find the companies looking for min / max amount of skills', () => {
 			const seekingSkills = g.outHistT(NODE_TYPES.Company, EDGE_TYPES.LooksForSkill);
 			expect(seekingSkills[11].size).toBe(1);
-			expect(seekingSkills[11].forEach(c => expect(['233']).toContain((<any>c).id)));
+			expect(Array.from(seekingSkills[11]).map(c => (<any> c).id)).toEqual(['233']);
 			expect(seekingSkills[18].size).toBe(1);
-			expect(seekingSkills[18].forEach(c => expect(['300']).toContain((<any>c).id)));
+			expect(Array.from(seekingSkills[18]).map(c => (<any> c).id)).toEqual(['300']);
 		});
 
 
@@ -155,9 +157,9 @@ describe('jobs dataset tests - ', () => {
 		it('should find the least / most skilled person', () => {
 			const skillDist = g.outHistT(NODE_TYPES.Person, EDGE_TYPES.HasSkill);
 			expect(skillDist[10].size).toBe(1);
-			expect(skillDist[10].forEach(p => expect(['199']).toContain((<any>p).id)));
+			expect(Array.from(skillDist[10]).map(p => (<any> p).id)).toEqual(['199']);
 			expect(skillDist[19].size).toBe(1);
-			expect(skillDist[19].forEach(p => expect(['175']).toContain((<any>p).id)));
+			expect(Array.from(skillDist[19]).map(p => (<any> p).id)).toEqual(['175']);
 		});
 
 
@@ -168,9 +170,9 @@ describe('jobs dataset tests - ', () => {
 		it('should find the best / least known people', () => {
 			const knownBy = g.inHistT(NODE_TYPES.Person, EDGE_TYPES.Knows);
 			expect(knownBy[7].size).toBe(1);
-			expect(knownBy[7].forEach(p => expect(['197']).toContain((<any>p).id)));
+			expect(Array.from(knownBy[7]).map(p => (<any> p).id)).toEqual(['197']);
 			expect(knownBy[29].size).toBe(2);
-			expect(knownBy[29].forEach(p => expect(['150', '190']).toContain((<any>p).id)));
+			expect(Array.from(knownBy[29]).map(p => (<any> p).id)).toEqual(['150', '190']);
 		});
 
 
@@ -180,6 +182,23 @@ describe('jobs dataset tests - ', () => {
 			expect(knowing[16].size).toBe(31);
 			expect(knowing[17].size).toBe(76);
 			expect(knowing[18].size).toBe(82);
+		});
+
+	});
+	
+	
+	describe('queries extending over at least 2 relations', () => {
+
+		it.todo('people known by people who know Judy Brekke');
+
+
+		it('combined set of skills of all the people working for Kohler Group', () => {
+			const kG = g.n(idx[jobsModels.Company].search('Kohler Group')[0].id);
+			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
+			expect(employees.size).toBe(6);
+			// console.log(employees.entries());
+			console.log(Array.from(employees).map(e => e.getFeature('name')));
+			// Now we need to collect the SET of all Skills that those employees have
 		});
 
 	});
