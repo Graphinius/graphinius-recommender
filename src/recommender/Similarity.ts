@@ -10,34 +10,9 @@ export function jaccard(a: Set<any>, b: Set<any>) {
 }
 
 
-/**
- * @description expansion from source to targets, ONE step
- * @todo refactor out into recommender class... but at the moment this is very suitable
- * 			 for iterative
- *
- * @param g graph
- * @param n node from which to expand
- * @param d direction
- * @param r relationship type to follow (only one at a time..)
- * @param t target node type to filter (only one at a time..)
- */
-export function expand(g: TypedGraph, n: ITypedNode, d:string, r :string, t? :string) {
-	switch(d) {
-		case 'in':
-			return g.ins(n, r);
-		case 'out':
-			return g.outs(n, r);
-		case 'conn':
-			return g.conns(n, r);
-		default:
-			throw new Error('unsupported edge direction');
-	}
-}
-
-
 // export type Source = [string, Set<any>];
 export type Source = Set<any>;
-export type Targets = {[key: string]: Set<any>};
+export type Sets = {[key: string]: Set<any>};
 
 /**
  * @description jaccard between set & particular node
@@ -46,10 +21,13 @@ export type Targets = {[key: string]: Set<any>};
  * @param c
  * @param k
  */
-export function jaccardSetNode(s: Source, t: Targets, c?: number, k?: number) {
+export function jaccardSource(s: string, t: Sets, c?: number, k?: number) {
 	const result = {};
+	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
-		result[k] = jaccard(s, v);
+		if ( k !== s ) {
+			result[k] = jaccard(start, v);
+		}
 	}
 	return result;
 }
@@ -57,14 +35,17 @@ export function jaccardSetNode(s: Source, t: Targets, c?: number, k?: number) {
 
 /**
  * @todo implement pairwise jaccard
- * @param set of nodes to consider
+ * @param s all sets
  * @param cutoff similarity value below which a pair is omitted from the return struct
  * @param k top-k similar neighbors
  */
-export function jaccardSetAll() {
-
+export function jaccardPairwise(s: Sets) {
+	const result = {};
+	for ( let [k,v] of Object.entries(s)) {
+		result[k] = jaccardSource(k, s);
+	}
+	return result;
 }
-
 
 
 /**

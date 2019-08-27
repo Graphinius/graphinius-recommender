@@ -1,4 +1,5 @@
-import {jaccard, jaccardI32, jaccardSetNode, expand} from "../../src/recommender/Similarities";
+import {BaseRecommender as $BR} from '../../src/recommender/BaseRecommender';
+import {jaccard, jaccardI32, jaccardSource, jaccardPairwise} from "../../src/recommender/Similarity";
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONOutput} from 'graphinius/lib/io/output/JSONOutput';
@@ -86,7 +87,7 @@ describe('neo4j samples, computed in graphinius', () => {
 		MERGE (arya)-[:LIKES]->(portuguese)
 	
 		MERGE (karin)-[:LIKES]->(lebanese)
-		MERGE (karin)-[:LIKES]->(italian)
+		MERGE (karin)-[:LIKES]->(itali{ Zhen: 0, Praveena: 0, Michael: 0.25, Arya: 0.6666666666666666 }an)
 	
 		MERGE (shrimp)-[:TYPE]->(italian)
 		MERGE (shrimp)-[:TYPE]->(indian)
@@ -169,23 +170,40 @@ describe('neo4j samples, computed in graphinius', () => {
 	});
 
 
-	/**
-	 * Cuisine preference of Karin to everyone else
-	 */
 	it('should compute the correct culinary similarity between Karin and everyone else', () => {
 		const start = karina.label;
-		const source = expand(g, karina, 'out', 'LIKES');
 		const targets = {};
-
 		g.getNodesT('Person').forEach(n => {
-			if ( n.label !== start ) {
-				targets[n.label] = expand(g, n, 'out', 'LIKES');
-			}
+			targets[n.label] = $BR.expand(g, n, 'out', 'LIKES');
 		});
-		// console.log(targets);
+		const jaccs = jaccardSource(start, targets);
+		console.log(jaccs);
+		expect(jaccs).toEqual({Zhen: 0, Praveena: 0, Michael: 0.25, Arya: 0.6666666666666666});
+	});
 
-		const jaccs = jaccardSetNode(source, targets);
+
+	it('should compute the pairwise culinary similarity', () => {
+		const targets = {};
+		g.getNodesT('Person').forEach(n => {
+			targets[n.label] = $BR.expand(g, n, 'out', 'LIKES');
+		});
+		const tic = +new Date;
+		const jaccs = jaccardPairwise(targets);
+		const toc = +new Date;
+		console.log(`All pairs Jaccard on mini DB took ${toc-tic} ms.`)
 		console.log(jaccs);
 	});
 
+
+	it.todo('should consider c (cutoff) threshold');
+
+	it.todo('should consider k (NN) factor');
+
+	it.todo('should return min(k, #res(c)) results');
+
+	it.todo('should return min(k, #res(c), #res) results');
+
+	/**
+	 * @todo refactor so that Source & Set distance functions work generally with all distance measures
+	 */
 });
