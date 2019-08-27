@@ -6,6 +6,22 @@ export function jaccard(a: Set<any> | Map<any, any>, b: Set<any> | Map<any, any>
 }
 
 
+/**
+ * @todo implement jaccard from particular node to all others
+ * @param set set of nodes to consider
+ * @param n node to compute similarity to
+ * @param cutoff similarity value below which a pair is omitted from the return struct
+ * @param k top-k similar neighbors
+ */
+
+
+/**
+ * @todo implement pairwise jaccard
+ * @param set of nodes to consider
+ * @param cutoff similarity value below which a pair is omitted from the return struct
+ * @param k top-k similar neighbors
+ */
+
 
 
 /**

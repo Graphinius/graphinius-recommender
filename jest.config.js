@@ -3,13 +3,16 @@ module.exports = {
   testEnvironment: 'jsdom',
   verbose: true,
   collectCoverage: false,
-
   // collectCoverageFrom: [
   //   "**/*.{ts}",
   //   "!**/node_modules/**",
   //   "!**/vendor/**"
   // ]
-
+  watchPathIgnorePatterns: [
+    "/lib",
+    "/outputs",
+    "/public"
+  ],
   "globals": {
     // "window": {}
   }
