@@ -4610,6 +4610,12 @@
         TypedGraph.prototype.getNodeById = function (id) {
             return _super.prototype.getNodeById.call(this, id);
         };
+        TypedGraph.prototype.getNodesT = function (type) {
+            return this._typedNodes.get(type.toUpperCase());
+        };
+        TypedGraph.prototype.getEdgesT = function (type) {
+            return this._typedEdges.get(type.toUpperCase());
+        };
         TypedGraph.prototype.deleteNode = function (node) {
             var id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
             if (!this._typedNodes.get(type)) {

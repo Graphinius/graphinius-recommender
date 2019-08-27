@@ -1,6 +1,8 @@
-import {jaccard, jaccardI32} from "../../src/recommender/Similarities";
+import {jaccard, jaccardI32, jaccardSetNode, expand} from "../../src/recommender/Similarities";
+import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONOutput} from 'graphinius/lib/io/output/JSONOutput';
+import { nodeInternals } from "stack-utils";
 
 describe('SET similarity tests', () => {
 
@@ -107,7 +109,7 @@ describe('neo4j samples, computed in graphinius', () => {
 		praveena = g.addNodeByID('Praveena', {type: 'PERSON'}),
 		michael = g.addNodeByID('Michael', {type: 'PERSON'}),
 		arya = g.addNodeByID('Arya', {type: 'PERSON'}),
-		karin = g.addNodeByID('Karina', {type: 'PERSON'}),
+		karina = g.addNodeByID('Karina', {type: 'PERSON'}),
 
 		shrimp = g.addNodeByID('Shrimp Bolognese', {type: 'RECIPE'}),
 		saltimbocca = g.addNodeByID('Saltimbocca alla roman', {type: 'RECIPE'}),
@@ -127,8 +129,8 @@ describe('neo4j samples, computed in graphinius', () => {
 		l9 = g.addEdgeByID('l9', arya, italian, {directed: true, type: 'LIKES'}),
 		l10 = g.addEdgeByID('l10', arya, portuguese, {directed: true, type: 'LIKES'}),
 
-		l11 = g.addEdgeByID('l11', karin, lebanese, {directed: true, type: 'LIKES'}),
-		l12 = g.addEdgeByID('l12', karin, italian, {directed: true, type: 'LIKES'}),
+		l11 = g.addEdgeByID('l11', karina, lebanese, {directed: true, type: 'LIKES'}),
+		l12 = g.addEdgeByID('l12', karina, italian, {directed: true, type: 'LIKES'}),
 
 		t1 = g.addEdgeByID('t1', shrimp, italian, {directed: true, type: 'TYPE'}),
 		t2 = g.addEdgeByID('t2', shrimp, indian, {directed: true, type: 'TYPE'}),
@@ -139,21 +141,51 @@ describe('neo4j samples, computed in graphinius', () => {
 		t5 = g.addEdgeByID('t5', periperi, portuguese, {directed: true, type: 'TYPE'}),
 		t6 = g.addEdgeByID('t6', periperi, indian, {directed: true, type: 'TYPE'});
 
+
 	beforeAll(() => {
-		new JSONOutput().writeToJSONFile('./outputs/cuisine.json', g);
+		// new JSONOutput().writeToJSONFile('./outputs/cuisine.json', g);
 	});
 
+
 	/**
+	 * Cuisine preference similarity of Karin & Arya
+	 *
 	 * MATCH (p1:Person {name: 'Karin'})-[:LIKES]->(cuisine1)
 		 WITH p1, collect(id(cuisine1)) AS p1Cuisine
 		 MATCH (p2:Person {name: "Arya"})-[:LIKES]->(cuisine2)
 		 WITH p1, p1Cuisine, p2, collect(id(cuisine2)) AS p2Cuisine
-		 RETURN p1.name AS from,
-		 p2.name AS to,
-		 algo.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity
+		 RETURN
+	 		p1.name AS from,
+		 	p2.name AS to,
+		 	algo.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity
 	 */
 	it('should compute the correct culinary similarity between Karin & Arya', () => {
+		const kc = g.outs(karina, 'LIKES');
+		const ac = g.outs(arya, 'LIKES');
+		const jacc = jaccard(kc, ac);
+		console.log(JSON.stringify({from: karina.label, to: arya.label, similarity: jacc}));
+		// console.log(`Karin & Arya have a Jaccard similarity of ${jacc} w.r.t to their taste in cuisines.`)
+		expect(+jacc.toFixed(4)).toBe(0.6667);
+	});
 
+
+	/**
+	 * Cuisine preference of Karin to everyone else
+	 */
+	it('should compute the correct culinary similarity between Karin and everyone else', () => {
+		const start = karina.label;
+		const source = expand(g, karina, 'out', 'LIKES');
+		const targets = {};
+
+		g.getNodesT('Person').forEach(n => {
+			if ( n.label !== start ) {
+				targets[n.label] = expand(g, n, 'out', 'LIKES');
+			}
+		});
+		// console.log(targets);
+
+		const jaccs = jaccardSetNode(source, targets);
+		console.log(jaccs);
 	});
 
 });

@@ -1,5 +1,9 @@
+import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
+import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 
-export function jaccard(a: Set<any> | Map<any, any>, b: Set<any> | Map<any, any>) {
+type TypedNodeSet = {[key: string]: TypedNode};
+
+export function jaccard(a: Set<any>, b: Set<any>) {
 	const unionSize = new Set([...a, ...b]).size;
 	const intersectSize = a.size + b.size - unionSize;
 	return intersectSize / unionSize;
@@ -7,12 +11,48 @@ export function jaccard(a: Set<any> | Map<any, any>, b: Set<any> | Map<any, any>
 
 
 /**
- * @todo implement jaccard from particular node to all others
- * @param set set of nodes to consider
- * @param n node to compute similarity to
- * @param cutoff similarity value below which a pair is omitted from the return struct
- * @param k top-k similar neighbors
+ * @description expansion from source to targets, ONE step
+ * @todo refactor out into recommender class... but at the moment this is very suitable
+ * 			 for iterative
+ *
+ * @param g graph
+ * @param n node from which to expand
+ * @param d direction
+ * @param r relationship type to follow (only one at a time..)
+ * @param t target node type to filter (only one at a time..)
  */
+export function expand(g: TypedGraph, n: ITypedNode, d:string, r :string, t? :string) {
+	switch(d) {
+		case 'in':
+			return g.ins(n, r);
+		case 'out':
+			return g.outs(n, r);
+		case 'conn':
+			return g.conns(n, r);
+		default:
+			throw new Error('unsupported edge direction');
+	}
+}
+
+
+// export type Source = [string, Set<any>];
+export type Source = Set<any>;
+export type Targets = {[key: string]: Set<any>};
+
+/**
+ * @description jaccard between set & particular node
+ * @param s source set
+ * @param t target sets to measure similarity to
+ * @param c
+ * @param k
+ */
+export function jaccardSetNode(s: Source, t: Targets, c?: number, k?: number) {
+	const result = {};
+	for ( let [k,v] of Object.entries(t)) {
+		result[k] = jaccard(s, v);
+	}
+	return result;
+}
 
 
 /**
@@ -21,12 +61,15 @@ export function jaccard(a: Set<any> | Map<any, any>, b: Set<any> | Map<any, any>
  * @param cutoff similarity value below which a pair is omitted from the return struct
  * @param k top-k similar neighbors
  */
+export function jaccardSetAll() {
+
+}
 
 
 
 /**
- * @works, but we would have to completely re-vamp Graphinius typed edge traversals
- * 				 in order to speed the code up by a factor of ~2...
+ * @description works, but we would have to completely re-vamp $G typed traversals
+ * 				 			in order to speed the code up by a factor of ~2...
  * @todo Fuck speed for the moment -> concern yourself with optimization ->
  * 					!!! AFTER THE FUCKING DEMO !!!
  * @todo I think this doesn't pay off in any way...
