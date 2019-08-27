@@ -203,160 +203,9 @@
     var StructUtils_5 = StructUtils.findKey;
     var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
 
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var CMD_ENV_LOG = 'G_LOG';
-    var GENERIC_TYPES = {
-        Node: 'GENERIC',
-        Edge: 'GENERIC',
-        Graph: 'GENERIC'
-    };
-    exports.GENERIC_TYPES = GENERIC_TYPES;
-    var LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    function runLevel() {
-        var log_level = LOG_LEVELS.production;
-        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
-            log_level = process.env[CMD_ENV_LOG];
-        }
-        return log_level;
-    }
-    exports.runLevel = runLevel;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.GENERIC_TYPES;
-    var run_config_2 = run_config.LOG_LEVELS;
-    var run_config_3 = run_config.runLevel;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var LogColors;
-    (function (LogColors) {
-        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
-        LogColors[LogColors["FgRed"] = 31] = "FgRed";
-        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
-        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
-        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
-        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
-        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
-        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
-        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
-        LogColors[LogColors["BgRed"] = 41] = "BgRed";
-        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
-        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
-        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
-        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
-        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
-        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    var DEFAULT_COLOR = 37;
-    var Logger = (function () {
-        function Logger(config) {
-            this.config = config || {
-                log_level: run_config.runLevel()
-            };
-        }
-        Logger.prototype.log = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.log.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.error = function (err, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.error.call(console, Logger.colorize(color, err, bright));
-                }
-                else {
-                    console.error.call(console, err);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.dir = function (obj, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
-                }
-                else {
-                    console.dir.call(console, obj);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.info = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.info.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.warn = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.warn.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.write = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    process.stdout.write.call(process.stdout, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.colorize = function (color, output, bright) {
-            var out_bright = bright ? '\x1b[1m' : null;
-            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        };
-        return Logger;
-    }());
-    exports.Logger = Logger;
-    });
-
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
-
     var BaseNode_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
-
-    var logger = new Logger_1.Logger();
     var BaseNode = (function () {
         function BaseNode(_id, config) {
             if (config === void 0) { config = {}; }
@@ -1578,8 +1427,6 @@
 
 
 
-
-    var logger = new Logger_1.Logger();
     var DEFAULT_WEIGHT = 1;
     var DIR;
     (function (DIR) {
@@ -2884,8 +2731,6 @@
     };
     Object.defineProperty(exports, "__esModule", { value: true });
 
-
-    var logger = new Logger_1.Logger();
     var DEFAULT_WEIGHTED = false;
     var DEFAULT_ALPHA = 0.15;
     var DEFAULT_MAX_ITERATIONS = 1e3;
@@ -2932,7 +2777,6 @@
             return this._PRArrayDS;
         };
         Pagerank.prototype.constructPRArrayDataStructs = function (config) {
-            var tic = +new Date;
             var nodes = this._graph.getNodes();
             var i = 0;
             var teleport_prob_sum = 0;
@@ -2992,8 +2836,6 @@
                     this._PRArrayDS.pull_weight[node_idx] = pull_weight_i;
                 }
             }
-            var toc = +new Date;
-            logger.log("PR Array DS init took " + (toc - tic) + " ms.");
         };
         Pagerank.prototype.getRankMapFromArray = function () {
             var result = {};
@@ -3051,8 +2893,6 @@
                             var source = _c.value;
                             visits++;
                             if (ds.out_deg[source] === 0) {
-                                logger.log("Node: " + node);
-                                logger.log("Source: " + source + " ");
                                 throw ('Encountered zero divisor!');
                             }
                             var weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
@@ -3090,6 +2930,155 @@
 
     unwrapExports(Pagerank_1);
     var Pagerank_2 = Pagerank_1.Pagerank;
+
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var CMD_ENV_LOG = 'G_LOG';
+    var GENERIC_TYPES = {
+        Node: 'GENERIC',
+        Edge: 'GENERIC',
+        Graph: 'GENERIC'
+    };
+    exports.GENERIC_TYPES = GENERIC_TYPES;
+    var LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    function runLevel() {
+        var log_level = LOG_LEVELS.production;
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
+            log_level = process.env[CMD_ENV_LOG];
+        }
+        return log_level;
+    }
+    exports.runLevel = runLevel;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.GENERIC_TYPES;
+    var run_config_2 = run_config.LOG_LEVELS;
+    var run_config_3 = run_config.runLevel;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    var DEFAULT_COLOR = 37;
+    var Logger = (function () {
+        function Logger(config) {
+            this.config = config || {
+                log_level: run_config.runLevel()
+            };
+        }
+        Logger.prototype.log = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.log.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.error = function (err, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.error.call(console, Logger.colorize(color, err, bright));
+                }
+                else {
+                    console.error.call(console, err);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.dir = function (obj, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
+                }
+                else {
+                    console.dir.call(console, obj);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.info = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.info.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.warn = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.warn.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.write = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    process.stdout.write.call(process.stdout, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.colorize = function (color, output, bright) {
+            var out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        };
+        return Logger;
+    }());
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
 
     var RemoteUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3142,8 +3131,6 @@
 
 
 
-
-    var logger = new Logger_1.Logger();
     var DEFAULT_WEIGHT = 1;
     var CSVInput = (function () {
         function CSVInput(config) {
@@ -3221,7 +3208,6 @@
                     continue;
                 }
                 if (elements.length < 2 || elements.length > 3) {
-                    logger.log(elements);
                     throw new Error('Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)');
                 }
                 var node_id = elements[0], node = void 0, target_node = void 0, edge = void 0, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed = void 0, edge_id = void 0, edge_id_u2 = void 0, parse_weight = void 0, edge_weight = void 0;
@@ -3356,8 +3342,6 @@
     };
     Object.defineProperty(exports, "__esModule", { value: true });
 
-
-    var logger = new Logger_1.Logger();
     var EdgeDupeChecker = (function () {
         function EdgeDupeChecker(_graph) {
             this._graph = _graph;
@@ -3751,8 +3735,6 @@
 
 
 
-
-    var logger = new Logger_1.Logger();
     var JSONOutput = (function () {
         function JSONOutput() {
         }
@@ -3870,8 +3852,6 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
     var v4 = uuid_1.v4;
-
-    var logger = new Logger_1.Logger();
     var SimplePerturber = (function () {
         function SimplePerturber(_graph) {
             this._graph = _graph;
@@ -4271,8 +4251,6 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-
-    var logger = new Logger_1.Logger();
     var TypedNode = (function (_super) {
         __extends(TypedNode, _super);
         function TypedNode(_id, config) {
@@ -4391,9 +4369,12 @@
             return result;
         };
         TypedNode.prototype.uniqueNID = function (e) {
-            var conn = e.getNodes();
-            var node = conn.a === this ? conn.b : conn.a;
+            var _a = e.getNodes(), a = _a.a, b = _a.b;
+            var node = a === this ? b : a;
             return node.id + "#" + e.id + "#" + (e.isWeighted() ? 'w' : 'u');
+        };
+        TypedNode.nIDFromUID = function (uid) {
+            return uid.split('#')[0];
         };
         TypedNode.prototype.noEdgesOfTypeLeft = function (type) {
             return (!this._typedAdjSets[type].ins || !this._typedAdjSets[type].ins.size)
@@ -4425,8 +4406,6 @@
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
-
-    var logger = new Logger_1.Logger();
     var TypedEdge = (function (_super) {
         __extends(TypedEdge, _super);
         function TypedEdge(_id, _node_a, _node_b, config) {
@@ -4478,16 +4457,6 @@
         };
         return __assign.apply(this, arguments);
     };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
     var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
         var m = typeof Symbol === "function" && o[Symbol.iterator];
         if (!m) return o;
@@ -4504,14 +4473,26 @@
         }
         return ar;
     };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
 
 
-
-    var logger = new Logger_1.Logger();
     var TypedGraph = (function (_super) {
         __extends(TypedGraph, _super);
         function TypedGraph(_label) {
@@ -4524,6 +4505,9 @@
             _this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
             return _this;
         }
+        TypedGraph.prototype.n = function (id) {
+            return this.getNodeById(id);
+        };
         Object.defineProperty(TypedGraph.prototype, "type", {
             get: function () {
                 return this._type;
@@ -4545,16 +4529,28 @@
             type = type.toUpperCase();
             return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
         };
+        TypedGraph.prototype.ins = function (node, type) {
+            var _this = this;
+            return __spread(node.ins(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); });
+        };
+        TypedGraph.prototype.outs = function (node, type) {
+            var _this = this;
+            return __spread(node.outs(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); });
+        };
+        TypedGraph.prototype.conns = function (node, type) {
+            var _this = this;
+            return __spread(node.conns(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); });
+        };
         TypedGraph.prototype.inHistT = function (nType, eType) {
-            return this.degreeHistTyped(BaseGraph_1.DIR.in, nType, eType);
+            return this.degreeHistT(BaseGraph_1.DIR.in, nType, eType);
         };
         TypedGraph.prototype.outHistT = function (nType, eType) {
-            return this.degreeHistTyped(BaseGraph_1.DIR.out, nType, eType);
+            return this.degreeHistT(BaseGraph_1.DIR.out, nType, eType);
         };
         TypedGraph.prototype.connHistT = function (nType, eType) {
-            return this.degreeHistTyped(BaseGraph_1.DIR.conn, nType, eType);
+            return this.degreeHistT(BaseGraph_1.DIR.conn, nType, eType);
         };
-        TypedGraph.prototype.degreeHistTyped = function (dir, nType, eType) {
+        TypedGraph.prototype.degreeHistT = function (dir, nType, eType) {
             var e_1, _a;
             var result = [];
             try {
@@ -4727,6 +4723,7 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -4772,7 +4769,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-
+    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -4810,7 +4807,7 @@
 
       return ExactWordIndexStrategy;
     }();
-
+    //# sourceMappingURL=ExactWordIndexStrategy.js.map
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -4856,7 +4853,7 @@
 
       return PrefixIndexStrategy;
     }();
-
+    //# sourceMappingURL=PrefixIndexStrategy.js.map
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -4894,7 +4891,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(IndexStrategy);
@@ -4931,7 +4928,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-
+    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -4969,7 +4966,7 @@
 
       return LowerCaseSanitizer;
     }();
-
+    //# sourceMappingURL=LowerCaseSanitizer.js.map
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -4998,7 +4995,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Sanitizer);
@@ -5033,7 +5030,7 @@
 
       return value;
     }
-
+    //# sourceMappingURL=getNestedFieldValue.js.map
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -5210,7 +5207,7 @@
 
       return TfIdfSearchIndex;
     }();
-
+    //# sourceMappingURL=TfIdfSearchIndex.js.map
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -5309,7 +5306,7 @@
 
       return UnorderedSearchIndex;
     }();
-
+    //# sourceMappingURL=UnorderedSearchIndex.js.map
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -5338,7 +5335,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(SearchIndex);
@@ -5382,7 +5379,7 @@
 
       return SimpleTokenizer;
     }();
-
+    //# sourceMappingURL=SimpleTokenizer.js.map
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -5436,7 +5433,7 @@
 
       return StemmingTokenizer;
     }();
-
+    //# sourceMappingURL=StemmingTokenizer.js.map
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -5577,7 +5574,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-
+    //# sourceMappingURL=StopWordsMap.js.map
     });
 
     unwrapExports(StopWordsMap_1);
@@ -5630,7 +5627,7 @@
 
       return StopWordsTokenizer;
     }();
-
+    //# sourceMappingURL=StopWordsTokenizer.js.map
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -5668,7 +5665,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Tokenizer);
@@ -5923,7 +5920,7 @@
 
       return Search;
     }();
-
+    //# sourceMappingURL=Search.js.map
     });
 
     unwrapExports(Search_1);
@@ -6046,7 +6043,7 @@
 
       return TokenHighlighter;
     }();
-
+    //# sourceMappingURL=TokenHighlighter.js.map
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -6156,7 +6153,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     var index = unwrapExports(commonjs);
@@ -6194,6 +6191,7 @@
         window['idx'] = indexes;
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -6224,6 +6222,7 @@
             fields: ['name']
         }
     };
+    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -6235,6 +6234,7 @@
         models: jobsModels,
         searchModel: jobsModels.Skill
     };
+    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = graphinius;
