@@ -1,5 +1,5 @@
 import {BaseRecommender as $BR, BaseRecommender} from '../../src/recommender/BaseRecommender';
-import {jaccard, jaccardI32, jaccardSource, jaccardPairwise, Similarity, SimilarityResult} from "../../src/recommender/Similarity";
+import {jaccard, jaccardI32, simSource, simPairwise, Similarity, SimilarityResult, simFuncs} from "../../src/recommender/Similarity";
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONOutput} from 'graphinius/lib/io/output/JSONOutput';
@@ -143,7 +143,7 @@ describe('neo4j samples, computed in graphinius', () => {
 		g.getNodesT('Person').forEach(n => {
 			targets[n.label] = br.expand(n, 'out', 'LIKES');
 		});
-		const jres = jaccardSource(start, targets);
+		const jres = simSource(simFuncs.jaccard, start, targets);
 		// console.log(jres);
 		expect(jres).toEqual(jexp);
 	});
@@ -167,7 +167,7 @@ describe('neo4j samples, computed in graphinius', () => {
 			targets[n.label] = br.expand(n, 'out', 'LIKES');
 		});
 		const tic = +new Date;
-		const jres = jaccardPairwise(targets);
+		const jres = simPairwise(simFuncs.jaccard, targets);
 		const toc = +new Date;
 		console.log(`All pairs Jaccard on mini DB took ${toc-tic} ms.`);
 		// console.log(jres);

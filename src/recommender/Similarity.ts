@@ -32,6 +32,10 @@ export function jaccard(a: Set<any>, b: Set<any>) : Similarity {
 }
 
 
+export const simFuncs = {
+	jaccard
+}
+
 
 
 /**
@@ -42,12 +46,12 @@ export function jaccard(a: Set<any>, b: Set<any>) : Similarity {
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function jaccardSource(s: string, t: Sets, c?: number, k?: number) : SimilarityResult {
+export function simSource(algo: Function, s: string, t: Sets, c?: number, k?: number) : SimilarityResult {
 	const result: SimilarityResult = [];
 	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
 		if ( k !== s ) {
-			result.push({from: s, to: k, ...jaccard(start, v)});
+			result.push({from: s, to: k, ...algo(start, v)});
 		}
 	}
 	return result.sort(simSort);
@@ -62,7 +66,7 @@ export function jaccardSource(s: string, t: Sets, c?: number, k?: number) : Simi
  * @param cutoff similarity value below which a pair is omitted from the return struct
  * @param k top-k similar neighbors
  */
-export function jaccardPairwise(s: Sets) : SimilarityResult {
+export function simPairwise(algo: Function, s: Sets) : SimilarityResult {
 	const result: SimilarityResult = [];
 	const done = {};
 
