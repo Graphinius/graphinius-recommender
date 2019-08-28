@@ -2,7 +2,7 @@ import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 
 
-class BaseRecommender {
+class TheExpanse {
 
 	constructor(private _g: TypedGraph) {}
 
@@ -44,8 +44,25 @@ class BaseRecommender {
 	 }
  }
 
+
+ /**
+	* @description expansion from source to targets, ONE step
+	*
+	* @param set node set from which to expand
+	* @param d direction
+	* @param r relationship type to follow (only one at a time..)
+	* @param t target node type to filter (only one at a time..)
+	*/
+	expandSet(set: Set<ITypedNode>, d:string, r :string, t? :string) : Set<ITypedNode> {
+		const theExpanse = new Set<ITypedNode>();
+		for ( let node of set ) {
+			const nodeExp = this.expand(node, d, r, t);
+			nodeExp.forEach(v => theExpanse.add(v));			
+		}
+		return theExpanse;
+	}
 }
 
 export {
-	BaseRecommender
+	TheExpanse
 }

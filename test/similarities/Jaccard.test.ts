@@ -1,5 +1,5 @@
-import {BaseRecommender as $BR, BaseRecommender} from '../../src/recommender/BaseRecommender';
-import {jaccard, jaccardI32, simSource, simPairwise, Similarity, SimilarityResult, simFuncs} from "../../src/recommender/Similarity";
+import {jaccard, jaccardI32, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode} from "../../src/recommender/Similarity";
+import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
 
@@ -61,7 +61,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 	const
 	gFile = './data/cuisine.json',
 	g = new JSONInput().readFromJSONFile(gFile, new TypedGraph('CuisineSimilarities')) as TypedGraph,
-	br = new BaseRecommender(g),
+	expanse = new TheExpanse(g),
 	arya = g.n('Arya'),
 	karin = g.n('Karin');
 
@@ -95,11 +95,11 @@ describe('JACCARD tests on neo4j sample graph', () => {
       { from: 'Karin', to: 'Praveena', isect: 0, sim: 0 }
     ];
 		const start = karin.label;
-		const targets = {};
+		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
-		const jres = simSource(simFuncs.jaccard, start, targets);
+		const jres = simSource(simFuncs.jaccard, start, allSets);
 		// console.log(jres);
 		expect(jres).toEqual(jexp);
 	});
@@ -119,14 +119,98 @@ describe('JACCARD tests on neo4j sample graph', () => {
       { from: 'Karin', to: 'Praveena', isect: 0, sim: 0 }
 		]
 
-		const targets = {};
+		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
-		const jres = simPairwise(simFuncs.jaccard, targets);
+		const jres = simPairwise(simFuncs.jaccard, allSets);
 
 		expect(jres.length).toBe(10);
 		expect(jres).toEqual(jexp);
 	});
+
+
+	it('should compute the top-K per node', () => {
+		const topKExp = {
+      Zhen: { to: 'Michael', isect: 2, sim: 0.66667 },
+      Praveena: { to: 'Zhen', isect: 1, sim: 0.33333 },
+      Michael: { to: 'Zhen', isect: 2, sim: 0.66667 },
+      Arya: { to: 'Karin', isect: 2, sim: 0.66667 },
+      Karin: { to: 'Arya', isect: 2, sim: 0.66667 }
+    };
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+		});
+		const topK = knnPerNode(simFuncs.jaccard, allSets);
+		// console.log(topK);
+		expect(topK).toEqual(topKExp);
+	});
+
+
+	/**
+	// compute categories for recipes
+	MATCH (recipe:Recipe)-[:TYPE]->(cuisine)
+	WITH {item:id(recipe), categories: collect(id(cuisine))} as data
+	WITH collect(data) AS recipeCuisines
+
+	// compute categories for people
+	MATCH (person:Person)-[:LIKES]->(cuisine)
+	WITH recipeCuisines, {item:id(person), categories: collect(id(cuisine))} as data
+	WITH recipeCuisines, collect(data) AS personCuisines
+
+	// create sourceIds and targetIds lists
+	WITH recipeCuisines, personCuisines,
+			[value in recipeCuisines | value.item] AS sourceIds,
+			[value in personCuisines | value.item] AS targetIds
+
+	CALL algo.similarity.jaccard.stream(recipeCuisines + personCuisines, {sourceIds: sourceIds, targetIds: targetIds})
+	YIELD item1, item2, similarity
+	WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+	RETURN from.title AS from, to.name AS to, similarity
+	ORDER BY similarity DESC
+	LIMIT 10
+	*
+	* @todo think about making it it's own method...
+ 	*/
+	it('should find similarities between recipes and people depending on shared cuisine', () => {
+		const simExp = [
+			{ from: 'Peri Peri Naan', to: 'Praveena', isect: 2, sim: 1 },
+			{ from: 'Shrimp Bolognese', to: 'Michael', isect: 2, sim: 0.66667 },
+			{	from: 'Saltimbocca alla roman', to: 'Michael', isect: 2, sim: 0.66667	},
+			{ from: 'Shrimp Bolognese', to: 'Zhen', isect: 1, sim: 0.33333 },
+			{ from: 'Shrimp Bolognese', to: 'Praveena', isect: 1, sim: 0.33333 },
+			{ from: 'Shrimp Bolognese', to: 'Karin', isect: 1, sim: 0.33333 },
+			{	from: 'Saltimbocca alla roman',	to: 'Zhen',	isect: 1,	sim: 0.33333},
+			{	from: 'Saltimbocca alla roman',	to: 'Karin', isect: 1,	sim: 0.33333 },
+			{ from: 'Peri Peri Naan', to: 'Zhen', isect: 1, sim: 0.33333 },
+			{ from: 'Shrimp Bolognese', to: 'Arya', isect: 1, sim: 0.25 },
+			{ from: 'Saltimbocca alla roman', to: 'Arya', isect: 1, sim: 0.25 },
+			{ from: 'Peri Peri Naan', to: 'Michael', isect: 1, sim: 0.25 },
+			{ from: 'Peri Peri Naan', to: 'Arya', isect: 1, sim: 0.25 }
+		]
+		
+		const tic = process.hrtime()[1];
+		const sims = [];
+		const recipes = g.getNodesT('Recipe');
+		const people = g.getNodesT('Person');
+		// console.log(recipes.entries());
+		for ( let [rName, recipe] of recipes.entries() ) {
+			for ( let [pName, person] of people.entries() ) {
+				const rCuis = g.outs(recipe, 'TYPE');
+				const pCuis = g.outs(person, 'LIKES');
+				const sim = jaccard(rCuis, pCuis);
+				if ( sim.sim > 0 ) {
+					sims.push({from: rName, to: pName, ...sim})
+				}
+			}
+		}
+		sims.sort(simSort);
+		const toc = process.hrtime()[1];
+		console.log(`Computing Jaccard similarity based on shared preferences took ${toc-tic} nanos.`);
+
+		// console.log(sims);
+		expect(sims).toEqual(simExp);
+	})
 	
 });

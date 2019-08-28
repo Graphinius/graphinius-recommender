@@ -1,11 +1,9 @@
-import {BaseRecommender as $BR, BaseRecommender} from '../src/recommender/BaseRecommender';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONOutput} from 'graphinius/lib/io/output/JSONOutput';
 
 
 const
 		g = new TypedGraph('CuisineSimilarities'),
-    br = new BaseRecommender(g),
     
     // NODES
 		french = g.addNodeByID('French', {type: 'CUISINE'}),
@@ -90,7 +88,7 @@ const neo4jCusineGraphInput = `
 		MERGE (arya)-[:LIKES]->(portuguese)
 	
 		MERGE (karin)-[:LIKES]->(lebanese)
-		MERGE (karin)-[:LIKES]->(itali{ Zhen: 0, Praveena: 0, Michael: 0.25, Arya: 0.6666666666666666 }an)
+		MERGE (karin)-[:LIKES]->(italian)
 	
 		MERGE (shrimp)-[:TYPE]->(italian)
 		MERGE (shrimp)-[:TYPE]->(indian)

@@ -1,13 +1,8 @@
 import { IBaseNode } from 'graphinius/lib/core/base/BaseNode';
 import { IGraph, BaseGraph } from 'graphinius/lib/core/base/BaseGraph';
+import {TheExpanse} from '../../src/recommender/TheExpanse';
 
 
-function similarGroupsRec(graph: IGraph) {
+describe('The Expanse Test', () => {
 
-}
-
-
-export {
-  similarGroupsRec
-}
-
+});

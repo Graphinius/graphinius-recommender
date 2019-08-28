@@ -1,4 +1,4 @@
-import {BaseRecommender as $BR, BaseRecommender} from '../../src/recommender/BaseRecommender';
+import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {jaccard, jaccardI32, simSource, simPairwise, Similarity, SimilarityResult, simFuncs} from "../../src/recommender/Similarity";
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -12,7 +12,7 @@ describe('Cutoff & knn similarity tests', () => {
   const
     gFile = './data/cuisine.json',
 		g = new JSONInput().readFromJSONFile(gFile, new TypedGraph('CuisineSimilarities')) as TypedGraph,
-    br = new BaseRecommender(g),
+    expanse = new TheExpanse(g),
     karin = g.n('Karin');
 
 
@@ -20,7 +20,7 @@ describe('Cutoff & knn similarity tests', () => {
 		const start = karin.label;
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simSource(simFuncs.jaccard, start, targets, {cutoff: 0.3});
 		expect(jres.length).toBe(1);
@@ -30,7 +30,7 @@ describe('Cutoff & knn similarity tests', () => {
 	it('simPairwise should consider c (cutoff) threshold', () => {
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simPairwise(simFuncs.jaccard, targets, {cutoff: 0.3});
 		expect(jres.length).toBe(3);
@@ -41,7 +41,7 @@ describe('Cutoff & knn similarity tests', () => {
 		const start = karin.label;
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simSource(simFuncs.jaccard, start, targets, {knn: 3});
 		expect(jres.length).toBe(3);
@@ -52,7 +52,7 @@ describe('Cutoff & knn similarity tests', () => {
 		const start = karin.label;
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simSource(simFuncs.jaccard, start, targets, {knn: 13});
 		expect(jres.length).toBe(4);
@@ -62,7 +62,7 @@ describe('Cutoff & knn similarity tests', () => {
 	it('simPairwise should consider knn factor', () => {
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simPairwise(simFuncs.jaccard, targets, {knn: 5});
 		expect(jres.length).toBe(5);
@@ -72,7 +72,7 @@ describe('Cutoff & knn similarity tests', () => {
 	it('simPairwise should consider min(knn, size(res) factor', () => {
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simPairwise(simFuncs.jaccard, targets, {knn: 15});
 		expect(jres.length).toBe(10);
@@ -83,7 +83,7 @@ describe('Cutoff & knn similarity tests', () => {
 		const start = karin.label;
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simSource(simFuncs.jaccard, start, targets, {cutoff: 0.3, knn: 3});
 		expect(jres.length).toBe(1);
@@ -93,7 +93,7 @@ describe('Cutoff & knn similarity tests', () => {
 	it('simPairwise should return min(knn, #res(>cutoff)) results', () => {
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		const jres = simPairwise(simFuncs.jaccard, targets, {cutoff: 0.3, knn: 5});
 		expect(jres.length).toBe(3);
@@ -120,7 +120,7 @@ describe('Cutoff & knn similarity tests', () => {
 		let tic = process.hrtime()[1];
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
-			targets[n.label] = br.expand(n, 'out', 'LIKES');
+			targets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
 		let toc = process.hrtime()[1];
 		console.log(`Expansion on 5 nodes on mini DB took ${toc-tic} nanos.`);

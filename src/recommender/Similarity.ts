@@ -8,6 +8,10 @@ export interface Similarity {
 	sim		: number; // similarity
 }
 
+export interface TopKEntry extends Similarity {
+	to: string;
+}
+
 export interface SimilarityEntry extends Similarity {
 	from	: string;
 	to 		: string;
@@ -15,7 +19,9 @@ export interface SimilarityEntry extends Similarity {
 
 export type SimilarityResult = SimilarityEntry[];
 
-const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
+export type TopKResult = {[key: string]: TopKEntry};
+
+export const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
 
 const PRECISION = 5;
 
@@ -103,8 +109,23 @@ export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : S
 }
 
 
-
-
+/**
+ * @description top-K per node
+ * 
+ * @param algo similarity function to use
+ * @param s all sets
+ * 
+ * @returns most similar neighbor per node
+ */
+export function knnPerNode(algo: Function, s: Sets) : TopKResult {
+	const topK: TopKResult = {};
+	for ( let node of Object.keys(s) ) {
+		const topKEntry: SimilarityEntry = simSource(simFuncs.jaccard, node, s, {knn: 1})[0];
+		delete topKEntry.from;
+		topK[node] = topKEntry;
+	}
+	return topK;
+}
 
 
 /**
