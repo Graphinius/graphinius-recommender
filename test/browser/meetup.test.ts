@@ -13,6 +13,9 @@ import { meetupConfig } from '../../src/indexers/meetup/appConfig';
 
 describe('Meetup example index tests', () => {
 
+  it('should be true', () => {
+    expect(true).toBe(true);
+  });
 
 });
 

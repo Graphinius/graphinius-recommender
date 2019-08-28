@@ -1,6 +1,11 @@
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 
+
+/*----------------------------------*/
+/*		INTERFACES, TYPES & ENUMS			*/
+/*----------------------------------*/
+
 export type Sets = {[key: string]: Set<any>};
 
 export interface Similarity {
@@ -21,31 +26,74 @@ export type SimilarityResult = SimilarityEntry[];
 
 export type TopKResult = {[key: string]: TopKEntry};
 
+export interface SimParams {
+	cutoff?: number;
+	knn?: number;
+}
+
+export enum DIR {
+	in = 'ins',
+	out = 'outs',
+	conn = 'conns'
+}
+
+/**
+ * @param t1 type of node set 1
+ * @param t2 type of node set 2
+ * @param d1 traversal direction for t1
+ * @param d2 traversal direction for t2
+ * @param e1 edge type to follow for t1
+ * @param e2 edge type to follow for t2
+ * @param co cutoff below which entry will be omitted
+ */
+export interface SimPerSharedPrefConfig {
+	t1: string;
+	t2: string;
+	d1: DIR;
+	d2: DIR;
+	e1: string;
+	e2: string;
+	co?: number;
+}
+
+
+
+/*----------------------------------*/
+/*							CONSTS							*/
+/*----------------------------------*/
+
+export const simFuncs = {
+	jaccard
+}
+
 export const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
 
 const PRECISION = 5;
 
+
+
+/*----------------------------------*/
+/*				SIMILARITY MEASURES				*/
+/*----------------------------------*/
+
 /**
- * ----- JACCARD -----
- *
  * @param a set A
  * @param b set B
  */
-export function jaccard(a: Set<any>, b: Set<any>) : Similarity {
+function jaccard(a: Set<any>, b: Set<any>) : Similarity {
 	const unionSize = new Set([...a, ...b]).size;
 	const intersectSize = a.size + b.size - unionSize;
 	return {isect: intersectSize, sim: +(intersectSize / unionSize).toPrecision(PRECISION)};
 }
 
 
-export const simFuncs = {
-	jaccard
-}
 
+/*----------------------------------*/
+/*			SIMILARITY FUNCTIONS				*/
+/*----------------------------------*/
 
-export interface SimParams {
-	cutoff?: number;
-	knn?: number;
+export function sim(algo: Function, a: Set<any>, b: Set<any>) {
+	return algo(a, b);
 }
 
 
@@ -126,6 +174,42 @@ export function knnPerNode(algo: Function, s: Sets) : TopKResult {
 	}
 	return topK;
 }
+
+
+/**
+ * @description Returns similarities of 2 node sets depending on shared preferences
+ * @description default cutoff similarity is 1e-6
+ * 
+ * @param g graph
+ * @param algo similarity function to use
+ * @param cfg config object of type SimPerSharedPrefConfig
+ * 
+ * @returns something
+ * 
+ * @todo type return value
+ * @todo get rid of graph somehow (transfer method to other class...!)
+ */
+export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: SimPerSharedPrefConfig ) {
+	const cutoff = cfg.co == null ? 1e-6 : cfg.co;
+	const sims = [];
+	const t1Set = g.getNodesT(cfg.t1);
+	const t2Set = g.getNodesT(cfg.t2);
+
+	for ( let [t1Name, t1Node] of t1Set.entries() ) {
+		for ( let [t2Name, t2Node] of t2Set.entries() ) {
+			const prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
+			const prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
+			const sim = jaccard(prefSet1, prefSet2);
+			if ( sim.sim >= cutoff ) {
+				sims.push({from: t1Name, to: t2Name, ...sim})
+			}
+		}
+	}
+	return sims.sort(simSort);
+}
+
+
+
 
 
 /**

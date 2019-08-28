@@ -1,4 +1,4 @@
-import {jaccard, jaccardI32, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode} from "../../src/recommender/Similarity";
+import {sim, jaccardI32, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -29,13 +29,13 @@ describe('JACCARD base similarity tests', () => {
 
 		it('should compute jaccard between two simple SETS', () => {
 			const jexp: Similarity = {isect: 2, sim: 0.4};
-			expect(jaccard(s_a, s_b)).toEqual(jexp);
+			expect(sim(simFuncs.jaccard, s_a, s_b)).toEqual(jexp);
 		});
 
 
 		it('should compute jaccard between two LARGE sets', () => {
 			const jexp: Similarity = {isect: 0, sim: 0};
-			expect(jaccard(s_c, s_d)).toEqual(jexp);
+			expect(sim(simFuncs.jaccard, s_c, s_d)).toEqual(jexp);
 		});
 
 
@@ -82,7 +82,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 		const kc = g.outs(karin, 'LIKES');
 		const ac = g.outs(arya, 'LIKES');
 		const jexp: Similarity = {isect: 2, sim: 0.66667};
-		const jres = jaccard(kc, ac);
+		const jres = sim(simFuncs.jaccard, kc, ac);
 		expect(jres).toEqual(jexp);
 	});
 
@@ -188,29 +188,51 @@ describe('JACCARD tests on neo4j sample graph', () => {
 			{ from: 'Saltimbocca alla roman', to: 'Arya', isect: 1, sim: 0.25 },
 			{ from: 'Peri Peri Naan', to: 'Michael', isect: 1, sim: 0.25 },
 			{ from: 'Peri Peri Naan', to: 'Arya', isect: 1, sim: 0.25 }
-		]
+		];
 		
 		const tic = process.hrtime()[1];
-		const sims = [];
-		const recipes = g.getNodesT('Recipe');
-		const people = g.getNodesT('Person');
-		// console.log(recipes.entries());
-		for ( let [rName, recipe] of recipes.entries() ) {
-			for ( let [pName, person] of people.entries() ) {
-				const rCuis = g.outs(recipe, 'TYPE');
-				const pCuis = g.outs(person, 'LIKES');
-				const sim = jaccard(rCuis, pCuis);
-				if ( sim.sim > 0 ) {
-					sims.push({from: rName, to: pName, ...sim})
-				}
-			}
-		}
-		sims.sort(simSort);
+		const sims = viaSharedPrefs(g, simFuncs.jaccard, {
+			t1: 'Recipe', 
+			t2: 'Person', 
+			d1: DIR.out, 
+			d2: DIR.out, 
+			e1: 'Type', 
+			e2: 'Likes'});
 		const toc = process.hrtime()[1];
+		
+		// console.log(sims);
 		console.log(`Computing Jaccard similarity based on shared preferences took ${toc-tic} nanos.`);
 
-		// console.log(sims);
 		expect(sims).toEqual(simExp);
-	})
+	});
+
+
+	/**
+	 * 
+	MATCH (person:Person)-[:LIKES]->(cuisine)
+	WITH {item:id(person), name: person.name, categories: collect(id(cuisine))} as data
+	WITH collect(data) AS personCuisines
+
+	// create sourceIds list containing ids for Praveena and Arya
+	WITH personCuisines,
+			[value in personCuisines WHERE value.name IN ["Praveena", "Arya"] | value.item ] AS sourceIds
+
+	CALL algo.similarity.jaccard.stream(personCuisines, {sourceIds: sourceIds, topK: 1})
+	YIELD item1, item2, similarity
+	WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+	RETURN from.name AS from, to.name AS to, similarity
+	ORDER BY similarity DESC
+	 *
+	 * @description nothing new
+	 * @todo do we need an extra method for this ???
+	 */
+	it('should find the most similar Person to Karin & Arya', () => {
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+		});
+		console.log(simSource(simFuncs.jaccard, 'Karin', allSets, {knn: 1})[0]);
+		console.log(simSource(simFuncs.jaccard, 'Arya', allSets, {knn: 1})[0]);
+	});
 	
 });

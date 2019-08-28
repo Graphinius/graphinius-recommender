@@ -5,4 +5,8 @@ import {TheExpanse} from '../../src/recommender/TheExpanse';
 
 describe('The Expanse Test', () => {
 
+  it('should be true', () => {
+    expect(true).toBe(true);
+  });
+  
 });
