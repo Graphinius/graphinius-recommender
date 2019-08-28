@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   verbose: true,
   collectCoverage: false,
   // collectCoverageFrom: [
@@ -10,8 +10,9 @@ module.exports = {
   // ]
   watchPathIgnorePatterns: [
     "/lib",
-    "/outputs",
-    "/public"
+    "/data",
+    "/public",
+    "/scripts"
   ],
   "globals": {
     // "window": {}
