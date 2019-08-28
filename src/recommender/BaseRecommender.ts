@@ -4,16 +4,21 @@ import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 
 class BaseRecommender {
 
-	constructor() {}
-
+	constructor(private _g: TypedGraph) {}
 
 	/**
+	 * @todo should we copy all incoming Sets into a new one or
+	 * 			 extend the base with the entries of the latter?
+	 *			 The second case would be considerably faster when
+	 *			 doing this iteratively during graph travsersl / expansion.
+	 *			 -> Make it so!
 	 *
-	 * @param {n}
-	 * @param t
-	 * @param s
+	 * @param n node from which to expand
+	 * @param d direction
+	 * @param r relationship type to follow (only one at a time..)
+	 * @param t target node type to filter (only one at a time..)
 	 */
-	expandOutward(n: TypedNode, t: string, s: number) {
+	expandK(n: ITypedNode, d:string, r :string, t? :string) {
 
 	}
 
@@ -21,20 +26,19 @@ class BaseRecommender {
  /**
 	* @description expansion from source to targets, ONE step
 	*
-	* @param g graph
 	* @param n node from which to expand
 	* @param d direction
 	* @param r relationship type to follow (only one at a time..)
 	* @param t target node type to filter (only one at a time..)
 	*/
- 	static expand(g: TypedGraph, n: ITypedNode, d:string, r :string, t? :string) {
+ 	expand(n: ITypedNode, d:string, r :string, t? :string) {
 	 switch(d) {
 		 case 'in':
-			 return g.ins(n, r);
+			 return this._g.ins(n, r);
 		 case 'out':
-			 return g.outs(n, r);
+			 return this._g.outs(n, r);
 		 case 'conn':
-			 return g.conns(n, r);
+			 return this._g.conns(n, r);
 		 default:
 			 throw new Error('unsupported edge direction');
 	 }
