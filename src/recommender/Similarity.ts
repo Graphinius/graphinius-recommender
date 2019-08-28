@@ -37,22 +37,37 @@ export const simFuncs = {
 }
 
 
+export interface SimParams {
+	cutoff?: number;
+	knn?: number;
+}
+
 
 /**
  * @description jaccard between set & particular node
  * 							sorted by similarity DESC
+ * 
+ * @param algo similarity function to use
  * @param s source set
  * @param t target sets to measure similarity to
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simSource(algo: Function, s: string, t: Sets, c?: number, k?: number) : SimilarityResult {
-	const result: SimilarityResult = [];
+export function simSource(algo: Function, s: string, t: Sets, config: SimParams = {}) : SimilarityResult {
+	let result: SimilarityResult = [];
 	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
-		if ( k !== s ) {
-			result.push({from: s, to: k, ...algo(start, v)});
+		if ( k === s ) {
+			continue;
 		}
+		const sim: Similarity = algo(start, v);
+		if ( config.cutoff == null || sim.sim >= config.cutoff ) {
+			result.push({from: s, to: k, ...sim});
+		}
+	}
+	result.sort(simSort);
+	if ( config.knn != null && config.knn <= result.length ) {
+		result = result.slice(0, config.knn);
 	}
 	return result.sort(simSort);
 }
@@ -62,26 +77,29 @@ export function simSource(algo: Function, s: string, t: Sets, c?: number, k?: nu
  * @description pairwise is a *symmetrical* algorithm, so we only need to
  * 							compute similarities in one direction
  * 
+ * @param algo similarity function to use
  * @param s all sets
- * @param cutoff similarity value below which a pair is omitted from the return struct
- * @param k top-k similar neighbors
+ * @param c cutoff parameter
+ * @param k kNN to consider
  */
-export function simPairwise(algo: Function, s: Sets) : SimilarityResult {
-	const result: SimilarityResult = [];
-	const done = {};
-
+export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : SimilarityResult {
+	let result: SimilarityResult = [];	
 	const keys = Object.keys(s);
 	for ( let i in keys ) {
-		// console.log(i);
-		// console.log(result);
 		for ( let j = 0; j < +i; j++) {
 			const from = keys[i];
 			const to = keys[j];
-			const jres = jaccard(s[keys[i]], s[keys[j]]);
-			result.push({from, to, ...jres});
+			const sim = jaccard(s[keys[i]], s[keys[j]]);
+			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
+				result.push({from, to, ...sim});
+			}
 		}
 	}
-	return result.sort(simSort);
+	result.sort(simSort);
+	if ( config.knn != null && config.knn <= result.length ) {
+		result = result.slice(0, config.knn);
+	}
+	return result;
 }
 
 
