@@ -117,7 +117,7 @@ export function sim(algo: Function, a: Set<any>, b: Set<any>) {
 
 
 /**
- * @description jaccard between set & particular node
+ * @description similarity between set & particular node
  * 							sorted by similarity DESC
  * 
  * @param algo similarity function to use
@@ -162,8 +162,9 @@ export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : S
 		for ( let j = 0; j < +i; j++) {
 			const from = keys[i];
 			const to = keys[j];
-			const sim = jaccard(s[keys[i]], s[keys[j]]);
+			const sim = algo(s[keys[i]], s[keys[j]]);
 			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
+				// console.log(`${from}: ${s[keys[i]].size} | ${to}: ${s[keys[j]].size}`);
 				result.push({from, to, ...sim});
 			}
 		}
@@ -187,7 +188,7 @@ export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : S
 export function knnPerNode(algo: Function, s: Sets) : TopKResult {
 	const topK: TopKResult = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntry: SimilarityEntry = simSource(simFuncs.jaccard, node, s, {knn: 1})[0];
+		const topKEntry: SimilarityEntry = simSource(algo, node, s, {knn: 1})[0];
 		delete topKEntry.from;
 		topK[node] = topKEntry;
 	}
@@ -218,7 +219,7 @@ export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: SimPerSharedP
 		for ( let [t2Name, t2Node] of t2Set.entries() ) {
 			const prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
 			const prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
-			const sim = jaccard(prefSet1, prefSet2);
+			const sim = algo(prefSet1, prefSet2);
 			if ( sim.sim >= cutoff ) {
 				sims.push({from: t1Name, to: t2Name, ...sim})
 			}

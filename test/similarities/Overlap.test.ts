@@ -23,15 +23,59 @@ describe('OVERLAP base similarity tests', () => {
 		s_d = new Set(d);
 
 
-		it('should compute jaccard between two simple SETS', () => {
+		it('should compute OVERLAP between two simple SETS', () => {
 			const jexp: Similarity = {isect: 2, sim: 0.66667};
 			expect(sim(simFuncs.overlap, s_a, s_b)).toEqual(jexp);
 		});
 
 
-		it('should compute jaccard between two LARGE sets', () => {
+		it('should compute OVERLAP between two LARGE sets', () => {
 			const jexp: Similarity = {isect: 0, sim: 0};
 			expect(sim(simFuncs.overlap, s_c, s_d)).toEqual(jexp);
 		});
+
+});
+
+
+
+/**
+ * @description similarities on neo4j sample graph (jaccard)
+ */
+describe('OVERLAP tests on neo4j sample graph', () => {
+	
+	const
+	gFile = './data/books.json',
+	g = new JSONInput().readFromJSONFile(gFile, new TypedGraph('BooksGenreSimilarities')) as TypedGraph,
+  expanse = new TheExpanse(g);
+  
+
+  /**
+   * 
+  MATCH (book:Book)-[:HAS_GENRE]->(genre)
+  WITH {item:id(genre), categories: collect(id(book))} as userData
+  WITH collect(userData) as data
+  CALL algo.similarity.overlap.stream(data)
+  YIELD item1, item2, count1, count2, intersection, similarity
+  RETURN algo.asNode(item1).name AS from, algo.asNode(item2).name AS to,
+        count1, count2, intersection, similarity
+  ORDER BY similarity DESC
+   */
+  it('should get OVERLAP pairwise similarities for genres', () => {
+    const oexp = [
+      { from: 'fantasy', to: 'scienceFiction', isect: 3, sim: 1 },
+      { from: 'dystopia', to: 'scienceFiction', isect: 2, sim: 1 },
+      { from: 'classics', to: 'dystopia', isect: 2, sim: 1 },
+      { from: 'classics', to: 'scienceFiction', isect: 3, sim: 0.75 },
+      { from: 'classics', to: 'fantasy', isect: 2, sim: 0.66667 },
+      { from: 'dystopia', to: 'fantasy', isect: 1, sim: 0.5 }
+    ];
+    const allSets = {};
+		g.getNodesT('Genre').forEach(n => {
+			allSets[n.label] = expanse.expand(n, 'in', 'HAS_GENRE');
+    });
+    const ores = simPairwise(simFuncs.overlap, allSets);
+    // console.log(ores);
+    expect(ores).toEqual(oexp);
+  });
 
 });
