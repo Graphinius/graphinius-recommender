@@ -192,12 +192,13 @@ describe('JACCARD tests on neo4j sample graph', () => {
 		
 		const tic = process.hrtime()[1];
 		const sims = viaSharedPrefs(g, simFuncs.jaccard, {
-			t1: 'Recipe', 
-			t2: 'Person', 
-			d1: DIR.out, 
-			d2: DIR.out, 
-			e1: 'Type', 
-			e2: 'Likes'});
+			t1: 'Recipe',
+			t2: 'Person',
+			d1: DIR.out,
+			d2: DIR.out,
+			e1: 'Type',
+			e2: 'Likes'
+		});
 		const toc = process.hrtime()[1];
 		
 		// console.log(sims);

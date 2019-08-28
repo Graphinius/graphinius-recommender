@@ -63,7 +63,8 @@ export interface SimPerSharedPrefConfig {
 /*----------------------------------*/
 
 export const simFuncs = {
-	jaccard
+	jaccard,
+	overlap
 }
 
 export const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
@@ -81,9 +82,27 @@ const PRECISION = 5;
  * @param b set B
  */
 function jaccard(a: Set<any>, b: Set<any>) : Similarity {
+	const ui = unionIntersect(a, b);
+	return {
+		isect: ui.isectSize,
+		sim: +(ui.isectSize / ui.unionSize).toPrecision(PRECISION)
+	}
+}
+
+
+function overlap(a: Set<any>, b: Set<any>) : Similarity {
+	const ui = unionIntersect(a, b);
+	return {
+		isect: ui.isectSize,
+		sim: +(ui.isectSize / Math.min(a.size, b.size)).toPrecision(PRECISION)
+	}
+}
+
+
+function unionIntersect(a: Set<any>, b: Set<any>) {
 	const unionSize = new Set([...a, ...b]).size;
-	const intersectSize = a.size + b.size - unionSize;
-	return {isect: intersectSize, sim: +(intersectSize / unionSize).toPrecision(PRECISION)};
+	const isectSize = a.size + b.size - unionSize;
+	return {unionSize, isectSize};
 }
 
 
