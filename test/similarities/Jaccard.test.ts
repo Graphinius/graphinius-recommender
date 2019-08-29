@@ -1,4 +1,4 @@
-import {sim, jaccardI32, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
+import {sim, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -39,16 +39,16 @@ describe('JACCARD base similarity tests', () => {
 		});
 
 
-		it('should compute jaccard between two simple TypedArraysI32', () => {
-			const jexp: Similarity = {isect: 2, sim: 0.4};
-			expect(jaccardI32(t_ai, t_bi)).toEqual(jexp);
-		});
+		// it('should compute jaccard between two simple TypedArraysI32', () => {
+		// 	const jexp: Similarity = {isect: 2, sim: 0.4};
+		// 	expect(jaccardI32(t_ai, t_bi)).toEqual(jexp);
+		// });
 
 
-		it('should compute jaccard between two LARGE TypedArraysI32', () => {
-			const jexp: Similarity = {isect: 0, sim: 0};
-			expect(jaccardI32(t_ci, t_di)).toEqual(jexp);
-		});
+		// it('should compute jaccard between two LARGE TypedArraysI32', () => {
+		// 	const jexp: Similarity = {isect: 0, sim: 0};
+		// 	expect(jaccardI32(t_ci, t_di)).toEqual(jexp);
+		// });
 	
 });
 
