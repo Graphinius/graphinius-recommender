@@ -1,4 +1,4 @@
-import {sim, simSource, simPairwise, Similarity, simSort, simFuncs, knnNodeArray, knnNodeDict, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
+import {sim, simSource, simPairwise, Similarity, simSubsets, simFuncs, knnNodeArray, knnNodeDict, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -55,6 +55,32 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 		g =  new JSONInput().readFromJSONFile(gFile, new TypedGraph('BooksGenreSimilarities')) as TypedGraph;
 		expanse = new TheExpanse(g);
 	});
+
+
+	it('should compute the overlap between two nodes', () => {
+		const oexp = {isect: 1, sim: 0.5};
+		const a = g.ins(g.n('fantasy'), 'HAS_GENRE');
+		const b = g.ins(g.n('dystopia'), 'HAS_GENRE');
+		const ores = sim(simFuncs.overlap, a, b);
+		expect(ores).toEqual(oexp);
+	});
+
+
+	it('should compute the overlap from a source', () => {
+		const oexp = [
+      { from: 'classics', to: 'dystopia', isect: 2, sim: 1 },
+      { from: 'classics', to: 'scienceFiction', isect: 3, sim: 0.75 },
+      { from: 'classics', to: 'fantasy', isect: 2, sim: 0.66667 }
+    ];
+		const allSets = {};
+		g.getNodesT('Genre').forEach(n => {
+			allSets[n.label] = expanse.expand(n, 'in', 'HAS_GENRE');
+    });
+		const ores = simSource(simFuncs.overlap, 'classics', allSets);
+		// console.log(ores);
+		expect(ores).toEqual(oexp);
+	});
+
 
   /**
    * 
@@ -176,7 +202,7 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 	});
 
 
-	it('kNN node should accept a cutoff', () => {
+	it('kNN node should accept a cutoff, DICT version', () => {
 		const oexp = {
       scienceFiction: [
         { to: 'fantasy', isect: 3, sim: 1 },
@@ -211,7 +237,7 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 	YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, stdDev, p25, p50, p75, p90, p95, p99, p999, p100
 	RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty, min, max, mean, p95
 	 */
-	it.only('should add new edges based on kNN query', () => {
+	it('should add new edges based on kNN query', () => {
 		const augment = new TheAugments(g);
 		const relName = 'SUB_GENRE';
 		const oldDirEdges = g.nrDirEdges();
@@ -231,5 +257,26 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 	 * fantasy -> scienceFiction -> classics
 	 */
 	it.todo('should compute hierarchies');
+
+
+	it('should compute similarities between subsets', () => {
+		const oexp = [
+      { from: 'fahrenheit451', to: 'nineteen84', isect: 3, sim: 1 },
+      { from: 'fahrenheit451', to: 'dune', isect: 3, sim: 1 },
+      { from: 'hungerGames', to: 'dune', isect: 2, sim: 1 },
+      { from: 'hungerGames', to: 'nineteen84', isect: 1, sim: 0.5 }
+    ];
+		const subSet1 = {}, subSet2 = {};
+		subSet1['fahrenheit451'] = g.outs(g.n('fahrenheit451'), 'HAS_GENRE');
+		subSet1['hungerGames'] = g.outs(g.n('hungerGames'), 'HAS_GENRE');
+		subSet2['nineteen84'] = g.outs(g.n('nineteen84'), 'HAS_GENRE');
+		subSet2['dune'] = g.outs(g.n('dune'), 'HAS_GENRE');
+		const ores = simSubsets(simFuncs.overlap, subSet1, subSet2);
+		// console.log(ores);
+    expect(ores).toEqual(oexp);		
+	});
+
+
+	it.todo('should compute group similarity');
 
 });

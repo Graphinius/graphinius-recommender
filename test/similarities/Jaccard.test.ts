@@ -234,5 +234,11 @@ describe('JACCARD tests on neo4j sample graph', () => {
 		console.log(simSource(simFuncs.jaccard, 'Karin', allSets, {knn: 1})[0]);
 		console.log(simSource(simFuncs.jaccard, 'Arya', allSets, {knn: 1})[0]);
 	});
+
+
+	/**
+	 * let's say (French, Lebanese) vs. (Italian, Portuguese)
+	 */
+	it.todo('should compute group similarity');
 	
 });

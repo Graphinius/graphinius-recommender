@@ -6,7 +6,7 @@ import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 /*		INTERFACES, TYPES & ENUMS			*/
 /*----------------------------------*/
 
-export type Sets = {[key: string]: Set<any>};
+export type SetOfSets = {[key: string]: Set<any>};
 
 export interface Similarity {
 	isect : number; // intersection (# of items)
@@ -134,7 +134,7 @@ export function sim(algo: Function, a: Set<any>, b: Set<any>) {
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simSource(algo: Function, s: string, t: Sets, config: SimilarityConfig = {}) : SimilarityResult {
+export function simSource(algo: Function, s: string, t: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
 	let result: SimilarityResult = [];
 	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
@@ -163,7 +163,7 @@ export function simSource(algo: Function, s: string, t: Sets, config: Similarity
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simPairwise(algo: Function, s: Sets, config: SimilarityConfig = {}) : SimilarityResult {
+export function simPairwise(algo: Function, s: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
 	let result: SimilarityResult = [];	
 	const keys = Object.keys(s);
 	for ( let i in keys ) {
@@ -186,6 +186,56 @@ export function simPairwise(algo: Function, s: Sets, config: SimilarityConfig = 
 
 
 /**
+ * @description similarity of individuals of one subset to another
+ * 
+ * @param algo 
+ * @param s1 
+ * @param s2 
+ * @param config
+ * 
+ * @returns an array of Similarity entries
+ */
+export function simSubsets(algo: Function, s1: SetOfSets, s2: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
+	let result: SimilarityResult = [];	
+	const keys1 = Object.keys(s1);
+	const keys2 = Object.keys(s2);
+	for ( let i in keys1 ) {
+		for ( let j in keys2 ) {
+			const from = keys1[i];
+			const to = keys2[j];
+			const sim = algo(s1[keys1[i]], s2[keys2[j]]);
+			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
+				// console.log(`${from}: ${s[keys[i]].size} | ${to}: ${s[keys[j]].size}`);
+				result.push({from, to, ...sim});
+			}
+		}
+	}
+	result.sort(simSort);
+	if ( config.knn != null && config.knn <= result.length ) {
+		result = result.slice(0, config.knn);
+	}
+	return result;
+}
+
+
+/**
+ * @description similarity of two groups to one another
+ * 							just collects sets & calls sim()
+ * 
+ * @param algo
+ * @param s1 
+ * @param s2 
+ * @param config
+ * 
+ * @returns an array of Similarity entries
+ */
+export function simGroups(algo: Function, s1: SetOfSets, s2: SetOfSets, config: SimilarityConfig = {}) : Similarity {
+	throw new Error('not implemented yet');
+	return {isect: 0, sim: 0};
+}
+
+
+/**
  * @description top-K per node
  * 
  * @param algo similarity function to use
@@ -193,7 +243,7 @@ export function simPairwise(algo: Function, s: Sets, config: SimilarityConfig = 
  * 
  * @returns most similar neighbor per node
  */
-export function knnNodeArray(algo: Function, s: Sets, cfg: SimilarityConfig) : TopKArray {
+export function knnNodeArray(algo: Function, s: SetOfSets, cfg: SimilarityConfig) : TopKArray {
 	const c = cfg.cutoff || 0;
 	const topK: TopKArray = [];
 	const dupes = {};
@@ -216,7 +266,7 @@ export function knnNodeArray(algo: Function, s: Sets, cfg: SimilarityConfig) : T
 }
 
 
-export function knnNodeDict(algo: Function, s: Sets, cfg: SimilarityConfig) {
+export function knnNodeDict(algo: Function, s: SetOfSets, cfg: SimilarityConfig) {
 	const c = cfg.cutoff || 0;
 	const topK: TopKDict = {};
 	for ( let node of Object.keys(s) ) {
