@@ -2,7 +2,7 @@ import {TypedEdge, ITypedEdge} from 'graphinius/lib/core/typed/TypedEdge';
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {TheExpanse} from './TheExpanse';
-import {simFuncs, knnNodeArray} from './Similarity';
+import {simFuncs, knnNodeArray} from './SetSimilarity';
 
 
 interface SubSetConfig {

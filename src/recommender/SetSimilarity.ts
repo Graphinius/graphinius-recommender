@@ -1,64 +1,6 @@
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-
-
-/*----------------------------------*/
-/*		INTERFACES, TYPES & ENUMS			*/
-/*----------------------------------*/
-
-export type SetOfSets = {[key: string]: Set<any>};
-
-export interface Similarity {
-	isect : number; // intersection (# of items)
-	sim		: number; // similarity
-}
-
-export interface SimilarityEntry extends Similarity {
-	from	: string;
-	to 		: string;
-}
-
-export type SimilarityResult = SimilarityEntry[];
-
-export interface TopKEntry extends Similarity {
-	from: string;
-	to: string;
-}
-export type TopKArray = TopKEntry[];
-export type TopKDict = {[key:string]: TopKEntry[]};
-
-export interface SimilarityConfig {
-	cutoff?: number;
-	knn?: number;
-	dup?: boolean;
-}
-
-export enum DIR {
-	in = 'ins',
-	out = 'outs',
-	conn = 'conns'
-}
-
-/**
- * @param t1 type of node set 1
- * @param t2 type of node set 2
- * @param d1 traversal direction for t1
- * @param d2 traversal direction for t2
- * @param e1 edge type to follow for t1
- * @param e2 edge type to follow for t2
- * @param co cutoff below which entry will be omitted
- */
-export interface SimPerSharedPrefConfig {
-	t1: string;
-	t2: string;
-	d1: DIR;
-	d2: DIR;
-	e1: string;
-	e2: string;
-	co?: number;
-}
-
-
+import * as $I from './interfaces';
 
 /*----------------------------------*/
 /*							CONSTS							*/
@@ -66,11 +8,10 @@ export interface SimPerSharedPrefConfig {
 
 export const simFuncs = {
 	jaccard,
-	overlap,
-	cosine
+	overlap
 }
 
-export const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
+export const simSort = (se1: $I.SimilarityEntry, se2: $I.SimilarityEntry) => se2.sim - se1.sim;
 
 const PRECISION = 5;
 
@@ -85,7 +26,7 @@ const PRECISION = 5;
  * @param a set A
  * @param b set B
  */
-function jaccard(a: Set<any>, b: Set<any>) : Similarity {
+function jaccard(a: Set<any>, b: Set<any>) : $I.Similarity {
 	const ui = unionIntersect(a, b);
 	return {
 		isect: ui.isectSize,
@@ -99,7 +40,7 @@ function jaccard(a: Set<any>, b: Set<any>) : Similarity {
  * @param a 
  * @param b 
  */
-function overlap(a: Set<any>, b: Set<any>) : Similarity {
+function overlap(a: Set<any>, b: Set<any>) : $I.Similarity {
 	const ui = unionIntersect(a, b);
 	return {
 		isect: ui.isectSize,
@@ -115,83 +56,12 @@ function unionIntersect(a: Set<any>, b: Set<any>) {
 }
 
 
-/**
- * 
- * @param a 
- * @param b 
- */
-export function cosine(a: number[], b: number[]) {
-	if ( a.length !== b.length ) {
-		throw new Error('Vectors must be of same size');
-	}
-	const fa1 = new Float32Array(a);
-	const fa2 = new Float32Array(b);
-	let numerator = 0;
-	for ( let i = 0; i < fa1.length; i++ ) {
-			numerator += fa1[i] * fa2[i];
-	}
-	let dena = 0, denb = 0;
-	for ( let i = 0; i < fa1.length; i++ ) {
-		dena += fa1[i] * fa1[i];
-		denb += fa2[i] * fa2[i];
-	}
-	dena = Math.sqrt(dena);
-	denb = Math.sqrt(denb);
-	return +(numerator / (dena * denb)).toPrecision(PRECISION);
-}
-
-
-/**
- * @description first extract
- * @param a 
- * @param b 
- */
-export function cosineSets(a: Set<string>, b: Set<string>) {
-	console.log(a);
-	console.log(b);
-	// we need to extract common targets first
-	let a_id = new Set(), b_id = new Set();
-	for ( let e of a ) a_id.add(e.split('#')[0]);
-	for ( let e of b ) b_id.add(e.split('#')[0]);
-
-	let aa = [], ba = [];
-	for ( let e of a )  {
-		const earr = e.split('#');
-		if ( b_id.has(earr[0]) ) {
-			aa.push(+earr[earr.length-1]);
-		}
-	}
-	for ( let e of b )  {
-		const earr = e.split('#');
-		if ( a_id.has(earr[0]) ) {
-			ba.push(+earr[earr.length-1]);
-		}
-	}
-
-	console.log(aa);
-	console.log(ba);
-	return cosine(aa, ba);
-}
-
-
-/**
- * @description get only scores of intersection of Neighborhood-string encoded sets
- * @param a 
- */
-function getIntersectScores(a: Set<any>, b: Set<any>) {
-
-
-}
-
-
-
 /*----------------------------------*/
 /*			SIMILARITY FUNCTIONS				*/
 /*----------------------------------*/
 
 export function sim(algo: Function, a: Set<any>, b: Set<any>) {
-	const sim = algo(a, b);
-	return {...sim};
+	return algo(a, b);
 }
 
 
@@ -205,14 +75,14 @@ export function sim(algo: Function, a: Set<any>, b: Set<any>) {
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simSource(algo: Function, s: string, t: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
-	let result: SimilarityResult = [];
+export function simSource(algo: Function, s: string, t: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
+	let result: $I.SimilarityResult = [];
 	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
 		if ( k === s ) {
 			continue;
 		}
-		const sim: Similarity = algo(start, v);
+		const sim: $I.Similarity = algo(start, v);
 		if ( config.cutoff == null || sim.sim >= config.cutoff ) {
 			result.push({from: s, to: k, ...sim});
 		}
@@ -234,8 +104,8 @@ export function simSource(algo: Function, s: string, t: SetOfSets, config: Simil
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simPairwise(algo: Function, s: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
-	let result: SimilarityResult = [];	
+export function simPairwise(algo: Function, s: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
+	let result: $I.SimilarityResult = [];	
 	const keys = Object.keys(s);
 	for ( let i in keys ) {
 		for ( let j = 0; j < +i; j++) {
@@ -266,8 +136,8 @@ export function simPairwise(algo: Function, s: SetOfSets, config: SimilarityConf
  * 
  * @returns an array of Similarity entries
  */
-export function simSubsets(algo: Function, s1: SetOfSets, s2: SetOfSets, config: SimilarityConfig = {}) : SimilarityResult {
-	let result: SimilarityResult = [];	
+export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
+	let result: $I.SimilarityResult = [];	
 	const keys1 = Object.keys(s1);
 	const keys2 = Object.keys(s2);
 	for ( let i in keys1 ) {
@@ -300,7 +170,7 @@ export function simSubsets(algo: Function, s1: SetOfSets, s2: SetOfSets, config:
  * 
  * @returns an array of Similarity entries
  */
-export function simGroups(algo: Function, s1: SetOfSets, s2: SetOfSets, config: SimilarityConfig = {}) : Similarity {
+export function simGroups(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.Similarity {
 	throw new Error('not implemented yet');
 	return {isect: 0, sim: 0};
 }
@@ -314,12 +184,12 @@ export function simGroups(algo: Function, s1: SetOfSets, s2: SetOfSets, config: 
  * 
  * @returns most similar neighbor per node
  */
-export function knnNodeArray(algo: Function, s: SetOfSets, cfg: SimilarityConfig) : TopKArray {
+export function knnNodeArray(algo: Function, s: $I.SetOfSets, cfg: $I.SimilarityConfig) : $I.TopKArray {
 	const c = cfg.cutoff || 0;
-	const topK: TopKArray = [];
+	const topK: $I.TopKArray = [];
 	const dupes = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
+		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
 		topKEntries.forEach(e => {
 			// console.log(e);
 			if ( c == null || e.sim < c ) {
@@ -337,11 +207,11 @@ export function knnNodeArray(algo: Function, s: SetOfSets, cfg: SimilarityConfig
 }
 
 
-export function knnNodeDict(algo: Function, s: SetOfSets, cfg: SimilarityConfig) {
+export function knnNodeDict(algo: Function, s: $I.SetOfSets, cfg: $I.SimilarityConfig) {
 	const c = cfg.cutoff || 0;
-	const topK: TopKDict = {};
+	const topK: $I.TopKDict = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
+		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
 		topKEntries.forEach(e => {
 			// console.log(e);
 			if ( c == null || e.sim < c) {
@@ -372,7 +242,7 @@ export function knnNodeDict(algo: Function, s: SetOfSets, cfg: SimilarityConfig)
  * @todo type return value
  * @todo get rid of graph somehow (transfer method to other class...!)
  */
-export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: SimPerSharedPrefConfig ) {
+export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: $I.SimPerSharedPrefConfig ) {
 	const cutoff = cfg.co == null ? 1e-6 : cfg.co;
 	const sims = [];
 	const t1Set = g.getNodesT(cfg.t1);
