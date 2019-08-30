@@ -141,18 +141,46 @@ export function cosine(a: number[], b: number[]) {
 }
 
 
+/**
+ * @description first extract
+ * @param a 
+ * @param b 
+ */
 export function cosineSets(a: Set<string>, b: Set<string>) {
-	let aa = Array.from(a).map(l => {
-		const larr = l.split('#');
-		return +larr[larr.length-1]
-	});
-	let ba = Array.from(b).map(l => {
-		const larr = l.split('#');
-		return +larr[larr.length-1]
-	});
+	console.log(a);
+	console.log(b);
+	// we need to extract common targets first
+	let a_id = new Set(), b_id = new Set();
+	for ( let e of a ) a_id.add(e.split('#')[0]);
+	for ( let e of b ) b_id.add(e.split('#')[0]);
+
+	let aa = [], ba = [];
+	for ( let e of a )  {
+		const earr = e.split('#');
+		if ( b_id.has(earr[0]) ) {
+			aa.push(+earr[earr.length-1]);
+		}
+	}
+	for ( let e of b )  {
+		const earr = e.split('#');
+		if ( a_id.has(earr[0]) ) {
+			ba.push(+earr[earr.length-1]);
+		}
+	}
+
 	console.log(aa);
 	console.log(ba);
 	return cosine(aa, ba);
+}
+
+
+/**
+ * @description get only scores of intersection of Neighborhood-string encoded sets
+ * @param a 
+ */
+function getIntersectScores(a: Set<any>, b: Set<any>) {
+
+
 }
 
 

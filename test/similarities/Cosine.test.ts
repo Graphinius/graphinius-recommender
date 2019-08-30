@@ -16,8 +16,8 @@ describe('COSINE base similarity tests', () => {
 	// Symmetric split...
   while (i++ < SUPER_SIZE / 2) c.push(i);
 	while (i++ <= SUPER_SIZE) d.push(i);
-  console.log(c.length);
-  console.log(d.length);
+  // console.log(c.length);
+  // console.log(d.length);
   
     it('should throw upon passing vectors of different size', () => {
       expect(cosine.bind(cosine, [1], [])).toThrowError('Vectors must be of same size');
