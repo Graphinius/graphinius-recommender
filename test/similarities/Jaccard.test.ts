@@ -1,4 +1,4 @@
-import {sim, simSource, simPairwise, Similarity, simSort, simFuncs, knnPerNode, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
+import {sim, simSource, simPairwise, Similarity, simSort, simFuncs, knnNodeArray, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -142,7 +142,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 		g.getNodesT('Person').forEach(n => {
 			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
-		const topK = knnPerNode(simFuncs.jaccard, allSets, 1, true);
+		const topK = knnNodeArray(simFuncs.jaccard, allSets, {knn: 1, dup: true});
 		// console.log(topK);
 		expect(topK).toEqual(topKExp);
 	});
@@ -224,8 +224,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 	RETURN from.name AS from, to.name AS to, similarity
 	ORDER BY similarity DESC
 	 *
-	 * @description nothing new
-	 * @todo do we need an extra method for this ???
+	 * @description similarity between subsets 
 	 */
 	it('should find the most similar Person to Karin & Arya', () => {
 		const allSets = {};

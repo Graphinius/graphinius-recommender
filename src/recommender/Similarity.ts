@@ -13,10 +13,6 @@ export interface Similarity {
 	sim		: number; // similarity
 }
 
-export interface TopKEntry extends Similarity {
-	to: string;
-}
-
 export interface SimilarityEntry extends Similarity {
 	from	: string;
 	to 		: string;
@@ -24,11 +20,17 @@ export interface SimilarityEntry extends Similarity {
 
 export type SimilarityResult = SimilarityEntry[];
 
-export type TopKResult = TopKEntry[];
+export interface TopKEntry extends Similarity {
+	from: string;
+	to: string;
+}
+export type TopKArray = TopKEntry[];
+export type TopKDict = {[key:string]: TopKEntry[]};
 
-export interface SimParams {
+export interface SimilarityConfig {
 	cutoff?: number;
 	knn?: number;
+	dup?: boolean;
 }
 
 export enum DIR {
@@ -89,6 +91,7 @@ function jaccard(a: Set<any>, b: Set<any>) : Similarity {
 	}
 }
 
+
 /**
  * @description commonly used to detect sub/super relationships
  * @param a 
@@ -116,7 +119,8 @@ function unionIntersect(a: Set<any>, b: Set<any>) {
 /*----------------------------------*/
 
 export function sim(algo: Function, a: Set<any>, b: Set<any>) {
-	return algo(a, b);
+	const sim = algo(a, b);
+	return {...sim};
 }
 
 
@@ -130,7 +134,7 @@ export function sim(algo: Function, a: Set<any>, b: Set<any>) {
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simSource(algo: Function, s: string, t: Sets, config: SimParams = {}) : SimilarityResult {
+export function simSource(algo: Function, s: string, t: Sets, config: SimilarityConfig = {}) : SimilarityResult {
 	let result: SimilarityResult = [];
 	const start = t[s];
 	for ( let [k,v] of Object.entries(t)) {
@@ -159,7 +163,7 @@ export function simSource(algo: Function, s: string, t: Sets, config: SimParams 
  * @param c cutoff parameter
  * @param k kNN to consider
  */
-export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : SimilarityResult {
+export function simPairwise(algo: Function, s: Sets, config: SimilarityConfig = {}) : SimilarityResult {
 	let result: SimilarityResult = [];	
 	const keys = Object.keys(s);
 	for ( let i in keys ) {
@@ -189,14 +193,18 @@ export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : S
  * 
  * @returns most similar neighbor per node
  */
-export function knnPerNode(algo: Function, s: Sets, knn: number = 1, dup: boolean = false) : TopKResult {
-	const topK: TopKResult = [];
+export function knnNodeArray(algo: Function, s: Sets, cfg: SimilarityConfig) : TopKArray {
+	const c = cfg.cutoff || 0;
+	const topK: TopKArray = [];
 	const dupes = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn});
+		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
 		topKEntries.forEach(e => {
 			// console.log(e);
-			if (!dup && ( dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from] ) ) {
+			if ( c == null || e.sim < c ) {
+				return;
+			}
+			if (!cfg.dup && ( dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from] ) ) {
 				return;
 			}		
 			topK.push(e);
@@ -205,6 +213,28 @@ export function knnPerNode(algo: Function, s: Sets, knn: number = 1, dup: boolea
 		});
 	}
 	return topK.sort(simSort);
+}
+
+
+export function knnNodeDict(algo: Function, s: Sets, cfg: SimilarityConfig) {
+	const c = cfg.cutoff || 0;
+	const topK: TopKDict = {};
+	for ( let node of Object.keys(s) ) {
+		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
+		topKEntries.forEach(e => {
+			// console.log(e);
+			if ( c == null || e.sim < c) {
+				return;
+			}
+			delete e.from;
+			topK[node] = topK[node] || [];
+			topK[node].push(e);
+		});
+		for ( let arr of Object.values(topK) ) {
+			arr.sort(simSort);
+		} 
+	}
+	return topK;
 }
 
 
