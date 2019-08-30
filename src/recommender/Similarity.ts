@@ -6,6 +6,10 @@ import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 /*		INTERFACES, TYPES & ENUMS			*/
 /*----------------------------------*/
 
+export interface CosineSet {
+	s: number; // score
+}
+
 export type SetOfSets = {[key: string]: Set<any>};
 
 export interface Similarity {
@@ -66,7 +70,8 @@ export interface SimPerSharedPrefConfig {
 
 export const simFuncs = {
 	jaccard,
-	overlap
+	overlap,
+	cosine
 }
 
 export const simSort = (se1: SimilarityEntry, se2: SimilarityEntry) => se2.sim - se1.sim;
@@ -78,6 +83,7 @@ const PRECISION = 5;
 /*----------------------------------*/
 /*				SIMILARITY MEASURES				*/
 /*----------------------------------*/
+
 
 /**
  * @param a set A
@@ -110,6 +116,32 @@ function unionIntersect(a: Set<any>, b: Set<any>) {
 	const unionSize = new Set([...a, ...b]).size;
 	const isectSize = a.size + b.size - unionSize;
 	return {unionSize, isectSize};
+}
+
+
+/**
+ * 
+ * @param a 
+ * @param b 
+ */
+export function cosine(a: number[], b: number[]) {
+	if ( a.length !== b.length ) {
+		throw new Error('Vectors must be of same size');
+	}
+	const fa1 = new Float32Array(a);
+	const fa2 = new Float32Array(b);
+	let numerator = 0;
+	for ( let i = 0; i < fa1.length; i++ ) {
+			numerator += fa1[i] * fa2[i];
+	}
+	let dena = 0, denb = 0;
+	for ( let i = 0; i < fa1.length; i++ ) {
+		dena += fa1[i] * fa1[i];
+		denb += fa2[i] * fa2[i];
+	}
+	dena = Math.sqrt(dena);
+	denb = Math.sqrt(denb);
+	return +(numerator / (dena * denb)).toPrecision(PRECISION);
 }
 
 
