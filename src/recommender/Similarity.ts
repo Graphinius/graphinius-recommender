@@ -6,10 +6,6 @@ import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 /*		INTERFACES, TYPES & ENUMS			*/
 /*----------------------------------*/
 
-export interface CosineSet {
-	s: number; // score
-}
-
 export type SetOfSets = {[key: string]: Set<any>};
 
 export interface Similarity {
@@ -142,6 +138,21 @@ export function cosine(a: number[], b: number[]) {
 	dena = Math.sqrt(dena);
 	denb = Math.sqrt(denb);
 	return +(numerator / (dena * denb)).toPrecision(PRECISION);
+}
+
+
+export function cosineSets(a: Set<string>, b: Set<string>) {
+	let aa = Array.from(a).map(l => {
+		const larr = l.split('#');
+		return +larr[larr.length-1]
+	});
+	let ba = Array.from(b).map(l => {
+		const larr = l.split('#');
+		return +larr[larr.length-1]
+	});
+	console.log(aa);
+	console.log(ba);
+	return cosine(aa, ba);
 }
 
 
