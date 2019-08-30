@@ -1,6 +1,7 @@
 import {simFuncs} from '../../src/similarity/ScoreSimilarity';
-import {sim, simSource, simPairwise, knnNodeArray} from '../../src/similarity/SimilarityCommons';
+import {sim, simSource, simPairwise, knnNodeArray, getBsNotInA} from '../../src/similarity/SimilarityCommons';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
+import {TheAugments} from '../../src/recommender/TheAugments';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
 
@@ -152,8 +153,54 @@ describe('COSINE tests on neo4j sample graph', () => {
 			allSets[n.label] = n.outs('LIKES');
 		});
 		const topK = knnNodeArray(simFuncs.cosineSets, allSets, {knn: 1, dup: true});
-		console.log(topK);
+		// console.log(topK);
 		expect(topK).toEqual(topKExp);
+	});
+
+
+	it('should add new edges based on kNN query', () => {
+		const augment = new TheAugments(g);
+		const relName = 'SUB_GENRE';
+		const oldDirEdges = g.nrDirEdges();
+		
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES')
+    });
+		const newEdges = augment.addSubsetRelationship(simFuncs.cosineSets, allSets, {
+			rtype: relName, knn: 2, cutoff: 0.5
+		});
+		expect(g.nrDirEdges()).toBe(oldDirEdges + newEdges.size);
+
+		// console.log(g.n('fantasy').outs(relName));
+		// console.log(g.n('scienceFiction').outs(relName));
+	});
+
+
+	/**
+	MATCH (p:Person {name: "Praveena"})-[:SIMILAR]->(other),
+		(other)-[:LIKES]->(cuisine)
+	WHERE not((p)-[:LIKES]->(cuisine))
+	RETURN cuisine.name AS cuisine
+	 */
+	it('find cuisines liked by the most similar person to praveena, which she does not like / know yet', () => {
+		// 1) find the top-K person for Praveena
+		const praveena = g.n('Praveena');
+		const start = praveena.label;
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const mostSim = simSource(simFuncs.cosineSets, start, allSets, {knn: 1})[0];
+		// console.log(mostSim); // Karin		
+		// 2) find the cuisines that Praveena & Karin likes
+		const pCuis = g.outs(g.n(start), 'LIKES');
+		const kCuis = g.outs(g.n(mostSim.to), 'LIKES');
+		// 3) filter the cuisines that Karin likes, but Praveena has no opinion about
+		let recommendations = getBsNotInA(pCuis, kCuis);
+		// console.log(recommendations);
+		expect(recommendations.size).toBe(2);
+		recommendations.forEach(r => expect(['Italian', 'Lebanese']).toContain(r.label));
 	});
 
 });

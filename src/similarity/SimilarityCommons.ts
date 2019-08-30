@@ -1,5 +1,6 @@
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import * as $I from './interfaces';
+import { ITypedNode } from 'graphinius/lib/core/typed/TypedNode';
 
 export const simSort = (se1: $I.SimilarityEntry, se2: $I.SimilarityEntry) => se2.sim - se1.sim;
 
@@ -207,6 +208,25 @@ export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: $I.SimPerShar
 		}
 	}
 	return sims.sort(simSort);
+}
+
+
+/**
+ * @description returns Set of elements in B that are not in A
+ * @param a 
+ * @param b 
+ */
+export function getBsNotInA(a: Set<ITypedNode>, b: Set<ITypedNode>) : Set<ITypedNode> {
+  let result = new Set<ITypedNode>();
+  let sa = new Set(), sb = new Set();
+  for ( let e of a ) sa.add(e.label);
+  // for ( let e of b ) sb.add(e.label);
+  for ( let e of b ) {
+    if ( !sa.has(e.label) ) {
+      result.add(e);
+    }
+  }
+  return result;
 }
 
 

@@ -243,7 +243,12 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 		const augment = new TheAugments(g);
 		const relName = 'SUB_GENRE';
 		const oldDirEdges = g.nrDirEdges();
-		const newEdges = augment.addSubsetRelationship({ntype: 'Genre', rtype: relName, knn: 2, cutoff: 0.5});
+		
+		const allSets = {};
+		g.getNodesT('Genre').forEach(n => {
+			allSets[n.label] = expanse.expand(n, 'in', 'HAS_GENRE');
+    });
+		const newEdges = augment.addSubsetRelationship(simFuncs.overlap, allSets, {rtype: relName, knn: 2, cutoff: 0.5});
 		expect(g.nrDirEdges()).toBe(oldDirEdges + newEdges.size);
 
 		// console.log(g.n('fantasy').outs(relName));
