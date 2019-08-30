@@ -1,5 +1,5 @@
 import {simFuncs} from '../../src/similarity/ScoreSimilarity';
-import {sim, simSource} from '../../src/similarity/SimilarityCommons';
+import {sim, simSource, simPairwise, knnNodeArray} from '../../src/similarity/SimilarityCommons';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -96,7 +96,6 @@ describe('COSINE tests on neo4j sample graph', () => {
 		const start = michael.label;
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			// allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
 			allSets[n.label] = n.outs('LIKES');
 		});
 		// console.log(allSets);
@@ -104,4 +103,57 @@ describe('COSINE tests on neo4j sample graph', () => {
 		// console.log(cores);
 		expect(cores).toEqual(cox);
 	});
+
+
+	it('should compute pairwise COSINE similarity', () => {
+		const cox = [
+      { from: 'Karin', to: 'Praveena', sim: 1 },
+      { from: 'Arya', to: 'Michael', sim: 0.97889 },
+      { from: 'Karin', to: 'Arya', sim: 0.96109 },
+      { from: 'Michael', to: 'Zhen', sim: 0.95423 },
+      { from: 'Michael', to: 'Praveena', sim: 0.94299 },
+      { from: 'Praveena', to: 'Zhen', sim: 0.91915 },
+      { from: 'Karin', to: 'Michael', sim: 0.84981 },
+      { from: 'Arya', to: 'Praveena', sim: 0.7194 },
+      { from: 'Arya', to: 'Zhen', sim: 0 },
+      { from: 'Karin', to: 'Zhen', sim: 0 }
+    ];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const cores = simPairwise(simFuncs.cosineSets, allSets);
+		// console.log(cores);
+		expect(cores).toEqual(cox);
+	});
+
+
+	it('should compute pairwise COSINE similarity witn CUTOFF', () => {
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const cores = simPairwise(simFuncs.cosineSets, allSets, {cutoff: 0.9});
+		// console.log(cores);
+		expect(cores.length).toBe(6);
+	});
+
+
+	it('should compute the top-K per node', () => {
+		const topKExp = [
+      { from: 'Praveena', to: 'Karin', sim: 1 },
+      { from: 'Karin', to: 'Praveena', sim: 1 },
+      { from: 'Michael', to: 'Arya', sim: 0.97889 },
+      { from: 'Arya', to: 'Michael', sim: 0.97889 },
+      { from: 'Zhen', to: 'Michael', sim: 0.95423 }
+    ];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const topK = knnNodeArray(simFuncs.cosineSets, allSets, {knn: 1, dup: true});
+		console.log(topK);
+		expect(topK).toEqual(topKExp);
+	});
+
 });

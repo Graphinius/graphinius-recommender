@@ -47,7 +47,10 @@ export const simFuncs = {
  * @param b 
  */
 function cosineSets(a: Set<string>, b: Set<string>) {
-	const [aa, ba] = extractCommonTargetScores(a, b);
+  const [aa, ba] = extractCommonTargetScores(a, b);
+  if ( !aa.length && !aa.length ) {
+    return {sim: 0};
+  }
 	return cosine(aa, ba);
 }
 
