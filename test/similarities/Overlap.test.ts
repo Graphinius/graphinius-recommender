@@ -280,7 +280,7 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 		subSet2['dune'] = g.outs(g.n('dune'), 'HAS_GENRE');
 		const ores = simSubsets(simFuncs.overlap, subSet1, subSet2);
 		// console.log(ores);
-    expect(ores).toEqual(oexp);		
+    expect(ores).toEqual(oexp);
 	});
 
 

@@ -95,7 +95,6 @@ export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, c
 			const to = keys2[j];
 			const sim = algo(s1[keys1[i]], s2[keys2[j]]);
 			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
-				// console.log(`${from}: ${s[keys[i]].size} | ${to}: ${s[keys[j]].size}`);
 				result.push({from, to, ...sim});
 			}
 		}

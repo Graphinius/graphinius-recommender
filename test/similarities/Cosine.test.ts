@@ -1,5 +1,5 @@
 import {simFuncs} from '../../src/similarity/ScoreSimilarity';
-import {sim, simSource, simPairwise, knnNodeArray, getBsNotInA} from '../../src/similarity/SimilarityCommons';
+import {sim, simSource, simPairwise, simSubsets, knnNodeArray, getBsNotInA} from '../../src/similarity/SimilarityCommons';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TheAugments} from '../../src/recommender/TheAugments';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
@@ -200,7 +200,53 @@ describe('COSINE tests on neo4j sample graph', () => {
 		let recommendations = getBsNotInA(pCuis, kCuis);
 		// console.log(recommendations);
 		expect(recommendations.size).toBe(2);
-		recommendations.forEach(r => expect(['Italian', 'Lebanese']).toContain(r.label));
+		expect(Array.from(recommendations).map(r => r.label).sort()).toEqual(['Italian', 'Lebanese'].sort());
+		// recommendations.forEach(r => expect(['Italian', 'Lebanese']).toContain(r.label));
 	});
+
+
+	/**
+	MATCH (p:Person), (c:Cuisine)
+	OPTIONAL MATCH (p)-[likes:LIKES]->(c)
+	WITH {item:id(p), name: p.name, weights: collect(coalesce(likes.score, algo.NaN()))} as userData
+	WITH collect(userData) as personCuisines
+
+	// create sourceIds list containing ids for Praveena and Arya
+	WITH personCuisines,
+			[value in personCuisines WHERE value.name IN ["Praveena", "Arya"] | value.item ] AS sourceIds
+
+	CALL algo.similarity.cosine.stream(personCuisines, {sourceIds: sourceIds, topK: 1})
+	YIELD item1, item2, similarity
+	WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+	RETURN from.name AS from, to.name AS to, similarity
+	ORDER BY similarity DESC
+	 *
+	 * @todo why not just use .forEach(item => simSource...) instead ??
+	 * 			 think of a more elegant way to solve this !?
+	 * @todo simSubsets is wront anyways => correct!
+	 */
+	it('should correctly compute similarities between two subsets', () => {
+		const starts = [g.n('Praveena').label, g.n('Arya').label];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		// Variant 1
+		starts.forEach(start => {
+			console.log(simSource(simFuncs.cosineSets, start, allSets, {knn: 1}));
+		});
+		// Variant 2
+		const subSet = {
+			Praveena: g.n('Praveena').outs('LIKES'),
+			Arya: g.n('Arya').outs('LIKES'),
+		};
+		const res2 = simSubsets(simFuncs.cosineSets, subSet, allSets, {knn: 4});
+		console.log(res2);
+	});
+
+
+	/**
+	 * @todo skipping values...
+	 */
 
 });
