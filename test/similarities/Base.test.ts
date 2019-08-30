@@ -1,5 +1,6 @@
 import {TheExpanse} from '../../src/recommender/TheExpanse';
-import {simSource, simPairwise, simFuncs} from "../../src/recommender/SetSimilarity";
+import {simSource, simPairwise} from "../../src/similarity/SimilarityCommons";
+import {simFuncs} from '../../src/similarity/SetSimilarity';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
 

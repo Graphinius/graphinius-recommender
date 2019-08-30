@@ -1,4 +1,5 @@
-import {simFuncs, simSource} from '../../src/recommender/ScoreSimilarity';
+import {simFuncs} from '../../src/similarity/ScoreSimilarity';
+import {sim, simSource} from '../../src/similarity/SimilarityCommons';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -25,12 +26,12 @@ describe('COSINE base similarity tests', () => {
 
 
 		it('should compute COSINE between two short vectors', () => {
-			expect(simFuncs.cosine(a, b)).toEqual(0.86389);
+			expect(simFuncs.cosine(a, b)).toEqual({sim: 0.86389});
 		});
 
 
 		it('should compute COSINE between two LARGE vectors', () => {
-			expect(simFuncs.cosine(c, d)).toEqual(0.94491);
+			expect(simFuncs.cosine(c, d)).toEqual({sim: 0.94491});
     });
 
 
@@ -66,12 +67,12 @@ describe('COSINE tests on neo4j sample graph', () => {
 					algo.similarity.cosine(collect(likes1.score), collect(likes2.score)) AS similarity
 		 */
 	it('should compute COSINE between Michael and Arya', () => {
-		const coexp = 0.97889;
+		const coexp = {sim: 0.97889};
 		const a = michael.outs(likes);
 		const b = arya.outs(likes);
-		const cores = simFuncs.cosineSets(a, b);
+		const cores = sim(simFuncs.cosineSets, a, b);
 		// console.log(cores);
-		expect(cores).toBe(coexp);
+		expect(cores).toEqual(coexp);
 	});
 
 
@@ -82,6 +83,8 @@ describe('COSINE tests on neo4j sample graph', () => {
 				p2.name AS to,
 				algo.similarity.cosine(collect(likes1.score), collect(likes2.score)) AS similarity
 	ORDER BY similarity DESC
+	 *
+	 * @todo 
 	 */
 	it('should compute COSINE from a source', () => {
 		const cox = [

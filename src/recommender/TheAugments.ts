@@ -2,8 +2,8 @@ import {TypedEdge, ITypedEdge} from 'graphinius/lib/core/typed/TypedEdge';
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {TheExpanse} from './TheExpanse';
-import {simFuncs, knnNodeArray} from './SetSimilarity';
-
+import {simFuncs} from '../similarity/SetSimilarity';
+import {knnNodeArray} from '../similarity/SimilarityCommons';
 
 interface SubSetConfig {
   ntype: string; // node type to search for potential sub/super relationships

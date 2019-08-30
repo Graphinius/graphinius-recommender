@@ -1,59 +1,7 @@
-import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import * as $I from './interfaces';
 
-/*----------------------------------*/
-/*							CONSTS							*/
-/*----------------------------------*/
-
-export const simFuncs = {
-	jaccard,
-	overlap
-}
-
 export const simSort = (se1: $I.SimilarityEntry, se2: $I.SimilarityEntry) => se2.sim - se1.sim;
-
-const PRECISION = 5;
-
-
-
-/*----------------------------------*/
-/*				SIMILARITY MEASURES				*/
-/*----------------------------------*/
-
-
-/**
- * @param a set A
- * @param b set B
- */
-function jaccard(a: Set<any>, b: Set<any>) : $I.Similarity {
-	const ui = unionIntersect(a, b);
-	return {
-		isect: ui.isectSize,
-		sim: +(ui.isectSize / ui.unionSize).toPrecision(PRECISION)
-	}
-}
-
-
-/**
- * @description commonly used to detect sub/super relationships
- * @param a 
- * @param b 
- */
-function overlap(a: Set<any>, b: Set<any>) : $I.Similarity {
-	const ui = unionIntersect(a, b);
-	return {
-		isect: ui.isectSize,
-		sim: +(ui.isectSize / Math.min(a.size, b.size)).toPrecision(PRECISION)
-	}
-}
-
-
-function unionIntersect(a: Set<any>, b: Set<any>) {
-	const unionSize = new Set([...a, ...b]).size;
-	const isectSize = a.size + b.size - unionSize;
-	return {unionSize, isectSize};
-}
 
 
 /*----------------------------------*/
@@ -260,8 +208,6 @@ export function viaSharedPrefs(g: TypedGraph, algo: Function, cfg: $I.SimPerShar
 	}
 	return sims.sort(simSort);
 }
-
-
 
 
 

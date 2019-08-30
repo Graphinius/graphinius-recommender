@@ -8,7 +8,11 @@ export const simFuncs = {
   cosineSets
 }
 
-const simSort = (a, b) => b.sim - a.sim;
+
+
+/*----------------------------------*/
+/*			SET SIMILARITY MEASURES			*/
+/*----------------------------------*/
 
 
 /**
@@ -33,7 +37,7 @@ const simSort = (a, b) => b.sim - a.sim;
 	}
 	dena = Math.sqrt(dena);
 	denb = Math.sqrt(denb);
-	return +(numerator / (dena * denb)).toPrecision(PRECISION);
+	return {sim: +(numerator / (dena * denb)).toPrecision(PRECISION)};
 }
 
 
@@ -71,21 +75,3 @@ function extractCommonTargetScores(a: Set<string>, b: Set<string>): [number[], n
 }
 
 
-export function simSource(algo: Function, s: string, t: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
-  let result: $I.SimilarityResult = [];
-	const start = t[s];
-	for ( let [k,v] of Object.entries(t)) {
-		if ( k === s ) {
-			continue;
-		}
-		const sim: number = algo(start, v);
-		if ( config.cutoff == null || sim >= config.cutoff ) {
-			result.push({from: s, to: k, sim});
-		}
-	}
-	result.sort(simSort);
-	if ( config.knn != null && config.knn <= result.length ) {
-		result = result.slice(0, config.knn);
-	}
-	return result.sort(simSort);
-}

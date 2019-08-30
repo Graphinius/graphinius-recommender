@@ -1,4 +1,6 @@
-import {sim, simSource, simPairwise, Similarity, simSubsets, simFuncs, knnNodeArray, knnNodeDict, DIR, viaSharedPrefs} from "../../src/recommender/Similarity";
+import {Similarity, DIR} from '../../src/similarity/interfaces';
+import {sim, simSource, simPairwise, simSubsets, knnNodeArray, knnNodeDict} from "../../src/similarity/SimilarityCommons";
+import {simFuncs} from '../../src/similarity/SetSimilarity';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
