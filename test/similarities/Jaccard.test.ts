@@ -131,18 +131,18 @@ describe('JACCARD tests on neo4j sample graph', () => {
 
 
 	it('should compute the top-K per node', () => {
-		const topKExp = {
-      Zhen: { to: 'Michael', isect: 2, sim: 0.66667 },
-      Praveena: { to: 'Zhen', isect: 1, sim: 0.33333 },
-      Michael: { to: 'Zhen', isect: 2, sim: 0.66667 },
-      Arya: { to: 'Karin', isect: 2, sim: 0.66667 },
-      Karin: { to: 'Arya', isect: 2, sim: 0.66667 }
-    };
+		const topKExp = [
+      { from: 'Zhen', to: 'Michael', isect: 2, sim: 0.66667 },
+      { from: 'Michael', to: 'Zhen', isect: 2, sim: 0.66667 },
+      { from: 'Arya', to: 'Karin', isect: 2, sim: 0.66667 },
+      { from: 'Karin', to: 'Arya', isect: 2, sim: 0.66667 },
+      { from: 'Praveena', to: 'Zhen', isect: 1, sim: 0.33333 }
+    ];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
 			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
 		});
-		const topK = knnPerNode(simFuncs.jaccard, allSets);
+		const topK = knnPerNode(simFuncs.jaccard, allSets, 1, true);
 		// console.log(topK);
 		expect(topK).toEqual(topKExp);
 	});

@@ -24,7 +24,7 @@ export interface SimilarityEntry extends Similarity {
 
 export type SimilarityResult = SimilarityEntry[];
 
-export type TopKResult = {[key: string]: TopKEntry};
+export type TopKResult = TopKEntry[];
 
 export interface SimParams {
 	cutoff?: number;
@@ -89,7 +89,11 @@ function jaccard(a: Set<any>, b: Set<any>) : Similarity {
 	}
 }
 
-
+/**
+ * @description commonly used to detect sub/super relationships
+ * @param a 
+ * @param b 
+ */
 function overlap(a: Set<any>, b: Set<any>) : Similarity {
 	const ui = unionIntersect(a, b);
 	return {
@@ -185,14 +189,22 @@ export function simPairwise(algo: Function, s: Sets, config: SimParams = {}) : S
  * 
  * @returns most similar neighbor per node
  */
-export function knnPerNode(algo: Function, s: Sets) : TopKResult {
-	const topK: TopKResult = {};
+export function knnPerNode(algo: Function, s: Sets, knn: number = 1, dup: boolean = false) : TopKResult {
+	const topK: TopKResult = [];
+	const dupes = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntry: SimilarityEntry = simSource(algo, node, s, {knn: 1})[0];
-		delete topKEntry.from;
-		topK[node] = topKEntry;
+		const topKEntries: SimilarityEntry[] = simSource(algo, node, s, {knn});
+		topKEntries.forEach(e => {
+			// console.log(e);
+			if (!dup && ( dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from] ) ) {
+				return;
+			}		
+			topK.push(e);
+			dupes[e.from] = dupes[e.from] || {};
+			dupes[e.from][e.to] = true;
+		});
 	}
-	return topK;
+	return topK.sort(simSort);
 }
 
 
