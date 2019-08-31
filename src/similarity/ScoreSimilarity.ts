@@ -6,8 +6,7 @@ const PRECISION = 5;
 export const simFuncs = {
   cosine,
   cosineSets
-}
-
+};
 
 
 /*----------------------------------*/
@@ -48,13 +47,20 @@ export const simFuncs = {
  */
 function cosineSets(a: Set<string>, b: Set<string>) {
   const [aa, ba] = extractCommonTargetScores(a, b);
-  if ( !aa.length && !aa.length ) {
+  // should always be of same length
+  if ( !aa.length || !ba.length ) {
     return {sim: 0};
   }
 	return cosine(aa, ba);
 }
 
 
+/**
+ * @description this method implicitly ensures that sets given to cosine
+ * 							are always of the same length
+ * @param a
+ * @param b
+ */
 function extractCommonTargetScores(a: Set<string>, b: Set<string>): [number[], number[]] {
   // we need to extract common targets first
   let a_id = new Set(), b_id = new Set();

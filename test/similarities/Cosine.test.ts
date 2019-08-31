@@ -220,30 +220,49 @@ describe('COSINE tests on neo4j sample graph', () => {
 	WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
 	RETURN from.name AS from, to.name AS to, similarity
 	ORDER BY similarity DESC
-	 *
-	 * @todo why not just use .forEach(item => simSource...) instead ??
-	 * 			 think of a more elegant way to solve this !?
-	 * @todo simSubsets is wront anyways => correct!
 	 */
-	it('should correctly compute similarities between two subsets', () => {
-		const starts = [g.n('Praveena').label, g.n('Arya').label];
+	it('should correctly compute similarities between two subsets WITH KNN', () => {
+		const cox = [
+			{ from: 'Praveena', to: 'Karin', sim: 1 },
+			{ from: 'Arya', to: 'Michael', sim: 0.97889 }
+		];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
 			allSets[n.label] = n.outs('LIKES');
 		});
-		// Variant 1
-		starts.forEach(start => {
-			console.log(simSource(simFuncs.cosineSets, start, allSets, {knn: 1}));
-		});
-		// Variant 2
 		const subSet = {
 			Praveena: g.n('Praveena').outs('LIKES'),
 			Arya: g.n('Arya').outs('LIKES'),
 		};
-		const res2 = simSubsets(simFuncs.cosineSets, subSet, allSets, {knn: 4});
-		console.log(res2);
+		const cores = simSubsets(simFuncs.cosineSets, subSet, allSets, {knn: 1});
+		// console.log(cores);
+		expect(cores).toEqual(cox);
 	});
 
+
+	it('subset cosine withOUT kNN', () => {
+		const cox = [
+			{ from: 'Praveena', to: 'Karin', sim: 1 },
+			{ from: 'Arya', to: 'Michael', sim: 0.97889 },
+			{ from: 'Arya', to: 'Karin', sim: 0.96109 },
+			{ from: 'Praveena', to: 'Michael', sim: 0.94299 },
+			{ from: 'Praveena', to: 'Zhen', sim: 0.91915 },
+			{ from: 'Praveena', to: 'Arya', sim: 0.7194 },
+			{ from: 'Arya', to: 'Praveena', sim: 0.7194 },
+			{ from: 'Arya', to: 'Zhen', sim: 0 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const subSet = {
+			Praveena: g.n('Praveena').outs('LIKES'),
+			Arya: g.n('Arya').outs('LIKES'),
+		};
+		const cores = simSubsets(simFuncs.cosineSets, subSet, allSets);
+		// console.log(cores);
+		expect(cores).toEqual(cox);
+	});
 
 	/**
 	 * @todo skipping values...

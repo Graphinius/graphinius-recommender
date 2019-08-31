@@ -77,6 +77,7 @@ export function simPairwise(algo: Function, s: $I.SetOfSets, config: $I.Similari
 
 /**
  * @description similarity of individuals of one subset to another
+ * @description kNN relates to each s1-node's subset
  * 
  * @param algo 
  * @param s1 
@@ -90,20 +91,27 @@ export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, c
 	const keys1 = Object.keys(s1);
 	const keys2 = Object.keys(s2);
 	for ( let i in keys1 ) {
+		let subRes = [];
 		for ( let j in keys2 ) {
 			const from = keys1[i];
 			const to = keys2[j];
+			if ( from === to ) {
+				continue;
+			}
 			const sim = algo(s1[keys1[i]], s2[keys2[j]]);
 			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
-				result.push({from, to, ...sim});
+				subRes.push({from, to, ...sim});
 			}
 		}
+		subRes.sort(simSort);
+		// console.log('SubResult', subRes);
+		if ( config.knn != null && config.knn <= subRes.length ) {
+			subRes = subRes.slice(0, config.knn);
+		}
+		result = result.concat(subRes);
+		// console.log('Result', result);
 	}
-	result.sort(simSort);
-	if ( config.knn != null && config.knn <= result.length ) {
-		result = result.slice(0, config.knn);
-	}
-	return result;
+	return result.sort(simSort);
 }
 
 
