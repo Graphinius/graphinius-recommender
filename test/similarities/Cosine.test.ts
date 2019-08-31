@@ -85,8 +85,6 @@ describe('COSINE tests on neo4j sample graph', () => {
 				p2.name AS to,
 				algo.similarity.cosine(collect(likes1.score), collect(likes2.score)) AS similarity
 	ORDER BY similarity DESC
-	 *
-	 * @todo 
 	 */
 	it('should compute COSINE from a source', () => {
 		const cox = [

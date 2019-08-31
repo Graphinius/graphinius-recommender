@@ -5,13 +5,33 @@ const PRECISION = 5;
 
 export const simFuncs = {
   cosine,
-  cosineSets
+  cosineSets,
+	euclidean,
+	euclideanSets
 };
 
 
 /*----------------------------------*/
 /*			SET SIMILARITY MEASURES			*/
 /*----------------------------------*/
+
+
+function euclidean(a: number[], b: number[]) {
+	if ( a.length !== b.length ) {
+		throw new Error('Vectors must be of same size');
+	}
+	const at = a.length < 1e4 ? a : new Float32Array(a);
+	const bt = b.length < 1e4 ? b : new Float32Array(b);
+
+	let sum = 0, diff = 0;
+	for ( let i = 0; i < at.length; i++ ) {
+		diff = at[i] - bt[i];
+		sum += diff * diff;
+	}
+	let sim = +Math.sqrt(sum).toPrecision(PRECISION);
+	// console.log(sim);
+	return {sim};
+}
 
 
 /**
@@ -51,6 +71,15 @@ function cosineSets(a: Set<string>, b: Set<string>) {
     return {sim: 0};
   }
 	return cosine(aa, ba);
+}
+
+
+function euclideanSets(a: Set<string>, b: Set<string>) {
+	const [aa, ba] = extractCommonTargetScores(a, b);
+	if ( !aa.length || !ba.length ) {
+		return {sim: 0};
+	}
+	return euclidean(aa, ba);
 }
 
 

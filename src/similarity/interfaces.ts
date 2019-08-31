@@ -24,7 +24,12 @@ export interface TopKEntry extends Similarity {
 export type TopKArray = TopKEntry[];
 export type TopKDict = {[key:string]: TopKEntry[]};
 
-export interface SimilarityConfig {
+interface SortCutFuncs {
+	sort?: (e1: SimilarityEntry, e2: SimilarityEntry) => number
+	cutFunc?: (sim: number, thres: number) => boolean
+}
+
+export interface SimilarityConfig extends SortCutFuncs {
 	cutoff?: number;
 	knn?: number;
 	dup?: boolean;
@@ -45,7 +50,7 @@ export enum DIR {
  * @param e2 edge type to follow for t2
  * @param co cutoff below which entry will be omitted
  */
-export interface SimPerSharedPrefConfig {
+export interface SimPerSharedPrefConfig extends SortCutFuncs {
 	t1: string;
 	t2: string;
 	d1: DIR;
