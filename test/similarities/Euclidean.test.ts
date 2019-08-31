@@ -6,7 +6,7 @@ import {
 	simSubsets,
 	knnNodeArray,
 	getBsNotInA,
-	simSort
+	simSort, cutFuncs, knnNodeDict
 } from '../../src/similarity/SimilarityCommons';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TheAugments} from '../../src/recommender/TheAugments';
@@ -18,13 +18,13 @@ import {DIR} from "../../src/similarity/interfaces";
 describe('EUCLIDEAN base similarity tests', () => {
 
 	const
-		a = [3,8,7,5,2,9],
-		b = [10,8,6,6,4,5],
+		a = [3, 8, 7, 5, 2, 9],
+		b = [10, 8, 6, 6, 4, 5],
 		c = [],
 		d = [],
 		SUPER_SIZE = 1e5;
 	let i = 0;
-	for ( let i = 0; i < SUPER_SIZE; i++ ) {
+	for (let i = 0; i < SUPER_SIZE; i++) {
 		c.push(i);
 		d.push(i);
 	}
@@ -46,7 +46,7 @@ describe('EUCLIDEAN base similarity tests', () => {
 
 	it('PERFORMANCE - should compute a great amount of cosines between two short vectors', () => {
 		const tic = +new Date;
-		for ( let i = 0; i < SUPER_SIZE; i++ ) simFuncs.euclidean(a,b);
+		for (let i = 0; i < SUPER_SIZE; i++) simFuncs.euclidean(a, b);
 		const toc = +new Date;
 		console.log(`1e5 iterations of cosine on 5-dim vectors took ${toc - tic} ms.`);
 	});
@@ -61,11 +61,21 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 
 	const
 		gFile = './data/cuisineCosine.json',
-		g = new JSONInput({weighted: true}).readFromJSONFile(gFile, new TypedGraph('CosineCuisineSimilarities')) as TypedGraph,
-		expanse = new TheExpanse(g),
-		likes = 'LIKES',
-		zhen = g.n('Zhen'),
+		likes = 'LIKES';
+
+	let
+		g: TypedGraph,
+		expanse,
+		zhen,
+		praveena;
+
+
+	beforeEach(() => {
+		g = new JSONInput({weighted: true}).readFromJSONFile(gFile, new TypedGraph('CosineCuisineSimilarities')) as TypedGraph;
+		expanse = new TheExpanse(g);
+		zhen = g.n('Zhen');
 		praveena = g.n('Praveena');
+	});
 
 
 	it('should compute similarity between Zhen and Praveena', () => {
@@ -73,39 +83,45 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 		const a = zhen.outs(likes);
 		const b = praveena.outs(likes);
 		const eres = sim(simFuncs.euclideanSets, a, b);
-		console.log(eres);
+		// console.log(eres);
 		expect(eres).toEqual(exp);
 	});
 
 
 	it('should compute sims from a source', () => {
 		const exp = [
-			{ from: 'Zhen', to: 'Michael', sim: 3.6056 },
-			{ from: 'Zhen', to: 'Praveena', sim: 6.7082 }
+			{from: 'Zhen', to: 'Arya', sim: 0},
+			{from: 'Zhen', to: 'Karin', sim: 0},
+			{from: 'Zhen', to: 'Michael', sim: 3.6056},
+			{from: 'Zhen', to: 'Praveena', sim: 6.7082}
 		];
 		const start = zhen.label;
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
 			allSets[n.label] = n.outs('LIKES');
 		});
-		const eres = simSource(simFuncs.euclideanSets, start, allSets, {cutoff: 1e-6, sort: simSort.asc});
-		console.log(eres);
+		const eres = simSource(simFuncs.euclideanSets, start, allSets, {
+			// cutoff: 1e-6,
+			cutFunc: cutFuncs.below,
+			sort: simSort.asc
+		});
+		// console.log(eres);
 		expect(eres).toEqual(exp);
 	});
 
 
 	it('should compute pairwise', () => {
 		const exp = [
-			{ from: 'Arya', to: 'Zhen', sim: 0 },
-			{ from: 'Karin', to: 'Zhen', sim: 0 },
-			{ from: 'Karin', to: 'Praveena', sim: 3 },
-			{ from: 'Michael', to: 'Zhen', sim: 3.6056 },
-			{ from: 'Michael', to: 'Praveena', sim: 4 },
-			{ from: 'Karin', to: 'Arya', sim: 4.3589 },
-			{ from: 'Arya', to: 'Michael', sim: 5 },
-			{ from: 'Praveena', to: 'Zhen', sim: 6.7082 },
-			{ from: 'Karin', to: 'Michael', sim: 7 },
-			{ from: 'Arya', to: 'Praveena', sim: 8 }
+			{from: 'Arya', to: 'Zhen', sim: 0},
+			{from: 'Karin', to: 'Zhen', sim: 0},
+			{from: 'Karin', to: 'Praveena', sim: 3},
+			{from: 'Michael', to: 'Zhen', sim: 3.6056},
+			{from: 'Michael', to: 'Praveena', sim: 4},
+			{from: 'Karin', to: 'Arya', sim: 4.3589},
+			{from: 'Arya', to: 'Michael', sim: 5},
+			{from: 'Praveena', to: 'Zhen', sim: 6.7082},
+			{from: 'Karin', to: 'Michael', sim: 7},
+			{from: 'Arya', to: 'Praveena', sim: 8}
 		];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
@@ -115,5 +131,112 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 		// console.log(eres);
 		expect(eres).toEqual(exp);
 	});
+
+
+	it('should compute pairwise with CUTOff', () => {
+		const exp = [
+			{from: 'Arya', to: 'Zhen', sim: 0},
+			{from: 'Karin', to: 'Zhen', sim: 0},
+			{from: 'Karin', to: 'Praveena', sim: 3},
+			{from: 'Michael', to: 'Zhen', sim: 3.6056},
+			{from: 'Michael', to: 'Praveena', sim: 4}
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const eres = simPairwise(simFuncs.euclideanSets, allSets, {
+			sort: simSort.asc,
+			cutoff: 4,
+			cutFunc: cutFuncs.below
+		});
+		// console.log(eres);
+		expect(eres).toEqual(exp);
+	});
+
+
+	it('should compute knn Array', () => {
+		const exp = [
+			{ from: 'Zhen', to: 'Arya', sim: 0 },
+			{ from: 'Arya', to: 'Zhen', sim: 0 },
+			{ from: 'Karin', to: 'Zhen', sim: 0 },
+			{ from: 'Praveena', to: 'Karin', sim: 3 },
+			{ from: 'Michael', to: 'Zhen', sim: 3.6056 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const eres = knnNodeArray(simFuncs.euclideanSets, allSets, {
+			sort: simSort.asc,
+			knn: 1,
+			dup: true
+		});
+		// console.log(eres);
+		expect(eres).toEqual(exp);
+	});
+
+
+	it('should compute knn Dict', () => {
+		const exp = {
+			Zhen: [ { to: 'Arya', sim: 0 } ],
+			Praveena: [ { to: 'Karin', sim: 3 } ],
+			Michael: [ { to: 'Zhen', sim: 3.6056 } ],
+			Arya: [ { to: 'Zhen', sim: 0 } ],
+			Karin: [ { to: 'Zhen', sim: 0 } ]
+		};
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const eres = knnNodeDict(simFuncs.euclideanSets, allSets, {
+			sort: simSort.asc,
+			knn: 1,
+			dup: true
+		});
+		// console.log(eres);
+		expect(eres).toEqual(exp);
+	});
+
+
+	it('should correctly compute similarities between two subsets WITH KNN', () => {
+		const exp = [
+			{ from: 'Arya', to: 'Zhen', sim: 0 },
+			{ from: 'Praveena', to: 'Karin', sim: 3 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const subSet = {
+			Praveena: g.n('Praveena').outs('LIKES'),
+			Arya: g.n('Arya').outs('LIKES'),
+		};
+		const eres = simSubsets(simFuncs.euclideanSets, subSet, allSets, {knn: 1, sort: simSort.asc});
+		// console.log(eres);
+		expect(eres).toEqual(exp);
+	});
+
+
+	it('should store an additional edge for each most similar user', () => {
+		const augment = new TheAugments(g);
+		const relName = 'SIMILAR';
+		const oldDirEdges = g.nrDirEdges();
+
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const newEdges = augment.addSubsetRelationship(simFuncs.euclideanSets, allSets, {
+			rtype: relName, knn: 1});
+		expect(g.nrDirEdges()).toBe(oldDirEdges + newEdges.size);
+	});
+
+
+	/**
+	 * @todo write when k-expander implemented
+	 * @todo we need a subset-expander in TypedGraph...
+	 */
+	it.todo('should recommend Cuisines to Praveena that users most similar to her like (but she does not know yet');
 
 });

@@ -157,12 +157,12 @@ export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, c
  */
 export function knnNodeArray(algo: Function, s: $I.SetOfSets, cfg: $I.SimilarityConfig) : $I.TopKArray {
 	const sort = cfg.sort || simSort.desc;
-
 	const c = cfg.cutoff || 0;
+
 	const topK: $I.TopKArray = [];
 	const dupes = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
+		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1, sort: cfg.sort});
 		topKEntries.forEach(e => {
 			// console.log(e);
 			if ( c == null || e.sim < c ) {
@@ -188,11 +188,11 @@ export function knnNodeArray(algo: Function, s: $I.SetOfSets, cfg: $I.Similarity
  */
 export function knnNodeDict(algo: Function, s: $I.SetOfSets, cfg: $I.SimilarityConfig) {
 	const sort = cfg.sort || simSort.desc;
-
 	const c = cfg.cutoff || 0;
+
 	const topK: $I.TopKDict = {};
 	for ( let node of Object.keys(s) ) {
-		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1});
+		const topKEntries: $I.SimilarityEntry[] = simSource(algo, node, s, {knn: cfg.knn || 1, sort: cfg.sort});
 		topKEntries.forEach(e => {
 			// console.log(e);
 			if ( c == null || e.sim < c) {

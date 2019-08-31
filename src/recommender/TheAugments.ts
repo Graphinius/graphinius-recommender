@@ -6,7 +6,7 @@ import * as $I from '../similarity/interfaces';
 import {simFuncs} from '../similarity/SetSimilarity';
 import {knnNodeArray} from '../similarity/SimilarityCommons';
 
-interface SubSetConfig {
+interface SubSetConfig extends $I.SortCutFuncs {
   rtype: string; // name of edge TYPE to use
   knn?: number;
   cutoff?: number;

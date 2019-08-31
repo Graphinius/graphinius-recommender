@@ -24,7 +24,7 @@ export interface TopKEntry extends Similarity {
 export type TopKArray = TopKEntry[];
 export type TopKDict = {[key:string]: TopKEntry[]};
 
-interface SortCutFuncs {
+export interface SortCutFuncs {
 	sort?: (e1: SimilarityEntry, e2: SimilarityEntry) => number
 	cutFunc?: (sim: number, thres: number) => boolean
 }

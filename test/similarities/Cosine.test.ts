@@ -177,34 +177,6 @@ describe('COSINE tests on neo4j sample graph', () => {
 
 
 	/**
-	MATCH (p:Person {name: "Praveena"})-[:SIMILAR]->(other),
-		(other)-[:LIKES]->(cuisine)
-	WHERE not((p)-[:LIKES]->(cuisine))
-	RETURN cuisine.name AS cuisine
-	 */
-	it('find cuisines liked by the most similar person to praveena, which she does not like / know yet', () => {
-		// 1) find the top-K person for Praveena
-		const praveena = g.n('Praveena');
-		const start = praveena.label;
-		const allSets = {};
-		g.getNodesT('Person').forEach(n => {
-			allSets[n.label] = n.outs('LIKES');
-		});
-		const mostSim = simSource(simFuncs.cosineSets, start, allSets, {knn: 1})[0];
-		// console.log(mostSim); // Karin		
-		// 2) find the cuisines that Praveena & Karin likes
-		const pCuis = g.outs(g.n(start), 'LIKES');
-		const kCuis = g.outs(g.n(mostSim.to), 'LIKES');
-		// 3) filter the cuisines that Karin likes, but Praveena has no opinion about
-		let recommendations = getBsNotInA(pCuis, kCuis);
-		// console.log(recommendations);
-		expect(recommendations.size).toBe(2);
-		expect(Array.from(recommendations).map(r => r.label).sort()).toEqual(['Italian', 'Lebanese'].sort());
-		// recommendations.forEach(r => expect(['Italian', 'Lebanese']).toContain(r.label));
-	});
-
-
-	/**
 	MATCH (p:Person), (c:Cuisine)
 	OPTIONAL MATCH (p)-[likes:LIKES]->(c)
 	WITH {item:id(p), name: p.name, weights: collect(coalesce(likes.score, algo.NaN()))} as userData
@@ -309,5 +281,32 @@ describe('COSINE tests on neo4j sample graph', () => {
 		expect(cores).toEqual(cox);
 	});
 
+
+	/**
+	 MATCH (p:Person {name: "Praveena"})-[:SIMILAR]->(other),
+	 (other)-[:LIKES]->(cuisine)
+	 WHERE not((p)-[:LIKES]->(cuisine))
+	 RETURN cuisine.name AS cuisine
+	 */
+	it('find cuisines liked by the most similar person to praveena, which she does not like / know yet', () => {
+		// 1) find the top-K person for Praveena
+		const praveena = g.n('Praveena');
+		const start = praveena.label;
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs('LIKES');
+		});
+		const mostSim = simSource(simFuncs.cosineSets, start, allSets, {knn: 1})[0];
+		// console.log(mostSim); // Karin
+		// 2) find the cuisines that Praveena & Karin likes
+		const pCuis = g.outs(g.n(start), 'LIKES');
+		const kCuis = g.outs(g.n(mostSim.to), 'LIKES');
+		// 3) filter the cuisines that Karin likes, but Praveena has no opinion about
+		let recommendations = getBsNotInA(pCuis, kCuis);
+		// console.log(recommendations);
+		expect(recommendations.size).toBe(2);
+		expect(Array.from(recommendations).map(r => r.label).sort()).toEqual(['Italian', 'Lebanese'].sort());
+		// recommendations.forEach(r => expect(['Italian', 'Lebanese']).toContain(r.label));
+	});
 
 });
