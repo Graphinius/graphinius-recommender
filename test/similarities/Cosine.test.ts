@@ -4,6 +4,7 @@ import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TheAugments} from '../../src/recommender/TheAugments';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
+import {DIR} from "../../src/similarity/interfaces";
 
 
 describe('COSINE base similarity tests', () => {
@@ -259,7 +260,7 @@ describe('COSINE tests on neo4j sample graph', () => {
 			Praveena: g.n('Praveena').outs('LIKES'),
 			Arya: g.n('Arya').outs('LIKES'),
 		};
-		console.log(subSet);
+		// console.log(subSet);
 		const cores = simSubsets(simFuncs.cosineSets, subSet, allSets);
 		// console.log(cores);
 		expect(cores).toEqual(cox);
@@ -267,20 +268,47 @@ describe('COSINE tests on neo4j sample graph', () => {
 
 
 	/**
-	 * @description very, very important....
+	 * @description Embeddings -> very important....
+	 MATCH (c:Cuisine)
+	 WITH {item:id(c), weights: c.embedding} as userData
+	 WITH collect(userData) as data
+	 CALL algo.similarity.cosine.stream(data, {skipValue: null})
+	 YIELD item1, item2, count1, count2, similarity
+	 RETURN algo.asNode(item1).name AS from, algo.asNode(item2).name AS to, similarity
+	 ORDER BY similarity DESC
 	 *
-	 * @todo the score is in the source nodes, not the target nodes...
 	 */
-	it.only('should use embeddings to compute similarity', () => {
+	it('should use embeddings to compute similarity', () => {
+		const cox = [
+			{ from: 'Portuguese', to: 'Lebanese', sim: 0.96711 },
+			{ from: 'Lebanese', to: 'Indian', sim: 0.95904 },
+			{ from: 'Portuguese', to: 'Italian', sim: 0.95824 },
+			{ from: 'Mauritian', to: 'Indian', sim: 0.94643 },
+			{ from: 'Indian', to: 'French', sim: 0.94145 },
+			{ from: 'Mauritian', to: 'Portuguese', sim: 0.92092 },
+			{ from: 'Mauritian', to: 'Lebanese', sim: 0.91925 },
+			{ from: 'Lebanese', to: 'Italian', sim: 0.90729 },
+			{ from: 'Portuguese', to: 'Indian', sim: 0.90302 },
+			{ from: 'Mauritian', to: 'French', sim: 0.89135 },
+			{ from: 'Lebanese', to: 'French', sim: 0.88538 },
+			{ from: 'Portuguese', to: 'French', sim: 0.88528 },
+			{ from: 'Italian', to: 'French', sim: 0.87784 },
+			{ from: 'Mauritian', to: 'Italian', sim: 0.85388 },
+			{ from: 'British', to: 'French', sim: 0.83846 },
+			{ from: 'Indian', to: 'Italian', sim: 0.83715 },
+			{ from: 'British', to: 'Indian', sim: 0.77173 },
+			{ from: 'British', to: 'Lebanese', sim: 0.73931 },
+			{ from: 'British', to: 'Portuguese', sim: 0.73871 },
+			{ from: 'British', to: 'Mauritian', sim: 0.65023 },
+			{ from: 'British', to: 'Italian', sim: 0.64292 }
+		];
 		const allSets = {};
-		g.getNodesT('Person').forEach(n => {
-			const n_set = g.outs(n, 'LIKES');
-
-			allSets[n.label] = g.outs(n, 'LIKES');
+		g.getNodesT('Cuisine').forEach(n => {
+			allSets[n.label] = n.getFeature('embeddings');
 		});
-		const cores = simPairwise(simFuncs.cosineEmbeddings, allSets);
-		console.log(cores);
-		// console.log(allSets);
+		const cores = simPairwise(simFuncs.cosine, allSets);
+		// console.log(cores);
+		expect(cores).toEqual(cox);
 	});
 
 

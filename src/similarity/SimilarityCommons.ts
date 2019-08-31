@@ -21,8 +21,7 @@ export function sim(algo: Function, a: Set<any>, b: Set<any>) {
  * @param algo similarity function to use
  * @param s source set
  * @param t target sets to measure similarity to
- * @param c cutoff parameter
- * @param k kNN to consider
+ * @param config object
  */
 export function simSource(algo: Function, s: string, t: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
 	let result: $I.SimilarityResult = [];
@@ -50,8 +49,7 @@ export function simSource(algo: Function, s: string, t: $I.SetOfSets, config: $I
  * 
  * @param algo similarity function to use
  * @param s all sets
- * @param c cutoff parameter
- * @param k kNN to consider
+ * @param config object
  */
 export function simPairwise(algo: Function, s: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.SimilarityResult {
 	let result: $I.SimilarityResult = [];	
@@ -60,7 +58,7 @@ export function simPairwise(algo: Function, s: $I.SetOfSets, config: $I.Similari
 		for ( let j = 0; j < +i; j++) {
 			const from = keys[i];
 			const to = keys[j];
-			const sim = algo(s[keys[i]], s[keys[j]]);
+			const sim = algo(s[keys[i]], s[keys[j]], i, j);
 			if ( config.cutoff == null || sim.sim >= config.cutoff ) {
 				// console.log(`${from}: ${s[keys[i]].size} | ${to}: ${s[keys[j]].size}`);
 				result.push({from, to, ...sim});
