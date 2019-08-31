@@ -57,6 +57,15 @@ const
 		t5 = g.addEdgeByID('t5', periperi, portuguese, {directed: true, type: 'TYPE'}),
     t6 = g.addEdgeByID('t6', periperi, indian, {directed: true, type: 'TYPE'});
 
+		// EMBEDDINGS
+		french.setFeature('embeddings', [0.71, 0.33, 0.81, 0.52, 0.41]);
+		italian.setFeature('embeddings', [0.31, 0.72, 0.58, 0.67, 0.31]);
+		indian.setFeature('embeddings', [0.43, 0.26, 0.98, 0.51, 0.76]);
+		lebanese.setFeature('embeddings', [0.12, 0.23, 0.35, 0.31, 0.39]);
+		portuguese.setFeature('embeddings', [0.47, 0.98, 0.81, 0.72, 0.89]);
+		british.setFeature('embeddings', [0.94, 0.12, 0.23, 0.4, 0.71]);
+		mauritian.setFeature('embeddings', [0.31, 0.56, 0.98, 0.21, 0.62]);
+
 new JSONOutput().writeToJSONFile('./data/cuisineCosine.json', g);
 
 
@@ -102,3 +111,14 @@ MERGE (karin)-[:LIKES {score: 9}]->(lebanese)
 MERGE (karin)-[:LIKES {score: 7}]->(italian)
 MERGE (karin)-[:LIKES {score: 10}]->(portuguese)
 	`;
+
+
+const additionalEmbeddings = `
+	MERGE (french:Cuisine {name:'French'})          SET french.embedding = [0.71, 0.33, 0.81, 0.52, 0.41]
+	MERGE (italian:Cuisine {name:'Italian'})        SET italian.embedding = [0.31, 0.72, 0.58, 0.67, 0.31]
+	MERGE (indian:Cuisine {name:'Indian'})          SET indian.embedding = [0.43, 0.26, 0.98, 0.51, 0.76]
+	MERGE (lebanese:Cuisine {name:'Lebanese'})      SET lebanese.embedding = [0.12, 0.23, 0.35, 0.31, 0.39]
+	MERGE (portuguese:Cuisine {name:'Portuguese'})  SET portuguese.embedding = [0.47, 0.98, 0.81, 0.72, 0.89]
+	MERGE (british:Cuisine {name:'British'})        SET british.embedding = [0.94, 0.12, 0.23, 0.4, 0.71]
+	MERGE (mauritian:Cuisine {name:'Mauritian'})    SET mauritian.embedding = [0.31, 0.56, 0.98, 0.21, 0.62]
+`;

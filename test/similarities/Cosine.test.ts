@@ -259,13 +259,29 @@ describe('COSINE tests on neo4j sample graph', () => {
 			Praveena: g.n('Praveena').outs('LIKES'),
 			Arya: g.n('Arya').outs('LIKES'),
 		};
+		console.log(subSet);
 		const cores = simSubsets(simFuncs.cosineSets, subSet, allSets);
 		// console.log(cores);
 		expect(cores).toEqual(cox);
 	});
 
+
 	/**
-	 * @todo skipping values...
+	 * @description very, very important....
+	 *
+	 * @todo the score is in the source nodes, not the target nodes...
 	 */
+	it.only('should use embeddings to compute similarity', () => {
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			const n_set = g.outs(n, 'LIKES');
+
+			allSets[n.label] = g.outs(n, 'LIKES');
+		});
+		const cores = simPairwise(simFuncs.cosineEmbeddings, allSets);
+		console.log(cores);
+		// console.log(allSets);
+	});
+
 
 });
