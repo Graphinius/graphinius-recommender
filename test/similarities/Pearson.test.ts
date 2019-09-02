@@ -18,19 +18,20 @@ import {DIR} from "../../src/similarity/interfaces";
 describe('PEARSON base similarity tests', () => {
 
 	const
-		a = [5,8,7,5,4,9],
-		b = [7,8,6,6,4,5],
+		a = [5, 8, 7, 5, 4, 9],
+		b = [7, 8, 6, 6, 4, 5],
 		c = [],
 		d = [],
 		e = [],
 		SUPER_SIZE = 1e5;
-	for ( let i = 0; i < SUPER_SIZE; i++ ) {
+	for (let i = 0; i < SUPER_SIZE; i++) {
 		c.push(i);
 		d.push(i);
 	}
-	for ( let i = SUPER_SIZE; i; i-- ) {
+	for (let i = SUPER_SIZE; i; i--) {
 		e.push(i);
 	}
+
 
 	it('should throw upon passing vectors of different size', () => {
 		expect(simFuncs.pearson.bind(simFuncs.pearson, [1], [])).toThrowError('Vectors must be of same size');
@@ -57,6 +58,62 @@ describe('PEARSON base similarity tests', () => {
 		for (let i = 0; i < SUPER_SIZE; i++) simFuncs.pearson(a, b);
 		const toc = +new Date;
 		console.log(`1e5 iterations of cosine on 5-dim vectors took ${toc - tic} ms.`);
+	});
+
+});
+
+
+/**
+ * @description similarities on neo4j sample graph
+ */
+describe('EUCLIDEAN tests on neo4j sample graph', () => {
+
+	const
+		gFile = './data/movies.json',
+		rated = 'RATED';
+
+	let
+		g: TypedGraph,
+		expanse,
+		zhen, praveena, michael, arya, karin;
+
+
+	beforeEach(() => {
+		g = new JSONInput({weighted: true}).readFromJSONFile(gFile, new TypedGraph('CosineCuisineSimilarities')) as TypedGraph;
+		expanse = new TheExpanse(g);
+		zhen = g.n('Zhen');
+		praveena = g.n('Praveena');
+		michael = g.n('Michael');
+		arya = g.n('Arya');
+		karin = g.n('Karin');
+	});
+
+
+	it('should compute similarity between Arya and Karin', () => {
+		const pxp = {sim: 0.81947};
+		const a = arya.outs(rated);
+		const b = karin.outs(rated);
+		const pears = sim(simFuncs.pearsonSets, a, b);
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
+	});
+
+
+	it('should compute PEARSON from a source', () => {
+		const pxp = [
+			{from: 'Arya', to: 'Karin', sim: 0.81947},
+			{from: 'Arya', to: 'Zhen', sim: 0.48395},
+			{from: 'Arya', to: 'Praveena', sim: 0.092623},
+			{from: 'Arya', to: 'Michael', sim: -0.9552}
+		];
+		const start = arya.label;
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const pears = simSource(simFuncs.pearsonSets, start, allSets);
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
 	});
 
 });

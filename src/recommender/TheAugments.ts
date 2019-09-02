@@ -27,15 +27,16 @@ class TheAugments {
   addSubsetRelationship(algo: Function, sets: $I.SetOfSets, cfg: SubSetConfig) : Set<ITypedEdge> {
     const edgeSet = new Set<ITypedEdge>();
     let edge: ITypedEdge;
+    const g = this._g;
     
     const ores = knnNodeArray(algo, sets, {knn: cfg.knn || 1, cutoff: cfg.cutoff || 0});
     // console.log(ores);
     ores.forEach(e => {
       if ( sets[e.from].size < sets[e.to].size ) {
-        edge = this._g.addEdgeByID('ontheedge', this._g.n(e.from), this._g.n(e.to), {directed: true, type: cfg.rtype});
+        edge = g.addEdgeByID('ontheedge', g.n(e.from), g.n(e.to), {directed: true, type: cfg.rtype});
       }
       else {
-        edge = this._g.addEdgeByID('ontheedge', this._g.n(e.to), this._g.n(e.from), {directed: true, type: cfg.rtype});
+        edge = g.addEdgeByID('ontheedge', g.n(e.to), g.n(e.from), {directed: true, type: cfg.rtype});
       }
       edgeSet.add(edge);
     });

@@ -3,7 +3,7 @@ import {JSONOutput} from 'graphinius/lib/io/output/JSONOutput';
 
 
 const
-		g = new TypedGraph('CuisineSimilarities'),
+		g = new TypedGraph('BookSimilarities'),
     
     // NODES
 		fahrenheit451 = g.addNodeByID('fahrenheit451', {type: 'BOOK'}),
