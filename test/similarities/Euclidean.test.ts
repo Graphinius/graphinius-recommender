@@ -157,11 +157,11 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 
 	it('should compute knn Array', () => {
 		const exp = [
-			{ from: 'Zhen', to: 'Arya', sim: 0 },
-			{ from: 'Arya', to: 'Zhen', sim: 0 },
-			{ from: 'Karin', to: 'Zhen', sim: 0 },
-			{ from: 'Praveena', to: 'Karin', sim: 3 },
-			{ from: 'Michael', to: 'Zhen', sim: 3.6056 }
+			{from: 'Zhen', to: 'Arya', sim: 0},
+			{from: 'Arya', to: 'Zhen', sim: 0},
+			{from: 'Karin', to: 'Zhen', sim: 0},
+			{from: 'Praveena', to: 'Karin', sim: 3},
+			{from: 'Michael', to: 'Zhen', sim: 3.6056}
 		];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
@@ -179,11 +179,11 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 
 	it('should compute knn Dict', () => {
 		const exp = {
-			Zhen: [ { to: 'Arya', sim: 0 } ],
-			Praveena: [ { to: 'Karin', sim: 3 } ],
-			Michael: [ { to: 'Zhen', sim: 3.6056 } ],
-			Arya: [ { to: 'Zhen', sim: 0 } ],
-			Karin: [ { to: 'Zhen', sim: 0 } ]
+			Zhen: [{to: 'Arya', sim: 0}],
+			Praveena: [{to: 'Karin', sim: 3}],
+			Michael: [{to: 'Zhen', sim: 3.6056}],
+			Arya: [{to: 'Zhen', sim: 0}],
+			Karin: [{to: 'Zhen', sim: 0}]
 		};
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
@@ -201,8 +201,8 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 
 	it('should correctly compute similarities between two subsets WITH KNN', () => {
 		const exp = [
-			{ from: 'Arya', to: 'Zhen', sim: 0 },
-			{ from: 'Praveena', to: 'Karin', sim: 3 }
+			{from: 'Arya', to: 'Zhen', sim: 0},
+			{from: 'Praveena', to: 'Karin', sim: 3}
 		];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
@@ -228,7 +228,8 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 			allSets[n.label] = n.outs('LIKES');
 		});
 		const newEdges = augment.addSubsetRelationship(simFuncs.euclideanSets, allSets, {
-			rtype: relName, knn: 1});
+			rtype: relName, knn: 1
+		});
 		expect(g.nrDirEdges()).toBe(oldDirEdges + newEdges.size);
 	});
 

@@ -7,7 +7,8 @@ export const simFuncs = {
   cosine,
   cosineSets,
 	euclidean,
-	euclideanSets
+	euclideanSets,
+	pearson
 };
 
 
@@ -57,6 +58,36 @@ function euclidean(a: number[], b: number[]) {
 	dena = Math.sqrt(dena);
 	denb = Math.sqrt(denb);
 	return {sim: +(numerator / (dena * denb)).toPrecision(PRECISION)};
+}
+
+
+/**
+ *
+ * @param a
+ * @param b
+ */
+function pearson(a: number[], b: number[]) {
+	if ( a.length !== b.length ) {
+		throw new Error('Vectors must be of same size');
+	}
+	let sum_a = 0, sum_b = 0, mean_a, mean_b, numerator = 0, diff_a_sq = 0, diff_b_sq = 0, denominator, a_diff, b_diff, sim;
+	for ( let i = 0; i < a.length; i++ ) {
+		sum_a += a[i];
+		sum_b += b[i];
+	}
+	mean_a = sum_a / a.length;
+	mean_b = sum_b / b.length;
+
+	for ( let i = 0; i < a.length; i++ ) {
+		a_diff = a[i] - mean_a;
+		b_diff = b[i] - mean_b;
+		numerator += a_diff * b_diff;
+		diff_a_sq += a_diff * a_diff;
+		diff_b_sq += b_diff * b_diff;
+	}
+	denominator = Math.sqrt(diff_a_sq) * Math.sqrt(diff_b_sq);
+	sim = +(numerator / denominator).toPrecision(PRECISION);
+	return {sim};
 }
 
 
