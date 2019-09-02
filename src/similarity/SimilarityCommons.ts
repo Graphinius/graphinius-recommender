@@ -154,6 +154,8 @@ export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, c
  * @param cfg
  *
  * @returns most similar neighbor per node
+ *
+ * @todo there are no duplicates in this array, similarities might differ in different directions -> adapt!
  */
 export function knnNodeArray(algo: Function, s: $I.SetOfSets, cfg: $I.SimilarityConfig) : $I.TopKArray {
 	const sort = cfg.sort || simSort.desc;
@@ -170,7 +172,7 @@ export function knnNodeArray(algo: Function, s: $I.SetOfSets, cfg: $I.Similarity
 			}
 			if (!cfg.dup && ( dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from] ) ) {
 				return;
-			}		
+			}
 			topK.push(e);
 			dupes[e.from] = dupes[e.from] || {};
 			dupes[e.from][e.to] = true;

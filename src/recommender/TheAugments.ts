@@ -29,10 +29,10 @@ class TheAugments {
     let edge: ITypedEdge;
     const g = this._g;
     
-    const ores = knnNodeArray(algo, sets, {knn: cfg.knn || 1, cutoff: cfg.cutoff || 0});
-    // console.log(ores);
-    ores.forEach(e => {
-      if ( sets[e.from].size < sets[e.to].size ) {
+    const sims = knnNodeArray(algo, sets, {knn: cfg.knn || 1, cutoff: cfg.cutoff || 0});
+
+    sims.forEach(e => {
+      if ( sets[e.from].size <= sets[e.to].size ) {
         edge = g.addEdgeByID('ontheedge', g.n(e.from), g.n(e.to), {directed: true, type: cfg.rtype});
       }
       else {

@@ -116,4 +116,107 @@ describe('EUCLIDEAN tests on neo4j sample graph', () => {
 		expect(pears).toEqual(pxp);
 	});
 
+
+	it('should compute PEARSON from a source', () => {
+		const pxp = [
+			{ from: 'Praveena', to: 'Zhen', sim: 0.88659 },
+			{ from: 'Karin', to: 'Zhen', sim: 0.83205 },
+			{ from: 'Karin', to: 'Arya', sim: 0.81947 },
+			{ from: 'Arya', to: 'Zhen', sim: 0.48395 },
+			{ from: 'Karin', to: 'Praveena', sim: 0.44721 },
+			{ from: 'Arya', to: 'Praveena', sim: 0.092623 },
+			{ from: 'Michael', to: 'Praveena', sim: -0.78849 },
+			{ from: 'Michael', to: 'Zhen', sim: -0.90914 },
+			{ from: 'Arya', to: 'Michael', sim: -0.9552 },
+			{ from: 'Karin', to: 'Michael', sim: -0.98639 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const pears = simPairwise(simFuncs.pearsonSets, allSets);
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
+	});
+
+
+	it('pearson should work with a cutoff', () => {
+		const pxp = [
+			{ from: 'Praveena', to: 'Zhen', sim: 0.88659 },
+			{ from: 'Karin', to: 'Zhen', sim: 0.83205 },
+			{ from: 'Karin', to: 'Arya', sim: 0.81947 },
+			{ from: 'Arya', to: 'Zhen', sim: 0.48395 },
+			{ from: 'Karin', to: 'Praveena', sim: 0.44721 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const pears = simPairwise(simFuncs.pearsonSets, allSets, {cutoff: 0.1});
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
+	});
+
+
+	it('top knn with a cutoff', () => {
+		const pxp = [
+			{ from: 'Zhen', to: 'Praveena', sim: 0.88659 },
+			{ from: 'Praveena', to: 'Zhen', sim: 0.88659 },
+			{ from: 'Karin', to: 'Zhen', sim: 0.83205 },
+			{ from: 'Arya', to: 'Karin', sim: 0.81947 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const pears = knnNodeArray(simFuncs.pearsonSets, allSets, {knn: 1, cutoff: .1, dup: true});
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
+	});
+
+
+	it('top knn per user -> store relationship in the graph', () => {
+		const augment = new TheAugments(g);
+		const relName = 'SIMILAR';
+		const oldDirEdges = g.nrDirEdges();
+
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const newEdges = augment.addSubsetRelationship(simFuncs.pearsonSets, allSets, {
+			rtype: relName, knn: 1, cutoff: -3,
+		});
+		// expect(g.nrDirEdges()).toBe(oldDirEdges + 5);
+		expect(g.nrDirEdges()).toBe(oldDirEdges + newEdges.size);
+	});
+
+
+	it('should correctly compute similarities between two subsets WITH KNN', () => {
+		const pxp = [
+			{ from: 'Praveena', to: 'Zhen', sim: 0.88659 },
+			{ from: 'Arya', to: 'Karin', sim: 0.81947 }
+		];
+		const allSets = {};
+		g.getNodesT('Person').forEach(n => {
+			allSets[n.label] = n.outs(rated);
+		});
+		const subSet = {
+			Praveena: g.n('Praveena').outs(rated),
+			Arya: g.n('Arya').outs(rated),
+		};
+		const pears = simSubsets(simFuncs.pearsonSets, subSet, allSets, {knn: 1});
+		// console.log(pears);
+		expect(pears).toEqual(pxp);
+	});
+
+
+	/**
+	 MATCH (p:Person {name: "Praveena"})-[:SIMILAR]->(other),
+	 (other)-[r:RATED]->(movie)
+	 WHERE not((p)-[:RATED]->(movie)) and r.score >= 8
+	 RETURN movie.name AS movie
+	 */
+	it.todo('should make a tiny recommendation');
+
 });
