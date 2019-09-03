@@ -66,7 +66,7 @@ describe('PEARSON base similarity tests', () => {
 /**
  * @description similarities on neo4j sample graph
  */
-describe('EUCLIDEAN tests on neo4j sample graph', () => {
+describe('PEARSON tests on neo4j sample graph', () => {
 
 	const
 		gFile = './data/movies.json',

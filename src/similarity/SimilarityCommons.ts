@@ -140,10 +140,10 @@ export function simSubsets(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, c
 //  *
 //  * @returns an array of Similarity entries
 //  */
-// export function simGroups(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.Similarity {
-// 	throw new Error('not implemented yet');
-// 	return {isect: 0, sim: 0};
-// }
+export function simGroups(algo: Function, s1: $I.SetOfSets, s2: $I.SetOfSets, config: $I.SimilarityConfig = {}) : $I.Similarity {
+	throw new Error('not implemented yet');
+	return {isect: 0, sim: 0};
+}
 
 
 /**

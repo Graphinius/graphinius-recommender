@@ -104,20 +104,7 @@ describe('Cutoff & knn similarity tests', () => {
 	/**
 	 * Time measurement -> not necessary for test suite
 	 */
-	it('should compute the pairwise JACCARD culinary similarity', () => {
-		const jexp = [
-      { from: 'Michael', to: 'Zhen', isect: 2, sim: 0.66667 },
-      { from: 'Karin', to: 'Arya', isect: 2, sim: 0.66667 },
-      { from: 'Praveena', to: 'Zhen', isect: 1, sim: 0.33333 },
-      { from: 'Michael', to: 'Praveena', isect: 1, sim: 0.25 },
-      { from: 'Arya', to: 'Praveena', isect: 1, sim: 0.25 },
-      { from: 'Karin', to: 'Michael', isect: 1, sim: 0.25 },
-      { from: 'Arya', to: 'Michael', isect: 1, sim: 0.2 },
-      { from: 'Arya', to: 'Zhen', isect: 0, sim: 0 },
-      { from: 'Karin', to: 'Zhen', isect: 0, sim: 0 },
-      { from: 'Karin', to: 'Praveena', isect: 0, sim: 0 }
-		]
-
+	it('should compute the pairwise culinary similarity (Jaccard)', () => {
 		let tic = process.hrtime()[1];
 		const targets = {};
 		g.getNodesT('Person').forEach(n => {
@@ -131,11 +118,19 @@ describe('Cutoff & knn similarity tests', () => {
 		toc = process.hrtime()[1]; // +new Date;
 		console.log(`All pairs Jaccard on mini DB took ${toc-tic} nanos.`);
 
-		tic = process.hrtime()[1];
-		expect(jres.length).toBe(10);
-		expect(jres).toEqual(jexp);
-		toc = process.hrtime()[1];
-		console.log(`Running Jest expect took ${toc-tic} nanos.`);
+		// tic = process.hrtime()[1];
+		// expect(jres.length).toBe(10);
+		// expect(jres).toEqual(jexp);
+		// toc = process.hrtime()[1];
+		// console.log(`Running Jest expect took ${toc-tic} nanos.`);
+	});
+
+
+	/**
+	 *
+	 */
+	it('should get correct (Jaccard) groupwise similarity', () => {
+
 	});
 	
 });

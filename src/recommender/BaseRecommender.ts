@@ -21,23 +21,20 @@ class BaseRecommender {
 
 
 	/**
-	 * @description takes a node type and computes pairwise similarities
-	 * @param algo similarity function
-	 * @param type
+	 * Peform several steps of g.getNeighbors() or g.expandK() depending on criteria
 	 */
-	embeddingsSimilarity(algo: Function, type: string) : $I.SimilarityResult {
-		throw('Not implemented yet');
+	expandChain() {
+
 	}
 
 
 	/**
-	 * @description
-	 * @param t1
-	 * @param t2
+	 * Eliminate items from set which violate constraints
 	 */
-	groupSimilarity(t1: string, t2: string) {}
+	applyConstraints() {
 
-	
+	}
+
 }
 
 

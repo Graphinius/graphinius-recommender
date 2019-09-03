@@ -284,6 +284,17 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 	});
 
 
-	it.todo('should compute group similarity');
+	it('should compute group similarity', () => {
+		const subSet1 = new Set([g.n('fahrenheit451'), g.n('hungerGames')]);
+		const subSet2 = new Set([g.n('dune')]);
+		const targetSet1 = g.getNeighborsOfSet(subSet1, DIR.out, 'HAS_GENRE');
+		const targetSet2 = g.getNeighborsOfSet(subSet2, DIR.out, 'HAS_GENRE');
+		const rover = sim(simFuncs.overlap, targetSet1, targetSet2);
+		const jackl = sim(simFuncs.jaccard, targetSet1, targetSet2);
+
+		// console.log(rover, jackl);
+		expect(rover).toEqual({isect: 3, sim: 1.0});
+		expect(jackl).toEqual({isect: 3, sim: 0.75});
+	});
 
 });
