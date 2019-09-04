@@ -59,15 +59,15 @@ describe('jobs dataset tests - ', () => {
 			for (let model in jobsModels) {
 				expect(idx[model]).toBeDefined;
 			}
-			expect(idx[jobsModels.Company]._documents.length).toBe(50);
-			expect(idx[jobsModels.Country]._documents.length).toBe(25);
-			expect(idx[jobsModels.Person]._documents.length).toBe(200);
-			expect(idx[jobsModels.Skill]._documents.length).toBe(30);
+			expect(idx[jobsModels.company]._documents.length).toBe(50);
+			expect(idx[jobsModels.country]._documents.length).toBe(25);
+			expect(idx[jobsModels.person]._documents.length).toBe(200);
+			expect(idx[jobsModels.skill]._documents.length).toBe(30);
 		});
 
 
 		it('gets the correct initial search results (IDs)', () => {
-			let searchRes = idx[jobsModels.Skill].search(jobsConfig.searchTerm);
+			let searchRes = idx[jobsModels.skill].search(jobsConfig.searchTerm);
 			expect(searchRes.length).toBe(2);
 			searchRes.forEach(item => expect(item.name).toBe('TypeScript'));
 		});
@@ -75,7 +75,7 @@ describe('jobs dataset tests - ', () => {
 
 		it('should find the two task-oriented companies', () => {
 			const term = 'task';
-			const res = idx[jobsModels.Company].search(term);
+			const res = idx[jobsModels.company].search(term);
 			expect(res.length).toBe(2);
 			res.forEach(item => expect(item.desc).toContain(term));
 		});
@@ -90,14 +90,13 @@ describe('jobs dataset tests - ', () => {
 
 		it('gets the correct amount of IN & OUT links for Skill `Typescript`', () => {
 			const
-				searchRes = idx[jobsModels.Skill].search(jobsConfig.searchTerm),
-				a: TypedNode = g.getNodeById(searchRes[0].id),
-				b: TypedNode = g.getNodeById(searchRes[1].id);
+				searchRes = idx[jobsModels.skill].search(jobsConfig.searchTerm);
 
-			expect(a.ins(EDGE_TYPES.HasSkill).size).toBe(106);
-			expect(a.ins(EDGE_TYPES.LooksForSkill).size).toBe(23);
-			expect(b.ins(EDGE_TYPES.HasSkill).size).toBe(98);
-			expect(b.ins(EDGE_TYPES.LooksForSkill).size).toBe(25);
+			searchRes.forEach(res => {
+				const n = g.n(res.id);
+				expect([106, 98]).toContain(n.ins(EDGE_TYPES.HasSkill).size);
+				expect([23, 25]).toContain(n.ins(EDGE_TYPES.LooksForSkill).size);
+			});
 		});
 
 
@@ -108,74 +107,118 @@ describe('jobs dataset tests - ', () => {
 		 * return collect(p.name), count(p)
 		 */
 		it('should find the 6 people are working for the Kohler Group', () => {
-			const kG = g.n(idx[jobsModels.Company].search('Kohler Group')[0].id);
+			const emp_names = ["Joannie Bartoletti", "Judy Brekke",	"Alfreda Kovacek", "Torey Steuber",	"Lyla Hodkiewicz", "Evie Cummerata"];
+
+			const kG = g.n(idx[jobsModels.company].search('Kohler Group')[0].id);
 			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
 			expect(employees.size).toBe(6);
-			expect(Array.from(employees).map(e => (<any>e).id)).toEqual(['43', '63', '196', '208', '212', '222']);
-			expect(Array.from(employees).map(e => (<any>e).getFeature('age'))).toEqual([45, 77, 35, 20, 77, 33]);
-			expect(Array.from(employees).map(e => (<any>e).getFeature('name'))).toEqual([
-				"Joannie Bartoletti",
-				"Judy Brekke",
-				"Alfreda Kovacek",
-				"Torey Steuber",
-				"Lyla Hodkiewicz",
-				"Evie Cummerata",
-			]);
+			expect(Array.from(employees).map(e => (<any>e).getFeature('age')).sort()).toEqual([45, 77, 35, 20, 77, 33].sort());
+			expect(Array.from(employees).map(e => (<any>e).getFeature('name')).sort()).toEqual(emp_names.sort());
 		});
 
 
 		/**
-		 * @description {least employees: 0} 2 companies -> 9, 17
-		 *              {most employees: 11} 1 company -> 302
+		 MATCH (c:Company)<-[employees:WORKS_FOR]-(p:Person)
+		 WITH c, count(employees) as staff
+		 RETURN collect(c.name), staff
+		 ORDER BY staff
 		 */
 		it('should find the companies with least / most #employees', () => {
-			// console.log(`Graph is typed: ${BaseGraph.isTyped(g)}`);
+			const emp_0_exp = ["Brakus, Rohan and Grimes", "Daniel Ltd"];
+			const emp_1_exp = ["Hahn and Sons", "Boehm LLC", "Hirthe Group", "Pouros PLC", "Rutherford, Gerlach and Jones", "Jaskolski Inc"];
+			const emp_11_exp = ["Hirthe PLC"];
+
 			const employeeDist = g.inHistT(NODE_TYPES.Company, EDGE_TYPES.WorksFor);
 			expect(employeeDist[0].size).toBe(2);
-			expect(Array.from(employeeDist[0]).map(n => (<any> n).id)).toEqual(['9', '17']);
-			expect(Array.from(employeeDist[11]).map(n => (<any> n).id)).toEqual(['302']);
+			expect(Array.from(employeeDist[0]).map(n => (<any>n).getFeature('name')).sort()).toEqual(emp_0_exp.sort());
+			expect(employeeDist[1].size).toBe(6);
+			expect(Array.from(employeeDist[1]).map(n => (<any>n).getFeature('name')).sort()).toEqual(emp_1_exp.sort());
+			expect(employeeDist[11].size).toBe(1);
+			expect(Array.from(employeeDist[11]).map(n => (<any>n).getFeature('name')).sort()).toEqual(emp_11_exp.sort());
 		});
 
 
 		/**
-		 * @description {min: 11} 1 company -> 233
-		 *              {max: 18} 1 company -> 300
+		 MATCH (c:Company)-[searching:LOOKS_FOR_SKILL]->(s:Skill)
+		 WITH collect(c.name) as cs, s, count(searching) as wanted
+		 RETURN s, cs, wanted
+		 ORDER BY wanted
+		 */
+		it('should find the most / least desired skills', () => {
+			const least_desired = ["Cython"];
+			const most_desired = ["S/SL", "MUMPS"];
+
+			const desiredSkills = g.inHistT(NODE_TYPES.Skill, EDGE_TYPES.LooksForSkill);
+			expect(desiredSkills[18].size).toBe(1);
+			expect(Array.from(desiredSkills[18]).map(n => (<any>n).getFeature('name')).sort()).toEqual(least_desired.sort());
+			expect(desiredSkills[31].size).toBe(2);
+			expect(Array.from(desiredSkills[31]).map(n => (<any>n).getFeature('name')).sort()).toEqual(most_desired.sort());
+		});
+
+
+		/**
+		 MATCH (c:Company)-[searching:LOOKS_FOR_SKILL]->(s:Skill)
+		 WITH collect(s.name) as skills, c, count(searching) as wanted
+		 RETURN c.name, skills, wanted
+		 ORDER BY wanted
 		 */
 		it('should find the companies looking for min / max amount of skills', () => {
+			const least_demanding = ["Mante Ltd"];
+			const most_demanding = ["Kohler Group"];
+
 			const seekingSkills = g.outHistT(NODE_TYPES.Company, EDGE_TYPES.LooksForSkill);
 			expect(seekingSkills[11].size).toBe(1);
-			expect(Array.from(seekingSkills[11]).map(c => (<any> c).id)).toEqual(['233']);
+			expect(Array.from(seekingSkills[11]).map(c => (<any>c).getFeature('name'))).toEqual(least_demanding);
 			expect(seekingSkills[18].size).toBe(1);
-			expect(Array.from(seekingSkills[18]).map(c => (<any> c).id)).toEqual(['300']);
+			expect(Array.from(seekingSkills[18]).map(c => (<any>c).getFeature('name'))).toEqual(most_demanding);
 		});
 
 
 		/**
-		 * @description {least skills: 10} 1 person -> 199
-		 *              {most skills: 19} 1 person -> 175
+		 MATCH (p:Person)-[talent:HAS_SKILL]->(s:Skill)
+		 WITH p, count(talent) as t_cnt, collect(s.name) as skills
+		 RETURN p.name, t_cnt, skills
+		 ORDER BY t_cnt DESC
+		 LIMIT 1
 		 */
 		it('should find the least / most skilled person', () => {
+			const least_skilled = ["Elenora Lemke"];
+			const most_skilled = ["Tyson Beatty"];
+
 			const skillDist = g.outHistT(NODE_TYPES.Person, EDGE_TYPES.HasSkill);
 			expect(skillDist[10].size).toBe(1);
-			expect(Array.from(skillDist[10]).map(p => (<any> p).id)).toEqual(['199']);
+			expect(Array.from(skillDist[10]).map(p => (<any>p).getFeature('name'))).toEqual(least_skilled);
 			expect(skillDist[19].size).toBe(1);
-			expect(Array.from(skillDist[19]).map(p => (<any> p).id)).toEqual(['175']);
+			expect(Array.from(skillDist[19]).map(p => (<any>p).getFeature('name'))).toEqual(most_skilled);
 		});
 
 
 		/**
-		 * @description {least known: 7} 1 person -> 197
-		 *              {best known: 29} 2 people -> 150, 190
+		 MATCH (p:Person)<-[known_by:KNOWS]-(op:Person)
+		 WITH p, count(known_by) as popularity, collect(op.name) as fans
+		 RETURN p.name, popularity, fans
+		 ORDER BY popularity DESC
+		 LIMIT 1
 		 */
 		it('should find the best / least known people', () => {
+			const least_known = ["Kylee Larkin"];
+			const best_known = ["Jana Dach", "Ursula Gerlach"];
+
 			const knownBy = g.inHistT(NODE_TYPES.Person, EDGE_TYPES.Knows);
 			expect(knownBy[7].size).toBe(1);
-			expect(Array.from(knownBy[7]).map(p => (<any> p).id)).toEqual(['197']);
+			expect(Array.from(knownBy[7]).map(p => (<any>p).getFeature('name'))).toEqual(least_known);
 			expect(knownBy[29].size).toBe(2);
-			expect(Array.from(knownBy[29]).map(p => (<any> p).id)).toEqual(['150', '190']);
+			expect(Array.from(knownBy[29]).map(p => (<any>p).getFeature('name')).sort()).toEqual(best_known.sort());
 		});
 
 
+		/**
+		 MATCH (p:Person)-[knows:KNOWS]->(op:Person)
+		 WITH p, count(knows) as connected, collect(op.name) as contacts
+		 RETURN collect(p.name), connected //, collect(contacts)
+		 ORDER BY connected
+		 LIMIT 10
+		 */
 		it('should find the best / least connected people', () => {
 			const knowing = g.outHistT(NODE_TYPES.Person, EDGE_TYPES.Knows);
 			expect(knowing[15].size).toBe(11);
@@ -185,15 +228,18 @@ describe('jobs dataset tests - ', () => {
 		});
 
 	});
-	
-	
+
+
 	describe('queries extending over at least 2 relations', () => {
 
-		it.todo('people known by people who know Judy Brekke');
+		it.skip('people known by people who Judy Brekke knows ;-)', () => {
+			let judy = idx[jobsModels.person].search('Judy Brekke');
+
+		});
 
 
 		it('combined set of skills of all the people working for Kohler Group', () => {
-			const kG = g.n(idx[jobsModels.Company].search('Kohler Group')[0].id);
+			const kG = g.n(idx[jobsModels.company].search('Kohler Group')[0].id);
 			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
 			expect(employees.size).toBe(6);
 			// console.log(employees.entries());

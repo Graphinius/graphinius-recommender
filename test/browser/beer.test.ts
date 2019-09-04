@@ -30,12 +30,12 @@ describe('BEER example index tests', () => {
 		for (let model in beerModels) {
 			expect(beerIdxs[model]).toBeDefined;
 		}
-		expect(beerIdxs[beerModels.Brewery]._documents.length).toBe(49);
+		expect(beerIdxs[beerModels.brewery]._documents.length).toBe(49);
 	});
 
 
 	it('gets the correct initial search results (IDs)', () => {
-		let searchRes = beerIdxs[beerModels.Brewery].search(beerConfig.searchTerm);
+		let searchRes = beerIdxs[beerModels.brewery].search(beerConfig.searchTerm);
 		expect(searchRes.length).toBe(3);
 		expect(searchRes[0].name).toBe('Allguer Brauhaus AG Kempten');
 		expect(searchRes[1].name).toBe('Allguer Brauhaus AG Kempten, Brausttte Leuterschach');
@@ -54,8 +54,8 @@ describe('BEER example index tests', () => {
 			state: 'Shire Mark',
 			country: 'Her stare ike'
 		};
-		beerIdxs[beerModels.Brewery].addDocuments([newDoc]);
-		let searchRes = beerIdxs[beerModels.Brewery].search(beerConfig.searchTerm);
+		beerIdxs[beerModels.brewery].addDocuments([newDoc]);
+		let searchRes = beerIdxs[beerModels.brewery].search(beerConfig.searchTerm);
 		// console.log(searchRes);
 		expect(searchRes).toContain(newDoc);
 		// just to be absolutely sure
@@ -68,7 +68,7 @@ describe('BEER example index tests', () => {
 	describe('typed node neighbor tests for beerGraph', () => {
 
 		it('gets the correct amount of IN & OUT links for some Brauhauses', () => {
-			let searchRes = beerIdxs[beerModels.Brewery].search(beerConfig.searchTerm);
+			let searchRes = beerIdxs[beerModels.brewery].search(beerConfig.searchTerm);
 			expect(searchRes.length).toBe(3);
 			const a: TypedNode = beerGraph.getNodeById(searchRes[0].id);
 			expect(a.ins('BREWED_AT').size).toBe(3);

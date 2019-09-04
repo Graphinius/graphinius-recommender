@@ -284,6 +284,16 @@ describe('OVERLAP tests on neo4j sample graph', () => {
 	});
 
 
+	/**
+	 MATCH (b1:Book)-[:HAS_GENRE]->(genre1:Genre)
+	 WHERE b1.title = 'Fahrenheit 451' or b1.title = 'The Hunger Games'
+	 WITH collect(distinct b1.title) as b1, collect(distinct id(genre1)) AS b1Genres
+	 MATCH (b2:Book {title: "Dune"})-[:HAS_GENRE]->(genre2:Genre)
+	 WITH b1, b1Genres, b2, collect(id(genre2)) AS b2Genres
+	 RETURN b1 AS from,
+	 b2.title AS to,
+	 algo.similarity.jaccard(b1Genres, b2Genres) AS similarity
+	 */
 	it('should compute group similarity', () => {
 		const subSet1 = new Set([g.n('fahrenheit451'), g.n('hungerGames')]);
 		const subSet2 = new Set([g.n('dune')]);
