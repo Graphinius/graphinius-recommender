@@ -10,7 +10,7 @@ const jobsConfig: AppConfig = {
 	searchTerm: `TypeScript`,
 	idxConfig: jobsIdxConfig,
 	models: jobsModels,
-	searchModel: jobsModels.Skill
+	searchModel: jobsModels.skill
 };
 
 

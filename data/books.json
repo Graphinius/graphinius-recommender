@@ -1,1 +1,134 @@
-{"name":"CuisineSimilarities","nodes":9,"dir_e":13,"und_e":0,"data":{"fahrenheit451":{"e":[{"t":"dystopia","d":1,"y":"HAS_GENRE"},{"t":"scienceFiction","d":1,"y":"HAS_GENRE"},{"t":"fantasy","d":1,"y":"HAS_GENRE"},{"t":"classics","d":1,"y":"HAS_GENRE"}],"x":"BOOK","f":{}},"dune":{"e":[{"t":"scienceFiction","d":1,"y":"HAS_GENRE"},{"t":"fantasy","d":1,"y":"HAS_GENRE"},{"t":"classics","d":1,"y":"HAS_GENRE"}],"x":"BOOK","f":{}},"hungerGames":{"e":[{"t":"scienceFiction","d":1,"y":"HAS_GENRE"},{"t":"fantasy","d":1,"y":"HAS_GENRE"}],"x":"BOOK","f":{}},"nineteen84":{"e":[{"t":"scienceFiction","d":1,"y":"HAS_GENRE"},{"t":"dystopia","d":1,"y":"HAS_GENRE"},{"t":"classics","d":1,"y":"HAS_GENRE"}],"x":"BOOK","f":{}},"gatsby":{"e":[{"t":"classics","d":1,"y":"HAS_GENRE"}],"x":"BOOK","f":{}},"scienceFiction":{"e":[],"x":"GENRE","f":{}},"fantasy":{"e":[],"x":"GENRE","f":{}},"dystopia":{"e":[],"x":"GENRE","f":{}},"classics":{"e":[],"x":"GENRE","f":{}}}}
+{
+  "name": "BookSimilarities",
+  "nodes": 9,
+  "dir_e": 13,
+  "und_e": 0,
+  "data": {
+    "fahrenheit451": {
+      "e": [
+        {
+          "t": "dystopia",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "scienceFiction",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "fantasy",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "classics",
+          "d": 1,
+          "y": "A"
+        }
+      ],
+      "x": "A",
+      "f": {}
+    },
+    "dune": {
+      "e": [
+        {
+          "t": "scienceFiction",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "fantasy",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "classics",
+          "d": 1,
+          "y": "A"
+        }
+      ],
+      "x": "A",
+      "f": {}
+    },
+    "hungerGames": {
+      "e": [
+        {
+          "t": "scienceFiction",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "fantasy",
+          "d": 1,
+          "y": "A"
+        }
+      ],
+      "x": "A",
+      "f": {}
+    },
+    "nineteen84": {
+      "e": [
+        {
+          "t": "scienceFiction",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "dystopia",
+          "d": 1,
+          "y": "A"
+        },
+        {
+          "t": "classics",
+          "d": 1,
+          "y": "A"
+        }
+      ],
+      "x": "A",
+      "f": {}
+    },
+    "gatsby": {
+      "e": [
+        {
+          "t": "classics",
+          "d": 1,
+          "y": "A"
+        }
+      ],
+      "x": "A",
+      "f": {}
+    },
+    "scienceFiction": {
+      "e": [],
+      "x": "B",
+      "f": {}
+    },
+    "fantasy": {
+      "e": [],
+      "x": "B",
+      "f": {}
+    },
+    "dystopia": {
+      "e": [],
+      "x": "B",
+      "f": {}
+    },
+    "classics": {
+      "e": [],
+      "x": "B",
+      "f": {}
+    }
+  },
+  "typeRLT": {
+    "nodes": {
+      "@": "GENERIC",
+      "A": "BOOK",
+      "B": "GENRE"
+    },
+    "edges": {
+      "@": "GENERIC",
+      "A": "HAS_GENRE"
+    }
+  }
+}

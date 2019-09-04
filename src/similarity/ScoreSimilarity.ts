@@ -138,7 +138,9 @@ function euclideanSets(a: Set<string>, b: Set<string>) {
  */
 function pearsonSets(a: Set<string>, b: Set<string>) {
 	const [aa, ba, a_mean, b_mean] = extractCommonTargetScores(a, b);
+
 	// console.log(aa, ba);
+
 	if (!aa.length || !ba.length) {
 		return {sim: 0};
 	}
@@ -159,7 +161,7 @@ function extractCommonTargetScores(a: Set<string>, b: Set<string>): [number[], n
 	for (let e of b) b_id.add(e.split('#')[0]);
 
 	// now we collect the scores for common targets (in the same order)
-	let score, a_map = new Map(), b_map = new Map(), a_vec, b_vec, earr, a_mean = 0, b_mean = 0;
+	let score, a_map = new Map(), b_map = new Map(), a_vec = [], b_vec = [], earr, a_mean = 0, b_mean = 0;
 	for (let e of a) {
 		earr = e.split('#'); // we can assume 0 is the target...
 		score = +earr[earr.length - 1];
@@ -176,8 +178,18 @@ function extractCommonTargetScores(a: Set<string>, b: Set<string>): [number[], n
 			b_map.set(earr[0], score);
 		}
 	}
-	a_vec = Array.from(a_map.values());
-	b_vec = Array.from(b_map.values());
+
+	// Maps preserve the order in which items were entered
+	// console.log(a_map, b_map);
+	let a_keys = Array.from(a_map.keys()).sort();
+	for ( let key of a_keys ) {
+		a_vec.push(a_map.get(key));
+	}
+	let b_keys = Array.from(b_map.keys()).sort();
+	for ( let key of b_keys ) {
+		b_vec.push(b_map.get(key));
+	}
+
 	return [a_vec, b_vec, a_mean / a.size, b_mean / b.size];
 }
 

@@ -582,7 +582,6 @@
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var bfsScope = {
-            marked: {},
             nodes: graph.getNodes(),
             queue: [],
             current: null,
@@ -1430,9 +1429,9 @@
     var DEFAULT_WEIGHT = 1;
     var DIR;
     (function (DIR) {
-        DIR["in"] = "IN";
-        DIR["out"] = "OUT";
-        DIR["conn"] = "CONN";
+        DIR["in"] = "ins";
+        DIR["out"] = "outs";
+        DIR["conn"] = "conns";
     })(DIR = exports.DIR || (exports.DIR = {}));
     var GraphMode;
     (function (GraphMode) {
@@ -3635,6 +3634,8 @@
         JSONInput.prototype.readFromJSON = function (json, graph) {
             graph = graph || new BaseGraph_1.BaseGraph(json.name);
             var edc = new Dupes.EdgeDupeChecker(graph);
+            var rlt = json.typeRLT;
+            logger.log(rlt);
             this.addNodesToGraph(json, graph);
             for (var node_id in json.data) {
                 var node = graph.getNodeById(node_id);
@@ -3643,7 +3644,7 @@
                     var edge_input = edges[e];
                     var target_node = this.getTargetNode(graph, edge_input);
                     var edge_label = edge_input[interfaces.labelKeys.e_label];
-                    var edge_type = edge_input[interfaces.labelKeys.e_type];
+                    var edge_type = rlt && rlt.edges[edge_input[interfaces.labelKeys.e_type]] || null;
                     var directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed;
                     var weight_float = JSONInput.handleEdgeWeights(edge_input);
                     var weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
@@ -3678,9 +3679,10 @@
             return graph;
         };
         JSONInput.prototype.addNodesToGraph = function (json, graph) {
+            var rlt = json.typeRLT;
             var coords_json, coords, coord_idx, features;
             for (var node_id in json.data) {
-                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? json.data[node_id][interfaces.labelKeys.n_type] : null;
+                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? rlt && rlt.nodes[json.data[node_id][interfaces.labelKeys.n_type]] : null;
                 var label = json.data[node_id][interfaces.labelKeys.n_label];
                 var node = graph.addNodeByID(node_id, { label: label, type: type });
                 features = json.data[node_id][interfaces.labelKeys.n_features];
@@ -3730,14 +3732,86 @@
     var JSONInput_2 = JSONInput_1.JSONInput;
 
     var JSONOutput_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
 
 
 
+
+    var startChar = 64;
     var JSONOutput = (function () {
         function JSONOutput() {
         }
+        JSONOutput.prototype.constructTypeRLUT = function (g) {
+            var e_1, _a, e_2, _b;
+            var nchar = startChar;
+            var echar = startChar;
+            var lut = {
+                nodes: {},
+                edges: {}
+            };
+            var rlut = {
+                nodes: {},
+                edges: {}
+            };
+            var ntypes = g.nodeTypes();
+            try {
+                for (var ntypes_1 = __values(ntypes), ntypes_1_1 = ntypes_1.next(); !ntypes_1_1.done; ntypes_1_1 = ntypes_1.next()) {
+                    var t = ntypes_1_1.value;
+                    lut.nodes[t] = String.fromCharCode(nchar);
+                    rlut.nodes[String.fromCharCode(nchar++)] = t;
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (ntypes_1_1 && !ntypes_1_1.done && (_a = ntypes_1.return)) _a.call(ntypes_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            var etypes = g.edgeTypes();
+            try {
+                for (var etypes_1 = __values(etypes), etypes_1_1 = etypes_1.next(); !etypes_1_1.done; etypes_1_1 = etypes_1.next()) {
+                    var t = etypes_1_1.value;
+                    lut.edges[t] = String.fromCharCode(echar);
+                    rlut.edges[String.fromCharCode(echar++)] = t;
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (etypes_1_1 && !etypes_1_1.done && (_b = etypes_1.return)) _b.call(etypes_1);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            return [lut, rlut];
+        };
         JSONOutput.prototype.writeToJSONFile = function (filepath, graph) {
             if (typeof window !== 'undefined' && window !== null) {
                 throw new Error('cannot write to File inside of Browser');
@@ -3745,7 +3819,9 @@
             fs.writeFileSync(filepath, this.writeToJSONString(graph));
         };
         JSONOutput.prototype.writeToJSONString = function (graph) {
-            var _a, _b, _c;
+            var _a, _b, _c, _d;
+            var lut = null;
+            var rlt = null;
             var nodes, node, node_struct, und_edges, dir_edges, edge, coords;
             var result = {
                 name: graph.label,
@@ -3754,41 +3830,30 @@
                 und_e: graph.nrUndEdges(),
                 data: {}
             };
+            if (BaseGraph_1.BaseGraph.isTyped(graph)) {
+                _a = __read(this.constructTypeRLUT(graph), 2), lut = _a[0], rlt = _a[1];
+            }
+            if (rlt) {
+                result['typeRLT'] = rlt;
+            }
             nodes = graph.getNodes();
             for (var node_key in nodes) {
                 node = nodes[node_key];
-                node_struct = result.data[node.getID()] = (_a = {},
-                    _a[interfaces.labelKeys.edges] = [],
-                    _a);
+                node_struct = result.data[node.getID()] = (_b = {},
+                    _b[interfaces.labelKeys.edges] = [],
+                    _b);
                 if (node.getID() !== node.getLabel()) {
                     node_struct[interfaces.labelKeys.n_label] = node.label;
                 }
                 if (BaseNode_1.BaseNode.isTyped(node)) {
-                    node_struct[interfaces.labelKeys.n_type] = node.type;
+                    node_struct[interfaces.labelKeys.n_type] = lut && lut.nodes[node.type];
                 }
                 und_edges = node.undEdges();
                 for (var edge_key in und_edges) {
                     edge = und_edges[edge_key];
                     var endPoints = edge.getNodes();
-                    var edgeStruct = (_b = {},
-                        _b[interfaces.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
-                        _b[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
-                        _b[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
-                        _b);
-                    if (edge.getID() !== edge.getLabel()) {
-                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
-                    }
-                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces.labelKeys.e_type] = edge.type;
-                    }
-                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
-                }
-                dir_edges = node.outEdges();
-                for (var edge_key in dir_edges) {
-                    edge = dir_edges[edge_key];
-                    var endPoints = edge.getNodes();
                     var edgeStruct = (_c = {},
-                        _c[interfaces.labelKeys.e_to] = endPoints.b.getID(),
+                        _c[interfaces.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
                         _c[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
                         _c[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _c);
@@ -3796,7 +3861,24 @@
                         edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
                     }
                     if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces.labelKeys.e_type] = edge.type;
+                        edgeStruct[interfaces.labelKeys.e_type] = lut && lut.edges[edge.type];
+                    }
+                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
+                }
+                dir_edges = node.outEdges();
+                for (var edge_key in dir_edges) {
+                    edge = dir_edges[edge_key];
+                    var endPoints = edge.getNodes();
+                    var edgeStruct = (_d = {},
+                        _d[interfaces.labelKeys.e_to] = endPoints.b.getID(),
+                        _d[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _d[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _d);
+                    if (edge.getID() !== edge.getLabel()) {
+                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                    }
+                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
+                        edgeStruct[interfaces.labelKeys.e_type] = lut && lut.edges[edge.type];
                     }
                     node_struct[interfaces.labelKeys.edges].push(edgeStruct);
                 }
@@ -4543,6 +4625,84 @@
             var _this = this;
             return new Set(__spread(node.conns(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
         };
+        TypedGraph.prototype.getNeighborsOfSet = function (nodes, dir, type) {
+            var e_1, _a, e_2, _b;
+            var resultSet = new Set();
+            var nr_visits = 0, nodeRef;
+            var tic = process.hrtime()[1];
+            try {
+                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
+                    var node = nodes_1_1.value;
+                    if (resultSet.size >= this._nr_nodes) {
+                        return resultSet;
+                    }
+                    var targets = node[dir](type);
+                    if (!targets) {
+                        return new Set();
+                    }
+                    try {
+                        for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
+                            var target = targets_1_1.value;
+                            nr_visits++;
+                            nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
+                            if (!nodes.has(nodeRef)) {
+                                resultSet.add(nodeRef);
+                            }
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (targets_1_1 && !targets_1_1.done && (_b = targets_1.return)) _b.call(targets_1);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            var toc = process.hrtime()[1];
+            return resultSet;
+        };
+        TypedGraph.prototype.expandK = function (nodes, dir, type, k) {
+            var e_3, _a;
+            if (k < 0) {
+                throw new Error('cowardly refusing to expand a negative number of steps.');
+            }
+            var resultSet = new Set();
+            var periphery = nodes;
+            k = k || this._nr_nodes;
+            while (k-- || resultSet.size >= this._nr_nodes) {
+                var otic = process.hrtime()[1];
+                periphery = this.getNeighborsOfSet(periphery, dir, type);
+                var old_size = resultSet.size;
+                var tic = process.hrtime()[1];
+                try {
+                    for (var periphery_1 = __values(periphery), periphery_1_1 = periphery_1.next(); !periphery_1_1.done; periphery_1_1 = periphery_1.next()) {
+                        var target = periphery_1_1.value;
+                        resultSet.add(target);
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (periphery_1_1 && !periphery_1_1.done && (_a = periphery_1.return)) _a.call(periphery_1);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                var toc = process.hrtime()[1];
+                if (old_size === resultSet.size) {
+                    break;
+                }
+                var otoc = process.hrtime()[1];
+            }
+            return resultSet;
+        };
         TypedGraph.prototype.inHistT = function (nType, eType) {
             return this.degreeHistT(BaseGraph_1.DIR.in, nType, eType);
         };
@@ -4553,7 +4713,7 @@
             return this.degreeHistT(BaseGraph_1.DIR.conn, nType, eType);
         };
         TypedGraph.prototype.degreeHistT = function (dir, nType, eType) {
-            var e_1, _a;
+            var e_4, _a;
             var result = [];
             try {
                 for (var _b = __values(this._typedNodes.get(nType)), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -4577,12 +4737,12 @@
                     }
                 }
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
                     if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                finally { if (e_1) throw e_1.error; }
+                finally { if (e_4) throw e_4.error; }
             }
             return result;
         };
@@ -4731,6 +4891,7 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -4776,7 +4937,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-
+    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -4814,7 +4975,7 @@
 
       return ExactWordIndexStrategy;
     }();
-
+    //# sourceMappingURL=ExactWordIndexStrategy.js.map
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -4860,7 +5021,7 @@
 
       return PrefixIndexStrategy;
     }();
-
+    //# sourceMappingURL=PrefixIndexStrategy.js.map
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -4898,7 +5059,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(IndexStrategy);
@@ -4935,7 +5096,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-
+    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -4973,7 +5134,7 @@
 
       return LowerCaseSanitizer;
     }();
-
+    //# sourceMappingURL=LowerCaseSanitizer.js.map
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -5002,7 +5163,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Sanitizer);
@@ -5037,7 +5198,7 @@
 
       return value;
     }
-
+    //# sourceMappingURL=getNestedFieldValue.js.map
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -5214,7 +5375,7 @@
 
       return TfIdfSearchIndex;
     }();
-
+    //# sourceMappingURL=TfIdfSearchIndex.js.map
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -5313,7 +5474,7 @@
 
       return UnorderedSearchIndex;
     }();
-
+    //# sourceMappingURL=UnorderedSearchIndex.js.map
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -5342,7 +5503,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(SearchIndex);
@@ -5386,7 +5547,7 @@
 
       return SimpleTokenizer;
     }();
-
+    //# sourceMappingURL=SimpleTokenizer.js.map
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -5440,7 +5601,7 @@
 
       return StemmingTokenizer;
     }();
-
+    //# sourceMappingURL=StemmingTokenizer.js.map
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -5581,7 +5742,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-
+    //# sourceMappingURL=StopWordsMap.js.map
     });
 
     unwrapExports(StopWordsMap_1);
@@ -5634,7 +5795,7 @@
 
       return StopWordsTokenizer;
     }();
-
+    //# sourceMappingURL=StopWordsTokenizer.js.map
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -5672,7 +5833,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Tokenizer);
@@ -5927,7 +6088,7 @@
 
       return Search;
     }();
-
+    //# sourceMappingURL=Search.js.map
     });
 
     unwrapExports(Search_1);
@@ -6050,7 +6211,7 @@
 
       return TokenHighlighter;
     }();
-
+    //# sourceMappingURL=TokenHighlighter.js.map
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -6160,7 +6321,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     var index = unwrapExports(commonjs);
@@ -6180,10 +6341,9 @@
             if (BaseGraph_4.isTyped(n) === false) {
                 throw Error("Node Type not supported in this scenario...!");
             }
-            var type = n.type;
+            var type = n.type.toLowerCase();
             var idxObj = idxConfig[type];
             if (!idxObj) {
-                console.log();
                 return false;
             }
             var idxEntry = { id: n.getID() };
@@ -6198,32 +6358,33 @@
         window['idx'] = indexes;
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
-        jobsModels["Person"] = "Person";
-        jobsModels["Company"] = "Company";
-        jobsModels["Country"] = "Country";
-        jobsModels["Skill"] = "Skill";
+        jobsModels["person"] = "person";
+        jobsModels["company"] = "company";
+        jobsModels["country"] = "country";
+        jobsModels["skill"] = "skill";
     })(jobsModels || (jobsModels = {}));
     var jobsIdxConfig = {
-        Company: {
-            string: 'Company',
+        company: {
+            string: 'company',
             id: 'id',
             fields: ['name', 'desc']
         },
-        Country: {
-            string: 'Country',
+        country: {
+            string: 'country',
             id: 'id',
             fields: ['name']
         },
-        Person: {
-            string: 'Person',
+        person: {
+            string: 'person',
             id: 'id',
             fields: ['name', 'age']
         },
-        Skill: {
-            string: 'Skill',
+        skill: {
+            string: 'skill',
             id: 'id',
             fields: ['name']
         }
@@ -6237,7 +6398,7 @@
         searchTerm: "TypeScript",
         idxConfig: jobsIdxConfig,
         models: jobsModels,
-        searchModel: jobsModels.Skill
+        searchModel: jobsModels.skill
     };
 
     var _this = undefined;

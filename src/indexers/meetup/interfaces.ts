@@ -6,30 +6,30 @@ import { IndexConfig } from '../interfaces';
  * @todo find more elegant solution (24/07/2019 -> too tired...)
  */
 export enum meetupModels {
-  Group        = 'Group',
-  Topic        = 'Topic',
-  Member       = 'Member',
-  Event        = 'Event'
+  group        = 'group',
+  topic        = 'topic',
+  member       = 'member',
+  event        = 'event'
 }
 
 const meetupIdxConfig: IndexConfig = {
-	Group: {
-    string: 'Group',
+	group: {
+    string: 'group',
     id: 'id',
 		fields: ['name', 'description', 'organiserName']
 	},
-	Topic: {
-		string: 'Topic',
+	topic: {
+		string: 'topic',
     id: 'id',
 		fields: ['name', 'urlkey']
 	},
-	Member: {
-		string: 'Member',
+	member: {
+		string: 'member',
     id: 'id',
 		fields: ['name']
 	},
-	Event: {
-		string: 'Event',
+	event: {
+		string: 'event',
     id: 'id',
 		fields: ['name', 'description']
 	}

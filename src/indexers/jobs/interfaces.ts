@@ -1,30 +1,30 @@
 import {IndexConfig} from '../interfaces';
 
 export enum jobsModels {
-	Person 	= 'Person',
-	Company = 'Company',
-	Country = 'Country',
-	Skill 	= 'Skill'
+	person 	= 'person',
+	company = 'company',
+	country = 'country',
+	skill 	= 'skill'
 }
 
 const jobsIdxConfig: IndexConfig = {
-	Company: {
-		string: 'Company',
+	company: {
+		string: 'company',
 		id: 'id',
 		fields: ['name', 'desc']
 	},
-	Country: {
-		string: 'Country',
+	country: {
+		string: 'country',
 		id: 'id',
 		fields: ['name']
 	},
-	Person: {
-		string: 'Person',
+	person: {
+		string: 'person',
 		id: 'id',
 		fields: ['name', 'age']
 	},
-	Skill: {
-		string: 'Skill',
+	skill: {
+		string: 'skill',
 		id: 'id',
 		fields: ['name']
 	}

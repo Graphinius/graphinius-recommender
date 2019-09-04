@@ -22,11 +22,11 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
     if ( BaseGraph.isTyped(n) === false ) {
       throw Error(`Node Type not supported in this scenario...!`)
     }
-    const type = (n as TypedNode).type;
+    const type = (n as TypedNode).type.toLowerCase();
+    // console.log(type);
 
     const idxObj = idxConfig[type];
     if ( !idxObj ) {
-      console.log();
       return false;
     }
     let idxEntry = {id: n.getID()};

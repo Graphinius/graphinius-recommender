@@ -6,48 +6,48 @@ import { IndexConfig, IndexEntryBody } from '../interfaces';
  * @todo find more elegant solution (24/07/2019 -> too tired...)
  */
 export enum beerModels {
-  Brewery     = 'Brewery',
-  Beer        = 'Beer',
-  Category    = 'Category',
-  City        = 'City',
-  State       = 'State',
-  Country     = 'Country',
-  Style       = 'Style'
+  brewery     = 'brewery',
+  beer        = 'beer',
+  category    = 'category',
+  city        = 'city',
+  state       = 'state',
+  country     = 'country',
+  style       = 'style'
 }
 
 const beerIdxConfig: IndexConfig = {
-	Brewery: {
-		string: 'Brewery',
+	brewery: {
+		string: 'brewery',
     id: 'id',
 		fields: ['name', 'address1', 'phone', 'code', 'city', 'state', 'country']
 	},
-	Beer: {
-    string: 'Beer',
+	beer: {
+    string: 'beer',
     id: 'id',
 		fields: ['name', 'abv']
 	},
-	Category: {
-		string: 'Category',
+	category: {
+		string: 'category',
     id: 'id',
 		fields: ['category']
 	},
-	City: {
-		string: 'City',
+	city: {
+		string: 'city',
     id: 'id',
 		fields: ['city', 'state', 'country']
 	},
-	State: {
-		string: 'State',
+	state: {
+		string: 'state',
     id: 'id',
 		fields: ['state']
 	},
-	Country: {
-		string: 'Country',
+	country: {
+		string: 'country',
     id: 'id',
 		fields: ['country']
 	},
-	Style: {
-		string: 'Style',
+	style: {
+		string: 'style',
     id: 'id',
 		fields: ['style']
 	}

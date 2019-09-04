@@ -10,7 +10,7 @@ const beerConfig: AppConfig = {
   searchTerm: `brauhaus`,
   idxConfig: beerIdxConfig,
   models: beerModels,
-  searchModel: beerModels.Brewery
+  searchModel: beerModels.brewery
 };
 
 
