@@ -1,17 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {TypedNode} from 'graphinius/lib/core/typed/TypedNode';
+import {DIR} from 'graphinius/lib/core/interfaces';
+import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
 import {jobsConfig} from '../../src/indexers/jobs/appConfig';
 import {BaseGraph} from 'graphinius/lib/core/base/BaseGraph';
-import getOwnPropertyDescriptor = Reflect.getOwnPropertyDescriptor;
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
-
 
 enum NODE_TYPES {
 	Person = "PERSON",
@@ -230,45 +229,110 @@ describe('jobs dataset tests - ', () => {
 	});
 
 
-	describe.skip('queries extending over at least 2 relations', () => {
+	/**
+	 * @todo differentiate between `expand-k` and `periphery-at-k`
+	 * @todo in case we are using a manual 2-step approach, the
+	 *       result set will sometimes contain the origin node
+	 *       -> just delete the origin manually
+	 *       -> encapsulate this bahavior within the recommender
+	 */
+	describe.only('queries extending over at least 2 relations', () => {
+		let
+			judyRes,
+			judy;
+
+		const
+			judy_knows = 16,
+			knowing_judy = 15,
+			judy_sphere_out_2 = 151,
+			judy_sphere_in_2 = 158,
+			judy_sphere_inOut_2 = 139,
+			judy_sphere_outIn_2 = 152;
+
+
+		beforeEach(() => {
+			judyRes = idx[jobsModels.person].search('Judy Brekke');
+			judy = g.n(judyRes[0].id);
+			expect(judyRes.length).toBe(1);
+		});
+
 
 		/**
-		 * simple OUTward expander, k=2
+		 * Judy -> intermediaries -> peeps
+		 *
+		 MATCH (p:Person{name: 'Judy Brekke'})-[:KNOWS]->(inter:Person)-[:KNOWS]->(op:Person)
+		 WITH distinct(op) as peeps2
+		 RETURN count(peeps2), collect(peeps2.name)
 		 */
 		it('people known by people known by Judy Brekke', () => {
-			const judyRes = idx[jobsModels.person].search('Judy Brekke');
-			expect(judyRes.length).toBe(1);
-			const judy = g.n(judyRes[0].id);
-			// const people =
+			const peeps = g.expandK(judy, DIR.out, 'KNOWS', 2);
+			expect(peeps.size).toBe(judy_sphere_out_2);
+
+			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();
+			// console.log('People known by people known by Judy number: ', people_arr.length);
+			// console.log(people_arr);
 		});
 
 
 		/**
-		 * simple INward expander, k=2
+		 * Judy <- intermediaries <- peeps
 		 */
 		it('people knowing people knowing Judy Brekke', () => {
-			const judyRes = idx[jobsModels.person].search('Judy Brekke');
-			expect(judyRes.length).toBe(1);
-			const judy = g.n(judyRes[0].id);
-			// const people =
+			const peeps = g.expandK(judy, DIR.in, 'KNOWS', 2);
+			expect(peeps.size).toBe(judy_sphere_in_2);
+
+			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();
+			// console.log('People knowing people knowing Judy number: ', people_arr.length);
+			// console.log(people_arr);
 		});
 
 
-		it('people known by people who know Judy Brekke', () => {
-			const judyRes = idx[jobsModels.person].search('Judy Brekke');
-			expect(judyRes.length).toBe(1);
-			const judy = g.n(judyRes[0].id);
-			console.log(judy);
+		/**
+		 * Judy <- intermediaries -> peeps
+		 */
+		it('people known by people knowing Judy Brekke', () => {
+			const intermediaries = g.ins(judy, 'KNOWS');
+			expect(intermediaries.size).toBe(knowing_judy);
+			const peeps = g.expand(intermediaries, DIR.out, 'KNOWS');
+
+			peeps.delete(judy);
+			expect(peeps.size).toBe(judy_sphere_inOut_2);
+
+			// console.log('Intermediaries: ', intermediaries.size);
+			// console.log('People intermediaries know: ', peeps.size);
 		});
 
 
+		/**
+		 * Judy -> intermediaries <- peeps
+		 */
+		it('people knowing people Judy Brekke knows', () => {
+			const intermediaries = g.outs(judy, 'KNOWS');
+			expect(intermediaries.size).toBe(judy_knows);
+			const peeps = g.expand(intermediaries, DIR.in, 'KNOWS');
+
+			peeps.delete(judy);
+			expect(peeps.size).toBe(judy_sphere_outIn_2);
+		});
+
+
+		/**
+		 MATCH (c:Company{name: 'Kohler Group'})<-[:WORKS_FOR]-(p:Person)-[:HAS_SKILL]->(s:Skill)
+		 WITH p, s, collect(p) as peeps, collect(s) as skills
+		 RETURN COUNT(skills), collect(s.name)
+		 */
 		it('combined set of skills of all the people working for Kohler Group', () => {
+			const skills_exp = ["SequenceL", "MUMPS", "J++", "csh", "TypeScript", "Babbage", "ColdC", "xHarbour", "Cython", "Ladder", "AIMMS", "Stata", "Mirah", "Scratch", "Red", "Scala", "Caml", "Datalog", "S/SL", "ALGOL W", "Cayenne", "RPL", "BPEL", "Caché ObjectScript", "Hartmann pipelines", "PL/M", "ML"];
 			const kG = g.n(idx[jobsModels.company].search('Kohler Group')[0].id);
 			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
 			expect(employees.size).toBe(6);
-			// console.log(employees.entries());
-			console.log(Array.from(employees).map(e => e.getFeature('name')));
 			// Now we need to collect the SET of all Skills that those employees have
+			// However, the graph has duplicate nodes for the same skill NAME, so we need to post-process..
+			const skills_dup = g.expand(employees, DIR.out, 'HAS_SKILL');
+			const skills = new Set<ITypedNode>();
+			Array.from(skills_dup).map(s => skills.add(s.getFeature('name')));
+			expect(skills.size).toBe(27);
+			expect(Array.from(skills).map(s => s).sort()).toEqual(skills_exp.sort());
 		});
 
 	});
@@ -280,6 +344,21 @@ describe('jobs dataset tests - ', () => {
 	 * -> $G is so much more convenient :-)))
 	 */
 	describe('real-world job/skill - based recommendations - ', () => {
+
+		it.todo('companies looking for a similar skill-set that I have');
+
+		/* collective application ?? */
+		it.todo('companies looking for a skill set similar to that of my social group');
+
+		it.todo('companies employing people similar to me (by skill set)');
+
+		it.todo('companies employing people similar to me (by the people they know)');
+
+		it.todo('companies employing people I know');
+
+		it.todo('companies employing people knowing people I know');
+
+		it.todo('companies employing people people I know know');
 
 		/**
 		 match (me:Person{name: 'Cyrus Koch'})-[:HAS_SKILL]->(ms:Skill)<-[:HAS_SKILL]-(p:Person)-[:WORKS_FOR]->(c:Company)-[:LOOKS_FOR_SKILL]->(os:Skill)

@@ -120,8 +120,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
       { from: 'Arya', to: 'Zhen', isect: 0, sim: 0 },
       { from: 'Karin', to: 'Zhen', isect: 0, sim: 0 },
       { from: 'Karin', to: 'Praveena', isect: 0, sim: 0 }
-		]
-
+		];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
 			allSets[n.label] = g.expand(n, DIR.out, 'LIKES');
