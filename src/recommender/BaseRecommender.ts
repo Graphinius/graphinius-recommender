@@ -3,8 +3,8 @@ import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {TheExpanse} from './TheExpanse';
 import * as $I from '../similarity/interfaces';
-import {simFuncs as setSims} from '../similarity/SetSimilarity';
-import {simFuncs as scoreSims} from '../similarity/ScoreSimilarity';
+import {simFuncs as setSims} from '../similarity/SetSimilarities';
+import {simFuncs as scoreSims} from '../similarity/ScoreSimilarities';
 import {knnNodeArray} from '../similarity/SimilarityCommons';
 import {TheAugments} from "./TheAugments";
 

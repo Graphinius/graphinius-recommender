@@ -8,7 +8,7 @@ import * as $I from './interfaces';
 export const simFuncs = {
 	jaccard,
 	overlap
-}
+};
 
 const PRECISION = 5;
 

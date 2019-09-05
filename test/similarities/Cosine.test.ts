@@ -1,10 +1,8 @@
-import {simFuncs} from '../../src/similarity/ScoreSimilarity';
+import {simFuncs} from '../../src/similarity/ScoreSimilarities';
 import {sim, simSource, simPairwise, simSubsets, knnNodeArray, getBsNotInA} from '../../src/similarity/SimilarityCommons';
-import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TheAugments} from '../../src/recommender/TheAugments';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
-import {DIR} from "../../src/similarity/interfaces";
 
 
 describe('COSINE base similarity tests', () => {
@@ -55,7 +53,7 @@ describe('COSINE tests on neo4j sample graph', () => {
 	const
 		gFile = './data/cuisineCosine.json',
 		g = new JSONInput({weighted: true}).readFromJSONFile(gFile, new TypedGraph('CosineCuisineSimilarities')) as TypedGraph,
-		expanse = new TheExpanse(g),
+		// expanse = new TheExpanse(g),
 		likes = 'LIKES',
 		michael = g.n('Michael'),
 		arya = g.n('Arya');

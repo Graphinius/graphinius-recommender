@@ -1,6 +1,7 @@
-import {Similarity, DIR} from '../../src/similarity/interfaces';
+import {DIR} from 'graphinius/lib/core/interfaces';
+import {Similarity} from '../../src/similarity/interfaces';
 import {sim, simSource, simPairwise, simSort,  knnNodeArray, viaSharedPrefs} from "../../src/similarity/SimilarityCommons";
-import {simFuncs} from '../../src/similarity/SetSimilarity';
+import {simFuncs} from '../../src/similarity/SetSimilarities';
 import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
@@ -63,7 +64,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 	const
 	gFile = './data/cuisine.json',
 	g = new JSONInput().readFromJSONFile(gFile, new TypedGraph('CuisineSimilarities')) as TypedGraph,
-	expanse = new TheExpanse(g),
+	// expanse = new TheExpanse(g),
 	arya = g.n('Arya'),
 	karin = g.n('Karin');
 
@@ -99,7 +100,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 		const start = karin.label;
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+			allSets[n.label] = g.expand(n, DIR.out, 'LIKES');
 		});
 		const jres = simSource(simFuncs.jaccard, start, allSets);
 		// console.log(jres);
@@ -123,7 +124,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+			allSets[n.label] = g.expand(n, DIR.out, 'LIKES');
 		});
 		const jres = simPairwise(simFuncs.jaccard, allSets);
 
@@ -142,7 +143,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
     ];
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+			allSets[n.label] = g.expand(n, DIR.out, 'LIKES');
 		});
 		const topK = knnNodeArray(simFuncs.jaccard, allSets, {knn: 1, dup: true});
 		// console.log(topK);
@@ -231,7 +232,7 @@ describe('JACCARD tests on neo4j sample graph', () => {
 	it('should find the most similar Person to Karin & Arya', () => {
 		const allSets = {};
 		g.getNodesT('Person').forEach(n => {
-			allSets[n.label] = expanse.expand(n, 'out', 'LIKES');
+			allSets[n.label] = g.expand(n, DIR.out, 'LIKES');
 		});
 		console.log(simSource(simFuncs.jaccard, 'Karin', allSets, {knn: 1})[0]);
 		console.log(simSource(simFuncs.jaccard, 'Arya', allSets, {knn: 1})[0]);

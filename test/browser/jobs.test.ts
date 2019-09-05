@@ -86,7 +86,7 @@ describe('jobs dataset tests - ', () => {
 	/**
 	 * @describe all fixed values (IDs, names, etc) coming from neo4j...
 	 */
-	describe('typed edges tests - ', () => {
+	describe('typed edges & histogram tests - ', () => {
 
 		it('gets the correct amount of IN & OUT links for Skill `Typescript`', () => {
 			const
@@ -107,7 +107,7 @@ describe('jobs dataset tests - ', () => {
 		 * return collect(p.name), count(p)
 		 */
 		it('should find the 6 people are working for the Kohler Group', () => {
-			const emp_names = ["Joannie Bartoletti", "Judy Brekke",	"Alfreda Kovacek", "Torey Steuber",	"Lyla Hodkiewicz", "Evie Cummerata"];
+			const emp_names = ["Joannie Bartoletti", "Judy Brekke", "Alfreda Kovacek", "Torey Steuber", "Lyla Hodkiewicz", "Evie Cummerata"];
 
 			const kG = g.n(idx[jobsModels.company].search('Kohler Group')[0].id);
 			const employees = g.ins(kG, EDGE_TYPES.WorksFor);
@@ -230,11 +230,35 @@ describe('jobs dataset tests - ', () => {
 	});
 
 
-	describe('queries extending over at least 2 relations', () => {
+	describe.skip('queries extending over at least 2 relations', () => {
 
-		it.skip('people known by people who Judy Brekke knows ;-)', () => {
-			let judy = idx[jobsModels.person].search('Judy Brekke');
+		/**
+		 * simple OUTward expander, k=2
+		 */
+		it('people known by people known by Judy Brekke', () => {
+			const judyRes = idx[jobsModels.person].search('Judy Brekke');
+			expect(judyRes.length).toBe(1);
+			const judy = g.n(judyRes[0].id);
+			// const people =
+		});
 
+
+		/**
+		 * simple INward expander, k=2
+		 */
+		it('people knowing people knowing Judy Brekke', () => {
+			const judyRes = idx[jobsModels.person].search('Judy Brekke');
+			expect(judyRes.length).toBe(1);
+			const judy = g.n(judyRes[0].id);
+			// const people =
+		});
+
+
+		it('people known by people who know Judy Brekke', () => {
+			const judyRes = idx[jobsModels.person].search('Judy Brekke');
+			expect(judyRes.length).toBe(1);
+			const judy = g.n(judyRes[0].id);
+			console.log(judy);
 		});
 
 
@@ -246,6 +270,29 @@ describe('jobs dataset tests - ', () => {
 			console.log(Array.from(employees).map(e => e.getFeature('name')));
 			// Now we need to collect the SET of all Skills that those employees have
 		});
+
+	});
+
+
+	/**
+	 * Partly queried from Neo4j in cypher, although cyphter becomes cumbersome
+	 * VERY QUICKLY when writing more than the most trivial queries
+	 * -> $G is so much more convenient :-)))
+	 */
+	describe('real-world job/skill - based recommendations - ', () => {
+
+		/**
+		 match (me:Person{name: 'Cyrus Koch'})-[:HAS_SKILL]->(ms:Skill)<-[:HAS_SKILL]-(p:Person)-[:WORKS_FOR]->(c:Company)-[:LOOKS_FOR_SKILL]->(os:Skill)
+		 where ms.name = 'TypeScript'
+		 and ms<>os
+		 return
+		 collect(DISTINCT p.name),
+		 collect(DISTINCT c.name),
+		 collect(DISTINCT os.name),
+		 count(DISTINCT os.name)
+		 limit 10
+		 */
+		it.todo('skills that companies employing similar people than me are looking for');
 
 	});
 

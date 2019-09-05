@@ -3,7 +3,7 @@ import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {TheExpanse} from './TheExpanse';
 import * as $I from '../similarity/interfaces';
-import {simFuncs} from '../similarity/SetSimilarity';
+import {simFuncs} from '../similarity/SetSimilarities';
 import {knnNodeArray} from '../similarity/SimilarityCommons';
 
 interface SubSetConfig extends $I.SortCutFuncs {

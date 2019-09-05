@@ -1,3 +1,4 @@
+import {DIR} from 'graphinius/lib/core/interfaces';
 
 /*----------------------------------*/
 /*		INTERFACES, TYPES & ENUMS			*/
@@ -33,12 +34,6 @@ export interface SimilarityConfig extends SortCutFuncs {
 	cutoff?: number;
 	knn?: number;
 	dup?: boolean;
-}
-
-export enum DIR {
-	in = 'ins',
-	out = 'outs',
-	conn = 'conns'
 }
 
 /**

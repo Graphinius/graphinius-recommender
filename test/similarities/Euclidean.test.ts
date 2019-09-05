@@ -1,4 +1,4 @@
-import {simFuncs} from '../../src/similarity/ScoreSimilarity';
+import {simFuncs} from '../../src/similarity/ScoreSimilarities';
 import {
 	sim,
 	simSource,
@@ -12,7 +12,6 @@ import {TheExpanse} from '../../src/recommender/TheExpanse';
 import {TheAugments} from '../../src/recommender/TheAugments';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONInput} from 'graphinius/lib/io/input/JSONInput';
-import {DIR} from "../../src/similarity/interfaces";
 
 
 describe('EUCLIDEAN base similarity tests', () => {

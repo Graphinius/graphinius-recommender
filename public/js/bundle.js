@@ -72,6 +72,27 @@
     	return module = { exports: {} }, fn(module, module.exports), module.exports;
     }
 
+    var interfaces = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var DIR;
+    (function (DIR) {
+        DIR["in"] = "ins";
+        DIR["out"] = "outs";
+        DIR["und"] = "unds";
+    })(DIR = exports.DIR || (exports.DIR = {}));
+    var GraphMode;
+    (function (GraphMode) {
+        GraphMode[GraphMode["INIT"] = 0] = "INIT";
+        GraphMode[GraphMode["DIRECTED"] = 1] = "DIRECTED";
+        GraphMode[GraphMode["UNDIRECTED"] = 2] = "UNDIRECTED";
+        GraphMode[GraphMode["MIXED"] = 3] = "MIXED";
+    })(GraphMode = exports.GraphMode || (exports.GraphMode = {}));
+    });
+
+    unwrapExports(interfaces);
+    var interfaces_1 = interfaces.DIR;
+    var interfaces_2 = interfaces.GraphMode;
+
     var StructUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -575,10 +596,10 @@
         config = config || prepareBFSStandardConfig();
         var callbacks = config.callbacks;
         var dir_mode = config.dir_mode;
-        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
+        if (graph.getMode() === interfaces.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
+        if (dir_mode === interfaces.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var bfsScope = {
@@ -597,13 +618,13 @@
         var i = 0;
         while (i < bfsScope.queue.length) {
             bfsScope.current = bfsScope.queue[i++];
-            if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
+            if (dir_mode === interfaces.GraphMode.MIXED) {
                 bfsScope.adj_nodes = bfsScope.current.reachNodes();
             }
-            else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
+            else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.connNodes();
             }
-            else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
+            else if (dir_mode === interfaces.GraphMode.DIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.nextNodes();
             }
             else {
@@ -639,7 +660,7 @@
                 node_marked: [],
                 sort_nodes: undefined
             },
-            dir_mode: BaseGraph_1.GraphMode.MIXED,
+            dir_mode: interfaces.GraphMode.MIXED,
             messages: {},
             filters: {}
         }, result = config.result, callbacks = config.callbacks;
@@ -694,10 +715,10 @@
         };
         config = config || prepareDFSVisitStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
+        if (graph.getMode() === interfaces.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
+        if (dir_mode === interfaces.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         if (callbacks.init_dfs_visit) {
@@ -719,13 +740,13 @@
                 if (callbacks.node_unmarked) {
                     CallbackUtils.execCallbacks(callbacks.node_unmarked, dfsVisitScope);
                 }
-                if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
+                if (dir_mode === interfaces.GraphMode.MIXED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.reachNodes();
                 }
-                else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
+                else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.connNodes();
                 }
-                else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
+                else if (dir_mode === interfaces.GraphMode.DIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.nextNodes();
                 }
                 if (typeof callbacks.sort_nodes === 'function') {
@@ -754,10 +775,10 @@
     function DFS(graph, root, config) {
         config = config || prepareDFSStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
+        if (graph.getMode() === interfaces.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
+        if (dir_mode === interfaces.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var dfsScope = {
@@ -804,7 +825,7 @@
             callbacks: {},
             messages: {},
             dfs_visit_marked: {},
-            dir_mode: BaseGraph_1.GraphMode.MIXED
+            dir_mode: interfaces.GraphMode.MIXED
         }, result = config.visit_result, callbacks = config.callbacks;
         var count = 0;
         var counter = function () {
@@ -1023,10 +1044,10 @@
     function PFS(graph, v, config) {
         config = config || preparePFSStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
-        if (graph.getMode() === BaseGraph_1.GraphMode.INIT) {
+        if (graph.getMode() === interfaces.GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === BaseGraph_1.GraphMode.INIT) {
+        if (dir_mode === interfaces.GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var start_ne = {
@@ -1060,13 +1081,13 @@
                 config.callbacks.goal_reached && CallbackUtils.execCallbacks(config.callbacks.goal_reached, scope);
                 return config.result;
             }
-            if (dir_mode === BaseGraph_1.GraphMode.MIXED) {
+            if (dir_mode === interfaces.GraphMode.MIXED) {
                 scope.adj_nodes = scope.current.node.reachNodes();
             }
-            else if (dir_mode === BaseGraph_1.GraphMode.UNDIRECTED) {
+            else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
                 scope.adj_nodes = scope.current.node.connNodes();
             }
-            else if (dir_mode === BaseGraph_1.GraphMode.DIRECTED) {
+            else if (dir_mode === interfaces.GraphMode.DIRECTED) {
                 scope.adj_nodes = scope.current.node.nextNodes();
             }
             else {
@@ -1125,7 +1146,7 @@
                 equal_path_msgs: [],
                 goal_reached_msgs: []
             },
-            dir_mode: BaseGraph_1.GraphMode.MIXED,
+            dir_mode: interfaces.GraphMode.MIXED,
             goal_node: null,
             evalPriority: function (ne) {
                 return ne.best || exports.DEFAULT_WEIGHT;
@@ -1426,27 +1447,15 @@
 
 
 
+
     var DEFAULT_WEIGHT = 1;
-    var DIR;
-    (function (DIR) {
-        DIR["in"] = "ins";
-        DIR["out"] = "outs";
-        DIR["conn"] = "conns";
-    })(DIR = exports.DIR || (exports.DIR = {}));
-    var GraphMode;
-    (function (GraphMode) {
-        GraphMode[GraphMode["INIT"] = 0] = "INIT";
-        GraphMode[GraphMode["DIRECTED"] = 1] = "DIRECTED";
-        GraphMode[GraphMode["UNDIRECTED"] = 2] = "UNDIRECTED";
-        GraphMode[GraphMode["MIXED"] = 3] = "MIXED";
-    })(GraphMode = exports.GraphMode || (exports.GraphMode = {}));
     var BaseGraph = (function () {
         function BaseGraph(_label) {
             this._label = _label;
             this._nr_nodes = 0;
             this._nr_dir_edges = 0;
             this._nr_und_edges = 0;
-            this._mode = GraphMode.INIT;
+            this._mode = interfaces.GraphMode.INIT;
             this._nodes = {};
             this._dir_edges = {};
             this._und_edges = {};
@@ -1477,21 +1486,21 @@
         });
         Object.defineProperty(BaseGraph.prototype, "inHist", {
             get: function () {
-                return this.degreeHist(DIR.in);
+                return this.degreeHist(interfaces.DIR.in);
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "outHist", {
             get: function () {
-                return this.degreeHist(DIR.out);
+                return this.degreeHist(interfaces.DIR.out);
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "connHist", {
             get: function () {
-                return this.degreeHist(DIR.conn);
+                return this.degreeHist(interfaces.DIR.und);
             },
             enumerable: true,
             configurable: true
@@ -1502,10 +1511,10 @@
                 var node = this._nodes[nid];
                 var deg = void 0;
                 switch (dir) {
-                    case DIR.in:
+                    case interfaces.DIR.in:
                         deg = node.inDegree();
                         break;
-                    case DIR.out:
+                    case interfaces.DIR.out:
                         deg = node.outDegree();
                         break;
                     default:
@@ -1966,16 +1975,16 @@
         BaseGraph.prototype.updateGraphMode = function () {
             var nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
             if (nr_dir && nr_und) {
-                this._mode = GraphMode.MIXED;
+                this._mode = interfaces.GraphMode.MIXED;
             }
             else if (nr_dir) {
-                this._mode = GraphMode.DIRECTED;
+                this._mode = interfaces.GraphMode.DIRECTED;
             }
             else if (nr_und) {
-                this._mode = GraphMode.UNDIRECTED;
+                this._mode = interfaces.GraphMode.UNDIRECTED;
             }
             else {
-                this._mode = GraphMode.INIT;
+                this._mode = interfaces.GraphMode.INIT;
             }
         };
         BaseGraph.prototype.pickRandomProperty = function (propList) {
@@ -2009,9 +2018,605 @@
     });
 
     unwrapExports(BaseGraph_1);
-    var BaseGraph_2 = BaseGraph_1.DIR;
-    var BaseGraph_3 = BaseGraph_1.GraphMode;
-    var BaseGraph_4 = BaseGraph_1.BaseGraph;
+    var BaseGraph_2 = BaseGraph_1.BaseGraph;
+
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var CMD_ENV_LOG = 'G_LOG';
+    var GENERIC_TYPES = {
+        Node: 'GENERIC',
+        Edge: 'GENERIC',
+        Graph: 'GENERIC'
+    };
+    exports.GENERIC_TYPES = GENERIC_TYPES;
+    var LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    function runLevel() {
+        var log_level = LOG_LEVELS.production;
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
+            log_level = process.env[CMD_ENV_LOG];
+        }
+        return log_level;
+    }
+    exports.runLevel = runLevel;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.GENERIC_TYPES;
+    var run_config_2 = run_config.LOG_LEVELS;
+    var run_config_3 = run_config.runLevel;
+
+    var TypedEdge_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    var TypedEdge = (function (_super) {
+        __extends(TypedEdge, _super);
+        function TypedEdge(_id, _node_a, _node_b, config) {
+            if (config === void 0) { config = {}; }
+            var _this = _super.call(this, _id, _node_a, _node_b, config) || this;
+            _this._id = _id;
+            _this._node_a = _node_a;
+            _this._node_b = _node_b;
+            _this._type = config.type || run_config.GENERIC_TYPES.Edge;
+            return _this;
+        }
+        Object.defineProperty(TypedEdge.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return TypedEdge;
+    }(BaseEdge_1.BaseEdge));
+    exports.TypedEdge = TypedEdge;
+    });
+
+    unwrapExports(TypedEdge_1);
+    var TypedEdge_2 = TypedEdge_1.TypedEdge;
+
+    var TypedNode_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    var TypedNode = (function (_super) {
+        __extends(TypedNode, _super);
+        function TypedNode(_id, config) {
+            var _a;
+            if (config === void 0) { config = {}; }
+            var _this = _super.call(this, _id, config) || this;
+            _this._id = _id;
+            _this._type = config.type || run_config.GENERIC_TYPES.Node;
+            _this._typedAdjSets = (_a = {},
+                _a[run_config.GENERIC_TYPES.Edge] = {
+                    ins: new Set(),
+                    outs: new Set(),
+                    conns: new Set()
+                },
+                _a);
+            return _this;
+        }
+        Object.defineProperty(TypedNode.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TypedNode.prototype, "stats", {
+            get: function () {
+                var e_1, _a;
+                var result = {
+                    typed_edges: {}
+                };
+                try {
+                    for (var _b = __values(Object.keys(this._typedAdjSets)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var type = _c.value;
+                        result.typed_edges[type] = { ins: 0, outs: 0, conns: 0 };
+                        result.typed_edges[type].ins = this._typedAdjSets[type].ins ? this._typedAdjSets[type].ins.size : 0;
+                        result.typed_edges[type].outs = this._typedAdjSets[type].outs ? this._typedAdjSets[type].outs.size : 0;
+                        result.typed_edges[type].conns = this._typedAdjSets[type].conns ? this._typedAdjSets[type].conns.size : 0;
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                return result;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TypedNode.prototype.addEdge = function (edge) {
+            if (!_super.prototype.addEdge.call(this, edge)) {
+                return null;
+            }
+            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var dir = edge.isDirected();
+            var uid = this.uniqueNID(edge);
+            if (!this._typedAdjSets[type]) {
+                this._typedAdjSets[type] = {};
+            }
+            if (!dir) {
+                if (!this._typedAdjSets[type].conns) {
+                    this._typedAdjSets[type].conns = new Set();
+                }
+                this._typedAdjSets[type].conns.add(uid);
+            }
+            else if (edge.getNodes().a === this) {
+                if (!this._typedAdjSets[type].outs) {
+                    this._typedAdjSets[type].outs = new Set();
+                }
+                this._typedAdjSets[type].outs.add(uid);
+            }
+            else {
+                if (!this._typedAdjSets[type].ins) {
+                    this._typedAdjSets[type].ins = new Set();
+                }
+                this._typedAdjSets[type].ins.add(uid);
+            }
+            return edge;
+        };
+        TypedNode.prototype.removeEdge = function (edge) {
+            _super.prototype.removeEdge.call(this, edge);
+            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var dir = edge.isDirected();
+            var uid = this.uniqueNID(edge);
+            if (!dir) {
+                this._typedAdjSets[type].conns.delete(uid);
+            }
+            else if (edge.getNodes().a === this) {
+                this._typedAdjSets[type].outs.delete(uid);
+            }
+            else {
+                this._typedAdjSets[type].ins.delete(uid);
+            }
+            if (type !== run_config.GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
+                delete this._typedAdjSets[type];
+            }
+        };
+        TypedNode.prototype.ins = function (type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
+        };
+        TypedNode.prototype.outs = function (type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].outs : undefined;
+        };
+        TypedNode.prototype.unds = function (type) {
+            return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
+        };
+        TypedNode.prototype.all = function (type) {
+            var result = new Set();
+            if (this._typedAdjSets[type]) {
+                this._typedAdjSets[type].ins && result.add(__spread(this._typedAdjSets[type].ins));
+                this._typedAdjSets[type].outs && result.add(__spread(this._typedAdjSets[type].outs));
+                this._typedAdjSets[type].conns && result.add(__spread(this._typedAdjSets[type].conns));
+            }
+            return result;
+        };
+        TypedNode.prototype.uniqueNID = function (e) {
+            var _a = e.getNodes(), a = _a.a, b = _a.b;
+            var node = a === this ? b : a;
+            var string = node.id + "#" + e.id + "#";
+            string += e.isWeighted() ? 'w#' + e.getWeight() : 'u';
+            return string;
+        };
+        TypedNode.nIDFromUID = function (uid) {
+            return uid.split('#')[0];
+        };
+        TypedNode.prototype.noEdgesOfTypeLeft = function (type) {
+            return (!this._typedAdjSets[type].ins || !this._typedAdjSets[type].ins.size)
+                && (!this._typedAdjSets[type].outs || !this._typedAdjSets[type].outs.size)
+                && (!this._typedAdjSets[type].conns || !this._typedAdjSets[type].conns.size);
+        };
+        return TypedNode;
+    }(BaseNode_1.BaseNode));
+    exports.TypedNode = TypedNode;
+    });
+
+    unwrapExports(TypedNode_1);
+    var TypedNode_2 = TypedNode_1.TypedNode;
+
+    var TypedGraph_1 = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                    t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+
+
+
+    var TypedGraph = (function (_super) {
+        __extends(TypedGraph, _super);
+        function TypedGraph(_label) {
+            var _this = _super.call(this, _label) || this;
+            _this._label = _label;
+            _this._typedNodes = new Map();
+            _this._typedEdges = new Map();
+            _this._type = run_config.GENERIC_TYPES.Graph;
+            _this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
+            _this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
+            return _this;
+        }
+        TypedGraph.prototype.n = function (id) {
+            return this.getNodeById(id);
+        };
+        Object.defineProperty(TypedGraph.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TypedGraph.prototype.nodeTypes = function () {
+            return Array.from(this._typedNodes.keys());
+        };
+        TypedGraph.prototype.edgeTypes = function () {
+            return Array.from(this._typedEdges.keys());
+        };
+        TypedGraph.prototype.nrTypedNodes = function (type) {
+            type = type.toUpperCase();
+            return this._typedNodes.get(type) ? this._typedNodes.get(type).size : null;
+        };
+        TypedGraph.prototype.nrTypedEdges = function (type) {
+            type = type.toUpperCase();
+            return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
+        };
+        TypedGraph.prototype.ins = function (node, type) {
+            var _this = this;
+            return new Set(__spread(node.ins(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+        };
+        TypedGraph.prototype.outs = function (node, type) {
+            var _this = this;
+            return new Set(__spread(node.outs(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+        };
+        TypedGraph.prototype.unds = function (node, type) {
+            var _this = this;
+            return new Set(__spread(node.unds(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+        };
+        TypedGraph.prototype.expand = function (input, dir, type) {
+            var e_1, _a, e_2, _b;
+            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
+            var resultSet = new Set();
+            var nr_visits = 0, nodeRef;
+            var tic = process.hrtime()[1];
+            try {
+                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
+                    var node = nodes_1_1.value;
+                    if (resultSet.size >= this._nr_nodes) {
+                        return resultSet;
+                    }
+                    var targets = node[dir](type);
+                    if (!targets) {
+                        return new Set();
+                    }
+                    try {
+                        for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
+                            var target = targets_1_1.value;
+                            nr_visits++;
+                            nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
+                            if (!nodes.has(nodeRef)) {
+                                resultSet.add(nodeRef);
+                            }
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (targets_1_1 && !targets_1_1.done && (_b = targets_1.return)) _b.call(targets_1);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            var toc = process.hrtime()[1];
+            return resultSet;
+        };
+        TypedGraph.prototype.expandK = function (input, dir, type, k) {
+            var e_3, _a;
+            if (k < 0) {
+                throw new Error('cowardly refusing to expand a negative number of steps.');
+            }
+            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
+            var resultSet = new Set();
+            var periphery = nodes;
+            k = k || this._nr_nodes;
+            while (k-- || resultSet.size >= this._nr_nodes) {
+                var otic = process.hrtime()[1];
+                periphery = this.expand(periphery, dir, type);
+                var old_size = resultSet.size;
+                var tic = process.hrtime()[1];
+                try {
+                    for (var periphery_1 = __values(periphery), periphery_1_1 = periphery_1.next(); !periphery_1_1.done; periphery_1_1 = periphery_1.next()) {
+                        var target = periphery_1_1.value;
+                        resultSet.add(target);
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (periphery_1_1 && !periphery_1_1.done && (_a = periphery_1.return)) _a.call(periphery_1);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                var toc = process.hrtime()[1];
+                if (old_size === resultSet.size) {
+                    break;
+                }
+                var otoc = process.hrtime()[1];
+            }
+            return resultSet;
+        };
+        TypedGraph.prototype.inHistT = function (nType, eType) {
+            return this.degreeHistT(interfaces.DIR.in, nType, eType);
+        };
+        TypedGraph.prototype.outHistT = function (nType, eType) {
+            return this.degreeHistT(interfaces.DIR.out, nType, eType);
+        };
+        TypedGraph.prototype.connHistT = function (nType, eType) {
+            return this.degreeHistT(interfaces.DIR.und, nType, eType);
+        };
+        TypedGraph.prototype.degreeHistT = function (dir, nType, eType) {
+            var e_4, _a;
+            var result = [];
+            try {
+                for (var _b = __values(this._typedNodes.get(nType)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var _d = __read(_c.value, 2), node_id = _d[0], node = _d[1];
+                    var deg = void 0;
+                    switch (dir) {
+                        case interfaces.DIR.in:
+                            deg = node.ins(eType) ? node.ins(eType).size : 0;
+                            break;
+                        case interfaces.DIR.out:
+                            deg = node.outs(eType) ? node.outs(eType).size : 0;
+                            break;
+                        default:
+                            deg = node.unds(eType) ? node.unds(eType).size : 0;
+                    }
+                    if (!result[deg]) {
+                        result[deg] = new Set([node]);
+                    }
+                    else {
+                        result[deg].add(node);
+                    }
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_4) throw e_4.error; }
+            }
+            return result;
+        };
+        TypedGraph.prototype.addNodeByID = function (id, opts) {
+            if (this.hasNodeID(id)) {
+                throw new Error("Won't add node with duplicate ID.");
+            }
+            var node = new TypedNode_1.TypedNode(id, opts);
+            return this.addNode(node) ? node : null;
+        };
+        TypedGraph.prototype.addNode = function (node) {
+            if (!_super.prototype.addNode.call(this, node)) {
+                return null;
+            }
+            var id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
+            if (!type) {
+                this._typedNodes.get(run_config.GENERIC_TYPES.Node).set(id, node);
+            }
+            else {
+                if (!this._typedNodes.get(type)) {
+                    this._typedNodes.set(type, new Map());
+                }
+                this._typedNodes.get(type).set(id, node);
+            }
+            return node;
+        };
+        TypedGraph.prototype.getNodeById = function (id) {
+            return _super.prototype.getNodeById.call(this, id);
+        };
+        TypedGraph.prototype.getNodesT = function (type) {
+            return this._typedNodes.get(type.toUpperCase());
+        };
+        TypedGraph.prototype.getEdgesT = function (type) {
+            return this._typedEdges.get(type.toUpperCase());
+        };
+        TypedGraph.prototype.deleteNode = function (node) {
+            var id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
+            if (!this._typedNodes.get(type)) {
+                throw Error('Node type does not exist on this TypedGraph.');
+            }
+            var removeNode = this._typedNodes.get(type).get(id);
+            if (!removeNode) {
+                throw Error('This particular node is nowhere to be found in its typed set.');
+            }
+            this._typedNodes.get(type).delete(id);
+            if (this.nrTypedNodes(type) === 0) {
+                this._typedNodes.delete(type);
+            }
+            _super.prototype.deleteNode.call(this, node);
+        };
+        TypedGraph.prototype.addEdgeByID = function (id, a, b, opts) {
+            var edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
+            return this.addEdge(edge);
+        };
+        TypedGraph.prototype.addEdge = function (edge) {
+            if (!_super.prototype.addEdge.call(this, edge)) {
+                return null;
+            }
+            var id = edge.getID();
+            var type = run_config.GENERIC_TYPES.Edge;
+            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+                type = edge.type.toUpperCase();
+            }
+            if (id === type) {
+                this._typedEdges.get(run_config.GENERIC_TYPES.Edge).set(id, edge);
+            }
+            else {
+                if (!this._typedEdges.get(type)) {
+                    this._typedEdges.set(type, new Map());
+                }
+                this._typedEdges.get(type).set(id, edge);
+            }
+            return edge;
+        };
+        TypedGraph.prototype.deleteEdge = function (edge) {
+            var id = edge.getID();
+            var type = run_config.GENERIC_TYPES.Edge;
+            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+                type = edge.type.toUpperCase();
+            }
+            if (!this._typedEdges.get(type)) {
+                throw Error('Edge type does not exist on this TypedGraph.');
+            }
+            var removeEdge = this._typedEdges.get(type).get(id);
+            if (!removeEdge) {
+                throw Error('This particular edge is nowhere to be found in its typed set.');
+            }
+            this._typedEdges.get(type).delete(id);
+            if (this.nrTypedEdges(type) === 0) {
+                this._typedEdges.delete(type);
+            }
+            _super.prototype.deleteEdge.call(this, edge);
+        };
+        TypedGraph.prototype.getStats = function () {
+            var typed_nodes = {}, typed_edges = {};
+            this._typedNodes.forEach(function (k, v) { return typed_nodes[v] = k.size; });
+            this._typedEdges.forEach(function (k, v) { return typed_edges[v] = k.size; });
+            return __assign({}, _super.prototype.getStats.call(this), { typed_nodes: typed_nodes,
+                typed_edges: typed_edges });
+        };
+        return TypedGraph;
+    }(BaseGraph_1.BaseGraph));
+    exports.TypedGraph = TypedGraph;
+    });
+
+    unwrapExports(TypedGraph_1);
+    var TypedGraph_2 = TypedGraph_1.TypedGraph;
 
     var FloydWarshall = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2930,35 +3535,6 @@
     unwrapExports(Pagerank_1);
     var Pagerank_2 = Pagerank_1.Pagerank;
 
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var CMD_ENV_LOG = 'G_LOG';
-    var GENERIC_TYPES = {
-        Node: 'GENERIC',
-        Edge: 'GENERIC',
-        Graph: 'GENERIC'
-    };
-    exports.GENERIC_TYPES = GENERIC_TYPES;
-    var LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    function runLevel() {
-        var log_level = LOG_LEVELS.production;
-        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
-            log_level = process.env[CMD_ENV_LOG];
-        }
-        return log_level;
-    }
-    exports.runLevel = runLevel;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.GENERIC_TYPES;
-    var run_config_2 = run_config.LOG_LEVELS;
-    var run_config_3 = run_config.runLevel;
-
     var Logger_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -3309,7 +3885,7 @@
     unwrapExports(CSVOutput_1);
     var CSVOutput_2 = CSVOutput_1.CSVOutput;
 
-    var interfaces = createCommonjsModule(function (module, exports) {
+    var interfaces$1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.labelKeys = {
         coords: 'c',
@@ -3325,8 +3901,8 @@
     };
     });
 
-    unwrapExports(interfaces);
-    var interfaces_1 = interfaces.labelKeys;
+    unwrapExports(interfaces$1);
+    var interfaces_1$1 = interfaces$1.labelKeys;
 
     var Dupes = createCommonjsModule(function (module, exports) {
     var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
@@ -3635,21 +4211,20 @@
             graph = graph || new BaseGraph_1.BaseGraph(json.name);
             var edc = new Dupes.EdgeDupeChecker(graph);
             var rlt = json.typeRLT;
-            logger.log(rlt);
             this.addNodesToGraph(json, graph);
             for (var node_id in json.data) {
                 var node = graph.getNodeById(node_id);
-                var edges = json.data[node_id][interfaces.labelKeys.edges];
+                var edges = json.data[node_id][interfaces$1.labelKeys.edges];
                 for (var e in edges) {
                     var edge_input = edges[e];
                     var target_node = this.getTargetNode(graph, edge_input);
-                    var edge_label = edge_input[interfaces.labelKeys.e_label];
-                    var edge_type = rlt && rlt.edges[edge_input[interfaces.labelKeys.e_type]] || null;
-                    var directed = this._config.explicit_direction ? !!edge_input[interfaces.labelKeys.e_dir] : this._config.directed;
+                    var edge_label = edge_input[interfaces$1.labelKeys.e_label];
+                    var edge_type = rlt && rlt.edges[edge_input[interfaces$1.labelKeys.e_type]] || null;
+                    var directed = this._config.explicit_direction ? !!edge_input[interfaces$1.labelKeys.e_dir] : this._config.directed;
                     var weight_float = JSONInput.handleEdgeWeights(edge_input);
                     var weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
                     var edge_weight = this._config.weighted ? weight_info : undefined;
-                    var target_node_id = edge_input[interfaces.labelKeys.e_to];
+                    var target_node_id = edge_input[interfaces$1.labelKeys.e_to];
                     var dir_char = directed ? 'd' : 'u';
                     var edge_id = node_id + "_" + target_node_id + "_" + dir_char;
                     var newEdge = {
@@ -3682,25 +4257,25 @@
             var rlt = json.typeRLT;
             var coords_json, coords, coord_idx, features;
             for (var node_id in json.data) {
-                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? rlt && rlt.nodes[json.data[node_id][interfaces.labelKeys.n_type]] : null;
-                var label = json.data[node_id][interfaces.labelKeys.n_label];
+                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? rlt && rlt.nodes[json.data[node_id][interfaces$1.labelKeys.n_type]] : null;
+                var label = json.data[node_id][interfaces$1.labelKeys.n_label];
                 var node = graph.addNodeByID(node_id, { label: label, type: type });
-                features = json.data[node_id][interfaces.labelKeys.n_features];
+                features = json.data[node_id][interfaces$1.labelKeys.n_features];
                 if (features) {
                     node.setFeatures(features);
                 }
-                coords_json = json.data[node_id][interfaces.labelKeys.coords];
+                coords_json = json.data[node_id][interfaces$1.labelKeys.coords];
                 if (coords_json) {
                     coords = {};
                     for (coord_idx in coords_json) {
                         coords[coord_idx] = +coords_json[coord_idx];
                     }
-                    node.setFeature(interfaces.labelKeys.coords, coords);
+                    node.setFeature(interfaces$1.labelKeys.coords, coords);
                 }
             }
         };
         JSONInput.prototype.getTargetNode = function (graph, edge_input) {
-            var target_node_id = edge_input[interfaces.labelKeys.e_to];
+            var target_node_id = edge_input[interfaces$1.labelKeys.e_to];
             var target_node = graph.getNodeById(target_node_id);
             if (!target_node) {
                 throw new Error('Node referenced by edge does not exist');
@@ -3708,7 +4283,7 @@
             return target_node;
         };
         JSONInput.handleEdgeWeights = function (edge_input) {
-            switch (edge_input[interfaces.labelKeys.e_weight]) {
+            switch (edge_input[interfaces$1.labelKeys.e_weight]) {
                 case "undefined":
                     return DEFAULT_WEIGHT;
                 case "Infinity":
@@ -3720,7 +4295,7 @@
                 case "MIN":
                     return Number.MIN_VALUE;
                 default:
-                    return parseFloat(edge_input[interfaces.labelKeys.e_weight]);
+                    return parseFloat(edge_input[interfaces$1.labelKeys.e_weight]);
             }
         };
         return JSONInput;
@@ -3840,51 +4415,51 @@
             for (var node_key in nodes) {
                 node = nodes[node_key];
                 node_struct = result.data[node.getID()] = (_b = {},
-                    _b[interfaces.labelKeys.edges] = [],
+                    _b[interfaces$1.labelKeys.edges] = [],
                     _b);
                 if (node.getID() !== node.getLabel()) {
-                    node_struct[interfaces.labelKeys.n_label] = node.label;
+                    node_struct[interfaces$1.labelKeys.n_label] = node.label;
                 }
                 if (BaseNode_1.BaseNode.isTyped(node)) {
-                    node_struct[interfaces.labelKeys.n_type] = lut && lut.nodes[node.type];
+                    node_struct[interfaces$1.labelKeys.n_type] = lut && lut.nodes[node.type];
                 }
                 und_edges = node.undEdges();
                 for (var edge_key in und_edges) {
                     edge = und_edges[edge_key];
                     var endPoints = edge.getNodes();
                     var edgeStruct = (_c = {},
-                        _c[interfaces.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
-                        _c[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
-                        _c[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _c[interfaces$1.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
+                        _c[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _c[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _c);
                     if (edge.getID() !== edge.getLabel()) {
-                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                        edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
                     }
                     if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces.labelKeys.e_type] = lut && lut.edges[edge.type];
+                        edgeStruct[interfaces$1.labelKeys.e_type] = lut && lut.edges[edge.type];
                     }
-                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
+                    node_struct[interfaces$1.labelKeys.edges].push(edgeStruct);
                 }
                 dir_edges = node.outEdges();
                 for (var edge_key in dir_edges) {
                     edge = dir_edges[edge_key];
                     var endPoints = edge.getNodes();
                     var edgeStruct = (_d = {},
-                        _d[interfaces.labelKeys.e_to] = endPoints.b.getID(),
-                        _d[interfaces.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
-                        _d[interfaces.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _d[interfaces$1.labelKeys.e_to] = endPoints.b.getID(),
+                        _d[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _d[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _d);
                     if (edge.getID() !== edge.getLabel()) {
-                        edgeStruct[interfaces.labelKeys.e_label] = edge.getLabel();
+                        edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
                     }
                     if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces.labelKeys.e_type] = lut && lut.edges[edge.type];
+                        edgeStruct[interfaces$1.labelKeys.e_type] = lut && lut.edges[edge.type];
                     }
-                    node_struct[interfaces.labelKeys.edges].push(edgeStruct);
+                    node_struct[interfaces$1.labelKeys.edges].push(edgeStruct);
                 }
-                node_struct[interfaces.labelKeys.n_features] = node.getFeatures();
-                if ((coords = node.getFeature(interfaces.labelKeys.coords)) != null) {
-                    node_struct[interfaces.labelKeys.coords] = coords;
+                node_struct[interfaces$1.labelKeys.n_features] = node.getFeatures();
+                if ((coords = node.getFeature(interfaces$1.labelKeys.coords)) != null) {
+                    node_struct[interfaces$1.labelKeys.coords] = coords;
                 }
             }
             return JSON.stringify(result);
@@ -4186,8 +4761,14 @@
     var KroneckerLeskovec_1 = KroneckerLeskovec.KROL;
 
     // CORE
-    const BaseEdge	      				= BaseEdge_1.BaseEdge;
-    const BaseNode 	      				= BaseNode_1.BaseNode;
+
+    // Base
+
+
+
+    // Typed
+
+
 
     // CENTRALITIES
 
@@ -4231,11 +4812,17 @@
      */
     out.$G = {
     	core: {
+    		GraphMode								: interfaces.GraphMode,
+    		DIR											: interfaces.DIR,
     		base: {
-    			BaseEdge 									: BaseEdge,
-    			BaseNode 									: BaseNode,
-    			BaseGraph 								: BaseGraph_1.BaseGraph,
-    			GraphMode									: BaseGraph_1.GraphMode
+    			BaseEdge 								: BaseEdge_1.BaseEdge,
+    			BaseNode 								: BaseNode_1.BaseNode,
+    			BaseGraph 							: BaseGraph_1.BaseGraph
+    		},
+    		typed: {
+    			TypedEdge								: TypedEdge_1.TypedEdge,
+    			TypedNode								: TypedNode_1.TypedNode,
+    			TypedGraph							: TypedGraph_1.TypedGraph
     		}
     	},
     	centralities: {
@@ -4285,571 +4872,6 @@
      * For NodeJS / CommonJS global object
      */
     var graphinius = out.$G;
-
-    var TypedNode_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var TypedNode = (function (_super) {
-        __extends(TypedNode, _super);
-        function TypedNode(_id, config) {
-            var _a;
-            if (config === void 0) { config = {}; }
-            var _this = _super.call(this, _id, config) || this;
-            _this._id = _id;
-            _this._type = config.type || run_config.GENERIC_TYPES.Node;
-            _this._typedAdjSets = (_a = {},
-                _a[run_config.GENERIC_TYPES.Edge] = {
-                    ins: new Set(),
-                    outs: new Set(),
-                    conns: new Set()
-                },
-                _a);
-            return _this;
-        }
-        Object.defineProperty(TypedNode.prototype, "type", {
-            get: function () {
-                return this._type;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(TypedNode.prototype, "stats", {
-            get: function () {
-                var e_1, _a;
-                var result = {
-                    typed_edges: {}
-                };
-                try {
-                    for (var _b = __values(Object.keys(this._typedAdjSets)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var type = _c.value;
-                        result.typed_edges[type] = { ins: 0, outs: 0, conns: 0 };
-                        result.typed_edges[type].ins = this._typedAdjSets[type].ins ? this._typedAdjSets[type].ins.size : 0;
-                        result.typed_edges[type].outs = this._typedAdjSets[type].outs ? this._typedAdjSets[type].outs.size : 0;
-                        result.typed_edges[type].conns = this._typedAdjSets[type].conns ? this._typedAdjSets[type].conns.size : 0;
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                }
-                return result;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TypedNode.prototype.addEdge = function (edge) {
-            if (!_super.prototype.addEdge.call(this, edge)) {
-                return null;
-            }
-            var type = edge.type || run_config.GENERIC_TYPES.Edge;
-            var dir = edge.isDirected();
-            var uid = this.uniqueNID(edge);
-            if (!this._typedAdjSets[type]) {
-                this._typedAdjSets[type] = {};
-            }
-            if (!dir) {
-                if (!this._typedAdjSets[type].conns) {
-                    this._typedAdjSets[type].conns = new Set();
-                }
-                this._typedAdjSets[type].conns.add(uid);
-            }
-            else if (edge.getNodes().a === this) {
-                if (!this._typedAdjSets[type].outs) {
-                    this._typedAdjSets[type].outs = new Set();
-                }
-                this._typedAdjSets[type].outs.add(uid);
-            }
-            else {
-                if (!this._typedAdjSets[type].ins) {
-                    this._typedAdjSets[type].ins = new Set();
-                }
-                this._typedAdjSets[type].ins.add(uid);
-            }
-            return edge;
-        };
-        TypedNode.prototype.removeEdge = function (edge) {
-            _super.prototype.removeEdge.call(this, edge);
-            var type = edge.type || run_config.GENERIC_TYPES.Edge;
-            var dir = edge.isDirected();
-            var uid = this.uniqueNID(edge);
-            if (!dir) {
-                this._typedAdjSets[type].conns.delete(uid);
-            }
-            else if (edge.getNodes().a === this) {
-                this._typedAdjSets[type].outs.delete(uid);
-            }
-            else {
-                this._typedAdjSets[type].ins.delete(uid);
-            }
-            if (type !== run_config.GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
-                delete this._typedAdjSets[type];
-            }
-        };
-        TypedNode.prototype.ins = function (type) {
-            return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
-        };
-        TypedNode.prototype.outs = function (type) {
-            return this._typedAdjSets[type] ? this._typedAdjSets[type].outs : undefined;
-        };
-        TypedNode.prototype.conns = function (type) {
-            return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
-        };
-        TypedNode.prototype.all = function (type) {
-            var result = new Set();
-            if (this._typedAdjSets[type]) {
-                this._typedAdjSets[type].ins && result.add(__spread(this._typedAdjSets[type].ins));
-                this._typedAdjSets[type].outs && result.add(__spread(this._typedAdjSets[type].outs));
-                this._typedAdjSets[type].conns && result.add(__spread(this._typedAdjSets[type].conns));
-            }
-            return result;
-        };
-        TypedNode.prototype.uniqueNID = function (e) {
-            var _a = e.getNodes(), a = _a.a, b = _a.b;
-            var node = a === this ? b : a;
-            var string = node.id + "#" + e.id + "#";
-            string += e.isWeighted() ? 'w#' + e.getWeight() : 'u';
-            return string;
-        };
-        TypedNode.nIDFromUID = function (uid) {
-            return uid.split('#')[0];
-        };
-        TypedNode.prototype.noEdgesOfTypeLeft = function (type) {
-            return (!this._typedAdjSets[type].ins || !this._typedAdjSets[type].ins.size)
-                && (!this._typedAdjSets[type].outs || !this._typedAdjSets[type].outs.size)
-                && (!this._typedAdjSets[type].conns || !this._typedAdjSets[type].conns.size);
-        };
-        return TypedNode;
-    }(BaseNode_1.BaseNode));
-    exports.TypedNode = TypedNode;
-    });
-
-    unwrapExports(TypedNode_1);
-    var TypedNode_2 = TypedNode_1.TypedNode;
-
-    var TypedEdge_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var TypedEdge = (function (_super) {
-        __extends(TypedEdge, _super);
-        function TypedEdge(_id, _node_a, _node_b, config) {
-            if (config === void 0) { config = {}; }
-            var _this = _super.call(this, _id, _node_a, _node_b, config) || this;
-            _this._id = _id;
-            _this._node_a = _node_a;
-            _this._node_b = _node_b;
-            _this._type = config.type || run_config.GENERIC_TYPES.Edge;
-            return _this;
-        }
-        Object.defineProperty(TypedEdge.prototype, "type", {
-            get: function () {
-                return this._type;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return TypedEdge;
-    }(BaseEdge_1.BaseEdge));
-    exports.TypedEdge = TypedEdge;
-    });
-
-    unwrapExports(TypedEdge_1);
-    var TypedEdge_2 = TypedEdge_1.TypedEdge;
-
-    var TypedGraph_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
-        __assign = Object.assign || function(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                    t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-
-    var TypedGraph = (function (_super) {
-        __extends(TypedGraph, _super);
-        function TypedGraph(_label) {
-            var _this = _super.call(this, _label) || this;
-            _this._label = _label;
-            _this._typedNodes = new Map();
-            _this._typedEdges = new Map();
-            _this._type = run_config.GENERIC_TYPES.Graph;
-            _this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
-            _this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
-            return _this;
-        }
-        TypedGraph.prototype.n = function (id) {
-            return this.getNodeById(id);
-        };
-        Object.defineProperty(TypedGraph.prototype, "type", {
-            get: function () {
-                return this._type;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TypedGraph.prototype.nodeTypes = function () {
-            return Array.from(this._typedNodes.keys());
-        };
-        TypedGraph.prototype.edgeTypes = function () {
-            return Array.from(this._typedEdges.keys());
-        };
-        TypedGraph.prototype.nrTypedNodes = function (type) {
-            type = type.toUpperCase();
-            return this._typedNodes.get(type) ? this._typedNodes.get(type).size : null;
-        };
-        TypedGraph.prototype.nrTypedEdges = function (type) {
-            type = type.toUpperCase();
-            return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
-        };
-        TypedGraph.prototype.ins = function (node, type) {
-            var _this = this;
-            return new Set(__spread(node.ins(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
-        };
-        TypedGraph.prototype.outs = function (node, type) {
-            var _this = this;
-            return new Set(__spread(node.outs(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
-        };
-        TypedGraph.prototype.conns = function (node, type) {
-            var _this = this;
-            return new Set(__spread(node.conns(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
-        };
-        TypedGraph.prototype.getNeighborsOfSet = function (nodes, dir, type) {
-            var e_1, _a, e_2, _b;
-            var resultSet = new Set();
-            var nr_visits = 0, nodeRef;
-            var tic = process.hrtime()[1];
-            try {
-                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
-                    var node = nodes_1_1.value;
-                    if (resultSet.size >= this._nr_nodes) {
-                        return resultSet;
-                    }
-                    var targets = node[dir](type);
-                    if (!targets) {
-                        return new Set();
-                    }
-                    try {
-                        for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
-                            var target = targets_1_1.value;
-                            nr_visits++;
-                            nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
-                            if (!nodes.has(nodeRef)) {
-                                resultSet.add(nodeRef);
-                            }
-                        }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (targets_1_1 && !targets_1_1.done && (_b = targets_1.return)) _b.call(targets_1);
-                        }
-                        finally { if (e_2) throw e_2.error; }
-                    }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            var toc = process.hrtime()[1];
-            return resultSet;
-        };
-        TypedGraph.prototype.expandK = function (nodes, dir, type, k) {
-            var e_3, _a;
-            if (k < 0) {
-                throw new Error('cowardly refusing to expand a negative number of steps.');
-            }
-            var resultSet = new Set();
-            var periphery = nodes;
-            k = k || this._nr_nodes;
-            while (k-- || resultSet.size >= this._nr_nodes) {
-                var otic = process.hrtime()[1];
-                periphery = this.getNeighborsOfSet(periphery, dir, type);
-                var old_size = resultSet.size;
-                var tic = process.hrtime()[1];
-                try {
-                    for (var periphery_1 = __values(periphery), periphery_1_1 = periphery_1.next(); !periphery_1_1.done; periphery_1_1 = periphery_1.next()) {
-                        var target = periphery_1_1.value;
-                        resultSet.add(target);
-                    }
-                }
-                catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                finally {
-                    try {
-                        if (periphery_1_1 && !periphery_1_1.done && (_a = periphery_1.return)) _a.call(periphery_1);
-                    }
-                    finally { if (e_3) throw e_3.error; }
-                }
-                var toc = process.hrtime()[1];
-                if (old_size === resultSet.size) {
-                    break;
-                }
-                var otoc = process.hrtime()[1];
-            }
-            return resultSet;
-        };
-        TypedGraph.prototype.inHistT = function (nType, eType) {
-            return this.degreeHistT(BaseGraph_1.DIR.in, nType, eType);
-        };
-        TypedGraph.prototype.outHistT = function (nType, eType) {
-            return this.degreeHistT(BaseGraph_1.DIR.out, nType, eType);
-        };
-        TypedGraph.prototype.connHistT = function (nType, eType) {
-            return this.degreeHistT(BaseGraph_1.DIR.conn, nType, eType);
-        };
-        TypedGraph.prototype.degreeHistT = function (dir, nType, eType) {
-            var e_4, _a;
-            var result = [];
-            try {
-                for (var _b = __values(this._typedNodes.get(nType)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var _d = __read(_c.value, 2), node_id = _d[0], node = _d[1];
-                    var deg = void 0;
-                    switch (dir) {
-                        case BaseGraph_1.DIR.in:
-                            deg = node.ins(eType) ? node.ins(eType).size : 0;
-                            break;
-                        case BaseGraph_1.DIR.out:
-                            deg = node.outs(eType) ? node.outs(eType).size : 0;
-                            break;
-                        default:
-                            deg = node.conns(eType) ? node.conns(eType).size : 0;
-                    }
-                    if (!result[deg]) {
-                        result[deg] = new Set([node]);
-                    }
-                    else {
-                        result[deg].add(node);
-                    }
-                }
-            }
-            catch (e_4_1) { e_4 = { error: e_4_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_4) throw e_4.error; }
-            }
-            return result;
-        };
-        TypedGraph.prototype.addNodeByID = function (id, opts) {
-            if (this.hasNodeID(id)) {
-                throw new Error("Won't add node with duplicate ID.");
-            }
-            var node = new TypedNode_1.TypedNode(id, opts);
-            return this.addNode(node) ? node : null;
-        };
-        TypedGraph.prototype.addNode = function (node) {
-            if (!_super.prototype.addNode.call(this, node)) {
-                return null;
-            }
-            var id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
-            if (!type) {
-                this._typedNodes.get(run_config.GENERIC_TYPES.Node).set(id, node);
-            }
-            else {
-                if (!this._typedNodes.get(type)) {
-                    this._typedNodes.set(type, new Map());
-                }
-                this._typedNodes.get(type).set(id, node);
-            }
-            return node;
-        };
-        TypedGraph.prototype.getNodeById = function (id) {
-            return _super.prototype.getNodeById.call(this, id);
-        };
-        TypedGraph.prototype.getNodesT = function (type) {
-            return this._typedNodes.get(type.toUpperCase());
-        };
-        TypedGraph.prototype.getEdgesT = function (type) {
-            return this._typedEdges.get(type.toUpperCase());
-        };
-        TypedGraph.prototype.deleteNode = function (node) {
-            var id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
-            if (!this._typedNodes.get(type)) {
-                throw Error('Node type does not exist on this TypedGraph.');
-            }
-            var removeNode = this._typedNodes.get(type).get(id);
-            if (!removeNode) {
-                throw Error('This particular node is nowhere to be found in its typed set.');
-            }
-            this._typedNodes.get(type).delete(id);
-            if (this.nrTypedNodes(type) === 0) {
-                this._typedNodes.delete(type);
-            }
-            _super.prototype.deleteNode.call(this, node);
-        };
-        TypedGraph.prototype.addEdgeByID = function (id, a, b, opts) {
-            var edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
-            return this.addEdge(edge);
-        };
-        TypedGraph.prototype.addEdge = function (edge) {
-            if (!_super.prototype.addEdge.call(this, edge)) {
-                return null;
-            }
-            var id = edge.getID();
-            var type = run_config.GENERIC_TYPES.Edge;
-            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
-                type = edge.type.toUpperCase();
-            }
-            if (id === type) {
-                this._typedEdges.get(run_config.GENERIC_TYPES.Edge).set(id, edge);
-            }
-            else {
-                if (!this._typedEdges.get(type)) {
-                    this._typedEdges.set(type, new Map());
-                }
-                this._typedEdges.get(type).set(id, edge);
-            }
-            return edge;
-        };
-        TypedGraph.prototype.deleteEdge = function (edge) {
-            var id = edge.getID();
-            var type = run_config.GENERIC_TYPES.Edge;
-            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
-                type = edge.type.toUpperCase();
-            }
-            if (!this._typedEdges.get(type)) {
-                throw Error('Edge type does not exist on this TypedGraph.');
-            }
-            var removeEdge = this._typedEdges.get(type).get(id);
-            if (!removeEdge) {
-                throw Error('This particular edge is nowhere to be found in its typed set.');
-            }
-            this._typedEdges.get(type).delete(id);
-            if (this.nrTypedEdges(type) === 0) {
-                this._typedEdges.delete(type);
-            }
-            _super.prototype.deleteEdge.call(this, edge);
-        };
-        TypedGraph.prototype.getStats = function () {
-            var typed_nodes = {}, typed_edges = {};
-            this._typedNodes.forEach(function (k, v) { return typed_nodes[v] = k.size; });
-            this._typedEdges.forEach(function (k, v) { return typed_edges[v] = k.size; });
-            return __assign({}, _super.prototype.getStats.call(this), { typed_nodes: typed_nodes,
-                typed_edges: typed_edges });
-        };
-        return TypedGraph;
-    }(BaseGraph_1.BaseGraph));
-    exports.TypedGraph = TypedGraph;
-    });
-
-    unwrapExports(TypedGraph_1);
-    var TypedGraph_2 = TypedGraph_1.TypedGraph;
 
     var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
     function importGraph(config) {
@@ -6337,7 +6359,7 @@
         var indexes = {};
         Object.keys(idxConfig).forEach(function (k) { return indexes[k] = null; });
         Object.values(graph.getNodes()).forEach(function (n) {
-            if (BaseGraph_4.isTyped(n) === false) {
+            if (BaseGraph_2.isTyped(n) === false) {
                 throw Error("Node Type not supported in this scenario...!");
             }
             var type = n.type.toLowerCase();
