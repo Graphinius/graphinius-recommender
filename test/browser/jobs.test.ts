@@ -236,7 +236,7 @@ describe('jobs dataset tests - ', () => {
 	 *       -> just delete the origin manually
 	 *       -> encapsulate this bahavior within the recommender
 	 */
-	describe.only('queries extending over at least 2 relations', () => {
+	describe('queries extending over at least 2 relations', () => {
 		let
 			judyRes,
 			judy;

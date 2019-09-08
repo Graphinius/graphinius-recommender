@@ -1,12 +1,11 @@
 import {TypedEdge, ITypedEdge} from 'graphinius/lib/core/typed/TypedEdge';
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
+import * as $I from 'graphinius/lib/similarities/interfaces';
+import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
+import {simFuncs as scoreSims} from 'graphinius/lib/similarities/ScoreSimilarities';
+import {knnNodeArray} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from './TheExpanse';
-import * as $I from '../similarity/interfaces';
-import {simFuncs as setSims} from '../similarity/SetSimilarities';
-import {simFuncs as scoreSims} from '../similarity/ScoreSimilarities';
-import {knnNodeArray} from '../similarity/SimilarityCommons';
-import {TheAugments} from "./TheAugments";
 
 
 
@@ -15,7 +14,6 @@ class BaseRecommender {
 	private _augment;
 
 	constructor(private _g: TypedGraph) {
-		this._augment = new TheAugments(this._g);
 		this._expanse = new TheExpanse(this._g);
 	}
 
