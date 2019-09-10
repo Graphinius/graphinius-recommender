@@ -8,7 +8,7 @@ import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
 import {jobsConfig} from '../../src/indexers/jobs/appConfig';
 import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
-import {viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
+import {viaSharedPrefs, simPairwise, cutFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
@@ -359,6 +359,43 @@ describe('jobs dataset tests - ', () => {
 			 */
 			it.todo('people knowing the same people');
 
+			
+			/**
+			MATCH (p:Person)-[:KNOWS]->(op:Person)
+			WITH {item:id(p), categories: collect(id(op))} as data
+			WITH collect(data) AS AKnows
+
+			// create sourceIds and targetIds lists
+			WITH AKnows,
+					[value in AKnows | value.item] AS sourceIds,
+					[value in AKnows | value.item] AS targetIds
+
+			CALL algo.similarity.jaccard.stream(AKnows + AKnows, {sourceIds: sourceIds, targetIds: targetIds})
+			YIELD item1, item2, similarity
+			WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+			RETURN from.name AS from, to.name AS to, similarity
+			ORDER BY similarity DESC
+			 */
+			it('people pairwise similarity by similar social group (jaccard)', () => {
+				const tic = +new Date;
+				const sims = viaSharedPrefs(g, setSims.jaccard, {
+					t1: 'Person',
+					t2: 'Person',
+					d1: DIR.out,
+					d2: DIR.out,
+					e1: 'KNOWS',
+					e2: 'KNOWS',
+					cutFunc: cutFuncs.below,
+					// co: 1 // gives 40k results as it should
+					co: 0.99
+				});
+				// const sims = simPairwise(setSims.jaccard, )
+				const toc = +new Date;
+				console.log(`Computation of shared-preference similarities for Person-Person social group took ${toc-tic} ms.`);
+				console.log(sims.length);
+				console.log(sims);
+			});
+
 			/* skills people I know have <-> skills other g */
 			it.todo('people knowing / known-by people of similar skill set');
 
@@ -466,7 +503,6 @@ describe('jobs dataset tests - ', () => {
 
 		
 		/**
-		// compute skills companies look for
 		MATCH (c:Company)-[:LOOKS_FOR_SKILL]->(s:Skill)
 		WITH {item:id(c), categories: collect(id(s))} as data
 		WITH collect(data) AS companySkills
@@ -486,9 +522,8 @@ describe('jobs dataset tests - ', () => {
 		WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
 		RETURN from.name AS from, to.name AS to, similarity
 		ORDER BY similarity DESC
-		LIMIT 10
 		 */
-		it('companies looking for a similar skill-set that I have', () => {
+		it('person <-> company pairwise similarities by overlapping skill sets (HAS / LOOKS_FOR)', () => {
 			const tic = +new Date;
 			const sims = viaSharedPrefs(g, setSims.jaccard, {
 				t1: 'Person',
