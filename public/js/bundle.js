@@ -2394,7 +2394,7 @@
             var e_1, _a, e_2, _b;
             var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
             var resultSet = new Set();
-            var nr_visits = 0, nodeRef;
+            var nodeRef;
             try {
                 for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
                     var node = nodes_1_1.value;
@@ -2405,7 +2405,6 @@
                     try {
                         for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
                             var target = targets_1_1.value;
-                            nr_visits++;
                             nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
                             resultSet.add(nodeRef);
                             if (resultSet.size >= this._nr_nodes) {
@@ -2439,7 +2438,7 @@
             var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
             var resultSet = new Set();
             var periphery = nodes;
-            k = k || this._nr_nodes;
+            k = k || this._nr_nodes - 1;
             while (k-- || resultSet.size >= this._nr_nodes) {
                 periphery = this.expand(periphery, dir, type);
                 var old_size = resultSet.size;
@@ -2463,7 +2462,17 @@
             return resultSet;
         };
         TypedGraph.prototype.peripheryAtK = function (input, dir, type, k) {
-            throw new Error('not yet implemented');
+            if (k < 0) {
+                throw new Error('cowardly refusing to expand a negative number of steps.');
+            }
+            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
+            var resultSet = new Set();
+            var periphery = nodes;
+            k = k || this._nr_nodes - 1;
+            while (k-- || resultSet.size >= this._nr_nodes) {
+                periphery = this.expand(periphery, dir, type);
+            }
+            return periphery;
         };
         TypedGraph.prototype.inHistT = function (nType, eType) {
             return this.degreeHistT(interfaces.DIR.in, nType, eType);
@@ -4500,6 +4509,584 @@
     unwrapExports(Dijkstra_1);
     var Dijkstra_2 = Dijkstra_1.Dijkstra;
 
+    var SimilarityCommons = createCommonjsModule(function (module, exports) {
+    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                    t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.simSort = {
+        asc: function (se1, se2) { return se1.sim - se2.sim; },
+        desc: function (se1, se2) { return se2.sim - se1.sim; }
+    };
+    exports.cutFuncs = {
+        above: function (sim, threshold) { return sim >= threshold; },
+        below: function (sim, threshold) { return sim <= threshold; },
+    };
+    function sim(algo, a, b) {
+        return algo(a, b);
+    }
+    exports.sim = sim;
+    function simSource(algo, s, t, cfg) {
+        if (cfg === void 0) { cfg = {}; }
+        var e_1, _a;
+        var sort = cfg.sort || exports.simSort.desc;
+        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
+        var result = [];
+        var start = t[s];
+        try {
+            for (var _b = __values(Object.entries(t)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), k = _d[0], v = _d[1];
+                if (k === s) {
+                    continue;
+                }
+                var sim_1 = algo(start, v);
+                if (cfg.cutoff == null || cutFunc(sim_1.sim, cfg.cutoff)) {
+                    result.push(__assign({ from: s, to: k }, sim_1));
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        result.sort(sort);
+        if (cfg.knn != null && cfg.knn <= result.length) {
+            result = result.slice(0, cfg.knn);
+        }
+        return result.sort(sort);
+    }
+    exports.simSource = simSource;
+    function simPairwise(algo, s, cfg) {
+        if (cfg === void 0) { cfg = {}; }
+        var sort = cfg.sort || exports.simSort.desc;
+        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
+        var result = [];
+        var keys = Object.keys(s);
+        for (var i in keys) {
+            for (var j = 0; j < +i; j++) {
+                var from = keys[i];
+                var to = keys[j];
+                var sim_2 = algo(s[keys[i]], s[keys[j]], i, j);
+                if (cfg.cutoff == null || cutFunc(sim_2.sim, cfg.cutoff)) {
+                    result.push(__assign({ from: from, to: to }, sim_2));
+                }
+            }
+        }
+        result.sort(sort);
+        if (cfg.knn != null && cfg.knn <= result.length) {
+            result = result.slice(0, cfg.knn);
+        }
+        return result;
+    }
+    exports.simPairwise = simPairwise;
+    function simSubsets(algo, s1, s2, cfg) {
+        if (cfg === void 0) { cfg = {}; }
+        var sort = cfg.sort || exports.simSort.desc;
+        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
+        var result = [];
+        var keys1 = Object.keys(s1);
+        var keys2 = Object.keys(s2);
+        for (var i in keys1) {
+            var subRes = [];
+            for (var j in keys2) {
+                var from = keys1[i];
+                var to = keys2[j];
+                if (from === to) {
+                    continue;
+                }
+                var sim_3 = algo(s1[keys1[i]], s2[keys2[j]]);
+                if (cfg.cutoff == null || cutFunc(sim_3.sim, cfg.cutoff)) {
+                    subRes.push(__assign({ from: from, to: to }, sim_3));
+                }
+            }
+            subRes.sort(sort);
+            if (cfg.knn != null && cfg.knn <= subRes.length) {
+                subRes = subRes.slice(0, cfg.knn);
+            }
+            result = result.concat(subRes);
+        }
+        return result.sort(sort);
+    }
+    exports.simSubsets = simSubsets;
+    function simGroups(algo, s1, s2, config) {
+        throw new Error('not implemented yet');
+        return { isect: 0, sim: 0 };
+    }
+    exports.simGroups = simGroups;
+    function knnNodeArray(algo, s, cfg) {
+        var e_2, _a;
+        var sort = cfg.sort || exports.simSort.desc;
+        var c = cfg.cutoff || 0;
+        var topK = [];
+        var dupes = {};
+        try {
+            for (var _b = __values(Object.keys(s)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var node = _c.value;
+                var topKEntries = simSource(algo, node, s, { knn: cfg.knn || 1, sort: cfg.sort });
+                topKEntries.forEach(function (e) {
+                    if (c == null || e.sim < c) {
+                        return;
+                    }
+                    if (!cfg.dup && (dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from])) {
+                        return;
+                    }
+                    topK.push(e);
+                    dupes[e.from] = dupes[e.from] || {};
+                    dupes[e.from][e.to] = true;
+                });
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        return topK.sort(sort);
+    }
+    exports.knnNodeArray = knnNodeArray;
+    function knnNodeDict(algo, s, cfg) {
+        var e_3, _a;
+        var sort = cfg.sort || exports.simSort.desc;
+        var c = cfg.cutoff || 0;
+        var topK = {};
+        var _loop_1 = function (node) {
+            var e_4, _a;
+            var topKEntries = simSource(algo, node, s, { knn: cfg.knn || 1, sort: cfg.sort });
+            topKEntries.forEach(function (e) {
+                if (c == null || e.sim < c) {
+                    return;
+                }
+                delete e.from;
+                topK[node] = topK[node] || [];
+                topK[node].push(e);
+            });
+            try {
+                for (var _b = __values(Object.values(topK)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var arr = _c.value;
+                    arr.sort(sort);
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_4) throw e_4.error; }
+            }
+        };
+        try {
+            for (var _b = __values(Object.keys(s)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var node = _c.value;
+                _loop_1(node);
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+        return topK;
+    }
+    exports.knnNodeDict = knnNodeDict;
+    function viaSharedPrefs(g, algo, cfg) {
+        var e_5, _a, e_6, _b;
+        var sort = cfg.sort || exports.simSort.desc;
+        var cutoff = cfg.co == null ? 1e-6 : cfg.co;
+        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
+        var sims = [];
+        var t1Set = g.getNodesT(cfg.t1);
+        var t2Set = g.getNodesT(cfg.t2);
+        try {
+            for (var _c = __values(t1Set.entries()), _d = _c.next(); !_d.done; _d = _c.next()) {
+                var _e = __read(_d.value, 2), t1Name = _e[0], t1Node = _e[1];
+                try {
+                    for (var _f = __values(t2Set.entries()), _g = _f.next(); !_g.done; _g = _f.next()) {
+                        var _h = __read(_g.value, 2), t2Name = _h[0], t2Node = _h[1];
+                        var prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
+                        var prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
+                        var sim_4 = algo(prefSet1, prefSet2);
+                        if (cutFunc(sim_4.sim, cutoff)) {
+                            sims.push(__assign({ from: t1Name, to: t2Name }, sim_4));
+                        }
+                    }
+                }
+                catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                finally {
+                    try {
+                        if (_g && !_g.done && (_b = _f.return)) _b.call(_f);
+                    }
+                    finally { if (e_6) throw e_6.error; }
+                }
+            }
+        }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
+        return sims.sort(sort);
+    }
+    exports.viaSharedPrefs = viaSharedPrefs;
+    function getBsNotInA(a, b) {
+        var e_7, _a, e_8, _b;
+        var result = new Set();
+        var sa = new Set();
+        try {
+            for (var a_1 = __values(a), a_1_1 = a_1.next(); !a_1_1.done; a_1_1 = a_1.next()) {
+                var e = a_1_1.value;
+                sa.add(e.label);
+            }
+        }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        finally {
+            try {
+                if (a_1_1 && !a_1_1.done && (_a = a_1.return)) _a.call(a_1);
+            }
+            finally { if (e_7) throw e_7.error; }
+        }
+        try {
+            for (var b_1 = __values(b), b_1_1 = b_1.next(); !b_1_1.done; b_1_1 = b_1.next()) {
+                var e = b_1_1.value;
+                if (!sa.has(e.label)) {
+                    result.add(e);
+                }
+            }
+        }
+        catch (e_8_1) { e_8 = { error: e_8_1 }; }
+        finally {
+            try {
+                if (b_1_1 && !b_1_1.done && (_b = b_1.return)) _b.call(b_1);
+            }
+            finally { if (e_8) throw e_8.error; }
+        }
+        return result;
+    }
+    exports.getBsNotInA = getBsNotInA;
+    });
+
+    unwrapExports(SimilarityCommons);
+    var SimilarityCommons_1 = SimilarityCommons.simSort;
+    var SimilarityCommons_2 = SimilarityCommons.cutFuncs;
+    var SimilarityCommons_3 = SimilarityCommons.sim;
+    var SimilarityCommons_4 = SimilarityCommons.simSource;
+    var SimilarityCommons_5 = SimilarityCommons.simPairwise;
+    var SimilarityCommons_6 = SimilarityCommons.simSubsets;
+    var SimilarityCommons_7 = SimilarityCommons.simGroups;
+    var SimilarityCommons_8 = SimilarityCommons.knnNodeArray;
+    var SimilarityCommons_9 = SimilarityCommons.knnNodeDict;
+    var SimilarityCommons_10 = SimilarityCommons.viaSharedPrefs;
+    var SimilarityCommons_11 = SimilarityCommons.getBsNotInA;
+
+    var SetSimilarities = createCommonjsModule(function (module, exports) {
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
+        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+        return ar;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.simFuncs = {
+        jaccard: jaccard,
+        overlap: overlap
+    };
+    var PRECISION = 5;
+    function jaccard(a, b) {
+        var ui = unionIntersect(a, b);
+        return {
+            isect: ui.isectSize,
+            sim: +(ui.isectSize / ui.unionSize).toPrecision(PRECISION)
+        };
+    }
+    function overlap(a, b) {
+        var ui = unionIntersect(a, b);
+        return {
+            isect: ui.isectSize,
+            sim: +(ui.isectSize / Math.min(a.size, b.size)).toPrecision(PRECISION)
+        };
+    }
+    function unionIntersect(a, b) {
+        var unionSize = new Set(__spread(a, b)).size;
+        var isectSize = a.size + b.size - unionSize;
+        return { unionSize: unionSize, isectSize: isectSize };
+    }
+    });
+
+    unwrapExports(SetSimilarities);
+    var SetSimilarities_1 = SetSimilarities.simFuncs;
+
+    var ScoreSimilarities = createCommonjsModule(function (module, exports) {
+    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var PRECISION = 5;
+    exports.simFuncs = {
+        cosine: cosine,
+        cosineSets: cosineSets,
+        euclidean: euclidean,
+        euclideanSets: euclideanSets,
+        pearson: pearson,
+        pearsonSets: pearsonSets
+    };
+    function euclidean(a, b) {
+        if (a.length !== b.length) {
+            throw new Error('Vectors must be of same size');
+        }
+        var at = a.length < 1e4 ? a : new Float32Array(a);
+        var bt = b.length < 1e4 ? b : new Float32Array(b);
+        var sum = 0, diff = 0;
+        for (var i = 0; i < at.length; i++) {
+            diff = at[i] - bt[i];
+            sum += diff * diff;
+        }
+        var sim = +Math.sqrt(sum).toPrecision(PRECISION);
+        return { sim: sim };
+    }
+    function cosine(a, b) {
+        if (a.length !== b.length) {
+            throw new Error('Vectors must be of same size');
+        }
+        var fa1 = new Float32Array(a);
+        var fa2 = new Float32Array(b);
+        var numerator = 0;
+        for (var i = 0; i < fa1.length; i++) {
+            numerator += fa1[i] * fa2[i];
+        }
+        var dena = 0, denb = 0;
+        for (var i = 0; i < fa1.length; i++) {
+            dena += fa1[i] * fa1[i];
+            denb += fa2[i] * fa2[i];
+        }
+        dena = Math.sqrt(dena);
+        denb = Math.sqrt(denb);
+        return { sim: +(numerator / (dena * denb)).toPrecision(PRECISION) };
+    }
+    function pearson(a, b, a_mean, b_mean) {
+        if (a.length !== b.length) {
+            throw new Error('Vectors must be of same size');
+        }
+        var sum_a = 0, sum_b = 0, mean_a = a_mean || 0, mean_b = b_mean || 0, numerator = 0, diff_a_sq = 0, diff_b_sq = 0, denominator, a_diff, b_diff, sim;
+        if (!a_mean || !b_mean) {
+            for (var i = 0; i < a.length; i++) {
+                sum_a += a[i];
+                sum_b += b[i];
+            }
+            mean_a = sum_a / a.length;
+            mean_b = sum_b / b.length;
+        }
+        for (var i = 0; i < a.length; i++) {
+            a_diff = a[i] - mean_a;
+            b_diff = b[i] - mean_b;
+            numerator += a_diff * b_diff;
+            diff_a_sq += a_diff * a_diff;
+            diff_b_sq += b_diff * b_diff;
+        }
+        denominator = Math.sqrt(diff_a_sq) * Math.sqrt(diff_b_sq);
+        sim = +(numerator / denominator).toPrecision(PRECISION);
+        return { sim: sim };
+    }
+    function cosineSets(a, b) {
+        var _a = __read(extractCommonTargetScores(a, b), 2), aa = _a[0], ba = _a[1];
+        if (!aa.length || !ba.length) {
+            return { sim: 0 };
+        }
+        return cosine(aa, ba);
+    }
+    function euclideanSets(a, b) {
+        var _a = __read(extractCommonTargetScores(a, b), 2), aa = _a[0], ba = _a[1];
+        if (!aa.length || !ba.length) {
+            return { sim: 0 };
+        }
+        return euclidean(aa, ba);
+    }
+    function pearsonSets(a, b) {
+        var _a = __read(extractCommonTargetScores(a, b), 4), aa = _a[0], ba = _a[1], a_mean = _a[2], b_mean = _a[3];
+        if (!aa.length || !ba.length) {
+            return { sim: 0 };
+        }
+        return pearson(aa, ba, a_mean, b_mean);
+    }
+    function extractCommonTargetScores(a, b) {
+        var e_1, _a, e_2, _b, e_3, _c, e_4, _d, e_5, _e, e_6, _f;
+        var a_id = new Set(), b_id = new Set();
+        try {
+            for (var a_1 = __values(a), a_1_1 = a_1.next(); !a_1_1.done; a_1_1 = a_1.next()) {
+                var e = a_1_1.value;
+                a_id.add(e.split('#')[0]);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (a_1_1 && !a_1_1.done && (_a = a_1.return)) _a.call(a_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        try {
+            for (var b_1 = __values(b), b_1_1 = b_1.next(); !b_1_1.done; b_1_1 = b_1.next()) {
+                var e = b_1_1.value;
+                b_id.add(e.split('#')[0]);
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (b_1_1 && !b_1_1.done && (_b = b_1.return)) _b.call(b_1);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        var score, a_map = new Map(), b_map = new Map(), a_vec = [], b_vec = [], earr, a_mean = 0, b_mean = 0;
+        try {
+            for (var a_2 = __values(a), a_2_1 = a_2.next(); !a_2_1.done; a_2_1 = a_2.next()) {
+                var e = a_2_1.value;
+                earr = e.split('#');
+                score = +earr[earr.length - 1];
+                a_mean += score;
+                if (b_id.has(earr[0])) {
+                    a_map.set(earr[0], score);
+                }
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (a_2_1 && !a_2_1.done && (_c = a_2.return)) _c.call(a_2);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+        try {
+            for (var b_2 = __values(b), b_2_1 = b_2.next(); !b_2_1.done; b_2_1 = b_2.next()) {
+                var e = b_2_1.value;
+                var earr_1 = e.split('#');
+                score = +earr_1[earr_1.length - 1];
+                b_mean += score;
+                if (a_id.has(earr_1[0])) {
+                    b_map.set(earr_1[0], score);
+                }
+            }
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (b_2_1 && !b_2_1.done && (_d = b_2.return)) _d.call(b_2);
+            }
+            finally { if (e_4) throw e_4.error; }
+        }
+        var a_keys = Array.from(a_map.keys()).sort();
+        try {
+            for (var a_keys_1 = __values(a_keys), a_keys_1_1 = a_keys_1.next(); !a_keys_1_1.done; a_keys_1_1 = a_keys_1.next()) {
+                var key = a_keys_1_1.value;
+                a_vec.push(a_map.get(key));
+            }
+        }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (a_keys_1_1 && !a_keys_1_1.done && (_e = a_keys_1.return)) _e.call(a_keys_1);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
+        var b_keys = Array.from(b_map.keys()).sort();
+        try {
+            for (var b_keys_1 = __values(b_keys), b_keys_1_1 = b_keys_1.next(); !b_keys_1_1.done; b_keys_1_1 = b_keys_1.next()) {
+                var key = b_keys_1_1.value;
+                b_vec.push(b_map.get(key));
+            }
+        }
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        finally {
+            try {
+                if (b_keys_1_1 && !b_keys_1_1.done && (_f = b_keys_1.return)) _f.call(b_keys_1);
+            }
+            finally { if (e_6) throw e_6.error; }
+        }
+        return [a_vec, b_vec, a_mean / a.size, b_mean / b.size];
+    }
+    });
+
+    unwrapExports(ScoreSimilarities);
+    var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
+
     var SimplePerturbations = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -4784,6 +5371,10 @@
 
 
 
+    // SIMILARITIES
+
+
+
     // UTILS
 
 
@@ -4843,6 +5434,11 @@
     		BellmanFord								: BellmanFord,
     		FloydWarshall							: FloydWarshall,
     		Johnsons									: Johnsons_1
+    	},
+    	similarities: {
+    		Commons										: SimilarityCommons,
+    		Sets											: SetSimilarities,
+    		Score											: ScoreSimilarities,
     	},
       utils: {						
         Struct        						: StructUtils,

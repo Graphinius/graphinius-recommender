@@ -339,11 +339,110 @@ describe('jobs dataset tests - ', () => {
 
 
 	/**
-	 * Partly queried from Neo4j in cypher, although cyphter becomes cumbersome
+	 * @todo should we have readily available functions for each of those?
+	 * 			 -> per problem domain?
+	 * 			 -> configurable via node & edge types
+	 */
+	describe('similarity measures - ', () => {
+
+		describe('person-person similarity - ', () => {
+
+			it.todo('people having a similar skill set');
+
+			it.todo( 'people living in the same / similar city)');
+
+			/**
+			 * @description people knowing the same people I do
+			 * @todo how to define "other groups"
+			 */
+			it.todo('people knowing the same people');
+
+			/* skills people I know have <-> skills other g */
+			it.todo('people knowing / known-by people of similar skill set');
+
+			/* different kind of similarities working together */
+			it.todo('people knowing / known-by people of same / similar employer');
+
+			it.todo('via overlapping social group employment');
+
+		});
+
+
+		describe('company-company similarity', () => {
+
+			it.todo('companies located in the same / similar city');
+
+			it.todo('companies looking for similar skill sets');
+
+			it.todo('companies employing people with overlapping skill sets');
+
+			it.todo('companies employing people with overlapping social groups');
+
+			it.todo('companies ')
+
+		});
+
+
+		describe('person-company related similarity', () => {
+
+			it.todo('companies located in the city I live in');
+
+			it.todo('working for the same company');
+
+			it.todo('knowing people who work for my company');
+
+			it.todo('people known by people working for the same company');
+
+		});
+
+
+		describe('skills clustering', () => {
+
+			it.todo('skills known by similar people');
+
+			it.todo('skills looked for by similar companies');
+
+			it.todo('skills known by people working for similar companies');
+
+
+		});
+
+
+		/**
+		 * @description ENRICHMENT OPPORTUNITIES
+		 */
+		describe('Graph enrichment opportunities - ', () => {
+
+			it.todo('people living in nearby cities');
+
+			it.todo('people living in cities of similar culture');
+
+			it.todo('people living in cities of similar industry sector composition');
+
+			it.todo('skills known by people of similar income group');
+
+			it.todo('sk')
+
+		});
+
+	});
+
+
+	/**
+	 * Partly queried from Neo4j in cypher, although cypher becomes cumbersome
 	 * VERY QUICKLY when writing more than the most trivial queries
-	 * -> $G is so much more convenient :-)))
+	 *
+	 *
 	 */
 	describe('real-world job/skill - based recommendations - ', () => {
+
+
+		/**
+		 *  I wanna re-locate to some place where people understand me
+		 *  -) People-people similarity
+		 */
+		it.todo('companies located in cities where like-minded people live');
+
 
 		it.todo('companies looking for a similar skill-set that I have');
 
