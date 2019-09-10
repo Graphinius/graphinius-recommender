@@ -459,13 +459,35 @@ describe('jobs dataset tests - ', () => {
 			expect(tom.f('age')).toBe(59);
 		});
 
-		// t1: string;
-		// t2: string;
-		// d1: DIR;
-		// d2: DIR;
-		// e1: string;
-		// e2: string;
-		// co?: number;
+
+		it('companies looking for a similar skill-set than I have', () => {
+
+		});
+
+		
+		/**
+		// compute skills companies look for
+		MATCH (c:Company)-[:LOOKS_FOR_SKILL]->(s:Skill)
+		WITH {item:id(c), categories: collect(id(s))} as data
+		WITH collect(data) AS companySkills
+
+		// compute skills people have
+		MATCH (p:Person)-[:HAS_SKILL]->(s:Skill)
+		WITH companySkills, {item:id(p), categories: collect(id(s))} as data
+		WITH companySkills, collect(data) AS personSkills
+
+		// create sourceIds and targetIds lists
+		WITH companySkills, personSkills,
+				[value in companySkills | value.item] AS sourceIds,
+				[value in personSkills | value.item] AS targetIds
+
+		CALL algo.similarity.jaccard.stream(companySkills + personSkills, {sourceIds: sourceIds, targetIds: targetIds})
+		YIELD item1, item2, similarity
+		WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+		RETURN from.name AS from, to.name AS to, similarity
+		ORDER BY similarity DESC
+		LIMIT 10
+		 */
 		it('companies looking for a similar skill-set that I have', () => {
 			const tic = +new Date;
 			const sims = viaSharedPrefs(g, setSims.jaccard, {

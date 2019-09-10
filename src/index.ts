@@ -13,6 +13,26 @@ import { beerConfig } from './indexers/beer/appConfig';
 import { jobsConfig } from './indexers/jobs/appConfig';
 import { meetupConfig } from './indexers/meetup/appConfig';
 
+import * as $comSim from 'graphinius/lib/similarities/SimilarityCommons';
+import * as $setSim from 'graphinius/lib/similarities/SetSimilarities';
+import * as $scoSim from 'graphinius/lib/similarities/ScoreSimilarities';
+
+/* HACKETY HACK */
+window.comSim = $comSim;
+window.setSim = $setSim;
+window.scoSim = $scoSim;
+
+/**
+ * @description sharedPrefSimilarity between Person-Skills & Company->Skills
+ comSim.viaSharedPrefs(g, setSim.simFuncs.jaccard, {
+    t1: 'Person',
+    t2: 'Company',
+    d1: 'outs',
+    d2: 'outs',
+    e1: 'HAS_SKILL',
+    e2: 'LOOKS_FOR_SKILL'
+  });
+*/
 
 
 (async () => {

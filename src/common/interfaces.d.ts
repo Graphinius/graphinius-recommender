@@ -24,6 +24,9 @@ declare global {
 
     $G                    : any;
     g                     : IGraph;
+    comSim                : any;
+    setSim                : any;
+    scoSim                : any;
     
     // idxLunr               : any;
     // idxFuse               : any;
