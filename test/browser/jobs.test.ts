@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {DIR} from 'graphinius/lib/core/interfaces';
-import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
-import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
-import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
-import {jobsConfig} from '../../src/indexers/jobs/appConfig';
-import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
-import {viaSharedPrefs, simPairwise, cutFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
+import { DIR } from 'graphinius/lib/core/interfaces';
+import { TypedNode, ITypedNode } from 'graphinius/lib/core/typed/TypedNode';
+import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
+import { JSONInput, JSONGraph } from 'graphinius/lib/io/input/JSONInput';
+import { buildIdxJSSearch } from '../../src/indexers/buildJSSearch';
+import { jobsIdxConfig, jobsModels } from '../../src/indexers/jobs/interfaces';
+import { jobsConfig } from '../../src/indexers/jobs/appConfig';
+import { simFuncs as setSimFuncs } from 'graphinius/lib/similarities/SetSimilarities';
+import { viaSharedPrefs, simSource, cutFuncs } from 'graphinius/lib/similarities/SimilarityCommons';
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
@@ -344,22 +344,72 @@ describe('jobs dataset tests - ', () => {
 	 * 			 -> per problem domain?
 	 * 			 -> configurable via node & edge types
 	 */
-	describe('similarity measures - ', () => {
+	describe.only('similarity measures - ', () => {
+
+		let tom;
+
+		beforeAll(() => {
+			json = JSON.parse(fs.readFileSync(graphFile).toString());
+			g = jsonIn.readFromJSON(json, new TypedGraph('Jobs')) as TypedGraph;
+			idx = buildIdxJSSearch(g, jobsIdxConfig);
+			expect(g.nrNodes()).toBe(NR_NODES);
+			expect(g.nrDirEdges()).toBe(NR_EDGES_DIR);
+			expect(g.nrUndEdges()).toBe(NR_EDGES_UND);
+
+			tom = g.n(idx[jobsModels.person].search('Tom Lemke')[0].id);
+			expect(tom).toBeDefined;
+			expect(tom.f('age')).toBe(59);
+		});
 
 
 		describe('people clustering - ', () => {
 
-			it.todo('people having a similar skill set');
+			it('people having a similar skill set', () => {
+				const tic = +new Date;
+				const start = tom.label;
+				const allSets = {};
+				g.getNodesT('Person').forEach(n => {
+					allSets[n.label] = g.expand(n, DIR.out, 'HAS_SKILL');
+				});
+				const sims = simSource(setSimFuncs.jaccard, start, allSets);
+				const toc = +new Date;
+				// console.log(`Computing most similar people to Tom Lemke by SKILL similarity (Jaccard) took ${toc-tic} ms.`);
+				// console.log(sims);
+				expect(sims.slice(0, 6).map(e => e.sim)).toEqual([0.55, 0.55, 0.55, 0.52632, 0.52381, 0.52381]);
+			});
 
-			it.todo( 'people living in the same / similar city)');
 
-			/**
-			 * @description people knowing the same people I do
-			 * @todo how to define "other groups"
-			 */
-			it.todo('people knowing the same people');
+			it('people living in the same / similar country)', () => {
+				const cmen_exp = ["Rosella Kohler", "Samson Hudson", "Khalid Lubowitz", "Oren Metz", "Javon Shields"];
+				const tic = +new Date;
+				const countries = Array.from(g.outs(tom, 'LIVES_IN'));
+				expect(countries.length).toBe(1);
+				const country = countries[0];
+				const cmen = g.ins(country, 'LIVES_IN');
+				cmen.delete(tom);
+				const toc = +new Date;
+				// console.log(`Computing people living in same city as Tom Lemke took ${toc-tic} ms.`);
+				const cmen_arr = Array.from(cmen).map(c => c.f('name'));
+				// console.log(cmen_arr.sort());
+				expect(cmen_arr.sort()).toEqual(cmen_exp.sort());
+			});
 
-			
+
+			it('people knowing the same people', () => {
+				const tic = +new Date;
+				const start = tom.label;
+				const allSets = {};
+				g.getNodesT('Person').forEach(n => {
+					allSets[n.label] = g.expand(n, DIR.out, 'KNOWS');
+				});
+				const sims = simSource(setSimFuncs.jaccard, start, allSets);
+				const toc = +new Date;
+				// console.log(`Computing most similar people to Tom Lemke by SKILL similarity (Jaccard) took ${toc-tic} ms.`);
+				// console.log(sims);
+				expect(sims.slice(0, 7).map(e => e.sim)).toEqual([0.17241, 0.16667, 0.16667, 0.16667, 0.14286, 0.13793, 0.13333]);
+			});
+
+
 			/**
 			MATCH (p:Person)-[:KNOWS]->(op:Person)
 			WITH {item:id(p), categories: collect(id(op))} as data
@@ -378,7 +428,7 @@ describe('jobs dataset tests - ', () => {
 			 */
 			it('people pairwise similarity by similar social group (jaccard)', () => {
 				const tic = +new Date;
-				const sims = viaSharedPrefs(g, setSims.jaccard, {
+				const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
 					t1: 'Person',
 					t2: 'Person',
 					d1: DIR.out,
@@ -386,14 +436,15 @@ describe('jobs dataset tests - ', () => {
 					e1: 'KNOWS',
 					e2: 'KNOWS',
 					cutFunc: cutFuncs.below,
-					// co: 1 // gives 40k results as it should
 					co: 0.99
+					// co: 1 // gives 40k results as it should
 				});
 				// const sims = simPairwise(setSims.jaccard, )
 				const toc = +new Date;
-				console.log(`Computation of shared-preference similarities for Person-Person social group took ${toc-tic} ms.`);
-				console.log(sims.length);
-				console.log(sims);
+				console.log(`Computation of shared-preference similarities for Person-Person social group took ${toc - tic} ms.`);
+				// console.log(sims);
+				expect(sims.length).toBe(39800);
+				expect(sims.slice(0, 3).map(e => e.sim)).toEqual([0.25926, 0.25926, 0.22222]);
 			});
 
 			/* skills people I know have <-> skills other g */
@@ -501,7 +552,7 @@ describe('jobs dataset tests - ', () => {
 
 		});
 
-		
+
 		/**
 		MATCH (c:Company)-[:LOOKS_FOR_SKILL]->(s:Skill)
 		WITH {item:id(c), categories: collect(id(s))} as data
@@ -525,7 +576,7 @@ describe('jobs dataset tests - ', () => {
 		 */
 		it('person <-> company pairwise similarities by overlapping skill sets (HAS / LOOKS_FOR)', () => {
 			const tic = +new Date;
-			const sims = viaSharedPrefs(g, setSims.jaccard, {
+			const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
 				t1: 'Person',
 				t2: 'Company',
 				d1: DIR.out,
@@ -534,9 +585,9 @@ describe('jobs dataset tests - ', () => {
 				e2: 'LOOKS_FOR_SKILL'
 			});
 			const toc = +new Date;
-			console.log(`Computation of shared-preference similarities for Person-Company-Skills took ${toc-tic} ms.`);
+			console.log(`Computation of shared-preference similarities for Person-Company-Skills took ${toc - tic} ms.`);
 			console.log(sims.length);
-			console.log(sims);
+			// console.log(sims);
 		});
 
 		/**
