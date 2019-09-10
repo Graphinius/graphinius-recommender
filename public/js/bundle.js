@@ -279,6 +279,9 @@
         BaseNode.prototype.getFeature = function (key) {
             return this._features[key];
         };
+        BaseNode.prototype.f = function (key) {
+            return this.getFeature(key);
+        };
         BaseNode.prototype.setFeatures = function (features) {
             this._features = StructUtils.clone(features);
         };

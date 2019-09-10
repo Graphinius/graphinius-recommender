@@ -7,7 +7,8 @@ import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../src/indexers/jobs/interfaces';
 import {jobsConfig} from '../../src/indexers/jobs/appConfig';
-import {BaseGraph} from 'graphinius/lib/core/base/BaseGraph';
+import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
+import {viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
@@ -345,7 +346,8 @@ describe('jobs dataset tests - ', () => {
 	 */
 	describe('similarity measures - ', () => {
 
-		describe('person-person similarity - ', () => {
+
+		describe('people clustering - ', () => {
 
 			it.todo('people having a similar skill set');
 
@@ -368,7 +370,7 @@ describe('jobs dataset tests - ', () => {
 		});
 
 
-		describe('company-company similarity', () => {
+		describe('company clustering', () => {
 
 			it.todo('companies located in the same / similar city');
 
@@ -376,9 +378,8 @@ describe('jobs dataset tests - ', () => {
 
 			it.todo('companies employing people with overlapping skill sets');
 
+			/* recursive definition? */
 			it.todo('companies employing people with overlapping social groups');
-
-			it.todo('companies ')
 
 		});
 
@@ -404,6 +405,8 @@ describe('jobs dataset tests - ', () => {
 
 			it.todo('skills known by people working for similar companies');
 
+			/* Inverse clustering */
+			it.todo('least similar skills by people I know');
 
 		});
 
@@ -413,6 +416,9 @@ describe('jobs dataset tests - ', () => {
 		 */
 		describe('Graph enrichment opportunities - ', () => {
 
+			/* Geolocation */
+			it.todo('nearby cities');
+
 			it.todo('people living in nearby cities');
 
 			it.todo('people living in cities of similar culture');
@@ -421,7 +427,9 @@ describe('jobs dataset tests - ', () => {
 
 			it.todo('skills known by people of similar income group');
 
-			it.todo('sk')
+			it.todo('skills known by people of similar social status / education level...');
+
+			it.todo('companies operating in the same business');
 
 		});
 
@@ -436,21 +444,71 @@ describe('jobs dataset tests - ', () => {
 	 */
 	describe('real-world job/skill - based recommendations - ', () => {
 
+		let tom;
+
+		beforeAll(() => {
+			json = JSON.parse(fs.readFileSync(graphFile).toString());
+			g = jsonIn.readFromJSON(json, new TypedGraph('Jobs')) as TypedGraph;
+			idx = buildIdxJSSearch(g, jobsIdxConfig);
+			expect(g.nrNodes()).toBe(NR_NODES);
+			expect(g.nrDirEdges()).toBe(NR_EDGES_DIR);
+			expect(g.nrUndEdges()).toBe(NR_EDGES_UND);
+
+			tom = g.n(idx[jobsModels.person].search('Tom Lemke')[0].id);
+			expect(tom).toBeDefined;
+			expect(tom.f('age')).toBe(59);
+		});
+
+		// t1: string;
+		// t2: string;
+		// d1: DIR;
+		// d2: DIR;
+		// e1: string;
+		// e2: string;
+		// co?: number;
+		it('companies looking for a similar skill-set that I have', () => {
+			const tic = +new Date;
+			const sims = viaSharedPrefs(g, setSims.jaccard, {
+				t1: 'Person',
+				t2: 'Company',
+				d1: DIR.out,
+				d2: DIR.out,
+				e1: 'HAS_SKILL',
+				e2: 'LOOKS_FOR_SKILL'
+			});
+			const toc = +new Date;
+			console.log(`Computation of shared-preference similarities for Person-Company-Skills took ${toc-tic} ms.`);
+			console.log(sims.length);
+			console.log(sims);
+		});
 
 		/**
-		 *  I wanna re-locate to some place where people understand me
-		 *  -) People-people similarity
+		 *  Best chance of getting a personal recommendation from friends (no competition)
+		 *
+		 *  @todo 1) overlap `my skills` - `skills they are looking for`
+		 *  		  2) overlap `my social group` - `their employees`
+		 *  			3) inverted overlap `my skills` - `their skills`
 		 */
-		it.todo('companies located in cities where like-minded people live');
+		it.todo('companies looking for skills their employees (who are in my social group) have not');
+
+		/* Initiative application via personal contacts... */
+		it.todo('companies employing people I know, whose skill set differs from mine the strongest');
+
+		/**
+		 * @description The strength of weak ties - most successful personal employment recommendations do
+		 * 							NOT come from direct friends, but acquaintances OR people THEY know
+		 * @description Me -> friends -> acquaintances <- working for companies <- looking for skills <- I got skills
+		 */
+		it.todo('companies looking for my skill-set employing people known by people I know');
 
 
-		it.todo('companies looking for a similar skill-set that I have');
 
 		/* collective application ?? */
 		it.todo('companies looking for a skill set similar to that of my social group');
 
 		it.todo('companies employing people similar to me (by skill set)');
 
+		/* Could be interesting for personal recommendations */
 		it.todo('companies employing people similar to me (by the people they know)');
 
 		it.todo('companies employing people I know');
@@ -458,6 +516,12 @@ describe('jobs dataset tests - ', () => {
 		it.todo('companies employing people knowing people I know');
 
 		it.todo('companies employing people people I know know');
+
+		/**
+		 *  I wanna re-locate to some place where people understand me ;-))))
+		 */
+		it.todo('companies located in cities where like-minded people live');
+
 
 		/**
 		 match (me:Person{name: 'Cyrus Koch'})-[:HAS_SKILL]->(ms:Skill)<-[:HAS_SKILL]-(p:Person)-[:WORKS_FOR]->(c:Company)-[:LOOKS_FOR_SKILL]->(os:Skill)
