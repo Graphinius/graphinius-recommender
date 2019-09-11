@@ -364,7 +364,7 @@ describe('jobs dataset tests - ', () => {
 
 		describe('people clustering - ', () => {
 
-			it('people having a similar skill set', () => {
+			it('people having a similar skill set -> to a specific node', () => {
 				const tic = +new Date;
 				const start = me.label;
 				const allSets = {};
@@ -428,6 +428,8 @@ describe('jobs dataset tests - ', () => {
 			WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
 			RETURN from.name AS from, to.name AS to, similarity
 			ORDER BY similarity DESC
+			 * 
+			 * @todo implement caching (since we only need to collect 200 groups, not 40k...)
 			 */
 			it.skip('people pairwise similarity by similar social group (jaccard)', () => {
 				const tic = +new Date;
@@ -451,12 +453,15 @@ describe('jobs dataset tests - ', () => {
 
 
 			/**
-			 * @description double overlap
+			 * @example 
 			 * @description skills people I know have <-> skills other groups have
+			 * @description double overlap
 			 * @description take the top-5 most similar-skilled people, and compute their social group overlap
 			 */
-			it.only('people knowing / known-by people of similar skill set', () => {
+			it('people knowing / known-by people of similar skill set', () => {
 				const tic = +new Date;
+
+				// 1) get the people with most similar skill set to me
 				let start = me.label;
 				let allSets = {};
 				g.getNodesT('Person').forEach(n => {
@@ -464,39 +469,55 @@ describe('jobs dataset tests - ', () => {
 				});
 				let sims = simSource(setSimFuncs.jaccard, start, allSets);
 
-				// Extact top-5 people with most similar skill set
-				let 
+				// 2) Extact the top-k people from this set
+				let
 					topK = new Map<string, ITypedNode>(),
 					i = 0;
-				for ( let e of sims ) {
-					if ( i++ < 15 ) {
+				for (let e of sims) {
+					if (i++ < 15) {
 						let node = g.n(e.to);
 						topK.set(node.f('name'), node);
 					}
 				}
-				// console.log(Array.from(topK.values()).map(t => t.f('name')).sort());
-				
-				// now add `myself` to this group (should be topF6 now...?)
+				// console.log(Array.from(topK.values()).map(t => [t.f('name')]).sort());
+
+				// 3) add `myself` back to this group (should be `topK+1` now...?)
 				topK.set(me.label, me);
 
-				// and perform a `normal` simSource over the people they know / are known by
+				// 4) perform a `normal` simSource over the people they know / are known by
 				start = me.label;
 				allSets = {};
 				topK.forEach(n => {
 					allSets[n.label] = g.expand(n, DIR.out, 'KNOWS');
 				});
-				sims = simSource(setSimFuncs.jaccard, start, allSets, {knn: 5});
+				sims = simSource(setSimFuncs.jaccard, start, allSets, { knn: 5 });
 
 				const toc = +new Date;
-				console.log(`Computing the social group overlap to the top-K most similarly skilled people took ${toc-tic} ms.`);
-				console.log(Array.from(sims).map(t => [g.n(t.to).f('name'), t.sim]));
+				console.log(`Computing the social group overlap to the top-K most similarly skilled people took ${toc - tic} ms.`);
+				// console.log(Array.from(sims).map(t => [g.n(t.to).f('name'), t.sim]));
+
+				const top5exp = [
+					['Bryce Hilpert', 0.16667],
+					['Olaf Jacobson', 0.14286],
+					['Mandy Kiehn', 0.1],
+					['Eino Stracke', 0.09375],
+					['Hunter Swaniawski', 0.064516]
+				];
+				expect(Array.from(sims).map(t => [g.n(t.to).f('name'), t.sim])).toEqual(top5exp);
 			});
 
 
 			/**
+			 * @description I want to switch jobs, but stay in my field 
+			 * 							-> who works for companies
 			 * @todo expand to `similar` employer -> ENRICHMENT
+			 * @description similar employer => looking for same skills
+			 * 															 => employing people of similar skill sets (sharedPrefs)?
 			 */
-			it.todo('people knowing / known-by people of same / similar employer');
+			it('people knowing people of similar employer', () => {
+				// 1) Do we start with one specific company? -> makes sense with recommendations
+				// 2) Specify similar employer
+			});
 
 
 			/**
@@ -511,7 +532,53 @@ describe('jobs dataset tests - ', () => {
 
 			it.todo('companies located in the same / similar city');
 
-			it.todo('companies looking for similar skill sets');
+			/**
+				MATCH (c1:Company {name: 'Kovacek-Aufderhar'})-[:LOOKS_FOR_SKILL]->(s1:Skill)
+				WITH c1, collect(id(s1)) AS c1Skills
+				MATCH (c2:Company)-[:LOOKS_FOR_SKILL]->(s2:Skill) WHERE c1 <> c2
+				WITH c1, c1Skills, c2, collect(id(s2)) AS c2Skills
+				RETURN c1.name AS from,
+							c2.name AS to,
+							algo.similarity.jaccard(c1Skills, c2Skills) AS similarity
+				ORDER BY similarity DESC
+			 */
+			it('companies looking for skill sets similar to a specific company (=my employer)', () => {
+				let sim_exp = [0.2608695652173913, 0.4, 0.23809523809523808, 0.20833333333333334, 0.34782608695652173, 0.20833333333333334, 0.2916666666666667, 0.2857142857142857, 0.38095238095238093, 0.3333333333333333, 0.25, 0.30434782608695654, 0.3181818181818182, 0.30434782608695654, 0.34782608695652173, 0.23809523809523808, 0.2857142857142857, 0.22727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2608695652173913, 0.2857142857142857, 0.22727272727272727, 0.36363636363636365, 0.2727272727272727, 0.5, 0.16666666666666666, 0.25, 0.45, 0.30434782608695654, 0.47368421052631576, 0.18181818181818182, 0.42105263157894735, 0.47368421052631576, 0.5238095238095238, 0.16, 0.22727272727272727, 0.2727272727272727, 0.36363636363636365, 0.35, 0.4, 0.4, 0.2727272727272727, 0.4, 0.22727272727272727, 0.21739130434782608];
+				
+				const tic = +new Date;
+				const employer = Array.from(g.outs(me, 'WORKS_FOR'))[0];
+				const source = employer.label;
+
+				const allSets = {};
+				g.getNodesT('Company').forEach(n => {
+					allSets[n.label] = g.expand(n, DIR.out, 'LOOKS_FOR_SKILL');
+				});
+				const sims = simSource(setSimFuncs.jaccard, source, allSets);
+				
+				const toc = +new Date;
+				console.log(`Computing companies interested in similar skills (than my employer) took ${toc - tic} ms.`);
+				// console.log(Array.from(sims).slice(0, 15).map(se => [g.n(se.from).f('name'), g.n(se.to).f('name'), se.isect, se.sim]));
+				expect(Array.from(sims).map(se => se.sim).sort()).toEqual(sim_exp.map(v => +v.toPrecision(5)).sort());
+			});
+
+
+			it('companies looking for similar skill sets - pairwise', () => {
+				const tic = +new Date;
+				const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
+					t1: 'Company',
+					t2: 'Company',
+					d1: DIR.out,
+					d2: DIR.out,
+					e1: 'LOOKS_FOR_SKILL',
+					e2: 'LOOKS_FOR_SKILL',
+					cutFunc: cutFuncs.below,
+					co: 0.99
+				});
+				const toc = +new Date;
+				console.log(`Company-Company shared skill preference took ${toc - tic} ms.`);
+				// console.log(sims);
+				expect(sims.length).toBe(2450);
+			});
 
 			it.todo('companies employing people with overlapping skill sets');
 
@@ -523,13 +590,13 @@ describe('jobs dataset tests - ', () => {
 
 		describe('person-company related similarity', () => {
 
+			it.todo('co-workers');
+
+			it.todo('overlapping skills (having / looking for)');
+
 			it.todo('companies located in the city I live in');
 
-			it.todo('working for the same company');
-
-			it.todo('knowing people who work for my company');
-
-			it.todo('people known by people working for the same company');
+			it.todo('people known by people working for the same / a similar company');
 
 		});
 
