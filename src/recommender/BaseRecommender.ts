@@ -5,8 +5,6 @@ import * as $I from 'graphinius/lib/similarities/interfaces';
 import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
 import {simFuncs as scoreSims} from 'graphinius/lib/similarities/ScoreSimilarities';
 import {knnNodeArray} from 'graphinius/lib/similarities/SimilarityCommons';
-import {TheExpanse} from './TheExpanse';
-
 
 
 class BaseRecommender {
@@ -14,15 +12,19 @@ class BaseRecommender {
 	private _augment;
 
 	constructor(private _g: TypedGraph) {
-		this._expanse = new TheExpanse(this._g);
+		// this._expanse = new TheExpanse(this._g);
 	}
-
-
-	
 
 
 	/**
 	 * Peform several steps of g.getNeighbors() or g.expandK() depending on criteria
+	 * @todo -) takes start node or set
+	 * 			 -) takes a series of expansion steps, for each:
+	 * 			 		- direction
+	 * 			 	  - target type
+	 * 			 	  - #steps
+	 * 			 -) callbacks to apply to each step ???
+	 * 			 		-
 	 */
 	expandChain() {
 

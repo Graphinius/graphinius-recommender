@@ -496,6 +496,7 @@
     var BaseEdge_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
+
     var BaseEdge = (function () {
         function BaseEdge(_id, _node_a, _node_b, config) {
             this._id = _id;
@@ -509,6 +510,7 @@
             this._weighted = config.weighted || false;
             this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
             this._label = config.label || this._id;
+            this._features = config.features != null ? StructUtils.clone(config.features) : {};
         }
         Object.defineProperty(BaseEdge.prototype, "id", {
             get: function () {
@@ -524,6 +526,13 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(BaseEdge.prototype, "features", {
+            get: function () {
+                return this._features;
+            },
+            enumerable: true,
+            configurable: true
+        });
         BaseEdge.prototype.getID = function () {
             return this._id;
         };
@@ -532,6 +541,29 @@
         };
         BaseEdge.prototype.setLabel = function (label) {
             this._label = label;
+        };
+        BaseEdge.prototype.getFeatures = function () {
+            return this._features;
+        };
+        BaseEdge.prototype.getFeature = function (key) {
+            return this._features[key];
+        };
+        BaseEdge.prototype.f = function (key) {
+            return this.getFeature(key);
+        };
+        BaseEdge.prototype.setFeatures = function (features) {
+            this._features = StructUtils.clone(features);
+        };
+        BaseEdge.prototype.setFeature = function (key, value) {
+            this._features[key] = value;
+        };
+        BaseEdge.prototype.deleteFeature = function (key) {
+            var feat = this._features[key];
+            delete this._features[key];
+            return feat;
+        };
+        BaseEdge.prototype.clearFeatures = function () {
+            this._features = {};
         };
         BaseEdge.prototype.isDirected = function () {
             return this._directed;
@@ -4593,7 +4625,7 @@
         if (cfg.knn != null && cfg.knn <= result.length) {
             result = result.slice(0, cfg.knn);
         }
-        return result.sort(sort);
+        return result;
     }
     exports.simSource = simSource;
     function simPairwise(algo, s, cfg) {
@@ -4740,14 +4772,28 @@
         var sims = [];
         var t1Set = g.getNodesT(cfg.t1);
         var t2Set = g.getNodesT(cfg.t2);
+        var prefCache = new Map();
         try {
             for (var _c = __values(t1Set.entries()), _d = _c.next(); !_d.done; _d = _c.next()) {
                 var _e = __read(_d.value, 2), t1Name = _e[0], t1Node = _e[1];
                 try {
                     for (var _f = __values(t2Set.entries()), _g = _f.next(); !_g.done; _g = _f.next()) {
                         var _h = __read(_g.value, 2), t2Name = _h[0], t2Node = _h[1];
-                        var prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
-                        var prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
+                        var prefSet1 = void 0, prefSet2 = void 0;
+                        if (prefCache.get(t1Node.id)) {
+                            prefSet1 = prefCache.get(t1Node.id);
+                        }
+                        else {
+                            prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
+                            prefCache.set(t1Node.id, prefSet1);
+                        }
+                        if (prefCache.get(t2Node.id)) {
+                            prefSet2 = prefCache.get(t2Node.id);
+                        }
+                        else {
+                            prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
+                            prefCache.set(t2Node.id, prefSet2);
+                        }
                         var sim_4 = algo(prefSet1, prefSet2);
                         if (cutFunc(sim_4.sim, cutoff)) {
                             sims.push(__assign({ from: t1Name, to: t2Name }, sim_4));

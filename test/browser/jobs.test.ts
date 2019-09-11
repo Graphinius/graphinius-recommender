@@ -8,7 +8,7 @@ import { buildIdxJSSearch } from '../../src/indexers/buildJSSearch';
 import { jobsIdxConfig, jobsModels } from '../../src/indexers/jobs/interfaces';
 import { jobsConfig } from '../../src/indexers/jobs/appConfig';
 import { simFuncs as setSimFuncs } from 'graphinius/lib/similarities/SetSimilarities';
-import { viaSharedPrefs, simSource, cutFuncs } from 'graphinius/lib/similarities/SimilarityCommons';
+import { viaSharedPrefs, simSource, simPairwise, cutFuncs } from 'graphinius/lib/similarities/SimilarityCommons';
 
 // import {Logger} from 'graphinius/lib/utils/Logger';
 // const logger = new Logger();
@@ -344,7 +344,7 @@ describe('jobs dataset tests - ', () => {
 	 * 			 -> per problem domain?
 	 * 			 -> configurable via node & edge types
 	 */
-	describe.only('similarity measures - ', () => {
+	describe('similarity measures - ', () => {
 
 		let me;
 
@@ -366,12 +366,12 @@ describe('jobs dataset tests - ', () => {
 
 			it('people having a similar skill set -> to a specific node', () => {
 				const tic = +new Date;
-				const start = me.label;
+				const source = me.label;
 				const allSets = {};
 				g.getNodesT('Person').forEach(n => {
 					allSets[n.label] = g.expand(n, DIR.out, 'HAS_SKILL');
 				});
-				const sims = simSource(setSimFuncs.jaccard, start, allSets);
+				const sims = simSource(setSimFuncs.jaccard, source, allSets);
 				const toc = +new Date;
 				// console.log(`Computing most similar people to Tom Lemke by SKILL similarity (Jaccard) took ${toc-tic} ms.`);
 				// console.log(sims);
@@ -391,7 +391,7 @@ describe('jobs dataset tests - ', () => {
 				const cmen = g.ins(country, 'LIVES_IN');
 				cmen.delete(me);
 				const toc = +new Date;
-				// console.log(`Computing people living in same city as Tom Lemke took ${toc-tic} ms.`);
+				// console.log(`Computing people living in same country as Tom Lemke took ${toc-tic} ms.`);
 				const cmen_arr = Array.from(cmen).map(c => c.f('name'));
 				// console.log(cmen_arr.sort());
 				expect(cmen_arr.sort()).toEqual(cmen_exp.sort());
@@ -400,12 +400,12 @@ describe('jobs dataset tests - ', () => {
 
 			it('people knowing the same people', () => {
 				const tic = +new Date;
-				const start = me.label;
+				const source = me.label;
 				const allSets = {};
 				g.getNodesT('Person').forEach(n => {
 					allSets[n.label] = g.expand(n, DIR.out, 'KNOWS');
 				});
-				const sims = simSource(setSimFuncs.jaccard, start, allSets);
+				const sims = simSource(setSimFuncs.jaccard, source, allSets);
 				const toc = +new Date;
 				// console.log(`Computing most similar people to Tom Lemke by SKILL similarity (Jaccard) took ${toc-tic} ms.`);
 				// console.log(sims);
@@ -431,7 +431,7 @@ describe('jobs dataset tests - ', () => {
 			 * 
 			 * @todo implement caching (since we only need to collect 200 groups, not 40k...)
 			 */
-			it.skip('people pairwise similarity by similar social group (jaccard)', () => {
+			it('people pairwise similarity by similar social group (jaccard)', () => {
 				const tic = +new Date;
 				const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
 					t1: 'Person',
@@ -462,12 +462,12 @@ describe('jobs dataset tests - ', () => {
 				const tic = +new Date;
 
 				// 1) get the people with most similar skill set to me
-				let start = me.label;
+				let source = me.label;
 				let allSets = {};
 				g.getNodesT('Person').forEach(n => {
 					allSets[n.label] = g.expand(n, DIR.out, 'HAS_SKILL');
 				});
-				let sims = simSource(setSimFuncs.jaccard, start, allSets);
+				let sims = simSource(setSimFuncs.jaccard, source, allSets);
 
 				// 2) Extact the top-k people from this set
 				let
@@ -485,12 +485,12 @@ describe('jobs dataset tests - ', () => {
 				topK.set(me.label, me);
 
 				// 4) perform a `normal` simSource over the people they know / are known by
-				start = me.label;
+				source = me.label;
 				allSets = {};
 				topK.forEach(n => {
 					allSets[n.label] = g.expand(n, DIR.out, 'KNOWS');
 				});
-				sims = simSource(setSimFuncs.jaccard, start, allSets, { knn: 5 });
+				sims = simSource(setSimFuncs.jaccard, source, allSets, { knn: 5 });
 
 				const toc = +new Date;
 				console.log(`Computing the social group overlap to the top-K most similarly skilled people took ${toc - tic} ms.`);
@@ -528,9 +528,57 @@ describe('jobs dataset tests - ', () => {
 		});
 
 
+		describe('country similarity - ', () => {
+
+			/**
+			 * 1) get companies per country
+			 * 		- only for countries hosting any companies
+			 * 2) collect skill sets looked for by those companies into "country sets"
+			 * 3) compute pairwise similarity
+			 * 4) check if anything meaningful falls out of this :-)))
+			 *
+			 * @todo test !!! (neo4j?)
+			 */
+			it.only('by companies seeking similar skill sets', () => {
+				const hostingCountries = {};
+				g.getNodesT('Country').forEach(n => {
+					let hosts = g.expand(n, DIR.in, 'LOCATED_IN');
+					if ( hosts.size ) {
+						hostingCountries[n.label] = hosts;
+					}
+				});
+				// console.log(Object.keys(hostingCountries).length);
+
+				const skillsSoughtPerCountry: {[key: string]: Set<ITypedNode>} = {};
+				const keys = Object.keys(hostingCountries);
+				for ( let i of keys ) {
+					// console.log(i);
+					// console.log(hostingCountries[i]);
+					for ( let company of hostingCountries[i] ) {
+						if ( !skillsSoughtPerCountry[i] ) {
+							skillsSoughtPerCountry[i] = new Set<ITypedNode>();
+						}
+						let companySkills = g.outs(company, 'LOOKS_FOR_SKILL');
+						for ( let skill of companySkills ) {
+							skillsSoughtPerCountry[i].add(skill);
+						}
+					}
+				}
+
+				const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtPerCountry);
+				console.log(sims);
+			});
+
+			it('by citizens possessing similar skill sets', () => {
+
+			});
+
+		});
+
+
 		describe('company clustering', () => {
 
-			it.todo('companies located in the same / similar city');
+			it.todo('companies located in the same / similar country');
 
 			/**
 				MATCH (c1:Company {name: 'Kovacek-Aufderhar'})-[:LOOKS_FOR_SKILL]->(s1:Skill)
@@ -594,7 +642,7 @@ describe('jobs dataset tests - ', () => {
 
 			it.todo('overlapping skills (having / looking for)');
 
-			it.todo('companies located in the city I live in');
+			it.todo('companies located in the country I live in');
 
 			it.todo('people known by people working for the same / a similar company');
 
@@ -646,9 +694,9 @@ describe('jobs dataset tests - ', () => {
 	 *
 	 *
 	 */
-	describe('real-world job/skill - based recommendations - ', () => {
+	describe.skip('real-world job/skill - based recommendations - ', () => {
 
-		let tom;
+		let me;
 
 		beforeAll(() => {
 			json = JSON.parse(fs.readFileSync(graphFile).toString());
@@ -658,14 +706,31 @@ describe('jobs dataset tests - ', () => {
 			expect(g.nrDirEdges()).toBe(NR_EDGES_DIR);
 			expect(g.nrUndEdges()).toBe(NR_EDGES_UND);
 
-			tom = g.n(idx[jobsModels.person].search('Tom Lemke')[0].id);
-			expect(tom).toBeDefined;
-			expect(tom.f('age')).toBe(59);
+			me = g.n(idx[jobsModels.person].search('Tom Lemke')[0].id);
+			expect(me).toBeDefined;
+			expect(me.f('age')).toBe(59);
 		});
 
 
+		/**
+		 * 1) get my skills
+		 * 2) collect companies' sought-after skill sets
+		 * 3) add my skill set to this collection
+		 * 4) run "normal" simSource
+		 */
 		it('companies looking for a similar skill-set than I have', () => {
+			const source = me.label;
+			const mySkills = g.outs(me, 'HAS_SKILL');
 
+			const allSets = {};
+			g.getNodesT('Company').forEach(n => {
+				allSets[n.label] = g.expand(n, DIR.out, 'LOOKS_FOR_SKILL');
+			});
+
+			allSets[me.label] = mySkills;
+			const sims = simSource(setSimFuncs.jaccard, source, allSets);
+			expect(sims.length).toBe(50);
+			console.log(sims.slice(0, 5).map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]));
 		});
 
 
@@ -713,6 +778,9 @@ describe('jobs dataset tests - ', () => {
 		 *  		  2) overlap `my social group` - `their employees`
 		 *  			3) inverted overlap `my skills` - `their skills`
 		 */
+		it.todo('companies looking for skills their employees have not');
+
+		/* Explain? */
 		it.todo('companies looking for skills their employees (who are in my social group) have not');
 
 		/* Initiative application via personal contacts... */
