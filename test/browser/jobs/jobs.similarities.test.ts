@@ -210,13 +210,30 @@ const
 			/**
 			 * @description I want to switch jobs, but stay in my field 
 			 * 							-> who works for companies
-			 * @todo expand to `similar` employer -> ENRICHMENT
 			 * @description similar employer => looking for same skills
 			 * 															 => employing people of similar skill sets (sharedPrefs)?
 			 */
-			it('people knowing people of similar employer', () => {
-				// 1) Do we start with one specific company? -> makes sense with recommendations
-				// 2) Specify similar employer
+			it.only('people knowing people of similar employer', () => {
+				/**
+				 * companies similar by skills sought
+				 */
+				const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+				// const employees = g.ins(myEmployer, EDGE_TYPES.WorksFor);
+				const skillsDemandByCompany = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+				const sims = simSource(setSimFuncs.jaccard, myEmployer.label, skillsDemandByCompany, {knn: 5});
+				console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+				/**
+				 * collect top-K companies
+				 */
+
+				/**
+				 * collect their employees
+				 */
+
+				/**
+				 * collect people knowing them
+				 */
+
 			});
 
 
