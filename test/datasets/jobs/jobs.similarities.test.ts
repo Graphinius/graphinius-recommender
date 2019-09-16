@@ -9,6 +9,7 @@ import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
 import {cutFuncs, simPairwise, simSource, viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
+import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
 
 
 enum NODE_TYPES {
@@ -209,13 +210,48 @@ const
 			/**
 			 * @description I want to switch jobs, but stay in my field 
 			 * 							-> who works for companies
-			 * @todo expand to `similar` employer -> ENRICHMENT
 			 * @description similar employer => looking for same skills
 			 * 															 => employing people of similar skill sets (sharedPrefs)?
 			 */
-			it('people knowing people of similar employer', () => {
-				// 1) Do we start with one specific company? -> makes sense with recommendations
-				// 2) Specify similar employer
+			it.only('people knowing employees of companies similar to my employer', () => {
+				const tic = Date.now();
+				/**
+				 * companies demanding similar skills
+				 */
+				const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+				const skillsDemandByCompany = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+				const sims = simSource(setSimFuncs.jaccard, myEmployer.label, skillsDemandByCompany, {knn: 5});
+				// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+
+				/**
+				 * collect their employees
+				 */
+				const simEmployersSet = new Set([...Array.from(sims).map(e => g.n(e.to))]);
+				const employeesCombined = g.expand(simEmployersSet, DIR.in, EDGE_TYPES.WorksFor);
+				// console.log(employeesCombined.size);
+
+				/**
+				 * collect people knowing them
+				 */
+				const peepsKnowingEmps = g.expand(employeesCombined, DIR.in, EDGE_TYPES.Knows);
+				// console.log(peepsKnowingEmps.size);
+
+				/**
+				 * collect the most important ones of them according to Pagerank
+				 */
+				const pr = new Pagerank(g, {normalize: true, epsilon: 1e-5}).computePR();
+				const prSorted = Array.from(Object.entries(pr)).filter(e => g.n(e[0]).type === NODE_TYPES.Person).sort((a, b) => b[1] - a[1]);
+				const prSortedTop10 = prSorted.slice(0, 10);
+				const top10Influencers = prSortedTop10.map(e => g.n(e[0]));
+				console.log(top10Influencers.map(i => i.f('name')));
+
+				/**
+				 * Maybe not only sort them by Pagerank but in addition by #people they know (amongst relevant employees...?)
+				 */
+
+				
+				const toc = Date.now();
+				console.log(`Computing top-10 influencers (people knowing employees of companies similar to my employer) via Pagerank took ${toc - tic} ms.`);
 			});
 
 
