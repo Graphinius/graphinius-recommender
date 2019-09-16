@@ -9,7 +9,7 @@ import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
 import {cutFuncs, simPairwise, simSource, viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
-import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
+import {Pagerank} from 'graphinius/lib/centralities/Pagerank';
 
 
 enum NODE_TYPES {
@@ -65,6 +65,52 @@ const
 			me = g.n(idx[jobsModels.person].search('Tom Lemke')[0].id);
 			expect(me).toBeDefined;
 			expect(me.f('age')).toBe(59);
+		});
+
+
+		/**
+		 * @todo formulate expectations
+		 */
+		describe('skills similarity - ', () => {
+
+			it('by overlap of people supplying them', () => {
+				const skillsByPeople = ex.accumulateSets(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.HasSkill);
+				const sims = simPairwise(setSimFuncs.jaccard, skillsByPeople, {knn: 10});
+				// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
+			it('by overlap of companies seeking them', () => {
+				const skillsSoughtByCompany = ex.accumulateSets(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.LooksForSkill);
+				const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCompany, {knn: 10});
+				// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
+			/**
+			 * @description although both sets - skills sought by company / country - are both of size 30
+			 * 							(since there is a 1:1 company-country relationship in this dataset), we get
+			 * 						  different similarity results because several companies are located in the same country
+			 * 						  (there are fewer countries than companies)
+			 */
+			it('by overlap of countries seeking them', () => {
+				const skillsSoughtByCompany = ex.accumulateSets(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.LooksForSkill);
+				const skillsSoughtByCountry = ex.accumulateSetRelations(skillsSoughtByCompany, DIR.out, EDGE_TYPES.LocatedIn);
+				const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCountry, {knn: 10});
+				// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
+			/**
+			 * @description we only check for sub-perfect similarities
+			 */
+			it('by overlap of countries supplying them', () => {
+				const skillsByPeople = ex.accumulateSets(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.HasSkill);
+				const skillsByCountry = ex.accumulateSetRelations(skillsByPeople, DIR.out, EDGE_TYPES.LivesIn);
+				const sims = simPairwise(setSimFuncs.jaccard, skillsByCountry, {knn: 10, cutoff: 0.99, cutFunc: cutFuncs.below});
+				// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
 		});
 
 
@@ -213,7 +259,7 @@ const
 			 * @description similar employer => looking for same skills
 			 * 															 => employing people of similar skill sets (sharedPrefs)?
 			 */
-			it.only('people knowing employees of companies similar to my employer', () => {
+			it('people knowing employees of companies similar to my employer', () => {
 				const tic = Date.now();
 				/**
 				 * companies demanding similar skills
@@ -243,22 +289,56 @@ const
 				const prSorted = Array.from(Object.entries(pr)).filter(e => g.n(e[0]).type === NODE_TYPES.Person).sort((a, b) => b[1] - a[1]);
 				const prSortedTop10 = prSorted.slice(0, 10);
 				const top10Influencers = prSortedTop10.map(e => g.n(e[0]));
-				console.log(top10Influencers.map(i => i.f('name')));
+				// console.log('top-10 influencers are: ', top10Influencers.map(i => i.f('name')));
 
 				/**
-				 * Maybe not only sort them by Pagerank but in addition by #people they know (amongst relevant employees...?)
+				 * @todo Maybe not only sort them by Pagerank but in addition by #people they know (amongst relevant employees...?)
 				 */
 
-				
 				const toc = Date.now();
 				console.log(`Computing top-10 influencers (people knowing employees of companies similar to my employer) via Pagerank took ${toc - tic} ms.`);
 			});
 
 
+			it('people knowing the same people', () => {
+				const allPeopleSets = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+				const top10SimPeople = simSource(setSimFuncs.jaccard, me.label, allPeopleSets, {knn: 10});
+				// console.log(Array.from(top10SimPeople).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
 			/**
-			 * @description huh !?
+			 * @description first from one source
 			 */
-			it.todo('via overlapping social group employment');
+			it('via overlapping social group employers, one source', () => {
+				const allPeopleSets = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+				const employers = ex.accumulateSetRelations(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
+				const simPeopleByEmployer = simSource(setSimFuncs.jaccard, me.label, employers, {knn: 10});
+				// console.log(Array.from(simPeopleByEmployer).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
+			/**
+			 * @description second, pairwise
+			 */
+			it('via overlapping social group employers, pairwise', () => {
+				const allPeopleSets = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+				const employers = ex.accumulateSetRelations(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
+				const simPeopleByEmployer = simPairwise(setSimFuncs.jaccard, employers, {knn: 10});
+				// console.log(Array.from(simPeopleByEmployer).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
+
+
+			/**
+			 * @todo really !?!?!?
+			 */
+			it('via overlapping social group employers countries of origin', () => {
+				const allPeopleSets = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+				const employers = ex.accumulateSetRelations(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
+				const countries = ex.accumulateSetRelations(employers, DIR.out, EDGE_TYPES.LocatedIn);
+				const simPeopleByEmployerCountry = simSource(setSimFuncs.jaccard, me.label, countries, {knn: 10});
+				// console.log(Array.from(simPeopleByEmployerCountry).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
+			});
 
 		});
 

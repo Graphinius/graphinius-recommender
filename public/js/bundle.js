@@ -4018,7 +4018,7 @@
 
     var rngBrowser = createCommonjsModule(function (module) {
     // Unique ID creation requires a high quality random # generator.  In the
-    // datasets this is a little complicated due to unknown quality of Math.random()
+    // browser this is a little complicated due to unknown quality of Math.random()
     // and inconsistent support for the `crypto` API.  We do the best we can via
     // feature-detection
 
@@ -4638,6 +4638,9 @@
             for (var j = 0; j < +i; j++) {
                 var from = keys[i];
                 var to = keys[j];
+                if (from === to) {
+                    continue;
+                }
                 var sim_2 = algo(s[keys[i]], s[keys[j]], i, j);
                 if (cfg.cutoff == null || cutFunc(sim_2.sim, cfg.cutoff)) {
                     result.push(__assign({ from: from, to: to }, sim_2));

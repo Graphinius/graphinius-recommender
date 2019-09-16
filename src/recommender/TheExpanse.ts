@@ -13,6 +13,7 @@ class TheExpanse {
    * @param nodes either a node type as string or a Set of ITypedNodes
    * @param dir
    * @param rel
+   *
    */
   accumulateSets(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
