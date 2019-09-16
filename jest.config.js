@@ -5,7 +5,7 @@ module.exports = {
   collectCoverage: false,
   watchPathIgnorePatterns: [
     "/lib",
-    "/data",
+    // "/data",
     "/public",
     "/scripts"
   ],
@@ -13,6 +13,6 @@ module.exports = {
     // "window": {}
   },
   testMatch: [
-    '**/test/browser/**/*.ts'
+    '**/test/datasets/**/*.ts'
   ],
 };
