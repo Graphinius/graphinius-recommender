@@ -27,7 +27,10 @@ declare global {
     comSim                : any;
     setSim                : any;
     scoSim                : any;
-    
+
+    // Tensorflow
+    tf                    : any;
+
     // idxLunr               : any;
     // idxFuse               : any;
     idxJSSearch           : any;

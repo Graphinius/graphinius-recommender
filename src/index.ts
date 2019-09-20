@@ -4,6 +4,7 @@ window.$G = $G.default;
 
 import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
 import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
+import { ComputeGraph } from 'graphinius/lib/core/compute/ComputeGraph';
 import { importGraph } from './common/importGraph';
 
 import { AppConfig } from './indexers/interfaces';
@@ -22,6 +23,7 @@ window.comSim = $comSim;
 window.setSim = $setSim;
 window.scoSim = $scoSim;
 
+
 /**
  * @description sharedPrefSimilarity between Person-Skills & Company->Skills
  comSim.viaSharedPrefs(g, setSim.simFuncs.jaccard, {
@@ -36,12 +38,23 @@ window.scoSim = $scoSim;
 
 
 (async () => {
-  [jobsConfig].forEach(async config => { // , beerConfig , meetupConfig
+  [jobsConfig].forEach(async config => { // jobsConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
+    await transitivity_cc(graph);
   });
 })();
+
+
+async function transitivity_cc(g) {
+  const cg = new ComputeGraph(g, window.tf);
+  // console.log(`TF backend is: ${window.tf.getBackend()}`); // -> undefined !?
+  let tic = +new Date;
+  await cg.transitivity();
+  let toc = +new Date;
+  console.log(`Transitivity took ${toc-tic} ms.`);
+}
 
 
 function createJSSearchIndex(graph: IGraph, config: AppConfig) {

@@ -93,6 +93,427 @@
     var interfaces_1 = interfaces.DIR;
     var interfaces_2 = interfaces.GraphMode;
 
+    var run_config = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var CMD_ENV_LOG = 'G_LOG';
+    var GENERIC_TYPES = {
+        Node: 'GENERIC',
+        Edge: 'GENERIC',
+        Graph: 'GENERIC'
+    };
+    exports.GENERIC_TYPES = GENERIC_TYPES;
+    var LOG_LEVELS = {
+        debug: 'debug',
+        production: 'production'
+    };
+    exports.LOG_LEVELS = LOG_LEVELS;
+    function runLevel() {
+        var log_level = LOG_LEVELS.production;
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
+            log_level = process.env[CMD_ENV_LOG];
+        }
+        return log_level;
+    }
+    exports.runLevel = runLevel;
+    });
+
+    unwrapExports(run_config);
+    var run_config_1 = run_config.GENERIC_TYPES;
+    var run_config_2 = run_config.LOG_LEVELS;
+    var run_config_3 = run_config.runLevel;
+
+    var Logger_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var LogColors;
+    (function (LogColors) {
+        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
+        LogColors[LogColors["FgRed"] = 31] = "FgRed";
+        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
+        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
+        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
+        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
+        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
+        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
+        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
+        LogColors[LogColors["BgRed"] = 41] = "BgRed";
+        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
+        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
+        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
+        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
+        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
+        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
+    })(LogColors = exports.LogColors || (exports.LogColors = {}));
+    var DEFAULT_COLOR = 37;
+    var Logger = (function () {
+        function Logger(config) {
+            this.config = config || {
+                log_level: run_config.runLevel()
+            };
+        }
+        Logger.prototype.log = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.log.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.error = function (err, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.error.call(console, Logger.colorize(color, err, bright));
+                }
+                else {
+                    console.error.call(console, err);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.dir = function (obj, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
+                }
+                else {
+                    console.dir.call(console, obj);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.info = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.info.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.warn = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    console.warn.call(console, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.prototype.write = function (msg, color, bright) {
+            if (bright === void 0) { bright = false; }
+            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+                if (color) {
+                    process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
+                }
+                else {
+                    process.stdout.write.call(process.stdout, msg);
+                }
+                return true;
+            }
+            return false;
+        };
+        Logger.colorize = function (color, output, bright) {
+            var out_bright = bright ? '\x1b[1m' : null;
+            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
+        };
+        return Logger;
+    }());
+    exports.Logger = Logger;
+    });
+
+    unwrapExports(Logger_1);
+    var Logger_2 = Logger_1.LogColors;
+    var Logger_3 = Logger_1.Logger;
+
+    var ComputeGraph_1 = createCommonjsModule(function (module, exports) {
+    var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var logger = new Logger_1.Logger();
+    var DEFAULT_WEIGHT = 1;
+    var ComputeGraph = (function () {
+        function ComputeGraph(_g, _tf) {
+            this._g = _g;
+            this._tf = _tf;
+        }
+        ComputeGraph.prototype.nextArray = function (incoming) {
+            if (incoming === void 0) { incoming = false; }
+            var next = [], node_keys = Object.keys(this._g.getNodes());
+            var adjDict = this.adjListW(incoming, true, 0);
+            for (var i = 0; i < this._g.nrNodes(); ++i) {
+                next.push([]);
+                for (var j = 0; j < this._g.nrNodes(); ++j) {
+                    next[i].push([]);
+                    next[i][j].push(i === j ? j : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? j : null);
+                }
+            }
+            return next;
+        };
+        ComputeGraph.prototype.adjMatrix = function () {
+            var adjList = [], node_keys = Object.keys(this._g.getNodes());
+            var adjDict = this.adjListW();
+            for (var i = 0; i < this._g.nrNodes(); ++i) {
+                adjList.push([]);
+                for (var j = 0; j < this._g.nrNodes(); ++j) {
+                    adjList[i].push(i === j ? 0 : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? 1 : 0);
+                }
+            }
+            return adjList;
+        };
+        ComputeGraph.prototype.adjMatrixW = function (incoming, include_self, self_dist) {
+            if (incoming === void 0) { incoming = false; }
+            if (include_self === void 0) { include_self = false; }
+            if (self_dist === void 0) { self_dist = 0; }
+            var adjList = [], node_keys = Object.keys(this._g.getNodes());
+            var adjDict = this.adjListW(incoming, include_self, self_dist);
+            for (var i = 0; i < this._g.nrNodes(); ++i) {
+                adjList.push([]);
+                for (var j = 0; j < this._g.nrNodes(); ++j) {
+                    adjList[i].push(i === j ? self_dist : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? adjDict[node_keys[i]][node_keys[j]] : Number.POSITIVE_INFINITY);
+                }
+            }
+            return adjList;
+        };
+        ComputeGraph.prototype.adjListW = function (incoming, include_self, self_dist) {
+            if (incoming === void 0) { incoming = false; }
+            if (include_self === void 0) { include_self = false; }
+            if (self_dist === void 0) { self_dist = 0; }
+            var adj_list_dict = {}, nodes = this._g.getNodes(), cur_dist, key, cur_edge_weight;
+            for (key in nodes) {
+                adj_list_dict[key] = {};
+                if (include_self) {
+                    adj_list_dict[key][key] = self_dist;
+                }
+            }
+            for (key in nodes) {
+                var neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
+                neighbors.forEach(function (ne) {
+                    cur_dist = adj_list_dict[key][ne.node.getID()] || Number.POSITIVE_INFINITY;
+                    cur_edge_weight = isNaN(ne.edge.getWeight()) ? DEFAULT_WEIGHT : ne.edge.getWeight();
+                    if (cur_edge_weight < cur_dist) {
+                        adj_list_dict[key][ne.node.getID()] = cur_edge_weight;
+                        if (incoming) {
+                            adj_list_dict[ne.node.getID()][key] = cur_edge_weight;
+                        }
+                    }
+                    else {
+                        adj_list_dict[key][ne.node.getID()] = cur_dist;
+                        if (incoming) {
+                            adj_list_dict[ne.node.getID()][key] = cur_dist;
+                        }
+                    }
+                });
+            }
+            return adj_list_dict;
+        };
+        ComputeGraph.prototype.triadCount = function (directed) {
+            if (directed === void 0) { directed = false; }
+            var e_1, _a, e_2, _b;
+            var triangle_count = 0;
+            var dupes_set = new Set();
+            var edges = directed ? Object.values(this._g.getDirEdges()) : Object.values(this._g.getUndEdges());
+            var ia, ib, ja, jb, path_id;
+            try {
+                for (var edges_1 = __values(edges), edges_1_1 = edges_1.next(); !edges_1_1.done; edges_1_1 = edges_1.next()) {
+                    var i = edges_1_1.value;
+                    try {
+                        for (var edges_2 = __values(edges), edges_2_1 = edges_2.next(); !edges_2_1.done; edges_2_1 = edges_2.next()) {
+                            var j = edges_2_1.value;
+                            if (i === j) {
+                                continue;
+                            }
+                            ia = i.getNodes().a;
+                            ib = i.getNodes().b;
+                            ja = j.getNodes().a;
+                            jb = j.getNodes().b;
+                            if (ia === ib || ja === jb) {
+                                continue;
+                            }
+                            if (ib === ja && ia !== jb) {
+                                path_id = ia.id + "-" + ib.id + "-" + jb.id;
+                                if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
+                                    dupes_set.add(path_id);
+                                    triangle_count++;
+                                }
+                            }
+                            if (!directed) {
+                                if (ia === ja && ib !== jb) {
+                                    path_id = ib.id + "-" + ia.id + "-" + jb.id;
+                                    if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
+                                        dupes_set.add(path_id);
+                                        triangle_count++;
+                                    }
+                                }
+                                if (ib === jb && ia !== ja) {
+                                    path_id = ia.id + "-" + ib.id + "-" + ja.id;
+                                    if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
+                                        dupes_set.add(path_id);
+                                        triangle_count++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (edges_2_1 && !edges_2_1.done && (_b = edges_2.return)) _b.call(edges_2);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (edges_1_1 && !edges_1_1.done && (_a = edges_1.return)) _a.call(edges_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return triangle_count;
+        };
+        ComputeGraph.prototype.triangleCount = function (directed) {
+            if (directed === void 0) { directed = false; }
+            return __awaiter(this, void 0, void 0, function () {
+                var adj_list, a, aux2, aux3, trace, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this._tf || !this._tf.matMul) {
+                                throw new Error("Tensorflow & TF matMul function must be present in order to compute transitivity.");
+                            }
+                            adj_list = this.adjMatrix();
+                            a = this._tf.tensor2d(adj_list);
+                            return [4, a.matMul(a).array()];
+                        case 1:
+                            aux2 = _a.sent();
+                            return [4, a.matMul(aux2).array()];
+                        case 2:
+                            aux3 = _a.sent();
+                            trace = 0;
+                            for (i = 0; i < aux3.length; i++) {
+                                trace += aux3[i][i];
+                            }
+                            return [2, directed ? trace / 3 : trace / 6];
+                    }
+                });
+            });
+        };
+        ComputeGraph.prototype.transitivity = function (directed) {
+            if (directed === void 0) { directed = false; }
+            return __awaiter(this, void 0, void 0, function () {
+                var triangles, triads;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4, this.triangleCount(directed)];
+                        case 1:
+                            triangles = _a.sent();
+                            triads = this.triadCount(directed);
+                            return [2, 3 * triangles / triads];
+                    }
+                });
+            });
+        };
+        ComputeGraph.prototype.clustCoef = function (directed) {
+            if (directed === void 0) { directed = false; }
+            return __awaiter(this, void 0, void 0, function () {
+                var result, adj_list, a, aux2, aux3, deg, node, cci, keys, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this._tf || !this._tf.matMul) {
+                                throw new Error("Tensorflow & TF matMul function must be present in order to compute clustering coef.");
+                            }
+                            result = {};
+                            adj_list = this.adjMatrix();
+                            a = this._tf.tensor2d(adj_list);
+                            return [4, a.matMul(a).array()];
+                        case 1:
+                            aux2 = _a.sent();
+                            return [4, a.matMul(aux2).array()];
+                        case 2:
+                            aux3 = _a.sent();
+                            keys = Object.keys(this._g.getNodes());
+                            for (i in aux3[0]) {
+                                node = this._g.getNodeById(keys[i]);
+                                deg = directed ? node.inDegree() + node.outDegree() : node.degree();
+                                cci = (aux3[i][i] / (deg * (deg - 1))) || 0;
+                                result[i] = directed ? 2 * cci : cci;
+                            }
+                            return [2, result];
+                    }
+                });
+            });
+        };
+        return ComputeGraph;
+    }());
+    exports.ComputeGraph = ComputeGraph;
+    });
+
+    unwrapExports(ComputeGraph_1);
+    var ComputeGraph_2 = ComputeGraph_1.ComputeGraph;
+
     var StructUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -1356,6 +1777,7 @@
 
 
 
+
     function Johnsons(graph) {
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
@@ -1423,8 +1845,9 @@
     }
     exports.reWeighGraph = reWeighGraph;
     function PFSFromAllNodes(graph) {
-        var dists = graph.adjListArray();
-        var next = graph.nextArray();
+        var cg = new ComputeGraph_1.ComputeGraph(graph);
+        var dists = cg.adjMatrixW();
+        var next = cg.nextArray();
         var nodesDict = graph.getNodes();
         var nodeIDIdxMap = {};
         var i = 0;
@@ -1476,14 +1899,6 @@
 
     var BaseGraph_1 = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-
-
-
-    var DEFAULT_WEIGHT = 1;
     var BaseGraph = (function () {
         function BaseGraph(_label) {
             this._label = _label;
@@ -1635,63 +2050,6 @@
                 }
             });
             return negative_cycle;
-        };
-        BaseGraph.prototype.nextArray = function (incoming) {
-            if (incoming === void 0) { incoming = false; }
-            var next = [], node_keys = Object.keys(this._nodes);
-            var adjDict = this.adjListDict(incoming, true, 0);
-            for (var i = 0; i < this._nr_nodes; ++i) {
-                next.push([]);
-                for (var j = 0; j < this._nr_nodes; ++j) {
-                    next[i].push([]);
-                    next[i][j].push(i === j ? j : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? j : null);
-                }
-            }
-            return next;
-        };
-        BaseGraph.prototype.adjListArray = function (incoming, include_self, self_dist) {
-            if (incoming === void 0) { incoming = false; }
-            var adjList = [], node_keys = Object.keys(this._nodes);
-            var adjDict = this.adjListDict(incoming, true, 0);
-            for (var i = 0; i < this._nr_nodes; ++i) {
-                adjList.push([]);
-                for (var j = 0; j < this._nr_nodes; ++j) {
-                    adjList[i].push(i === j ? 0 : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? adjDict[node_keys[i]][node_keys[j]] : Number.POSITIVE_INFINITY);
-                }
-            }
-            return adjList;
-        };
-        BaseGraph.prototype.adjListDict = function (incoming, include_self, self_dist) {
-            if (incoming === void 0) { incoming = false; }
-            if (include_self === void 0) { include_self = false; }
-            if (self_dist === void 0) { self_dist = 0; }
-            var adj_list_dict = {}, nodes = this.getNodes(), cur_dist, key, cur_edge_weight;
-            for (key in nodes) {
-                adj_list_dict[key] = {};
-                if (include_self) {
-                    adj_list_dict[key][key] = self_dist;
-                }
-            }
-            for (key in nodes) {
-                var neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
-                neighbors.forEach(function (ne) {
-                    cur_dist = adj_list_dict[key][ne.node.getID()] || Number.POSITIVE_INFINITY;
-                    cur_edge_weight = isNaN(ne.edge.getWeight()) ? DEFAULT_WEIGHT : ne.edge.getWeight();
-                    if (cur_edge_weight < cur_dist) {
-                        adj_list_dict[key][ne.node.getID()] = cur_edge_weight;
-                        if (incoming) {
-                            adj_list_dict[ne.node.getID()][key] = cur_edge_weight;
-                        }
-                    }
-                    else {
-                        adj_list_dict[key][ne.node.getID()] = cur_dist;
-                        if (incoming) {
-                            adj_list_dict[ne.node.getID()][key] = cur_dist;
-                        }
-                    }
-                });
-            }
-            return adj_list_dict;
         };
         BaseGraph.prototype.getMode = function () {
             return this._mode;
@@ -2054,35 +2412,6 @@
 
     unwrapExports(BaseGraph_1);
     var BaseGraph_2 = BaseGraph_1.BaseGraph;
-
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var CMD_ENV_LOG = 'G_LOG';
-    var GENERIC_TYPES = {
-        Node: 'GENERIC',
-        Edge: 'GENERIC',
-        Graph: 'GENERIC'
-    };
-    exports.GENERIC_TYPES = GENERIC_TYPES;
-    var LOG_LEVELS = {
-        debug: 'debug',
-        production: 'production'
-    };
-    exports.LOG_LEVELS = LOG_LEVELS;
-    function runLevel() {
-        var log_level = LOG_LEVELS.production;
-        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
-            log_level = process.env[CMD_ENV_LOG];
-        }
-        return log_level;
-    }
-    exports.runLevel = runLevel;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.GENERIC_TYPES;
-    var run_config_2 = run_config.LOG_LEVELS;
-    var run_config_3 = run_config.runLevel;
 
     var TypedEdge_1 = createCommonjsModule(function (module, exports) {
     var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
@@ -2663,8 +2992,9 @@
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
-        var dists = graph.adjListArray();
-        var next = graph.nextArray();
+        var cg = new ComputeGraph_1.ComputeGraph(graph);
+        var dists = cg.adjMatrixW();
+        var next = cg.nextArray();
         var N = dists.length;
         for (var k = 0; k < N; ++k) {
             for (var i = 0; i < N; ++i) {
@@ -2688,7 +3018,8 @@
         if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
             throw new Error("Cowardly refusing to traverse graph without edges.");
         }
-        var dists = graph.adjListArray();
+        var cg = new ComputeGraph_1.ComputeGraph(graph);
+        var dists = cg.adjMatrixW();
         var N = dists.length;
         for (var k = 0; k < N; ++k) {
             for (var i = 0; i < N; ++i) {
@@ -2761,7 +3092,7 @@
 
     function betweennessCentrality(graph, directed, sparse) {
         var paths;
-        var sparse = sparse || false;
+        sparse = sparse || false;
         if (sparse) {
             paths = Johnsons_1.Johnsons(graph)[1];
         }
@@ -2877,9 +3208,11 @@
 
 
 
+
     var Brandes = (function () {
         function Brandes(_graph) {
             this._graph = _graph;
+            this._cg = new ComputeGraph_1.ComputeGraph(this._graph);
         }
         Brandes.prototype.computeUnweighted = function (normalize, directed) {
             if (normalize === void 0) { normalize = false; }
@@ -2889,7 +3222,7 @@
                 throw new Error("Cowardly refusing to traverse graph without edges.");
             }
             var nodes = this._graph.getNodes();
-            var adjList = this._graph.adjListDict();
+            var adjList = this._cg.adjListW();
             var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, Q = [], S = [], CB = {};
             var closedNodes = {};
             for (var n in nodes) {
@@ -2978,7 +3311,7 @@
             }
             var nodes = this._graph.getNodes();
             var N = Object.keys(nodes).length;
-            var adjList = this._graph.adjListDict();
+            var adjList = this._cg.adjListW();
             var evalPriority = function (nb) { return nb.best; };
             var evalObjID = function (nb) { return nb.id; };
             var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, S = [], CB = {}, closedNodes = {}, Q = new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID);
@@ -3064,7 +3397,7 @@
         Brandes.prototype.computePFSbased = function (normalize, directed) {
             var e_3, _a;
             var nodes = this._graph.getNodes();
-            var adjList = this._graph.adjListDict();
+            var adjList = this._cg.adjListW();
             var Pred = {}, sigma = {}, delta = {}, S = [], CB = {};
             for (var n in nodes) {
                 var currID = nodes[n].getID();
@@ -3573,126 +3906,6 @@
 
     unwrapExports(Pagerank_1);
     var Pagerank_2 = Pagerank_1.Pagerank;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var LogColors;
-    (function (LogColors) {
-        LogColors[LogColors["FgBlack"] = 30] = "FgBlack";
-        LogColors[LogColors["FgRed"] = 31] = "FgRed";
-        LogColors[LogColors["FgGreen"] = 32] = "FgGreen";
-        LogColors[LogColors["FgYellow"] = 33] = "FgYellow";
-        LogColors[LogColors["FgBlue"] = 34] = "FgBlue";
-        LogColors[LogColors["FgMagenta"] = 35] = "FgMagenta";
-        LogColors[LogColors["FgCyan"] = 36] = "FgCyan";
-        LogColors[LogColors["FgWhite"] = 37] = "FgWhite";
-        LogColors[LogColors["BgBlack"] = 40] = "BgBlack";
-        LogColors[LogColors["BgRed"] = 41] = "BgRed";
-        LogColors[LogColors["BgGreen"] = 42] = "BgGreen";
-        LogColors[LogColors["BgYellow"] = 43] = "BgYellow";
-        LogColors[LogColors["BgBlue"] = 44] = "BgBlue";
-        LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
-        LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
-        LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    var DEFAULT_COLOR = 37;
-    var Logger = (function () {
-        function Logger(config) {
-            this.config = config || {
-                log_level: run_config.runLevel()
-            };
-        }
-        Logger.prototype.log = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.log.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.error = function (err, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.error.call(console, Logger.colorize(color, err, bright));
-                }
-                else {
-                    console.error.call(console, err);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.dir = function (obj, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
-                }
-                else {
-                    console.dir.call(console, obj);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.info = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.info.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.warn = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    console.warn.call(console, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.prototype.write = function (msg, color, bright) {
-            if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
-                if (color) {
-                    process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
-                }
-                else {
-                    process.stdout.write.call(process.stdout, msg);
-                }
-                return true;
-            }
-            return false;
-        };
-        Logger.colorize = function (color, output, bright) {
-            var out_bright = bright ? '\x1b[1m' : null;
-            return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
-        };
-        return Logger;
-    }());
-    exports.Logger = Logger;
-    });
-
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
 
     var RemoteUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -4277,7 +4490,6 @@
                         type: edge_type
                     };
                     if (this._config.dupeCheck && edc.isDupe(newEdge)) {
-                        logger.log("Edge " + edge_label + " is a duplicate according to assumptions... omitting.");
                         continue;
                     }
                     graph.addEdgeByID(edge_id, node, target_node, {
@@ -5424,6 +5636,7 @@
 
     // CORE
 
+
     // Base
 
 
@@ -5489,6 +5702,9 @@
     			TypedEdge								: TypedEdge_1.TypedEdge,
     			TypedNode								: TypedNode_1.TypedNode,
     			TypedGraph							: TypedGraph_1.TypedGraph
+    		},
+    		compute: {
+    			ComputeGraph						: ComputeGraph_1.ComputeGraph
     		}
     	},
     	centralities: {
@@ -5584,6 +5800,7 @@
             });
         });
     }
+    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -5629,7 +5846,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-
+    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -5667,7 +5884,7 @@
 
       return ExactWordIndexStrategy;
     }();
-
+    //# sourceMappingURL=ExactWordIndexStrategy.js.map
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -5713,7 +5930,7 @@
 
       return PrefixIndexStrategy;
     }();
-
+    //# sourceMappingURL=PrefixIndexStrategy.js.map
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -5751,7 +5968,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(IndexStrategy);
@@ -5788,7 +6005,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-
+    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -5826,7 +6043,7 @@
 
       return LowerCaseSanitizer;
     }();
-
+    //# sourceMappingURL=LowerCaseSanitizer.js.map
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -5855,7 +6072,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Sanitizer);
@@ -5890,7 +6107,7 @@
 
       return value;
     }
-
+    //# sourceMappingURL=getNestedFieldValue.js.map
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6067,7 +6284,7 @@
 
       return TfIdfSearchIndex;
     }();
-
+    //# sourceMappingURL=TfIdfSearchIndex.js.map
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6166,7 +6383,7 @@
 
       return UnorderedSearchIndex;
     }();
-
+    //# sourceMappingURL=UnorderedSearchIndex.js.map
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6195,7 +6412,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(SearchIndex);
@@ -6239,7 +6456,7 @@
 
       return SimpleTokenizer;
     }();
-
+    //# sourceMappingURL=SimpleTokenizer.js.map
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6293,7 +6510,7 @@
 
       return StemmingTokenizer;
     }();
-
+    //# sourceMappingURL=StemmingTokenizer.js.map
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6434,7 +6651,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-
+    //# sourceMappingURL=StopWordsMap.js.map
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6487,7 +6704,7 @@
 
       return StopWordsTokenizer;
     }();
-
+    //# sourceMappingURL=StopWordsTokenizer.js.map
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -6525,7 +6742,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     unwrapExports(Tokenizer);
@@ -6780,7 +6997,7 @@
 
       return Search;
     }();
-
+    //# sourceMappingURL=Search.js.map
     });
 
     unwrapExports(Search_1);
@@ -6903,7 +7120,7 @@
 
       return TokenHighlighter;
     }();
-
+    //# sourceMappingURL=TokenHighlighter.js.map
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7013,7 +7230,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-
+    //# sourceMappingURL=index.js.map
     });
 
     var index = unwrapExports(commonjs);
@@ -7050,6 +7267,7 @@
         window['idx'] = indexes;
         return indexes;
     }
+    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -7109,6 +7327,9 @@
                             graph = _a.sent();
                             indexes = createJSSearchIndex(graph, config);
                             searchRes = executeSearch(indexes, config, graph);
+                            return [4, transitivity_cc(graph)];
+                        case 2:
+                            _a.sent();
                             return [2];
                     }
                 });
@@ -7116,6 +7337,24 @@
             return [2];
         });
     }); })();
+    function transitivity_cc(g) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cg, tic, toc;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        cg = new ComputeGraph_2(g, window.tf);
+                        tic = +new Date;
+                        return [4, cg.transitivity()];
+                    case 1:
+                        _a.sent();
+                        toc = +new Date;
+                        console.log("Transitivity took " + (toc - tic) + " ms.");
+                        return [2];
+                }
+            });
+        });
+    }
     function createJSSearchIndex(graph, config) {
         var tic = +new Date;
         var indexes = buildIdxJSSearch(graph, config.idxConfig);
