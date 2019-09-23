@@ -18,6 +18,11 @@ import * as $comSim from 'graphinius/lib/similarities/SimilarityCommons';
 import * as $setSim from 'graphinius/lib/similarities/SetSimilarities';
 import * as $scoSim from 'graphinius/lib/similarities/ScoreSimilarities';
 
+// import { TextDecoder } from 'text-encoding';
+// if (!window['TextDecoder']) {
+//   window['TextDecoder'] = TextDecoder;
+// }
+
 /* HACKETY HACK */
 window.comSim = $comSim;
 window.setSim = $setSim;
@@ -53,7 +58,7 @@ async function transitivity_cc(g) {
   let tic = +new Date;
   await cg.transitivity();
   let toc = +new Date;
-  console.log(`Transitivity took ${toc-tic} ms.`);
+  console.log(`Transitivity on ${g.label} graph took ${toc-tic} ms.`);
 }
 
 

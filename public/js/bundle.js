@@ -7298,6 +7298,7 @@
             fields: ['name']
         }
     };
+    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -7309,34 +7310,31 @@
         models: jobsModels,
         searchModel: jobsModels.skill
     };
+    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = graphinius;
     window.comSim = $comSim;
     window.setSim = $setSim;
     window.scoSim = $scoSim;
-    (function () { return __awaiter(_this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            [jobsConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
-                var graph, indexes, searchRes;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4, importGraph(config)];
-                        case 1:
-                            graph = _a.sent();
-                            indexes = createJSSearchIndex(graph, config);
-                            searchRes = executeSearch(indexes, config, graph);
-                            return [4, transitivity_cc(graph)];
-                        case 2:
-                            _a.sent();
-                            return [2];
-                    }
-                });
-            }); });
-            return [2];
-        });
-    }); })();
+    (function () {
+        [jobsConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+            var graph, indexes, searchRes;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, importGraph(config)];
+                    case 1:
+                        graph = _a.sent();
+                        indexes = createJSSearchIndex(graph, config);
+                        searchRes = executeSearch(indexes, config, graph);
+                        return [4, transitivity_cc(graph)];
+                    case 2:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        }); });
+    })();
     function transitivity_cc(g) {
         return __awaiter(this, void 0, void 0, function () {
             var cg, tic, toc;
@@ -7349,7 +7347,7 @@
                     case 1:
                         _a.sent();
                         toc = +new Date;
-                        console.log("Transitivity took " + (toc - tic) + " ms.");
+                        console.log("Transitivity on " + g.label + " graph took " + (toc - tic) + " ms.");
                         return [2];
                 }
             });

@@ -9,7 +9,7 @@ import {knnNodeArray} from 'graphinius/lib/similarities/SimilarityCommons';
 
 class BaseRecommender {
 	private _expanse;
-	private _augment;
+	// private _augment;
 
 	constructor(private _g: TypedGraph) {
 		// this._expanse = new TheExpanse(this._g);
@@ -23,8 +23,10 @@ class BaseRecommender {
 	 * 			 		- direction
 	 * 			 	  - target type
 	 * 			 	  - #steps
+	 * 			 	  	- expand or periphery
 	 * 			 -) callbacks to apply to each step ???
-	 * 			 		-
+	 * 			 		- PRO: flexibility
+	 * 			 	  - CONS: speed
 	 */
 	expandChain() {
 
