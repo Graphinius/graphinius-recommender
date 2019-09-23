@@ -37,7 +37,7 @@ window.scoSim = $scoSim;
 */
 
 
-(async () => {
+(() => {
   [jobsConfig].forEach(async config => { // jobsConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);

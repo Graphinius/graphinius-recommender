@@ -9,21 +9,7 @@ import { jobsIdxConfig, jobsModels } from '../../../src/indexers/jobs/interfaces
 import { jobsConfig } from '../../../src/indexers/jobs/appConfig';
 import { simFuncs as setSimFuncs } from 'graphinius/lib/similarities/SetSimilarities';
 import { viaSharedPrefs, simSource, simPairwise, cutFuncs } from 'graphinius/lib/similarities/SimilarityCommons';
-
-
-enum NODE_TYPES {
-	Person = "PERSON",
-	Company = "COMPANY",
-	Country = "COUNTRY",
-	Skill = "SKILL"
-}
-
-enum EDGE_TYPES {
-	HasSkill = "HAS_SKILL",
-	WorksFor = "WORKS_FOR",
-	Knows = "KNOWS",
-	LooksForSkill = "LOOKS_FOR_SKILL"
-}
+import {NODE_TYPES, EDGE_TYPES} from './common';
 
 
 const

@@ -10,23 +10,7 @@ import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilariti
 import {cutFuncs, simPairwise, simSource, viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {Pagerank} from 'graphinius/lib/centralities/Pagerank';
-
-
-enum NODE_TYPES {
-	Person = "PERSON",
-	Company = "COMPANY",
-	Country = "COUNTRY",
-	Skill = "SKILL"
-}
-
-enum EDGE_TYPES {
-	HasSkill = "HAS_SKILL",
-	WorksFor = "WORKS_FOR",
-	Knows = "KNOWS",
-	LivesIn = "LIVES_IN",
-	LocatedIn = "LOCATED_IN",
-	LooksForSkill = "LOOKS_FOR_SKILL"
-}
+import {NODE_TYPES, EDGE_TYPES} from './common';
 
 
 const

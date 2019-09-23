@@ -9,10 +9,14 @@ class TheExpanse {
 
 
   /**
-   * @todo transfer to graphinius (core)?
    * @param nodes either a node type as string or a Set of ITypedNodes
    * @param dir
    * @param rel
+   * @returns expansion from a type of nodes or from a set of nodes
+   *
+   * @todo transfer to graphinius (core)?
+   * @todo isn't the `set of nodes` version the same as our normal expander? Except we have a map here...?
+   *       -> where is multiple dispatch when you need it !?
    *
    */
   accumulateSets(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {

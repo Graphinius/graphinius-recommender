@@ -1,31 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { DIR } from 'graphinius/lib/core/interfaces';
-import { TypedNode, ITypedNode } from 'graphinius/lib/core/typed/TypedNode';
-import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
-import { JSONInput, JSONGraph } from 'graphinius/lib/io/input/JSONInput';
-import { buildIdxJSSearch } from '../../../src/indexers/buildJSSearch';
-import { jobsIdxConfig, jobsModels } from '../../../src/indexers/jobs/interfaces';
-import { jobsConfig } from '../../../src/indexers/jobs/appConfig';
-import { simFuncs as setSimFuncs } from 'graphinius/lib/similarities/SetSimilarities';
-import { viaSharedPrefs, simSource, simPairwise, cutFuncs } from 'graphinius/lib/similarities/SimilarityCommons';
-
-// import {Logger} from 'graphinius/lib/utils/Logger';
-// const logger = new Logger();
-
-enum NODE_TYPES {
-	Person = "PERSON",
-	Company = "COMPANY",
-	Country = "COUNTRY",
-	Skill = "SKILL"
-}
-
-enum EDGE_TYPES {
-	HasSkill = "HAS_SKILL",
-	WorksFor = "WORKS_FOR",
-	Knows = "KNOWS",
-	LooksForSkill = "LOOKS_FOR_SKILL"
-}
+import {DIR} from 'graphinius/lib/core/interfaces';
+import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
+import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
+import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
+import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
+import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
+import {jobsConfig} from '../../../src/indexers/jobs/appConfig';
+import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
+import {viaSharedPrefs, simSource, simPairwise, cutFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
+import {NODE_TYPES, EDGE_TYPES} from './common';
 
 
 const
