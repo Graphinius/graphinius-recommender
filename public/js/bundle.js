@@ -369,65 +369,24 @@
         };
         ComputeGraph.prototype.triadCount = function (directed) {
             if (directed === void 0) { directed = false; }
-            var e_1, _a, e_2, _b;
+            var e_1, _a;
             var triangle_count = 0;
-            var dupes_set = new Set();
-            var edges = directed ? Object.values(this._g.getDirEdges()) : Object.values(this._g.getUndEdges());
-            var ia, ib, ja, jb, path_id;
+            var nodes = Object.values(this._g.getNodes());
             try {
-                for (var edges_1 = __values(edges), edges_1_1 = edges_1.next(); !edges_1_1.done; edges_1_1 = edges_1.next()) {
-                    var i = edges_1_1.value;
-                    try {
-                        for (var edges_2 = __values(edges), edges_2_1 = edges_2.next(); !edges_2_1.done; edges_2_1 = edges_2.next()) {
-                            var j = edges_2_1.value;
-                            if (i === j) {
-                                continue;
-                            }
-                            ia = i.getNodes().a;
-                            ib = i.getNodes().b;
-                            ja = j.getNodes().a;
-                            jb = j.getNodes().b;
-                            if (ia === ib || ja === jb) {
-                                continue;
-                            }
-                            if (ib === ja && ia !== jb) {
-                                path_id = ia.id + "-" + ib.id + "-" + jb.id;
-                                if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
-                                    dupes_set.add(path_id);
-                                    triangle_count++;
-                                }
-                            }
-                            if (!directed) {
-                                if (ia === ja && ib !== jb) {
-                                    path_id = ib.id + "-" + ia.id + "-" + jb.id;
-                                    if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
-                                        dupes_set.add(path_id);
-                                        triangle_count++;
-                                    }
-                                }
-                                if (ib === jb && ia !== ja) {
-                                    path_id = ia.id + "-" + ib.id + "-" + ja.id;
-                                    if (!dupes_set.has(path_id) && !dupes_set.has(path_id.split('-').reverse().join('-'))) {
-                                        dupes_set.add(path_id);
-                                        triangle_count++;
-                                    }
-                                }
-                            }
-                        }
+                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
+                    var n = nodes_1_1.value;
+                    if (directed) {
+                        triangle_count += n.inDegree() * n.outDegree();
                     }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (edges_2_1 && !edges_2_1.done && (_b = edges_2.return)) _b.call(edges_2);
-                        }
-                        finally { if (e_2) throw e_2.error; }
+                    else {
+                        triangle_count += n.degree() * (n.degree() - 1) / 2;
                     }
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (edges_1_1 && !edges_1_1.done && (_a = edges_1.return)) _a.call(edges_1);
+                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
@@ -655,6 +614,7 @@
             this._in_degree = 0;
             this._out_degree = 0;
             this._und_degree = 0;
+            this._self_degree = 0;
             this._in_edges = {};
             this._out_edges = {};
             this._und_edges = {};
@@ -725,6 +685,9 @@
         };
         BaseNode.prototype.degree = function () {
             return this._und_degree;
+        };
+        BaseNode.prototype.selfDegree = function () {
+            return this._self_degree;
         };
         BaseNode.prototype.addEdge = function (edge) {
             var nodes = edge.getNodes();
@@ -5800,7 +5763,6 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -5846,7 +5808,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -5884,7 +5846,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -5930,7 +5892,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -5968,7 +5930,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -6005,7 +5967,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -6043,7 +6005,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -6072,7 +6034,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -6107,7 +6069,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6284,7 +6246,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6383,7 +6345,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6412,7 +6374,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -6456,7 +6418,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6510,7 +6472,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6651,7 +6613,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6704,7 +6666,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -6742,7 +6704,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -6997,7 +6959,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -7120,7 +7082,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7230,7 +7192,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
@@ -7267,7 +7229,6 @@
         window['idx'] = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -7298,7 +7259,6 @@
             fields: ['name']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -7310,7 +7270,6 @@
         models: jobsModels,
         searchModel: jobsModels.skill
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     window.$G = graphinius;
@@ -7337,14 +7296,20 @@
     })();
     function transitivity_cc(g) {
         return __awaiter(this, void 0, void 0, function () {
-            var cg, tic, toc;
+            var tic, toc, cg;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         cg = new ComputeGraph_2(g, window.tf);
                         tic = +new Date;
-                        return [4, cg.transitivity()];
+                        return [4, cg.clustCoef(true)];
                     case 1:
+                        _a.sent();
+                        toc = +new Date;
+                        console.log("Clustering coefficient on " + g.label + " graph took " + (toc - tic) + " ms.");
+                        tic = +new Date;
+                        return [4, cg.transitivity(true)];
+                    case 2:
                         _a.sent();
                         toc = +new Date;
                         console.log("Transitivity on " + g.label + " graph took " + (toc - tic) + " ms.");

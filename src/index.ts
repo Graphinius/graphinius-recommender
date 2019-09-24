@@ -53,11 +53,18 @@ window.scoSim = $scoSim;
 
 
 async function transitivity_cc(g) {
+  let tic, toc;
   const cg = new ComputeGraph(g, window.tf);
   // console.log(`TF backend is: ${window.tf.getBackend()}`); // -> undefined !?
-  let tic = +new Date;
-  await cg.transitivity();
-  let toc = +new Date;
+
+  tic = +new Date;
+  await cg.clustCoef(true);
+  toc = +new Date;
+  console.log(`Clustering coefficient on ${g.label} graph took ${toc-tic} ms.`);
+
+  tic = +new Date;
+  await cg.transitivity(true);
+  toc = +new Date;
   console.log(`Transitivity on ${g.label} graph took ${toc-tic} ms.`);
 }
 
