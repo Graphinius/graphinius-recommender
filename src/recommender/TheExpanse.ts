@@ -19,7 +19,7 @@ class TheExpanse {
    *       -> where is multiple dispatch when you need it !?
    *
    */
-  accumulateSets(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
+  accumulateMaps(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
     let sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
     sourceNodes.forEach(n => {

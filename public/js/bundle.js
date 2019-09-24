@@ -372,14 +372,16 @@
             var e_1, _a;
             var triangle_count = 0;
             var nodes = Object.values(this._g.getNodes());
+            var deg;
             try {
                 for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
                     var n = nodes_1_1.value;
                     if (directed) {
-                        triangle_count += n.inDegree() * n.outDegree();
+                        triangle_count += (n.in_deg - n.self_in_deg) * (n.out_deg - n.self_out_deg);
                     }
                     else {
-                        triangle_count += n.degree() * (n.degree() - 1) / 2;
+                        deg = n.deg - n.self_deg;
+                        triangle_count += deg * (deg - 1) / 2;
                     }
                 }
             }
@@ -456,7 +458,7 @@
                             keys = Object.keys(this._g.getNodes());
                             for (i in aux3[0]) {
                                 node = this._g.getNodeById(keys[i]);
-                                deg = directed ? node.inDegree() + node.outDegree() : node.degree();
+                                deg = directed ? node.in_deg + node.out_deg : node.deg;
                                 cci = (aux3[i][i] / (deg * (deg - 1))) || 0;
                                 result[i] = directed ? 2 * cci : cci;
                             }
@@ -605,16 +607,28 @@
     var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
 
     var BaseNode_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
 
     var BaseNode = (function () {
         function BaseNode(_id, config) {
             if (config === void 0) { config = {}; }
             this._id = _id;
-            this._in_degree = 0;
-            this._out_degree = 0;
-            this._und_degree = 0;
-            this._self_degree = 0;
+            this._in_deg = 0;
+            this._out_deg = 0;
+            this._deg = 0;
+            this._self_in_deg = 0;
+            this._self_out_deg = 0;
+            this._self_deg = 0;
             this._in_edges = {};
             this._out_edges = {};
             this._und_edges = {};
@@ -677,44 +691,79 @@
         BaseNode.prototype.clearFeatures = function () {
             this._features = {};
         };
-        BaseNode.prototype.inDegree = function () {
-            return this._in_degree;
-        };
-        BaseNode.prototype.outDegree = function () {
-            return this._out_degree;
-        };
-        BaseNode.prototype.degree = function () {
-            return this._und_degree;
-        };
-        BaseNode.prototype.selfDegree = function () {
-            return this._self_degree;
-        };
+        Object.defineProperty(BaseNode.prototype, "deg", {
+            get: function () {
+                return this._deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "in_deg", {
+            get: function () {
+                return this._in_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "out_deg", {
+            get: function () {
+                return this._out_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_deg", {
+            get: function () {
+                return this._self_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_in_deg", {
+            get: function () {
+                return this._self_in_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_out_deg", {
+            get: function () {
+                return this._self_out_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
         BaseNode.prototype.addEdge = function (edge) {
-            var nodes = edge.getNodes();
-            if (nodes.a !== this && nodes.b !== this) {
+            var ends = edge.getNodes();
+            if (ends.a !== this && ends.b !== this) {
                 throw new Error("Cannot add edge that does not connect to this node");
             }
-            var edgeID = edge.getID();
+            var id = edge.id;
             if (edge.isDirected()) {
-                if (nodes.a === this && !this._out_edges[edgeID]) {
-                    this._out_edges[edgeID] = edge;
-                    this._out_degree += 1;
-                    if (nodes.b === this && !this._in_edges[edgeID]) {
-                        this._in_edges[edgeID] = edge;
-                        this._in_degree += 1;
+                if (ends.a === this && !this._out_edges[id]) {
+                    this._out_edges[id] = edge;
+                    this._out_deg += 1;
+                    if (ends.b === this && !this._in_edges[id]) {
+                        this._in_edges[id] = edge;
+                        this._in_deg += 1;
+                        this._self_in_deg += 1;
+                        this._self_out_deg += 1;
                     }
                 }
-                else if (!this._in_edges[edgeID]) {
-                    this._in_edges[edgeID] = edge;
-                    this._in_degree += 1;
+                else if (!this._in_edges[id]) {
+                    this._in_edges[id] = edge;
+                    this._in_deg += 1;
                 }
             }
             else {
-                if (this._und_edges[edge.getID()]) {
+                if (this._und_edges[edge.id]) {
                     throw new Error("Cannot add same undirected edge multiple times.");
                 }
-                this._und_edges[edge.getID()] = edge;
-                this._und_degree += 1;
+                this._und_edges[id] = edge;
+                this._deg += 1;
+                if (ends.a === ends.b) {
+                    this._self_deg += 1;
+                }
             }
             return edge;
         };
@@ -750,59 +799,75 @@
             if (!this.hasEdge(edge)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            var id = edge.getID();
+            var id = edge.id;
+            var ends = edge.getNodes();
             var e = this._und_edges[id];
             if (e) {
                 delete this._und_edges[id];
-                this._und_degree -= 1;
+                this._deg -= 1;
+                (ends.a === ends.b) && (this._self_deg -= 1);
             }
             e = this._in_edges[id];
             if (e) {
                 delete this._in_edges[id];
-                this._in_degree -= 1;
+                this._in_deg -= 1;
+                (ends.a === ends.b) && (this._self_in_deg -= 1);
             }
             e = this._out_edges[id];
             if (e) {
                 delete this._out_edges[id];
-                this._out_degree -= 1;
+                this._out_deg -= 1;
+                (ends.a === ends.b) && (this._self_out_deg -= 1);
             }
         };
         BaseNode.prototype.removeEdgeByID = function (id) {
             if (!this.hasEdgeID(id)) {
                 throw new Error("Cannot remove unconnected edge.");
             }
-            var e = this._und_edges[id];
-            if (e) {
-                delete this._und_edges[id];
-                this._und_degree -= 1;
-            }
-            e = this._in_edges[id];
-            if (e) {
-                delete this._in_edges[id];
-                this._in_degree -= 1;
-            }
-            e = this._out_edges[id];
-            if (e) {
-                delete this._out_edges[id];
-                this._out_degree -= 1;
-            }
+            this.removeEdge(this.getEdge(id));
         };
         BaseNode.prototype.clearOutEdges = function () {
-            this._out_edges = {};
-            this._out_degree = 0;
+            var e_1, _a;
+            try {
+                for (var _b = __values(Object.values(this.outEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var e = _c.value;
+                    this.removeEdge(e);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
         };
         BaseNode.prototype.clearInEdges = function () {
-            this._in_edges = {};
-            this._in_degree = 0;
+            var e_2, _a;
+            try {
+                for (var _b = __values(Object.values(this.inEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var e = _c.value;
+                    this.removeEdge(e);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
         };
         BaseNode.prototype.clearUndEdges = function () {
             this._und_edges = {};
-            this._und_degree = 0;
+            this._deg = 0;
+            this._self_deg = 0;
         };
         BaseNode.prototype.clearEdges = function () {
-            this.clearInEdges();
-            this.clearOutEdges();
             this.clearUndEdges();
+            this._in_edges = {};
+            this._out_edges = {};
+            this._deg = this._self_deg = this._in_deg = this._self_in_deg = this._out_deg = this._self_out_deg = 0;
         };
         BaseNode.prototype.prevNodes = function () {
             var prevs = [];
@@ -1925,13 +1990,13 @@
                 var deg = void 0;
                 switch (dir) {
                     case interfaces.DIR.in:
-                        deg = node.inDegree();
+                        deg = node.in_deg;
                         break;
                     case interfaces.DIR.out:
-                        deg = node.outDegree();
+                        deg = node.out_deg;
                         break;
                     default:
-                        deg = node.degree();
+                        deg = node.deg;
                 }
                 if (!result[deg]) {
                     result[deg] = new Set([node]);
@@ -2071,9 +2136,9 @@
             if (!rem_node) {
                 throw new Error('Cannot remove a foreign node.');
             }
-            var in_deg = node.inDegree();
-            var out_deg = node.outDegree();
-            var deg = node.degree();
+            var in_deg = node.in_deg;
+            var out_deg = node.out_deg;
+            var deg = node.deg;
             if (in_deg) {
                 this.deleteInEdgesOf(node);
             }
@@ -3524,7 +3589,7 @@
                         var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
-                                ret[key] = node.inDegree();
+                                ret[key] = node.in_deg;
                             }
                             else {
                                 ret[key] = ret[key] || 0;
@@ -3540,7 +3605,7 @@
                         var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
-                                ret[key] = node.outDegree();
+                                ret[key] = node.out_deg;
                             }
                             else {
                                 ret[key] = ret[key] || 0;
@@ -3556,7 +3621,7 @@
                         var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
-                                ret[key] = node.degree();
+                                ret[key] = node.deg;
                             }
                             else {
                                 ret[key] = ret[key] || 0;
@@ -3572,7 +3637,7 @@
                         var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
-                                ret[key] = node.inDegree() + node.outDegree();
+                                ret[key] = node.in_deg + node.out_deg;
                             }
                             else {
                                 ret[key] = ret[key] || 0;
@@ -3589,7 +3654,7 @@
                         var node = graph.getNodeById(key);
                         if (node != null) {
                             if (!weighted) {
-                                ret[key] = node.degree() + node.inDegree() + node.outDegree();
+                                ret[key] = node.deg + node.in_deg + node.out_deg;
                             }
                             else {
                                 ret[key] = ret[key] || 0;
@@ -3608,7 +3673,7 @@
             var max_deg = 0, key, nodes = graph.getNodes(), node, all_deg;
             for (key in nodes) {
                 node = nodes[key];
-                all_deg = node.inDegree() + node.outDegree() + node.degree() + 1;
+                all_deg = node.in_deg + node.out_deg + node.deg + 1;
                 max_deg = all_deg > max_deg ? all_deg : max_deg;
             }
             var deg_dist = {
@@ -3620,11 +3685,11 @@
             };
             for (key in nodes) {
                 node = nodes[key];
-                deg_dist.in[node.inDegree()]++;
-                deg_dist.out[node.outDegree()]++;
-                deg_dist.dir[node.inDegree() + node.outDegree()]++;
-                deg_dist.und[node.degree()]++;
-                deg_dist.all[node.inDegree() + node.outDegree() + node.degree()]++;
+                deg_dist.in[node.in_deg]++;
+                deg_dist.out[node.out_deg]++;
+                deg_dist.dir[node.in_deg + node.out_deg]++;
+                deg_dist.und[node.deg]++;
+                deg_dist.all[node.in_deg + node.out_deg + node.deg]++;
             }
             return deg_dist;
         };
@@ -3736,7 +3801,7 @@
                     this._PRArrayDS.curr[i] = defaultInit(this._graph);
                     this._PRArrayDS.old[i] = defaultInit(this._graph);
                 }
-                this._PRArrayDS.out_deg[i] = node.outDegree() + node.degree();
+                this._PRArrayDS.out_deg[i] = node.out_deg + node.deg;
                 if (this._personalized) {
                     var tele_prob_node = config.tele_set[node.getID()] || 0;
                     this._PRArrayDS.teleport[i] = tele_prob_node;
