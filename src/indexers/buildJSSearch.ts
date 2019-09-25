@@ -29,8 +29,8 @@ function buildIdxJSSearch(graph: IGraph, idxConfig: IndexConfig) : {} {
     if ( !idxObj ) {
       return false;
     }
-    let idxEntry = {id: n.getID()};
-    idxObj.fields.forEach(f => idxEntry[f] = n.getFeature(f));
+    let idxEntry = {id: n.id};
+    idxObj.fields.forEach(f => idxEntry[f] = n.f(f));
 
     // console.log(idxEntry);
 

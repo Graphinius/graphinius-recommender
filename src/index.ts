@@ -13,15 +13,12 @@ import { buildIdxJSSearch } from './indexers/buildJSSearch';
 import { beerConfig } from './indexers/beer/appConfig';
 import { jobsConfig } from './indexers/jobs/appConfig';
 import { meetupConfig } from './indexers/meetup/appConfig';
+import { northwindConfig } from './indexers/northwind/appConfig';
 
 import * as $comSim from 'graphinius/lib/similarities/SimilarityCommons';
 import * as $setSim from 'graphinius/lib/similarities/SetSimilarities';
 import * as $scoSim from 'graphinius/lib/similarities/ScoreSimilarities';
 
-// import { TextDecoder } from 'text-encoding';
-// if (!window['TextDecoder']) {
-//   window['TextDecoder'] = TextDecoder;
-// }
 
 /* HACKETY HACK */
 window.comSim = $comSim;
@@ -29,21 +26,8 @@ window.setSim = $setSim;
 window.scoSim = $scoSim;
 
 
-/**
- * @description sharedPrefSimilarity between Person-Skills & Company->Skills
- comSim.viaSharedPrefs(g, setSim.simFuncs.jaccard, {
-    t1: 'Person',
-    t2: 'Company',
-    d1: 'outs',
-    d2: 'outs',
-    e1: 'HAS_SKILL',
-    e2: 'LOOKS_FOR_SKILL'
-  });
-*/
-
-
 (() => {
-  [jobsConfig].forEach(async config => { // jobsConfig , beerConfig , meetupConfig
+  [northwindConfig].forEach(async config => { // jobsConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
