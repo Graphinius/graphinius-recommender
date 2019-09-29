@@ -9,7 +9,7 @@
     "watch": "rollup -cw",
     "prod": "NODE_ENV=production rollup -cw",
     "dev": "ts-node-dev src/recs/simpleGroupRecs.ts",
-    "test:jobs": "G_LOG=debug jest -c jest.config.js --watch jobs.test",
+    "test:jobs": "G_LOG=debug jest -c jest.config.js --watch jobs",
     "test:all": "jest && jest -c jest.config.js"
   },
   "repository": {
@@ -32,7 +32,7 @@
     "@types/node": "^12.6.8",
     "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
-    "rollup": "^1.17.0",
+    "rollup": "^1.22.0",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-livereload": "^1.0.1",
     "rollup-plugin-node-resolve": "^5.2.0",

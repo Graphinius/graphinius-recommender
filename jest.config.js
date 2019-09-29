@@ -13,6 +13,6 @@ module.exports = {
     // "window": {}
   },
   testMatch: [
-    '**/test/datasets/**/*.ts'
+    '**/test/datasets/**/*.test.ts'
   ],
 };

@@ -1,4 +1,6 @@
 import * as $G from 'graphinius';
+console.log('Graphinius: ', $G);
+
 /* HACKETY HACK */
 window.$G = $G.default;
 
