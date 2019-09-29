@@ -3848,8 +3848,7 @@
                 this.normalizePR();
             }
             for (var key in nodes) {
-                var node_val = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
-                result[key] = node_val;
+                result[key] = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
             }
             return result;
         };
@@ -7295,57 +7294,45 @@
         return indexes;
     }
 
-    var nwModels;
-    (function (nwModels) {
-        nwModels["category"] = "category";
-        nwModels["product"] = "product";
-        nwModels["customer"] = "customer";
-        nwModels["supplier"] = "supplier";
-        nwModels["employee"] = "employee";
-        nwModels["order"] = "order";
-    })(nwModels || (nwModels = {}));
-    var nwIdxConfig = {
-        category: {
-            string: nwModels.category,
+    var jobsModels;
+    (function (jobsModels) {
+        jobsModels["person"] = "person";
+        jobsModels["company"] = "company";
+        jobsModels["country"] = "country";
+        jobsModels["skill"] = "skill";
+    })(jobsModels || (jobsModels = {}));
+    var jobsIdxConfig = {
+        company: {
+            string: 'company',
             id: 'id',
-            fields: ['name', 'description']
+            fields: ['name', 'desc']
         },
-        product: {
-            string: nwModels.product,
+        country: {
+            string: 'country',
             id: 'id',
             fields: ['name']
         },
-        customer: {
-            string: nwModels.customer,
+        person: {
+            string: 'person',
             id: 'id',
-            fields: ['name', 'contact', 'ctitle', 'address', 'city', 'region', 'postalCode', 'country', 'phone', 'fax']
+            fields: ['name', 'age']
         },
-        supplier: {
-            string: nwModels.supplier,
+        skill: {
+            string: 'skill',
             id: 'id',
-            fields: ['name', 'contact', 'ctitle', 'address', 'city', 'region', 'postalCode', 'country', 'phone', 'fax', 'homePage']
-        },
-        employee: {
-            string: nwModels.employee,
-            id: 'id',
-            fields: ['lastName', 'firstName', 'title', 'titleOfCourtesy', 'birthDate', 'address', 'city', 'region', 'postalCode', 'country', 'homePhone', 'notes']
-        },
-        order: {
-            string: nwModels.order,
-            id: 'id',
-            fields: ['orderDate', 'requiredDate', 'shippedDate', 'shipVia', 'freight', 'shipName', 'shipAddress', 'shipCity', 'shipRegion', 'shipPostalCode', 'shipCountry']
+            fields: ['name']
         }
     };
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
-    var northwindConfig = {
-        graphName: "northwind",
-        graphFile: testGraphDir + "/northwind." + graphExt,
-        searchTerm: "apple",
-        idxConfig: nwIdxConfig,
-        models: nwIdxConfig,
-        searchModel: nwModels.product
+    var jobsConfig = {
+        graphName: "jobs",
+        graphFile: testGraphDir + "/jobs." + graphExt,
+        searchTerm: "TypeScript",
+        idxConfig: jobsIdxConfig,
+        models: jobsModels,
+        searchModel: jobsModels.skill
     };
 
     var _this = undefined;
@@ -7354,7 +7341,7 @@
     window.setSim = $setSim;
     window.scoSim = $scoSim;
     (function () {
-        [northwindConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+        [jobsConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
             var graph, indexes, searchRes;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -7363,7 +7350,9 @@
                         graph = _a.sent();
                         indexes = createJSSearchIndex(graph, config);
                         searchRes = executeSearch(indexes, config, graph);
-                        return [4, transitivity_cc(graph)];
+                        testBDPFS(graph);
+                        testPagerank(graph);
+                        return [4, testTransitivityCc(graph)];
                     case 2:
                         _a.sent();
                         return [2];
@@ -7371,7 +7360,23 @@
             });
         }); });
     })();
-    function transitivity_cc(g) {
+    function testBDPFS(g) {
+        var tic, toc;
+        [BFS_2, DFS_3, PFS_3].forEach(function (traversal) {
+            tic = +new Date;
+            traversal(g, g.getRandomNode());
+            toc = +new Date;
+            console.log(traversal.name + " on " + g.label + " graph took " + (toc - tic) + " ms.");
+        });
+    }
+    function testPagerank(g) {
+        var PR = new Pagerank_2(g, { normalize: true, epsilon: 1e-6 });
+        var tic = +new Date;
+        PR.computePR();
+        var toc = +new Date;
+        console.log("Pagerank on " + g.label + " graph took " + (toc - tic) + " ms.");
+    }
+    function testTransitivityCc(g) {
         return __awaiter(this, void 0, void 0, function () {
             var tic, toc, cg;
             return __generator(this, function (_a) {

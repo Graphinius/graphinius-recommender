@@ -33,7 +33,7 @@ export default {
     serve({
       contentBase: 'public',
       open: false,
-      host: 'localhost',
+      host: '0.0.0.0',
       port: '8080'
     }),
     livereload({

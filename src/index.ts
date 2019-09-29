@@ -5,6 +5,10 @@ window.$G = $G.default;
 import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
 import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
 import { ComputeGraph } from 'graphinius/lib/core/compute/ComputeGraph';
+import { BFS } from 'graphinius/lib/search/BFS';
+import { DFS } from 'graphinius/lib/search/DFS';
+import { PFS } from 'graphinius/lib/search/PFS';
+import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
 import { importGraph } from './common/importGraph';
 
 import { AppConfig } from './indexers/interfaces';
@@ -27,16 +31,38 @@ window.scoSim = $scoSim;
 
 
 (() => {
-  [northwindConfig].forEach(async config => { // jobsConfig , beerConfig , meetupConfig
+  [jobsConfig].forEach(async config => { // jobsConfig , northwindConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
-    await transitivity_cc(graph);
+    testBDPFS(graph);
+    testPagerank(graph);
+    await testTransitivityCc(graph);
   });
 })();
 
 
-async function transitivity_cc(g) {
+function testBDPFS(g: IGraph) {
+  let tic, toc;
+  [BFS, DFS, PFS].forEach(traversal => {
+    tic = +new Date;
+    traversal(g, g.getRandomNode());
+    toc = +new Date;
+    console.log(`${traversal.name} on ${g.label} graph took ${toc-tic} ms.`);
+  });
+}
+
+
+function testPagerank(g: IGraph) {
+  const PR = new Pagerank(g, {normalize: true, epsilon: 1e-6});
+  const tic = +new Date;
+  PR.computePR();
+  const toc = +new Date;
+  console.log(`Pagerank on ${g.label} graph took ${toc-tic} ms.`);
+}
+
+
+async function testTransitivityCc(g) {
   let tic, toc;
   const cg = new ComputeGraph(g, window.tf);
   // console.log(`TF backend is: ${window.tf.getBackend()}`); // -> undefined !?
