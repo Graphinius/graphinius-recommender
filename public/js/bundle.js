@@ -62,6 +62,17 @@
         }
     }
 
+    function __values(o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    }
+
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
     function unwrapExports (x) {
@@ -4833,13 +4844,13 @@
         return ar;
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.simSort = {
+    exports.sortFuncs = {
         asc: function (se1, se2) { return se1.sim - se2.sim; },
         desc: function (se1, se2) { return se2.sim - se1.sim; }
     };
     exports.cutFuncs = {
         above: function (sim, threshold) { return sim >= threshold; },
-        below: function (sim, threshold) { return sim <= threshold; },
+        below: function (sim, threshold) { return sim <= threshold; }
     };
     function sim(algo, a, b) {
         return algo(a, b);
@@ -4848,7 +4859,7 @@
     function simSource(algo, s, t, cfg) {
         if (cfg === void 0) { cfg = {}; }
         var e_1, _a;
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
         var result = [];
         var start = t[s];
@@ -4880,7 +4891,7 @@
     exports.simSource = simSource;
     function simPairwise(algo, s, cfg) {
         if (cfg === void 0) { cfg = {}; }
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
         var result = [];
         var keys = Object.keys(s);
@@ -4906,7 +4917,7 @@
     exports.simPairwise = simPairwise;
     function simSubsets(algo, s1, s2, cfg) {
         if (cfg === void 0) { cfg = {}; }
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
         var result = [];
         var keys1 = Object.keys(s1);
@@ -4933,14 +4944,9 @@
         return result.sort(sort);
     }
     exports.simSubsets = simSubsets;
-    function simGroups(algo, s1, s2, config) {
-        throw new Error('not implemented yet');
-        return { isect: 0, sim: 0 };
-    }
-    exports.simGroups = simGroups;
     function knnNodeArray(algo, s, cfg) {
         var e_2, _a;
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var c = cfg.cutoff || 0;
         var topK = [];
         var dupes = {};
@@ -4973,7 +4979,7 @@
     exports.knnNodeArray = knnNodeArray;
     function knnNodeDict(algo, s, cfg) {
         var e_3, _a;
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var c = cfg.cutoff || 0;
         var topK = {};
         var _loop_1 = function (node) {
@@ -5019,7 +5025,7 @@
     exports.knnNodeDict = knnNodeDict;
     function viaSharedPrefs(g, algo, cfg) {
         var e_5, _a, e_6, _b;
-        var sort = cfg.sort || exports.simSort.desc;
+        var sort = cfg.sort || exports.sortFuncs.desc;
         var cutoff = cfg.co == null ? 1e-6 : cfg.co;
         var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
         var sims = [];
@@ -5110,33 +5116,30 @@
     });
 
     var SimilarityCommons$1 = unwrapExports(SimilarityCommons);
-    var SimilarityCommons_1 = SimilarityCommons.simSort;
+    var SimilarityCommons_1 = SimilarityCommons.sortFuncs;
     var SimilarityCommons_2 = SimilarityCommons.cutFuncs;
     var SimilarityCommons_3 = SimilarityCommons.sim;
     var SimilarityCommons_4 = SimilarityCommons.simSource;
     var SimilarityCommons_5 = SimilarityCommons.simPairwise;
     var SimilarityCommons_6 = SimilarityCommons.simSubsets;
-    var SimilarityCommons_7 = SimilarityCommons.simGroups;
-    var SimilarityCommons_8 = SimilarityCommons.knnNodeArray;
-    var SimilarityCommons_9 = SimilarityCommons.knnNodeDict;
-    var SimilarityCommons_10 = SimilarityCommons.viaSharedPrefs;
-    var SimilarityCommons_11 = SimilarityCommons.getBsNotInA;
+    var SimilarityCommons_7 = SimilarityCommons.knnNodeArray;
+    var SimilarityCommons_8 = SimilarityCommons.knnNodeDict;
+    var SimilarityCommons_9 = SimilarityCommons.viaSharedPrefs;
+    var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
-        simSort: SimilarityCommons_1,
+        sortFuncs: SimilarityCommons_1,
         cutFuncs: SimilarityCommons_2,
         sim: SimilarityCommons_3,
         simSource: SimilarityCommons_4,
         simPairwise: SimilarityCommons_5,
         simSubsets: SimilarityCommons_6,
-        simGroups: SimilarityCommons_7,
-        knnNodeArray: SimilarityCommons_8,
-        knnNodeDict: SimilarityCommons_9,
-        viaSharedPrefs: SimilarityCommons_10,
-        getBsNotInA: SimilarityCommons_11
+        knnNodeArray: SimilarityCommons_7,
+        knnNodeDict: SimilarityCommons_8,
+        viaSharedPrefs: SimilarityCommons_9,
+        getBsNotInA: SimilarityCommons_10
     });
 
     var SetSimilarities = createCommonjsModule(function (module, exports) {
@@ -5191,7 +5194,6 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5414,7 +5416,6 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5795,13 +5796,10 @@
     	// },
     };
 
-    /**
-     * For NodeJS / CommonJS global object
-     */
+    // CommonJS global object
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -5847,6 +5845,72 @@
         });
     }
     //# sourceMappingURL=importGraph.js.map
+
+    var TheExpanse = (function () {
+        function TheExpanse(_g) {
+            this._g = _g;
+        }
+        TheExpanse.prototype.accumulateSets = function (nodes, dir, rel) {
+            var _this = this;
+            var result = {};
+            var sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
+            sourceNodes.forEach(function (n) {
+                var targets = _this._g.expand(n, dir, rel);
+                if (targets.size) {
+                    result[n.label] = targets;
+                }
+            });
+            return result;
+        };
+        TheExpanse.prototype.accumulateSetRelations = function (sources, dir, rel) {
+            var e_1, _a, e_2, _b, e_3, _c;
+            var result = {};
+            var keys = Object.keys(sources);
+            try {
+                for (var keys_1 = __values(keys), keys_1_1 = keys_1.next(); !keys_1_1.done; keys_1_1 = keys_1.next()) {
+                    var i = keys_1_1.value;
+                    try {
+                        for (var _d = (e_2 = void 0, __values(sources[i])), _e = _d.next(); !_e.done; _e = _d.next()) {
+                            var source = _e.value;
+                            if (!result[i]) {
+                                result[i] = new Set();
+                            }
+                            var targets = this._g[dir](source, rel);
+                            try {
+                                for (var targets_1 = (e_3 = void 0, __values(targets)), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
+                                    var target = targets_1_1.value;
+                                    result[i].add(target);
+                                }
+                            }
+                            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                            finally {
+                                try {
+                                    if (targets_1_1 && !targets_1_1.done && (_c = targets_1.return)) _c.call(targets_1);
+                                }
+                                finally { if (e_3) throw e_3.error; }
+                            }
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (keys_1_1 && !keys_1_1.done && (_a = keys_1.return)) _a.call(keys_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return result;
+        };
+        return TheExpanse;
+    }());
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -7282,7 +7346,6 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });
@@ -7373,6 +7436,7 @@
                     case 0: return [4, importGraph(config)];
                     case 1:
                         graph = _a.sent();
+                        window.ex = new TheExpanse(graph);
                         indexes = createJSSearchIndex(graph, config);
                         searchRes = executeSearch(indexes, config, graph);
                         testBDPFS(graph);

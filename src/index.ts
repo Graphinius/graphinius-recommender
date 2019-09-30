@@ -1,6 +1,5 @@
 import * as $G from 'graphinius';
 console.log('Graphinius: ', $G);
-
 /* HACKETY HACK */
 window.$G = $G.default;
 
@@ -12,6 +11,7 @@ import { DFS } from 'graphinius/lib/search/DFS';
 import { PFS } from 'graphinius/lib/search/PFS';
 import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
 import { importGraph } from './common/importGraph';
+import {TheExpanse} from '../src/recommender/TheExpanse';
 
 import { AppConfig } from './indexers/interfaces';
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
@@ -35,6 +35,7 @@ window.scoSim = $scoSim;
 (() => {
   [jobsConfig].forEach(async config => { // jobsConfig , northwindConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
+    window.ex = new TheExpanse(graph);
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
     testBDPFS(graph);

@@ -19,7 +19,7 @@ class TheExpanse {
    *       -> where is multiple dispatch when you need it !?
    *
    */
-  accumulateMaps(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
+  accumulateSets(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
     let sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
     sourceNodes.forEach(n => {
@@ -34,7 +34,7 @@ class TheExpanse {
 
   /**
    * @description we get a map/dict of Set<ITypedNode>, a direction & a relation 
-   * @returns a set of Set<ITypedNode>, where each Set is an expansion of one input Set
+   * @returns a object of key : Set<ITypedNode>, where each Set is an expansion of one input Set
    * 
    * @todo transfer to graphinius (core)?
    * @todo rename -> !? ...
@@ -48,8 +48,11 @@ class TheExpanse {
           result[i] = new Set<ITypedNode>();
         }
         let targets = this._g[dir](source, rel);
-        for ( let skill of targets ) {
-          result[i].add(skill);
+        if ( !targets ) {
+          continue;
+        }
+        for ( let target of targets ) {
+          result[i].add(target);
         }
       }
     }

@@ -96,7 +96,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const source = me.label;
 			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
 
-			const allSets = ex.accumulateMaps(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			const allSets = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
 			allSets[me.label] = mySkills;
 
 			const sims = simSource(setSimFuncs.jaccard, source, allSets);

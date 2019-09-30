@@ -1,6 +1,7 @@
 import { IBaseNode } from 'graphinius/lib/core/base/BaseNode';
 import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
 import * as JsSearch from 'js-search';
+import {TheExpanse} from "../recommender/TheExpanse";
 
 
 /**
@@ -24,6 +25,7 @@ declare global {
 
     $G                    : any;
     g                     : IGraph;
+    ex                    : TheExpanse;
     comSim                : any;
     setSim                : any;
     scoSim                : any;
