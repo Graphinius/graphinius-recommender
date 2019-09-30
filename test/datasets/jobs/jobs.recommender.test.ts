@@ -59,6 +59,8 @@ describe('real-world job/skill - based recommendations - ', () => {
 	 * 				* direct applications -> to company
 	 * 				* referrals (hunting for influential people)
 	 * 					 - strength of weak ties ?
+	 * 				* more general similarities (by country, sector, job description => enrichment!)
+	 * 				* all of the above weighted by other graph metrics (pagerank, transitivity, ...)
 	 * 
 	 * @example	scenarios
 	 * 					1) Companies looking for my skill set?
@@ -81,9 +83,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 	 * 						  - branch / department profiles / job postings / skill demands
 	 * 						  - ratings (companies / departments / skills)
 	 * 						  - enrich social network of employees (married, enemies, hierarchies !!)
-	 *
-	 * @description
-	 * 							- What (wo)men could I sleep with that are married to high-level employees of companies looking for my skill set?
 	 */
 	describe('Company-centered recommendations', () => {
 
