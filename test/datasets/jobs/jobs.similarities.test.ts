@@ -190,6 +190,44 @@ describe('similarity measures - ', () => {
 		});
 
 
+				/**
+		 MATCH (c:Company)-[:LOOKS_FOR_SKILL]->(s:Skill)
+		 WITH {item:id(c), categories: collect(id(s))} as data
+		 WITH collect(data) AS companySkills
+
+		 // compute skills people have
+		 MATCH (p:Person)-[:HAS_SKILL]->(s:Skill)
+		 WITH companySkills, {item:id(p), categories: collect(id(s))} as data
+		 WITH companySkills, collect(data) AS personSkills
+
+		 // create sourceIds and targetIds lists
+		 WITH companySkills, personSkills,
+		 [value in companySkills | value.item] AS sourceIds,
+		 [value in personSkills | value.item] AS targetIds
+
+		 CALL algo.similarity.jaccard.stream(companySkills + personSkills, {sourceIds: sourceIds, targetIds: targetIds})
+		 YIELD item1, item2, similarity
+		 WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
+		 RETURN from.name AS from, to.name AS to, similarity
+		 ORDER BY similarity DESC
+		 */
+		it('person <-> company pairwise similarities by overlapping skill sets (HAS / LOOKS_FOR)', () => {
+			const tic = +new Date;
+			const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
+				t1: NODE_TYPES.Person,
+				t2: NODE_TYPES.Company,
+				d1: DIR.out,
+				d2: DIR.out,
+				e1: EDGE_TYPES.HasSkill,
+				e2: EDGE_TYPES.LooksForSkill
+			});
+			const toc = +new Date;
+			console.log(`Computation of shared-preference similarities for Person-Company-Skills took ${toc - tic} ms.`);
+			expect(sims.length).toBe(10000);
+			// console.log(sims.length);
+		});
+
+
 		/**
 		 * @example
 		 * @description skills people I know have <-> skills other groups have
@@ -382,9 +420,6 @@ describe('similarity measures - ', () => {
 	describe('company clustering', () => {
 
 
-		/**
-		 * @todo Aufwaermen on Tue, the 17th
-		 */
 		it('companies located in a similar country (by skills sought)', () => {
 
 		});
@@ -401,7 +436,7 @@ describe('similarity measures - ', () => {
 		 ORDER BY similarity DESC
 		 */
 		it('companies looking for skill sets similar to a specific company (=my employer)', () => {
-			let sim_exp = [0.2608695652173913, 0.4, 0.23809523809523808, 0.20833333333333334, 0.34782608695652173, 0.20833333333333334, 0.2916666666666667, 0.2857142857142857, 0.38095238095238093, 0.3333333333333333, 0.25, 0.30434782608695654, 0.3181818181818182, 0.30434782608695654, 0.34782608695652173, 0.23809523809523808, 0.2857142857142857, 0.22727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2608695652173913, 0.2857142857142857, 0.22727272727272727, 0.36363636363636365, 0.2727272727272727, 0.5, 0.16666666666666666, 0.25, 0.45, 0.30434782608695654, 0.47368421052631576, 0.18181818181818182, 0.42105263157894735, 0.47368421052631576, 0.5238095238095238, 0.16, 0.22727272727272727, 0.2727272727272727, 0.36363636363636365, 0.35, 0.4, 0.4, 0.2727272727272727, 0.4, 0.22727272727272727, 0.21739130434782608];
+			let sim_exp = [0.2608695652173913, 0.4, 0.23809523809523808, 0.20833333333333334, 0.34782608695652173, 0.20833333333333334, 0.2916666666666667, 0.2857142857142857, 0.38095238095238093, 0.3333333333333333, 0.25, 0.30434782608695654, 0.3181818181818182, 0.30434782608695654, 0.34782608695652173, 0.23809523809523808, 0.2857142857142857, 0.22727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2608695652173913, 0.2857142857142857, 0.22727272727272727, 0.36363636363636365, 0.2727272727272727, 0.5, 0.16666666666666666, 0.25, 0.45, 0.30434782608695654, 0.47368421052631576, 0.18181818181818182, 0.42105263157894735, 0.47368421052631576, 0.5238095238095238, 0.16, 0.22727272727272727,0.2727272727272727, 0.36363636363636365, 0.35, 0.4, 0.4, 0.2727272727272727, 0.4, 0.22727272727272727, 0.21739130434782608];
 
 			const tic = +new Date;
 

@@ -6,7 +6,7 @@ import {JSONGraph, JSONInput} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {simSource, viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
+import {simSource} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 
@@ -51,7 +51,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 	/*--------------------------------------------*/
-	/*					COMPANY (JOB)-CENTERED					  */
+	/*							 PERSON -> JOBS 						  */
 	/*--------------------------------------------*/
 	/**
 	 * @description `what companies / jobs should I apply to / for ?`
@@ -102,44 +102,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const sims = simSource(setSimFuncs.jaccard, source, allSets);
 			expect(sims.length).toBe(50);
 			console.log(sims.slice(0, 5).map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]));
-		});
-
-
-		/**
-		 MATCH (c:Company)-[:LOOKS_FOR_SKILL]->(s:Skill)
-		 WITH {item:id(c), categories: collect(id(s))} as data
-		 WITH collect(data) AS companySkills
-
-		 // compute skills people have
-		 MATCH (p:Person)-[:HAS_SKILL]->(s:Skill)
-		 WITH companySkills, {item:id(p), categories: collect(id(s))} as data
-		 WITH companySkills, collect(data) AS personSkills
-
-		 // create sourceIds and targetIds lists
-		 WITH companySkills, personSkills,
-		 [value in companySkills | value.item] AS sourceIds,
-		 [value in personSkills | value.item] AS targetIds
-
-		 CALL algo.similarity.jaccard.stream(companySkills + personSkills, {sourceIds: sourceIds, targetIds: targetIds})
-		 YIELD item1, item2, similarity
-		 WITH algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS to, similarity
-		 RETURN from.name AS from, to.name AS to, similarity
-		 ORDER BY similarity DESC
-		 */
-		it('person <-> company pairwise similarities by overlapping skill sets (HAS / LOOKS_FOR)', () => {
-			const tic = +new Date;
-			const sims = viaSharedPrefs(g, setSimFuncs.jaccard, {
-				t1: NODE_TYPES.Person,
-				t2: NODE_TYPES.Company,
-				d1: DIR.out,
-				d2: DIR.out,
-				e1: EDGE_TYPES.HasSkill,
-				e2: EDGE_TYPES.LooksForSkill
-			});
-			const toc = +new Date;
-			console.log(`Computation of shared-preference similarities for Person-Company-Skills took ${toc - tic} ms.`);
-			console.log(sims.length);
-			// console.log(sims);
 		});
 
 
@@ -195,17 +157,9 @@ describe('real-world job/skill - based recommendations - ', () => {
 	});
 
 
-	/*--------------------------------------------*/
-	/*							EMPLOYEE-CENTERED						  */
-	/*--------------------------------------------*/
-	describe('Employee-centered recommendations', () => {
-
-
-	});
-
 
 	/*--------------------------------------------*/
-	/*								SKILL-CENTERED 						  */
+	/*							PERSON -> SKILLS	 					  */
 	/*--------------------------------------------*/
 	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
@@ -233,11 +187,24 @@ describe('real-world job/skill - based recommendations - ', () => {
 	});
 
 
-	/*--------------------------------------------*/
-	/*							LOCATION-CENTERED						  */
-	/*--------------------------------------------*/
-	describe('Location-centered recommendations', () => {
 
+	/*--------------------------------------------*/
+	/*						COMPANY -> EMPLOYEES					  */
+	/*--------------------------------------------*/
+	describe('Employee-centered recommendations', () => {
+
+
+	});
+
+
+
+	/*--------------------------------------------*/
+	/*						 COUNTRY -> OTHERS						  */
+	/*--------------------------------------------*/
+	/**
+	 * @todo only
+	 */
+	describe('Location-centered recommendations', () => {
 
 	});
 

@@ -10,7 +10,7 @@ module.exports = {
     "/scripts"
   ],
   "globals": {
-    // "window": {}
+    "window": {}
   },
   testMatch: [
     '**/test/datasets/**/*.test.ts'
