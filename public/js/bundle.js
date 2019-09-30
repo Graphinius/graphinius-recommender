@@ -3747,7 +3747,7 @@
             config = config || {};
             this._weighted = config.weighted || DEFAULT_WEIGHTED;
             this._alpha = config.alpha || DEFAULT_ALPHA;
-            this._maxIterations = config.maxIterations || DEFAULT_MAX_ITERATIONS;
+            this._maxIterations = config.iterations || DEFAULT_MAX_ITERATIONS;
             this._epsilon = config.epsilon || DEFAULT_EPSILON;
             this._normalize = config.normalize || DEFAULT_NORMALIZE;
             this._personalized = config.personalized ? config.personalized : false;
@@ -3770,11 +3770,11 @@
         }
         Pagerank.prototype.getConfig = function () {
             return {
-                weighted: this._weighted,
-                alpha: this._alpha,
-                maxIterations: this._maxIterations,
-                epsilon: this._epsilon,
-                normalize: this._normalize
+                _weighted: this._weighted,
+                _alpha: this._alpha,
+                _maxIterations: this._maxIterations,
+                _epsilon: this._epsilon,
+                _normalize: this._normalize,
             };
         };
         Pagerank.prototype.getDSs = function () {
@@ -3848,7 +3848,8 @@
                 this.normalizePR();
             }
             for (var key in nodes) {
-                result[key] = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
+                var node_val = this._PRArrayDS.curr[nodes[key].getFeature('PR_index')];
+                result[key] = node_val;
             }
             return result;
         };
@@ -3885,9 +3886,8 @@
             var ds = this._PRArrayDS;
             var N = this._graph.nrNodes();
             var visits = 0;
-            var delta_iter;
             for (var i = 0; i < this._maxIterations; ++i) {
-                delta_iter = 0.0;
+                var delta_iter = 0.0;
                 for (var node in ds.curr) {
                     var pull_rank = 0;
                     visits++;
@@ -3921,21 +3921,11 @@
                     delta_iter += Math.abs(ds.curr[node] - ds.old[node]);
                 }
                 if (delta_iter <= this._epsilon) {
-                    return {
-                        config: this.getConfig(),
-                        map: this.getRankMapFromArray(),
-                        iters: i,
-                        delta: delta_iter
-                    };
+                    return this.getRankMapFromArray();
                 }
                 ds.old = __spread(ds.curr);
             }
-            return {
-                config: this.getConfig(),
-                map: this.getRankMapFromArray(),
-                iters: this._maxIterations,
-                delta: delta_iter
-            };
+            return this.getRankMapFromArray();
         };
         return Pagerank;
     }());
@@ -5123,6 +5113,7 @@
     var SimilarityCommons_11 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         simSort: SimilarityCommons_1,
@@ -5190,6 +5181,7 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5412,6 +5404,7 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5718,6 +5711,7 @@
 
     // MISC
     // var MCMFBoykov							= require("./dist/mincutmaxflow/minCutMaxFlowBoykov.js");
+    // var PRGauss								= require("./lib/centralities/PageRankGaussian.js");
 
 
     // Define global object
@@ -5798,6 +5792,7 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -7277,6 +7272,7 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });

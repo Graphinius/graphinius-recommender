@@ -54,17 +54,27 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*					COMPANY (JOB)-CENTERED					  */
 	/*--------------------------------------------*/
 	/**
-	 * @description "what companies should I apply to ?"
-	 * 				-> direct applications
-	 * 				-> referrals
-	 * 				-> strength of weak ties ?
-	 * 							- what companies are looking for my skills?
-	 * 						  - what companies employ people I know (n-th degree) AND looking for my skills?
-	 * 						  - what are companies that employ people of a skill set similar to that of my social group?
-	 *							- companies looking for my skills whose work-force don't (just weakly) possess them (-> urgency)
-	 * 						  - friends working for companies seeking my skills NOT having that skill
+	 * @description `what companies / jobs should I apply to / for ?`
+	 * 	We can generally subdivide between different fundamental approaches:
+	 * 				* direct applications -> to company
+	 * 				* referrals (hunting for influential people)
+	 * 					 - strength of weak ties ?
+	 * 
+	 * @example	scenarios
+	 * 					1) Companies looking for my skill set?
+	 * 					2) Companies looking for my skill set whose workforce is bad at it (urgency)
+	 * 					3) Companies employing people of a similar skill set to mine (where would I fit in)?
+	 * 					4) Companies employing people I know (n-th degree) AND looking for my skills? (Referral 1)
+	 * 					5) Same companies as 4) whose workforce is bad at my skills? (Referral 2)
+	 * 					6) Most influential people amongst employees of such companies (Pagerank)
+	 * 					7) Most influential people amongst employers of such companies (Cross-Pagerank !?)
+	 * 					8) Companies that employ people of a skill set similar to that of my social group? (REASON???)
+	 * 					9) Companies looking for my skill set located in countries generally in demand of it (greater chances)
+	 * 				 10) Companies looking for my skill set located in countries weak in supply of it (also greater chances)
+	 * 				 11) Companies similar to my current employer (by skill set / workforce social group overlap)
+	 * 				 12) Same companies BUT DISsimilar to my current employer
 	 *
-	 * @description "ENRICHMENT"
+	 * @description `enrichment possibilities`
 	 * 							- company profiles (histories)
 	 * 							- job postings (textual search)
 	 * 							- (average) salaries
