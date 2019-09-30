@@ -3747,7 +3747,7 @@
             config = config || {};
             this._weighted = config.weighted || DEFAULT_WEIGHTED;
             this._alpha = config.alpha || DEFAULT_ALPHA;
-            this._maxIterations = config.iterations || DEFAULT_MAX_ITERATIONS;
+            this._maxIterations = config.maxIterations || DEFAULT_MAX_ITERATIONS;
             this._epsilon = config.epsilon || DEFAULT_EPSILON;
             this._normalize = config.normalize || DEFAULT_NORMALIZE;
             this._personalized = config.personalized ? config.personalized : false;
@@ -3770,11 +3770,11 @@
         }
         Pagerank.prototype.getConfig = function () {
             return {
-                _weighted: this._weighted,
-                _alpha: this._alpha,
-                _maxIterations: this._maxIterations,
-                _epsilon: this._epsilon,
-                _normalize: this._normalize
+                weighted: this._weighted,
+                alpha: this._alpha,
+                maxIterations: this._maxIterations,
+                epsilon: this._epsilon,
+                normalize: this._normalize
             };
         };
         Pagerank.prototype.getDSs = function () {
@@ -3885,8 +3885,9 @@
             var ds = this._PRArrayDS;
             var N = this._graph.nrNodes();
             var visits = 0;
+            var delta_iter;
             for (var i = 0; i < this._maxIterations; ++i) {
-                var delta_iter = 0.0;
+                delta_iter = 0.0;
                 for (var node in ds.curr) {
                     var pull_rank = 0;
                     visits++;
@@ -3920,11 +3921,21 @@
                     delta_iter += Math.abs(ds.curr[node] - ds.old[node]);
                 }
                 if (delta_iter <= this._epsilon) {
-                    return this.getRankMapFromArray();
+                    return {
+                        config: this.getConfig(),
+                        map: this.getRankMapFromArray(),
+                        iters: i,
+                        delta: delta_iter
+                    };
                 }
                 ds.old = __spread(ds.curr);
             }
-            return this.getRankMapFromArray();
+            return {
+                config: this.getConfig(),
+                map: this.getRankMapFromArray(),
+                iters: this._maxIterations,
+                delta: delta_iter
+            };
         };
         return Pagerank;
     }());
@@ -5112,7 +5123,6 @@
     var SimilarityCommons_11 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         simSort: SimilarityCommons_1,
@@ -5180,7 +5190,6 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5403,7 +5412,6 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5710,7 +5718,6 @@
 
     // MISC
     // var MCMFBoykov							= require("./dist/mincutmaxflow/minCutMaxFlowBoykov.js");
-    // var PRGauss								= require("./lib/centralities/PageRankGaussian.js");
 
 
     // Define global object
@@ -5791,7 +5798,6 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -5836,7 +5842,6 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -5882,7 +5887,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -5920,7 +5925,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -5966,7 +5971,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -6004,7 +6009,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -6041,7 +6046,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -6079,7 +6084,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -6108,7 +6113,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -6143,7 +6148,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6320,7 +6325,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6419,7 +6424,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6448,7 +6453,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -6492,7 +6497,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6546,7 +6551,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6687,7 +6692,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6740,7 +6745,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -6778,7 +6783,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -7033,7 +7038,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -7156,7 +7161,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7266,13 +7271,12 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });
@@ -7304,7 +7308,6 @@
         window['idx'] = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {

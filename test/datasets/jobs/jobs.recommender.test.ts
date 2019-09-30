@@ -51,8 +51,30 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 	/*--------------------------------------------*/
-	/*							COMPANY-CENTERED 						  */
+	/*					COMPANY (JOB)-CENTERED					  */
 	/*--------------------------------------------*/
+	/**
+	 * @description "what companies should I apply to ?"
+	 * 				-> direct applications
+	 * 				-> referrals
+	 * 				-> strength of weak ties ?
+	 * 							- what companies are looking for my skills?
+	 * 						  - what companies employ people I know (n-th degree) AND looking for my skills?
+	 * 						  - what are companies that employ people of a skill set similar to that of my social group?
+	 *							- companies looking for my skills whose work-force don't (just weakly) possess them (-> urgency)
+	 * 						  - friends working for companies seeking my skills NOT having that skill
+	 *
+	 * @description "ENRICHMENT"
+	 * 							- company profiles (histories)
+	 * 							- job postings (textual search)
+	 * 							- (average) salaries
+	 * 						  - branch / department profiles / job postings / skill demands
+	 * 						  - ratings (companies / departments / skills)
+	 * 						  - enrich social network of employees (married, enemies, hierarchies !!)
+	 *
+	 * @description
+	 * 							- What (wo)men could I sleep with that are married to high-level employees of companies looking for my skill set?
+	 */
 	describe('Company-centered recommendations', () => {
 
 		/**
