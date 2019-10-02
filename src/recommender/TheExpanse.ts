@@ -9,7 +9,7 @@ class TheExpanse {
 
 
   /**
-   * @param nodes either a node type as string or a Set of ITypedNodes
+   * @param nodes either a node type as string or a Map of ITypedNodes
    * @param dir
    * @param rel
    * @returns expansion from a type of nodes or from a set of nodes

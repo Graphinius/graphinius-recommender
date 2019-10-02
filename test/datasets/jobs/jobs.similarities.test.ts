@@ -282,18 +282,22 @@ describe('similarity measures - ', () => {
 	});
 
 
-
 	describe('people clustering - ', () => {
 
 		it('people having a similar skill set -> by source', () => {
-			const tic = +new Date;
-			const source = me.label;
+			const sims_exp = [
+				[ 'Tom Lemke', 'Mandy Kiehn', 11, 0.55 ],
+				[ 'Tom Lemke', 'Asa Botsford', 11, 0.55 ],
+				[ 'Tom Lemke', 'Tristin Kohler', 11, 0.55 ],
+				[ 'Tom Lemke', 'Randi Mosciski', 10, 0.52632 ],
+				[ 'Tom Lemke', 'Olaf Jacobson', 11, 0.52381 ],
+				[ 'Tom Lemke', 'Carolyn Hessel', 11, 0.52381 ]
+			];
 			const allSets = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simSource(setSimFuncs.jaccard, source, allSets);
-			const toc = +new Date;
-			// console.log(`Computing most similar people to Tom Lemke by SKILL similarity (Jaccard) took ${toc-tic} ms.`);
-			// console.log(sims);
-			expect(sims.slice(0, 6).map(e => e.sim)).toEqual([0.55, 0.55, 0.55, 0.52632, 0.52381, 0.52381]);
+			const sims = simSource(setSimFuncs.jaccard, me.id, allSets, {knn: 6});
+			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sims_res);
+			expect(sims_res).toEqual(sims_exp);
 		});
 
 

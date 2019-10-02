@@ -2783,15 +2783,22 @@
         };
         TypedGraph.prototype.ins = function (node, type) {
             var _this = this;
-            return new Set(__spread(node.ins(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            var targets = node.ins(type);
+            if (targets) {
+                return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            }
         };
         TypedGraph.prototype.outs = function (node, type) {
             var _this = this;
-            return new Set(__spread(node.outs(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            var targets = node.outs(type);
+            return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
         };
         TypedGraph.prototype.unds = function (node, type) {
             var _this = this;
-            return new Set(__spread(node.unds(type)).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            var targets = node.unds(type);
+            if (targets) {
+                return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            }
         };
         TypedGraph.prototype.expand = function (input, dir, type) {
             var e_1, _a, e_2, _b;
@@ -5128,6 +5135,7 @@
     var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         sortFuncs: SimilarityCommons_1,
@@ -5194,6 +5202,7 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5416,6 +5425,7 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5800,6 +5810,7 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -5844,7 +5855,6 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     var TheExpanse = (function () {
         function TheExpanse(_g) {
@@ -5876,6 +5886,9 @@
                                 result[i] = new Set();
                             }
                             var targets = this._g[dir](source, rel);
+                            if (!targets) {
+                                continue;
+                            }
                             try {
                                 for (var targets_1 = (e_3 = void 0, __values(targets)), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
                                     var target = targets_1_1.value;
@@ -5956,7 +5969,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -5994,7 +6007,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -6040,7 +6053,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -6078,7 +6091,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -6115,7 +6128,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -6153,7 +6166,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -6182,7 +6195,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -6217,7 +6230,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6394,7 +6407,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6493,7 +6506,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6522,7 +6535,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -6566,7 +6579,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6620,7 +6633,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6761,7 +6774,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6814,7 +6827,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -6852,7 +6865,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -7107,7 +7120,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -7230,7 +7243,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7340,12 +7353,13 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });
@@ -7377,7 +7391,6 @@
         window['idx'] = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -7408,7 +7421,6 @@
             fields: ['name']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -7420,7 +7432,6 @@
         models: jobsModels,
         searchModel: jobsModels.skill
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     console.log('Graphinius: ', $G);
@@ -7507,7 +7518,6 @@
         });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

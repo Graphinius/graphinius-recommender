@@ -6,7 +6,7 @@ import {JSONGraph, JSONInput} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {simSource} from 'graphinius/lib/similarities/SimilarityCommons';
+import {sim, simSource} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 
@@ -53,65 +53,75 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*							 PERSON -> JOBS 						  */
 	/*--------------------------------------------*/
-	/**
-	 * @description `what companies / jobs should I apply to / for ?`
-	 * 	We can generally subdivide between different fundamental approaches:
-	 * 				* direct applications -> to company
-	 * 				* referrals (hunting for influential people)
-	 * 					 - strength of weak ties ?
-	 * 				* more general similarities (by country, sector, job description => enrichment!)
-	 * 				* all of the above weighted by other graph metrics (pagerank, transitivity, ...)
-	 * 
-	 * @example	scenarios
-	 * 					1) Companies looking for my skill set?
-	 * 					2) Companies looking for my skill set whose workforce is bad at it (urgency)
-	 * 					3) Companies employing people of a similar skill set to mine (where would I fit in)?
-	 * 					4) Companies employing people I know (n-th degree) AND looking for my skills? (Referral 1)
-	 * 					5) Same companies as 4) whose workforce is bad at my skills? (Referral 2)
-	 * 					6) Most influential people amongst employees of such companies (Pagerank)
-	 * 					7) Most influential people amongst employers of such companies (Cross-Pagerank !?)
-	 * 					8) Companies that employ people of a skill set similar to that of my social group? (REASON???)
-	 * 					9) Companies looking for my skill set located in countries generally in demand of it (greater chances)
-	 * 				 10) Companies looking for my skill set located in countries weak in supply of it (also greater chances)
-	 * 				 11) Companies similar to my current employer (by skill set / workforce social group overlap)
-	 * 				 12) Same companies BUT DISsimilar to my current employer
-	 *
-	 * @description `enrichment possibilities`
-	 * 							- company profiles (histories)
-	 * 							- job postings (textual search)
-	 * 							- (average) salaries
-	 * 						  - branch / department profiles / job postings / skill demands
-	 * 						  - ratings (companies / departments / skills)
-	 * 						  - enrich social network of employees (married, enemies, hierarchies !!)
-	 */
-	describe('Company-centered recommendations', () => {
+	describe('Person -> Job (company) recommendations', () => {
 
 		/**
+		 * @example simple profile matching
 		 * 1) get my skills
 		 * 2) collect companies' sought-after skill sets
 		 * 3) add my skill set to this collection
 		 * 4) run "normal" simSource
 		 */
 		it('companies looking for a similar skill-set than I have', () => {
-			const source = me.label;
-			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
-
+			const sims_exp = [
+				[ 'Tom Lemke', 'Schroeder-Corwin', 10, 0.55556 ],
+				[ 'Tom Lemke', 'Carter-McGlynn', 11, 0.55 ],
+				[ 'Tom Lemke', 'Hahn and Sons', 10, 0.5 ],
+				[ 'Tom Lemke', 'Powlowski and Sons', 10, 0.5 ],
+				[ 'Tom Lemke', 'Boehm LLC', 10, 0.47619 ]
+			];
 			const allSets = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
-			allSets[me.label] = mySkills;
 
-			const sims = simSource(setSimFuncs.jaccard, source, allSets);
-			expect(sims.length).toBe(50);
-			console.log(sims.slice(0, 5).map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]));
+			/**
+			 * @description We are cross-comparing skill sets by companies & a person,
+			 * 							so we need to manually add the person to the set
+			 *
+			 * @todo should our simSource alternatively take a `source set` as parameter
+			 * 			 (really - we need effing multiple dispatch in Javascript !!!)
+ 			 */
+			allSets[me.label] = g.outs(me, EDGE_TYPES.HasSkill);
+
+			const sims = simSource(setSimFuncs.jaccard, me.label, allSets, {knn: 5});
+			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sims_res);
+			expect(sims.length).toBe(5);
+			expect(sims_res).toEqual(sims_exp);
 		});
-
 
 		/**
 		 * @example MOST URGENT DEMAND
-		 *          The weaker a workforce a company employs is on the set of skills they are
+		 *          The weaker a company's workforce is on the set of skills they are
 		 *          currently looking for, the more urgent they'll need someone from outside -
 		 *          and offer substantially higher salaries (hopefully ;-)
 		 */
-		it.todo('companies looking for skills their employees do not have / are weak on');
+		it('Companies looking for similar skill set whose workforce is bad at it (urgency)', () => {
+			const tic = +new Date();
+
+			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+			// 1) same as before - get companies with greatest overlap
+			const allSetsSkillDemand = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			allSetsSkillDemand[me.label] = mySkills;
+			const sims = simSource(setSimFuncs.jaccard, me.label, allSetsSkillDemand, {knn: 10});
+
+			/**
+			 * 2) now get the ones with least skill overlap between their skill demand and their workforce's skills
+			 *
+			 * @todo structure -> standardize -> methodize ;-)
+ 			 */
+			const skillDemandSupplyOverlaps = [];
+			for ( let entry of sims ) {
+				const company = g.n(entry.to);
+				const companySkillDemand = allSetsSkillDemand[entry.to];
+				const employees = g.expand(company, DIR.in, EDGE_TYPES.WorksFor);
+				const employeeSkills = g.expand(employees, DIR.out, EDGE_TYPES.HasSkill);
+				const simSupplyDemand = sim(setSimFuncs.jaccard, companySkillDemand, employeeSkills);
+				skillDemandSupplyOverlaps.push({company: company.f('name'), myOverlap: entry.sim,internalOverlap: simSupplyDemand.sim});
+			}
+			skillDemandSupplyOverlaps.sort((a, b) => a.internalOverlap - b.internalOverlap);
+			const toc = +new Date();
+			// console.log(`Companies looking for similar skill set whose workforce is bad at it (urgency) took ${toc-tic} ms.`);
+			// console.log(skillDemandSupplyOverlaps);
+		});
 
 		/**
 		 * @example GETTING REFERRED QUICKLY
