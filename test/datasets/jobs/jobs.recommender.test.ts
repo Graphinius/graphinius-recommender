@@ -6,7 +6,7 @@ import {JSONGraph, JSONInput} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {sim, simSource, viaSharedPrefs} from 'graphinius/lib/similarities/SimilarityCommons';
+import {cutFuncs, sortFuncs, sim, simSource} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 
@@ -138,19 +138,19 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies employing people I know (k-th degree) AND looking for my skills', () => {
+		it('Companies employing people I know (k-th degree) AND looking for my skills (Referral 1)', () => {
 			// 1) Companies looking for my skills
 			const allSets = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
 			allSets[me.label] = g.outs(me, EDGE_TYPES.HasSkill);
 			const sims1 = simSource(setSimFuncs.overlap, me.label, allSets, {knn: 10});
-			const skillSims = sims1.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// const skillSims = sims1.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
 			// console.log(skillSims);
 
 			// 2) Companies employing people I know
 			const employees = ex.accumulateSets(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			employees[me.id] = g.outs(me, EDGE_TYPES.Knows);
 			const sims2 = simSource(setSimFuncs.overlap, me.id, employees, {knn: 10});
-			const peopleSims = sims2.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// const peopleSims = sims2.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
 			// console.log(peopleSims);
 
 			// 3) Take both results and check if the companies overlap
@@ -172,7 +172,63 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
+		/**
+		 * @example GETTING REFERRED by non-competitors
+		 */
+		it('Companies employing people I know whose workforce is bad at my skills (Referral 2)', () => {
+			const res_exp = [
+				{
+					me: '583',
+					company: 'Boehm LLC',
+					peopleOverlap: 0.058824,
+					skillOverlap: 0.53333
+				},
+				{
+					me: '583',
+					company: 'Rippin Group',
+					peopleOverlap: 0.055556,
+					skillOverlap: 0.76667
+				},
+				{
+					me: '583',
+					company: 'Kohler Group',
+					peopleOverlap: 0.095238,
+					skillOverlap: 1
+				},
+				{
+					me: '583',
+					company: 'King LLC',
+					peopleOverlap: 0.090909,
+					skillOverlap: 1
+				},
+				{
+					me: '583',
+					company: 'Hirthe PLC',
+					peopleOverlap: 0.076923,
+					skillOverlap: 1
+				}
+			];
 
+			// 1) Get people overlap
+			const allEmployees = ex.accumulateSets(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+			allEmployees[me.id] = g.outs(me, EDGE_TYPES.Knows);
+			const peopleSims = simSource(setSimFuncs.jaccard, me.id, allEmployees, {knn: 5});
+			// console.log(peopleSims);
+
+			// 2) Get inverse skill overlap
+			const skillMineTheirsOverlap = [];
+			const skillSupply = ex.accumulateSetRelations(allEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const mySkills = skillSupply[me.id];
+			for ( let entry of peopleSims ) {
+				const company = g.n(entry.to);
+				const employeeSkills = skillSupply[company.id];
+				const simMySkillsToTheirs = sim(setSimFuncs.jaccard, employeeSkills, mySkills);
+				skillMineTheirsOverlap.push({me: me.id, company: company.f('name'), peopleOverlap: entry.sim, skillOverlap: simMySkillsToTheirs.sim});
+			}
+			skillMineTheirsOverlap.sort((a, b) => a.skillOverlap - b.skillOverlap);
+			// console.log(skillMineTheirsOverlap);
+			expect(skillMineTheirsOverlap).toEqual(res_exp);
+		});
 
 
 		/**
@@ -182,12 +238,32 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 *          competition, so the weaker their skill overlap is with mine, the better!
 		 *          (yet their company should be looking for that skill...)
 		 */
-		it.todo('companies looking for skills their employees (who are in my social group) have not');
+		it.only('Companies employing people I know whose workforce is bad at their skill demand (Referral 2)', () => {
+// 1) Get people overlap
+			const allEmployees = ex.accumulateSets(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+			allEmployees[me.id] = g.outs(me, EDGE_TYPES.Knows);
+			const peopleSims = simSource(setSimFuncs.jaccard, me.id, allEmployees, {knn: 5});
 
-		/**
-		 * @example GETTING REFERRED
-		 */
-		it.todo('companies employing people I know, whose skill set greatly differs from mine');
+			// 2) Get inverse skill overlap
+			const skillSupplyDemandOverlap = [];
+			const skillSupplies = ex.accumulateSetRelations(allEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const skillDemands = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			for ( let entry of peopleSims ) {
+				const company = g.n(entry.to);
+				const employeeSkills = skillSupplies[company.id];
+				const skillDemand = skillDemands[company.id];
+				const supplyDemandSim = sim(setSimFuncs.jaccard, employeeSkills, skillDemand);
+				skillSupplyDemandOverlap.push({me: me.id, company: company.f('name'), peopleOverlap: entry.sim, skillOverlap: supplyDemandSim.sim});
+			}
+			skillSupplyDemandOverlap.sort((a, b) => a.skillOverlap - b.skillOverlap);
+			// console.log(skillSupplyDemandOverlap);
+		});
+		
+
+
+
+
+
 
 		/**
 		 * @description The strength of weak ties - most successful personal employment recommendations do
