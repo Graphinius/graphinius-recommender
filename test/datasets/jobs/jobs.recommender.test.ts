@@ -165,7 +165,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 							from: g.n(e1.from).f('name'), to: g.n(e1.to).f('name'), isectSkills: e1.isect, simSkills: e1.sim, isectPeople: e2.isect, simPeople: e2.sim
 						});
 					}
-				})
+				});
 			});
 			matchingEntries.sort((a, b) => a.simPeople - b.simPeople);
 			// console.log(matchingEntries);
@@ -238,7 +238,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 *          competition, so the weaker their skill overlap is with mine, the better!
 		 *          (yet their company should be looking for that skill...)
 		 */
-		it.only('Companies employing people I know whose workforce is bad at their skill demand (Referral 2)', () => {
+		it('Companies employing people I know whose workforce is bad at their skill demand (Referral 2)', () => {
 // 1) Get people overlap
 			const allEmployees = ex.accumulateSets(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			allEmployees[me.id] = g.outs(me, EDGE_TYPES.Knows);
@@ -260,37 +260,88 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 		
 
-
-
-
-
-
 		/**
-		 * @description The strength of weak ties - most successful personal employment recommendations do
-		 *              NOT come from direct friends, but acquaintances OR people THEY know
-		 * @description Me -> friends -> acquaintances <- working for companies <- looking for skills <- I got skills
+		 * @todo reason !?!? collective application?
 		 */
-		it.todo('companies looking for my skill-set employing people known by people I know');
+		it('companies looking for a skill set similar to that of my social group', () => {
+			const myFriends = g.outs(me, EDGE_TYPES.Knows);
+			const friendsSkills = g.expand(myFriends, DIR.out, EDGE_TYPES.HasSkill);
+			const skillDemands = ex.accumulateSets(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillDemands[me.id] = friendsSkills;		
+			const sims = simSource(setSimFuncs.jaccard, me.id, skillDemands, {knn: 10});
+			const sim_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sim_res);
+		});
 
 
-		/* collective application ?? */
-		it.todo('companies looking for a skill set similar to that of my social group');
+		it('companies employing people similar to me (by skill set)', () => {
+			const allSkills = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const mostSimToMeBySkills = simSource(setSimFuncs.overlap, me.id, allSkills, {knn: 10});
+			// console.log(mostSimToMe);
+			const employers = mostSimToMeBySkills.map(e => ({
+				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'), 
+				isect: e.isect, 
+				sim: e.sim
+			}));
+			// console.log(employers);
+		});
 
-		it.todo('companies employing people similar to me (by skill set)');
 
 		/* Could be interesting for personal recommendations */
-		it.todo('companies employing people similar to me (by the people they know)');
+		it('companies employing people similar to me (by the people they know)', () => {
+			const allFriends = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+			const mostSimToMeByFriends = simSource(setSimFuncs.overlap, me.id, allFriends, {knn: 10});
+			const employers = mostSimToMeByFriends.map(e => ({
+				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'), 
+				isect: e.isect, 
+				sim: e.sim
+			}));
+			// console.log(employers);
+		});
 
-		it.todo('companies employing people I know');
 
-		it.todo('companies employing people knowing people I know');
+		it('companies employing people I know (k^th degree)', () => {
+			const myFriends = g.outs(me, EDGE_TYPES.Knows);
+			const employers = Array.from(myFriends).map(f => ({
+				company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
+			}));
+			// console.log(employers);
+		});
 
-		it.todo('companies employing people people I know know');
+
+		it('companies employing people knowing people I know', () => {
+			const myFriends = g.outs(me, EDGE_TYPES.Knows);
+			const peopleKnowingThem = g.expand(myFriends, DIR.in, EDGE_TYPES.Knows);
+			const employers = Array.from(peopleKnowingThem)
+				.slice(0, 10)
+				.map(f => ({
+					company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
+				}));
+			// console.log(employers);
+		});
+
 
 		/**
 		 *  I wanna re-locate to some place where people understand me ;-))))
 		 */
-		it.todo('companies located in cities where like-minded people live');
+		it.only('companies located in countries where like-minded people live (by skills)', () => {
+			const allSkills = ex.accumulateSets(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.overlap, me.id, allSkills, {knn: 10});
+			const employers = Array.from(sims).map(e => {
+				const country = Array.from(g.outs(g.n(e.to), EDGE_TYPES.LivesIn))[0];
+				const companies = g.ins(country, EDGE_TYPES.LocatedIn);
+				if ( !companies || companies.size === 0 ) {
+					return;
+				}
+				return {
+					country: country.f('name'),
+					companies: Array.from(companies).map(c => ({
+						company: c.f('name')
+				}))};
+			});
+			// console.log(employers);
+			// console.log(JSON.stringify(employers));
+		});
 
 	});
 
