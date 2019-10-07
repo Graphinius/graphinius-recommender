@@ -1,13 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {DIR} from 'graphinius/lib/core/interfaces';
+import {ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {JSONGraph, JSONInput} from 'graphinius/lib/io/input/JSONInput';
 import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {Pagerank} from 'graphinius/lib/centralities/Pagerank';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {cutFuncs, sortFuncs, sim, simSource} from 'graphinius/lib/similarities/SimilarityCommons';
+import {sim, simSource, sortFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 
@@ -481,9 +482,95 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*							PERSON -> SKILLS	 					  */
 	/*--------------------------------------------*/
-	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
+	describe.only('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
-		
+		describe('skills required by companies ', () => {
+
+			/**
+			 * @description IDs of `task`-oriented companies
+			 * 							-> id: "244", name: "O'Kon, Cormier and Jast", desc: "Mandatory 4thgeneration task-force"
+			 * 						 	-> id: "283", name: "Durgan LLC", desc: "Enterprise-wide local task-force"
+			 */
+			it('that interest me (particular company) - start with full text search (simulated)', () => {
+				const companies = new Set<ITypedNode>([g.n("244"), g.n("283")]);
+				const skillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
+				const result = Array.from(skillDemand).map(s => g.n(s.id).f('name'));
+				console.log(result);
+			});
+
+			it('employing my k^th degree friends', () => {
+
+			});
+
+			it('employing similar people than me (itself by skill overlap)', () => {
+
+			});
+
+		});
+
+
+		describe('Which people possess skills I don\'t have? - ', () => {
+
+			it('working at companies I am interested in', () => {
+
+			});
+
+			it('where my k^th degree friends work', () => {
+
+			});
+
+		});
+
+
+		describe('Which people don\'t possess skills I got? - ', () => {
+
+			it('working at companies I am interested in', () => {
+
+			});
+
+			it('where my k^th degree friends work', () => {
+
+			});
+
+		});
+
+
+		describe('company / country skill comparisons', () => {
+
+			it('Companies possessing skills I don\'t have (via their employees)', () => {
+
+			});
+
+
+			it('Companies NOT possessing skills I\'ve got (via their employees)', () => {
+
+			});
+
+
+			it('Countries possessing skills I don\'t have (via employees of their companies)', () => {
+
+			});
+
+
+			it('Countries NOT possessing skills I\'ve got (via employees of their companies)', () => {
+
+			});
+
+		});
+
+
+		describe('Brian Tracy - ', () => {
+
+			it('At which companies would I be special (less than k% of employees have a skill overlap > m with me)', () => {
+
+			});
+
+
+			it('At which companies would I be SUPER special (I got at least k (1) skills **nobody** there possesses)', () => {
+
+			});
+
+		});
 
 	});
 
