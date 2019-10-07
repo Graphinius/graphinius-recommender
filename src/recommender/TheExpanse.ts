@@ -7,7 +7,6 @@ class TheExpanse {
 
   constructor(private _g: TypedGraph) {}
 
-
   /**
    * @param nodes either a node type as string or a Map of ITypedNodes
    * @param dir
@@ -19,7 +18,7 @@ class TheExpanse {
    *       -> where is multiple dispatch when you need it !?
    *
    */
-  accumulateSets(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
+  accumulateSetsFromNodes(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
     let sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
     sourceNodes.forEach(n => {
@@ -39,7 +38,7 @@ class TheExpanse {
    * @todo transfer to graphinius (core)?
    * @todo rename -> !? ...
    */
-  accumulateSetRelations(sources: {[key: string]: Set<ITypedNode>}, dir: DIR, rel: string) : {[key: string]: Set<ITypedNode>} {
+  accumulateSetsFromSets(sources: {[key: string]: Set<ITypedNode>}, dir: DIR, rel: string) : {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
     const keys = Object.keys(sources);
     for ( let i of keys ) {

@@ -5859,7 +5859,7 @@
         function TheExpanse(_g) {
             this._g = _g;
         }
-        TheExpanse.prototype.accumulateSets = function (nodes, dir, rel) {
+        TheExpanse.prototype.accumulateSetsFromNodes = function (nodes, dir, rel) {
             var _this = this;
             var result = {};
             var sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
@@ -5871,7 +5871,7 @@
             });
             return result;
         };
-        TheExpanse.prototype.accumulateSetRelations = function (sources, dir, rel) {
+        TheExpanse.prototype.accumulateSetsFromSets = function (sources, dir, rel) {
             var e_1, _a, e_2, _b, e_3, _c;
             var result = {};
             var keys = Object.keys(sources);
