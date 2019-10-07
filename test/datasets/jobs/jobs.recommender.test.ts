@@ -7,7 +7,7 @@ import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
 import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
 import {Pagerank} from 'graphinius/lib/centralities/Pagerank';
 import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {sim, simSource} from 'graphinius/lib/similarities/SimilarityCommons';
+import {cutFuncs, sortFuncs, sim, simSource} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 
@@ -405,6 +405,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 * @todo check against Neo4j
 		 */
 		it('Companies looking for my skill set located in countries weak in supply of it (greater chances)', () => {
+			const tic = +new Date;
 			// 1) potential employers
 			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
 			const allSets = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
@@ -427,22 +428,38 @@ describe('real-world job/skill - based recommendations - ', () => {
 				});
 			});
 			const result = countriesInDemandOfMySkills.sort((a, b) => a.sim - b.sim).slice(0, 10);
+			const toc = +new Date;
+			// console.log(`Companies looking for my skill set located in countries weak in supply of it took ${toc-tic} ms.`)
 			// console.log(result);
 		});
 
 
 		it('Companies similar to my current employer (by skill demand)', () => {
-
+			const skillDemandByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+			const sims = simSource(setSimFuncs.jaccard, myEmployer.id, skillDemandByCompany, {knn: 10});
+			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sims_res);
 		});
 
 
-		it('Companies similar to my current employer (by skill supply)', () => {
-
+		it('Companies most similar to my current employer (by skill supply)', () => {
+			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+			const skillSets = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+			const sims = simSource(setSimFuncs.jaccard, myEmployer.id, skillSets, {knn: 10});
+			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sims_res);
 		});
 
 
-		it('Companies similar to my current employer (by workforce social group overlap)', () => {
-
+		it('Companies most DISsimilar to my current employer (by skill supply)', () => {
+			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+			const skillSets = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+			const sims = simSource(setSimFuncs.jaccard, myEmployer.id, skillSets, {knn: 10, sort: sortFuncs.asc});
+			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
+			// console.log(sims_res);
 		});
 
 
@@ -466,29 +483,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
-		/**
-		 match (me:Person{name: 'Cyrus Koch'})-[:HAS_SKILL]->(ms:Skill)<-[:HAS_SKILL]-(p:Person)-[:WORKS_FOR]->(c:Company)-[:LOOKS_FOR_SKILL]->(os:Skill)
-		 where ms.name = 'TypeScript'
-		 and ms<>os
-		 return
-		 collect(DISTINCT p.name),
-		 collect(DISTINCT c.name),
-		 collect(DISTINCT os.name),
-		 count(DISTINCT os.name)
-		 limit 10
-		 */
-		it.todo('skills that companies employing similar people than me (by skills) are looking for');
-
-
-		it.todo('skills that companies employing similar people than me (by friends) are looking for');
-
-
-		/**
-		 * @example What skills could I learn close to home
-		 */
-		it('job training available close to my location (by skills that people here have)', () => {
-
-		});
+		
 
 	});
 
