@@ -486,585 +486,6 @@
     unwrapExports(ComputeGraph_1);
     var ComputeGraph_2 = ComputeGraph_1.ComputeGraph;
 
-    var StructUtils = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    function clone(obj) {
-        if (obj === null || typeof obj !== 'object') {
-            return obj;
-        }
-        if (obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
-            return;
-        }
-        var cloneObj = obj.constructor ? obj.constructor() : {};
-        for (var attribute in obj) {
-            if (!obj.hasOwnProperty(attribute)) {
-                continue;
-            }
-            if (typeof obj[attribute] === "object") {
-                cloneObj[attribute] = clone(obj[attribute]);
-            }
-            else {
-                cloneObj[attribute] = obj[attribute];
-            }
-        }
-        return cloneObj;
-    }
-    exports.clone = clone;
-    function shuffleArray(arr) {
-        for (var i = arr.length - 1; i >= 0; i--) {
-            var randomIndex = Math.floor(Math.random() * (i + 1));
-            var itemAtIndex = arr[randomIndex];
-            arr[randomIndex] = arr[i];
-            arr[i] = itemAtIndex;
-        }
-        return arr;
-    }
-    exports.shuffleArray = shuffleArray;
-    function mergeArrays(args, cb) {
-        if (cb === void 0) { cb = undefined; }
-        for (var arg_idx in args) {
-            if (!Array.isArray(args[arg_idx])) {
-                throw new Error('Will only mergeArrays arrays');
-            }
-        }
-        var seen = {}, result = [], identity;
-        for (var i = 0; i < args.length; i++) {
-            for (var j = 0; j < args[i].length; j++) {
-                identity = typeof cb !== 'undefined' ? cb(args[i][j]) : args[i][j];
-                if (seen[identity] !== true) {
-                    result.push(args[i][j]);
-                    seen[identity] = true;
-                }
-            }
-        }
-        return result;
-    }
-    exports.mergeArrays = mergeArrays;
-    function mergeObjects(args) {
-        for (var i = 0; i < args.length; i++) {
-            if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
-                throw new Error('Will only take objects as inputs');
-            }
-        }
-        var result = {};
-        for (var i = 0; i < args.length; i++) {
-            for (var key in args[i]) {
-                if (args[i].hasOwnProperty(key)) {
-                    result[key] = args[i][key];
-                }
-            }
-        }
-        return result;
-    }
-    exports.mergeObjects = mergeObjects;
-    function findKey(obj, cb) {
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key) && cb(obj[key])) {
-                return key;
-            }
-        }
-        return undefined;
-    }
-    exports.findKey = findKey;
-    function mergeOrderedArraysNoDups(a, b) {
-        var ret = [];
-        var idx_a = 0;
-        var idx_b = 0;
-        if (a[0] != null && b[0] != null) {
-            while (true) {
-                if (idx_a >= a.length || idx_b >= b.length)
-                    break;
-                if (a[idx_a] == b[idx_b]) {
-                    if (ret[ret.length - 1] != a[idx_a])
-                        ret.push(a[idx_a]);
-                    idx_a++;
-                    idx_b++;
-                    continue;
-                }
-                if (a[idx_a] < b[idx_b]) {
-                    ret.push(a[idx_a]);
-                    idx_a++;
-                    continue;
-                }
-                if (b[idx_b] < a[idx_a]) {
-                    ret.push(b[idx_b]);
-                    idx_b++;
-                }
-            }
-        }
-        while (idx_a < a.length) {
-            if (a[idx_a] != null)
-                ret.push(a[idx_a]);
-            idx_a++;
-        }
-        while (idx_b < b.length) {
-            if (b[idx_b] != null)
-                ret.push(b[idx_b]);
-            idx_b++;
-        }
-        return ret;
-    }
-    exports.mergeOrderedArraysNoDups = mergeOrderedArraysNoDups;
-    });
-
-    unwrapExports(StructUtils);
-    var StructUtils_1 = StructUtils.clone;
-    var StructUtils_2 = StructUtils.shuffleArray;
-    var StructUtils_3 = StructUtils.mergeArrays;
-    var StructUtils_4 = StructUtils.mergeObjects;
-    var StructUtils_5 = StructUtils.findKey;
-    var StructUtils_6 = StructUtils.mergeOrderedArraysNoDups;
-
-    var BaseNode_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var BaseNode = (function () {
-        function BaseNode(_id, config) {
-            if (config === void 0) { config = {}; }
-            this._id = _id;
-            this._in_deg = 0;
-            this._out_deg = 0;
-            this._deg = 0;
-            this._self_in_deg = 0;
-            this._self_out_deg = 0;
-            this._self_deg = 0;
-            this._in_edges = {};
-            this._out_edges = {};
-            this._und_edges = {};
-            this._label = config.label || _id;
-            this._features = config.features != null ? StructUtils.clone(config.features) : {};
-        }
-        BaseNode.isTyped = function (arg) {
-            return !!arg.type;
-        };
-        Object.defineProperty(BaseNode.prototype, "id", {
-            get: function () {
-                return this._id;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "label", {
-            get: function () {
-                return this._label;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "features", {
-            get: function () {
-                return this._features;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseNode.prototype.getID = function () {
-            return this._id;
-        };
-        BaseNode.prototype.getLabel = function () {
-            return this._label;
-        };
-        BaseNode.prototype.setLabel = function (label) {
-            this._label = label;
-        };
-        BaseNode.prototype.getFeatures = function () {
-            return this._features;
-        };
-        BaseNode.prototype.getFeature = function (key) {
-            return this._features[key];
-        };
-        BaseNode.prototype.f = function (key) {
-            return this.getFeature(key);
-        };
-        BaseNode.prototype.setFeatures = function (features) {
-            this._features = StructUtils.clone(features);
-        };
-        BaseNode.prototype.setFeature = function (key, value) {
-            this._features[key] = value;
-        };
-        BaseNode.prototype.deleteFeature = function (key) {
-            var feat = this._features[key];
-            delete this._features[key];
-            return feat;
-        };
-        BaseNode.prototype.clearFeatures = function () {
-            this._features = {};
-        };
-        Object.defineProperty(BaseNode.prototype, "deg", {
-            get: function () {
-                return this._deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "in_deg", {
-            get: function () {
-                return this._in_deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "out_deg", {
-            get: function () {
-                return this._out_deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "self_deg", {
-            get: function () {
-                return this._self_deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "self_in_deg", {
-            get: function () {
-                return this._self_in_deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseNode.prototype, "self_out_deg", {
-            get: function () {
-                return this._self_out_deg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseNode.prototype.addEdge = function (edge) {
-            var ends = edge.getNodes();
-            if (ends.a !== this && ends.b !== this) {
-                throw new Error("Cannot add edge that does not connect to this node");
-            }
-            var id = edge.id;
-            if (edge.isDirected()) {
-                if (ends.a === this && !this._out_edges[id]) {
-                    this._out_edges[id] = edge;
-                    this._out_deg += 1;
-                    if (ends.b === this && !this._in_edges[id]) {
-                        this._in_edges[id] = edge;
-                        this._in_deg += 1;
-                        this._self_in_deg += 1;
-                        this._self_out_deg += 1;
-                    }
-                }
-                else if (!this._in_edges[id]) {
-                    this._in_edges[id] = edge;
-                    this._in_deg += 1;
-                }
-            }
-            else {
-                if (this._und_edges[edge.id]) {
-                    throw new Error("Cannot add same undirected edge multiple times.");
-                }
-                this._und_edges[id] = edge;
-                this._deg += 1;
-                if (ends.a === ends.b) {
-                    this._self_deg += 1;
-                }
-            }
-            return edge;
-        };
-        BaseNode.prototype.hasEdge = function (edge) {
-            return !!this._in_edges[edge.getID()] || !!this._out_edges[edge.getID()] || !!this._und_edges[edge.getID()];
-        };
-        BaseNode.prototype.hasEdgeID = function (id) {
-            return !!this._in_edges[id] || !!this._out_edges[id] || !!this._und_edges[id];
-        };
-        BaseNode.prototype.getEdge = function (id) {
-            var edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
-            if (!edge) {
-                throw new Error("Cannot retrieve non-existing edge.");
-            }
-            return edge;
-        };
-        BaseNode.prototype.inEdges = function () {
-            return this._in_edges;
-        };
-        BaseNode.prototype.outEdges = function () {
-            return this._out_edges;
-        };
-        BaseNode.prototype.undEdges = function () {
-            return this._und_edges;
-        };
-        BaseNode.prototype.dirEdges = function () {
-            return StructUtils.mergeObjects([this._in_edges, this._out_edges]);
-        };
-        BaseNode.prototype.allEdges = function () {
-            return StructUtils.mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
-        };
-        BaseNode.prototype.removeEdge = function (edge) {
-            if (!this.hasEdge(edge)) {
-                throw new Error("Cannot remove unconnected edge.");
-            }
-            var id = edge.id;
-            var ends = edge.getNodes();
-            var e = this._und_edges[id];
-            if (e) {
-                delete this._und_edges[id];
-                this._deg -= 1;
-                (ends.a === ends.b) && (this._self_deg -= 1);
-            }
-            e = this._in_edges[id];
-            if (e) {
-                delete this._in_edges[id];
-                this._in_deg -= 1;
-                (ends.a === ends.b) && (this._self_in_deg -= 1);
-            }
-            e = this._out_edges[id];
-            if (e) {
-                delete this._out_edges[id];
-                this._out_deg -= 1;
-                (ends.a === ends.b) && (this._self_out_deg -= 1);
-            }
-        };
-        BaseNode.prototype.removeEdgeByID = function (id) {
-            if (!this.hasEdgeID(id)) {
-                throw new Error("Cannot remove unconnected edge.");
-            }
-            this.removeEdge(this.getEdge(id));
-        };
-        BaseNode.prototype.clearOutEdges = function () {
-            var e_1, _a;
-            try {
-                for (var _b = __values(Object.values(this.outEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var e = _c.value;
-                    this.removeEdge(e);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-        };
-        BaseNode.prototype.clearInEdges = function () {
-            var e_2, _a;
-            try {
-                for (var _b = __values(Object.values(this.inEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var e = _c.value;
-                    this.removeEdge(e);
-                }
-            }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_2) throw e_2.error; }
-            }
-        };
-        BaseNode.prototype.clearUndEdges = function () {
-            this._und_edges = {};
-            this._deg = 0;
-            this._self_deg = 0;
-        };
-        BaseNode.prototype.clearEdges = function () {
-            this.clearUndEdges();
-            this._in_edges = {};
-            this._out_edges = {};
-            this._deg = this._self_deg = this._in_deg = this._self_in_deg = this._out_deg = this._self_out_deg = 0;
-        };
-        BaseNode.prototype.prevNodes = function () {
-            var prevs = [];
-            var key, edge;
-            for (key in this._in_edges) {
-                if (this._in_edges.hasOwnProperty(key)) {
-                    edge = this._in_edges[key];
-                    prevs.push({
-                        node: edge.getNodes().a,
-                        edge: edge
-                    });
-                }
-            }
-            return prevs;
-        };
-        BaseNode.prototype.nextNodes = function () {
-            var nexts = [];
-            var key, edge;
-            for (key in this._out_edges) {
-                if (this._out_edges.hasOwnProperty(key)) {
-                    edge = this._out_edges[key];
-                    nexts.push({
-                        node: edge.getNodes().b,
-                        edge: edge
-                    });
-                }
-            }
-            return nexts;
-        };
-        BaseNode.prototype.connNodes = function () {
-            var conns = [];
-            var key, edge;
-            for (key in this._und_edges) {
-                if (this._und_edges.hasOwnProperty(key)) {
-                    edge = this._und_edges[key];
-                    var nodes = edge.getNodes();
-                    if (nodes.a === this) {
-                        conns.push({
-                            node: edge.getNodes().b,
-                            edge: edge
-                        });
-                    }
-                    else {
-                        conns.push({
-                            node: edge.getNodes().a,
-                            edge: edge
-                        });
-                    }
-                }
-            }
-            return conns;
-        };
-        BaseNode.prototype.reachNodes = function (identityFunc) {
-            var identity = 0;
-            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (function (ne) { return identity++; }));
-        };
-        BaseNode.prototype.allNeighbors = function (identityFunc) {
-            var identity = 0;
-            return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
-        };
-        BaseNode.prototype.clone = function () {
-            var new_node = new BaseNode(this._id);
-            new_node._label = this._label;
-            new_node.setFeatures(StructUtils.clone(this.getFeatures()));
-            return new_node;
-        };
-        return BaseNode;
-    }());
-    exports.BaseNode = BaseNode;
-    });
-
-    unwrapExports(BaseNode_1);
-    var BaseNode_2 = BaseNode_1.BaseNode;
-
-    var BaseEdge_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var BaseEdge = (function () {
-        function BaseEdge(_id, _node_a, _node_b, config) {
-            this._id = _id;
-            this._node_a = _node_a;
-            this._node_b = _node_b;
-            if (!(_node_a instanceof BaseNode_1.BaseNode) || !(_node_b instanceof BaseNode_1.BaseNode)) {
-                throw new Error("cannot instantiate edge without two valid node objects");
-            }
-            config = config || {};
-            this._directed = config.directed || false;
-            this._weighted = config.weighted || false;
-            this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
-            this._label = config.label || this._id;
-            this._features = config.features != null ? StructUtils.clone(config.features) : {};
-        }
-        Object.defineProperty(BaseEdge.prototype, "id", {
-            get: function () {
-                return this._id;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseEdge.prototype, "label", {
-            get: function () {
-                return this._label;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BaseEdge.prototype, "features", {
-            get: function () {
-                return this._features;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseEdge.prototype.getID = function () {
-            return this._id;
-        };
-        BaseEdge.prototype.getLabel = function () {
-            return this._label;
-        };
-        BaseEdge.prototype.setLabel = function (label) {
-            this._label = label;
-        };
-        BaseEdge.prototype.getFeatures = function () {
-            return this._features;
-        };
-        BaseEdge.prototype.getFeature = function (key) {
-            return this._features[key];
-        };
-        BaseEdge.prototype.f = function (key) {
-            return this.getFeature(key);
-        };
-        BaseEdge.prototype.setFeatures = function (features) {
-            this._features = StructUtils.clone(features);
-        };
-        BaseEdge.prototype.setFeature = function (key, value) {
-            this._features[key] = value;
-        };
-        BaseEdge.prototype.deleteFeature = function (key) {
-            var feat = this._features[key];
-            delete this._features[key];
-            return feat;
-        };
-        BaseEdge.prototype.clearFeatures = function () {
-            this._features = {};
-        };
-        BaseEdge.prototype.isDirected = function () {
-            return this._directed;
-        };
-        BaseEdge.prototype.isWeighted = function () {
-            return this._weighted;
-        };
-        BaseEdge.prototype.getWeight = function () {
-            return this._weight;
-        };
-        BaseEdge.prototype.setWeight = function (w) {
-            if (!this._weighted) {
-                throw new Error("Cannot set weight on unweighted edge.");
-            }
-            this._weight = w;
-        };
-        BaseEdge.prototype.getNodes = function () {
-            return { a: this._node_a, b: this._node_b };
-        };
-        BaseEdge.prototype.clone = function (new_node_a, new_node_b) {
-            if (!(new_node_a instanceof BaseNode_1.BaseNode) || !(new_node_b instanceof BaseNode_1.BaseNode)) {
-                throw new Error("refusing to clone edge if any new node is invalid");
-            }
-            return new BaseEdge(this._id, new_node_a, new_node_b, {
-                directed: this._directed,
-                weighted: this._weighted,
-                weight: this._weight,
-                label: this._label
-            });
-        };
-        BaseEdge.isTyped = function (arg) {
-            return !!arg.type;
-        };
-        return BaseEdge;
-    }());
-    exports.BaseEdge = BaseEdge;
-    });
-
-    unwrapExports(BaseEdge_1);
-    var BaseEdge_2 = BaseEdge_1.BaseEdge;
-
     var CallbackUtils = createCommonjsModule(function (module, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     function execCallbacks(cbs, context) {
@@ -2451,6 +1872,580 @@
 
     unwrapExports(BaseGraph_1);
     var BaseGraph_2 = BaseGraph_1.BaseGraph;
+
+    var StructUtils = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+    function clone(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        if (obj instanceof BaseGraph_1.BaseGraph || obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
+            return null;
+        }
+        var cloneObj = Array.isArray(obj) ? [] : {};
+        for (var attribute in obj) {
+            if (!obj.hasOwnProperty(attribute)) {
+                continue;
+            }
+            if (typeof obj[attribute] === "object") {
+                cloneObj[attribute] = clone(obj[attribute]);
+            }
+            else {
+                cloneObj[attribute] = obj[attribute];
+            }
+        }
+        return cloneObj;
+    }
+    exports.clone = clone;
+    function shuffleArray(arr) {
+        for (var i = arr.length - 1; i >= 0; i--) {
+            var randomIndex = Math.floor(Math.random() * (i + 1));
+            var itemAtIndex = arr[randomIndex];
+            arr[randomIndex] = arr[i];
+            arr[i] = itemAtIndex;
+        }
+        return arr;
+    }
+    exports.shuffleArray = shuffleArray;
+    function mergeArrays(args, cb) {
+        if (cb === void 0) { cb = undefined; }
+        for (var arg_idx in args) {
+            if (!Array.isArray(args[arg_idx])) {
+                throw new Error('Will only mergeArrays arrays');
+            }
+        }
+        var seen = {}, result = [], identity;
+        for (var i = 0; i < args.length; i++) {
+            for (var j = 0; j < args[i].length; j++) {
+                identity = typeof cb !== 'undefined' ? cb(args[i][j]) : args[i][j];
+                if (seen[identity] !== true) {
+                    result.push(args[i][j]);
+                    seen[identity] = true;
+                }
+            }
+        }
+        return result;
+    }
+    exports.mergeArrays = mergeArrays;
+    function mergeObjects(args) {
+        for (var i = 0; i < args.length; i++) {
+            if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
+                throw new Error('Will only take objects as inputs');
+            }
+        }
+        var result = {};
+        for (var i = 0; i < args.length; i++) {
+            for (var key in args[i]) {
+                if (args[i].hasOwnProperty(key)) {
+                    result[key] = args[i][key];
+                }
+            }
+        }
+        return result;
+    }
+    exports.mergeObjects = mergeObjects;
+    function mergeOrderedArraysNoDups(a, b) {
+        var ret = [];
+        var idx_a = 0;
+        var idx_b = 0;
+        if (a[0] != null && b[0] != null) {
+            while (true) {
+                if (idx_a >= a.length || idx_b >= b.length) {
+                    break;
+                }
+                if (a[idx_a] == b[idx_b]) {
+                    if (ret[ret.length - 1] != a[idx_a]) {
+                        ret.push(a[idx_a]);
+                    }
+                    idx_a++;
+                    idx_b++;
+                    continue;
+                }
+                if (a[idx_a] < b[idx_b]) {
+                    ret.push(a[idx_a]);
+                    idx_a++;
+                    continue;
+                }
+                if (b[idx_b] < a[idx_a]) {
+                    ret.push(b[idx_b]);
+                    idx_b++;
+                }
+            }
+        }
+        while (idx_a < a.length) {
+            if (a[idx_a] != null) {
+                ret.push(a[idx_a]);
+            }
+            idx_a++;
+        }
+        while (idx_b < b.length) {
+            if (b[idx_b] != null) {
+                ret.push(b[idx_b]);
+            }
+            idx_b++;
+        }
+        return ret;
+    }
+    exports.mergeOrderedArraysNoDups = mergeOrderedArraysNoDups;
+    });
+
+    unwrapExports(StructUtils);
+    var StructUtils_1 = StructUtils.clone;
+    var StructUtils_2 = StructUtils.shuffleArray;
+    var StructUtils_3 = StructUtils.mergeArrays;
+    var StructUtils_4 = StructUtils.mergeObjects;
+    var StructUtils_5 = StructUtils.mergeOrderedArraysNoDups;
+
+    var BaseNode_1 = createCommonjsModule(function (module, exports) {
+    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+        if (m) return m.call(o);
+        return {
+            next: function () {
+                if (o && i >= o.length) o = void 0;
+                return { value: o && o[i++], done: !o };
+            }
+        };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+    var BaseNode = (function () {
+        function BaseNode(_id, config) {
+            if (config === void 0) { config = {}; }
+            this._id = _id;
+            this._in_deg = 0;
+            this._out_deg = 0;
+            this._deg = 0;
+            this._self_in_deg = 0;
+            this._self_out_deg = 0;
+            this._self_deg = 0;
+            this._in_edges = {};
+            this._out_edges = {};
+            this._und_edges = {};
+            this._label = config.label || _id;
+            this._features = config.features != null ? StructUtils.clone(config.features) : {};
+        }
+        BaseNode.isTyped = function (arg) {
+            return !!arg.type;
+        };
+        Object.defineProperty(BaseNode.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "features", {
+            get: function () {
+                return this._features;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseNode.prototype.getID = function () {
+            return this._id;
+        };
+        BaseNode.prototype.getLabel = function () {
+            return this._label;
+        };
+        BaseNode.prototype.setLabel = function (label) {
+            this._label = label;
+        };
+        BaseNode.prototype.getFeatures = function () {
+            return this._features;
+        };
+        BaseNode.prototype.getFeature = function (key) {
+            return this._features[key];
+        };
+        BaseNode.prototype.f = function (key) {
+            return this.getFeature(key);
+        };
+        BaseNode.prototype.setFeatures = function (features) {
+            this._features = StructUtils.clone(features);
+        };
+        BaseNode.prototype.setFeature = function (key, value) {
+            this._features[key] = value;
+        };
+        BaseNode.prototype.deleteFeature = function (key) {
+            var feat = this._features[key];
+            delete this._features[key];
+            return feat;
+        };
+        BaseNode.prototype.clearFeatures = function () {
+            this._features = {};
+        };
+        Object.defineProperty(BaseNode.prototype, "deg", {
+            get: function () {
+                return this._deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "in_deg", {
+            get: function () {
+                return this._in_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "out_deg", {
+            get: function () {
+                return this._out_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_deg", {
+            get: function () {
+                return this._self_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_in_deg", {
+            get: function () {
+                return this._self_in_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseNode.prototype, "self_out_deg", {
+            get: function () {
+                return this._self_out_deg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseNode.prototype.addEdge = function (edge) {
+            var ends = edge.getNodes();
+            if (ends.a !== this && ends.b !== this) {
+                throw new Error("Cannot add edge that does not connect to this node");
+            }
+            var id = edge.id;
+            if (edge.isDirected()) {
+                if (ends.a === this && !this._out_edges[id]) {
+                    this._out_edges[id] = edge;
+                    this._out_deg += 1;
+                    if (ends.b === this && !this._in_edges[id]) {
+                        this._in_edges[id] = edge;
+                        this._in_deg += 1;
+                        this._self_in_deg += 1;
+                        this._self_out_deg += 1;
+                    }
+                }
+                else if (!this._in_edges[id]) {
+                    this._in_edges[id] = edge;
+                    this._in_deg += 1;
+                }
+            }
+            else {
+                if (this._und_edges[edge.id]) {
+                    throw new Error("Cannot add same undirected edge multiple times.");
+                }
+                this._und_edges[id] = edge;
+                this._deg += 1;
+                if (ends.a === ends.b) {
+                    this._self_deg += 1;
+                }
+            }
+            return edge;
+        };
+        BaseNode.prototype.hasEdge = function (edge) {
+            return !!this._in_edges[edge.getID()] || !!this._out_edges[edge.getID()] || !!this._und_edges[edge.getID()];
+        };
+        BaseNode.prototype.hasEdgeID = function (id) {
+            return !!this._in_edges[id] || !!this._out_edges[id] || !!this._und_edges[id];
+        };
+        BaseNode.prototype.getEdge = function (id) {
+            var edge = this._in_edges[id] || this._out_edges[id] || this._und_edges[id];
+            if (!edge) {
+                throw new Error("Cannot retrieve non-existing edge.");
+            }
+            return edge;
+        };
+        BaseNode.prototype.inEdges = function () {
+            return this._in_edges;
+        };
+        BaseNode.prototype.outEdges = function () {
+            return this._out_edges;
+        };
+        BaseNode.prototype.undEdges = function () {
+            return this._und_edges;
+        };
+        BaseNode.prototype.dirEdges = function () {
+            return StructUtils.mergeObjects([this._in_edges, this._out_edges]);
+        };
+        BaseNode.prototype.allEdges = function () {
+            return StructUtils.mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
+        };
+        BaseNode.prototype.removeEdge = function (edge) {
+            if (!this.hasEdge(edge)) {
+                throw new Error("Cannot remove unconnected edge.");
+            }
+            var id = edge.id;
+            var ends = edge.getNodes();
+            var e = this._und_edges[id];
+            if (e) {
+                delete this._und_edges[id];
+                this._deg -= 1;
+                (ends.a === ends.b) && (this._self_deg -= 1);
+            }
+            e = this._in_edges[id];
+            if (e) {
+                delete this._in_edges[id];
+                this._in_deg -= 1;
+                (ends.a === ends.b) && (this._self_in_deg -= 1);
+            }
+            e = this._out_edges[id];
+            if (e) {
+                delete this._out_edges[id];
+                this._out_deg -= 1;
+                (ends.a === ends.b) && (this._self_out_deg -= 1);
+            }
+        };
+        BaseNode.prototype.removeEdgeByID = function (id) {
+            if (!this.hasEdgeID(id)) {
+                throw new Error("Cannot remove unconnected edge.");
+            }
+            this.removeEdge(this.getEdge(id));
+        };
+        BaseNode.prototype.clearOutEdges = function () {
+            var e_1, _a;
+            try {
+                for (var _b = __values(Object.values(this.outEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var e = _c.value;
+                    this.removeEdge(e);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+        };
+        BaseNode.prototype.clearInEdges = function () {
+            var e_2, _a;
+            try {
+                for (var _b = __values(Object.values(this.inEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var e = _c.value;
+                    this.removeEdge(e);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+        };
+        BaseNode.prototype.clearUndEdges = function () {
+            this._und_edges = {};
+            this._deg = 0;
+            this._self_deg = 0;
+        };
+        BaseNode.prototype.clearEdges = function () {
+            this.clearUndEdges();
+            this._in_edges = {};
+            this._out_edges = {};
+            this._deg = this._self_deg = this._in_deg = this._self_in_deg = this._out_deg = this._self_out_deg = 0;
+        };
+        BaseNode.prototype.prevNodes = function () {
+            var prevs = [];
+            var key, edge;
+            for (key in this._in_edges) {
+                if (this._in_edges.hasOwnProperty(key)) {
+                    edge = this._in_edges[key];
+                    prevs.push({
+                        node: edge.getNodes().a,
+                        edge: edge
+                    });
+                }
+            }
+            return prevs;
+        };
+        BaseNode.prototype.nextNodes = function () {
+            var nexts = [];
+            var key, edge;
+            for (key in this._out_edges) {
+                if (this._out_edges.hasOwnProperty(key)) {
+                    edge = this._out_edges[key];
+                    nexts.push({
+                        node: edge.getNodes().b,
+                        edge: edge
+                    });
+                }
+            }
+            return nexts;
+        };
+        BaseNode.prototype.connNodes = function () {
+            var conns = [];
+            var key, edge;
+            for (key in this._und_edges) {
+                if (this._und_edges.hasOwnProperty(key)) {
+                    edge = this._und_edges[key];
+                    var nodes = edge.getNodes();
+                    if (nodes.a === this) {
+                        conns.push({
+                            node: edge.getNodes().b,
+                            edge: edge
+                        });
+                    }
+                    else {
+                        conns.push({
+                            node: edge.getNodes().a,
+                            edge: edge
+                        });
+                    }
+                }
+            }
+            return conns;
+        };
+        BaseNode.prototype.reachNodes = function (identityFunc) {
+            var identity = 0;
+            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (function (ne) { return identity++; }));
+        };
+        BaseNode.prototype.allNeighbors = function (identityFunc) {
+            var identity = 0;
+            return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
+        };
+        BaseNode.prototype.clone = function () {
+            var new_node = new BaseNode(this._id);
+            new_node._label = this._label;
+            new_node.setFeatures(StructUtils.clone(this.getFeatures()));
+            return new_node;
+        };
+        return BaseNode;
+    }());
+    exports.BaseNode = BaseNode;
+    });
+
+    unwrapExports(BaseNode_1);
+    var BaseNode_2 = BaseNode_1.BaseNode;
+
+    var BaseEdge_1 = createCommonjsModule(function (module, exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+
+
+    var BaseEdge = (function () {
+        function BaseEdge(_id, _node_a, _node_b, config) {
+            this._id = _id;
+            this._node_a = _node_a;
+            this._node_b = _node_b;
+            if (!(_node_a instanceof BaseNode_1.BaseNode) || !(_node_b instanceof BaseNode_1.BaseNode)) {
+                throw new Error("cannot instantiate edge without two valid node objects");
+            }
+            config = config || {};
+            this._directed = config.directed || false;
+            this._weighted = config.weighted || false;
+            this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
+            this._label = config.label || this._id;
+            this._features = config.features != null ? StructUtils.clone(config.features) : {};
+        }
+        Object.defineProperty(BaseEdge.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseEdge.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BaseEdge.prototype, "features", {
+            get: function () {
+                return this._features;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseEdge.prototype.getID = function () {
+            return this._id;
+        };
+        BaseEdge.prototype.getLabel = function () {
+            return this._label;
+        };
+        BaseEdge.prototype.setLabel = function (label) {
+            this._label = label;
+        };
+        BaseEdge.prototype.getFeatures = function () {
+            return this._features;
+        };
+        BaseEdge.prototype.getFeature = function (key) {
+            return this._features[key];
+        };
+        BaseEdge.prototype.f = function (key) {
+            return this.getFeature(key);
+        };
+        BaseEdge.prototype.setFeatures = function (features) {
+            this._features = StructUtils.clone(features);
+        };
+        BaseEdge.prototype.setFeature = function (key, value) {
+            this._features[key] = value;
+        };
+        BaseEdge.prototype.deleteFeature = function (key) {
+            var feat = this._features[key];
+            delete this._features[key];
+            return feat;
+        };
+        BaseEdge.prototype.clearFeatures = function () {
+            this._features = {};
+        };
+        BaseEdge.prototype.isDirected = function () {
+            return this._directed;
+        };
+        BaseEdge.prototype.isWeighted = function () {
+            return this._weighted;
+        };
+        BaseEdge.prototype.getWeight = function () {
+            return this._weight;
+        };
+        BaseEdge.prototype.setWeight = function (w) {
+            if (!this._weighted) {
+                throw new Error("Cannot set weight on unweighted edge.");
+            }
+            this._weight = w;
+        };
+        BaseEdge.prototype.getNodes = function () {
+            return { a: this._node_a, b: this._node_b };
+        };
+        BaseEdge.prototype.clone = function (new_node_a, new_node_b) {
+            if (!(new_node_a instanceof BaseNode_1.BaseNode) || !(new_node_b instanceof BaseNode_1.BaseNode)) {
+                throw new Error("refusing to clone edge if any new node is invalid");
+            }
+            return new BaseEdge(this._id, new_node_a, new_node_b, {
+                directed: this._directed,
+                weighted: this._weighted,
+                weight: this._weight,
+                label: this._label
+            });
+        };
+        BaseEdge.isTyped = function (arg) {
+            return !!arg.type;
+        };
+        return BaseEdge;
+    }());
+    exports.BaseEdge = BaseEdge;
+    });
+
+    unwrapExports(BaseEdge_1);
+    var BaseEdge_2 = BaseEdge_1.BaseEdge;
 
     var TypedEdge_1 = createCommonjsModule(function (module, exports) {
     var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
@@ -5138,7 +5133,6 @@
     var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         sortFuncs: SimilarityCommons_1,
@@ -5205,7 +5199,6 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5428,7 +5421,6 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5813,7 +5805,6 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -7362,7 +7353,6 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });

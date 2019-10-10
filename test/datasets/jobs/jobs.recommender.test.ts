@@ -31,7 +31,8 @@ describe('real-world job/skill - based recommendations - ', () => {
 		idx: any = null,
 		json: JSONGraph = null,
 		ex: TheExpanse,
-		me;
+		me,
+		myCountry;
 
 	const jsonIn = new JSONInput();
 
@@ -473,7 +474,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*							PERSON -> SKILLS	 					  */
 	/*--------------------------------------------*/
-	describe.skip('Skill-centered recommendations (what could I learn / offer to teach)', () => {
+	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
 		describe('skills required by companies ', () => {
 
@@ -638,41 +639,156 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*						 COUNTRY -> OTHERS						  */
 	/*--------------------------------------------*/
 	/**
-	 * @todo only
+	 * @description from the vie-point of countries / governments
 	 */
-	describe('Location-centered recommendations', () => {
+	describe.only('Country-centered recommendations', () => {
 
+		beforeAll(() => {
+			// it's Congo...
+			myCountry = Array.from(g.outs(me, EDGE_TYPES.LivesIn))[0];
+		});
+
+
+		/**
+		 * @example obvious
+		 */
+		it('skills our companies seek', () => {
+			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
+			const skills = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
+			// console.log(Array.from(skills).map(e => e.f('name')));
+		});
+
+
+		/**
+		 * @example obvious
+		 */
+		it('skills our people have', () => {
+			const ourPeople = g.ins(myCountry, EDGE_TYPES.LivesIn);
+			const skills = g.expand(ourPeople, DIR.out, EDGE_TYPES.HasSkill);
+			// console.log(Array.from(skills).map(e => e.f('name')));
+		});
+
+
+		/**
+		 * @example on a dataset of internationally known industry leaders
+		 */
 		it('People (individuals) with a skill set our companies need', () => {
-
+			const peeps = [
+				{ person: 'Heloise DuBuque', isect: 11, sim: 0.84615 },
+				{ person: 'Minerva Halvorson', isect: 12, sim: 0.75 },
+				{ person: 'Lucinda Macejkovic', isect: 12, sim: 0.75 },
+				{ person: 'Carolyn Hessel', isect: 12, sim: 0.75 },
+				{ person: 'Javon Shields', isect: 12, sim: 0.75 },
+				{ person: 'Vergie Zulauf', isect: 11, sim: 0.73333 },
+				{ person: 'Tom Lemke', isect: 11, sim: 0.73333 },
+				{ person: 'Randi Mosciski', isect: 10, sim: 0.71429 },
+				{ person: 'Omer Ebert', isect: 11, sim: 0.6875 },
+				{ person: 'Daphney Weber', isect: 11, sim: 0.6875 }
+			];
+			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
+			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
+			const allPeopleSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			allPeopleSkills[myCountry.id] = ourSkillDemand;
+			const sims = simSource(setSimFuncs.overlap, myCountry.id, allPeopleSkills, {knn: 10});
+			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+			expect(sims_read).toEqual(peeps);
 		});
 
 
+		/**
+		 * @example on a dataset of internationally known experts (institutes) we could hire
+		 *
+		 * @todo this only gives us people that are differently skilled than our workforce...
+		 * 			 it doesn't say anything about whether they are experts or not
+		 * 			 -> graph enrichment !
+		 */
 		it('People (individuals) with a skill set our workforce has not', () => {
+			const ourPeople = g.ins(myCountry, EDGE_TYPES.LivesIn);
+			const ourSkills = g.expand(ourPeople, DIR.out, EDGE_TYPES.HasSkill);
+			const allPeopleSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			allPeopleSkills[myCountry.id] = ourSkills;
+			const sims = simSource(setSimFuncs.jaccard, myCountry.id, allPeopleSkills, {knn: 10, sort: sortFuncs.asc});
+			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+		});
+
+
+		/**
+		 * @example Which foreign companies could attract our talented people?
+		 *
+		 * @todo enhance for `low` demand - right now we can only do `no` demand
+		 * @todo filter the foreign part, I am too lazy now
+		 * 			 -> this is a constraint for the base recommender class !
+		 */
+		it('Foreign companies seeking skills our people have but our economy has no / low demand for', () => {
+			// 1) skills our economy is not demanding
+			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
+			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
+			const allSkills = g.getNodesT(NODE_TYPES.Skill);
+
+			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.has(s));
+			// console.log(skillsOuttaDemand.length);
+
+			// 2 companies seeking those skills
+			const skillsSoughtByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillsSoughtByCompany[myCountry.id] = new Set(skillsOuttaDemand);
+			const sims = simSource(setSimFuncs.overlap, myCountry.id, skillsSoughtByCompany);
+			const sims_read = sims.map(e => ({
+				company: g.n(e.to).f('name'),
+				country: Array.from(g.outs(g.n(e.to), EDGE_TYPES.LocatedIn))[0].f('name'),
+				isect: e.isect,
+				sim: e.sim
+			}));
+			// console.log(sims_read);
+		});
+
+
+		/**
+		 * @example Which countries could attract our talented people?
+		 */
+		it('Countries seeking skills our people have but our economy has no / low demand for', () => {
 
 		});
 
 
 		/**
-		 * @example What people do we want to attract?
+		 * @example from where should we try to attract talent?
 		 */
-		it('Companies seeking skills our people have but our economies is not providing chances for', () => {
+		it.todo('Countries with people talented at what our companies seek');
 
+
+		/**
+		 * @example which country has a `mobile` workforce we could use?
+		 */
+		it.todo('Countries with people whose talents are not appreciated at home');
+
+
+		/**
+		 * @example international competitors
+		 */
+		it('Peoples (collective) with a similar skill set to ours', () => {
+			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+			const workforceByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const skillBaseByCountry = ex.accumulateSetsFromSets(workforceByCountry, DIR.out, EDGE_TYPES.HasSkill);
+			const myCountry = Array.from(g.outs(me, EDGE_TYPES.LivesIn))[0];
+			const sims = simSource(setSimFuncs.jaccard, myCountry.id, skillBaseByCountry, {knn: 10});
+			const sims_read = sims.map(e => ({country: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
 		});
 
 
 		/**
-		 * @example Which of our citizens could potentially leave the country
+		 * @example we could create educational exchange programs...
 		 */
-		it('Countries seeking skills our people have but our economies is not providing chances for', () => {
-
-		});
-
-
-		/**
-		 * @example international competition
-		 */
-		it('Peoples (collective) with a skill set our workforce has not', () => {
-
+		it('Peoples (collective) with a skill set our workforce is bad at', () => {
+			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+			const workforceByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const skillBaseByCountry = ex.accumulateSetsFromSets(workforceByCountry, DIR.out, EDGE_TYPES.HasSkill);
+			const myCountry = Array.from(g.outs(me, EDGE_TYPES.LivesIn))[0];
+			const sims = simSource(setSimFuncs.jaccard, myCountry.id, skillBaseByCountry, {knn: 10, sort: sortFuncs.asc});
+			const sims_read = sims.map(e => ({country: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
 		});
 
 	});
