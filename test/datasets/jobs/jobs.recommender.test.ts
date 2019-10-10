@@ -52,6 +52,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	});
 
 
+
 	/*--------------------------------------------*/
 	/*							 PERSON -> JOBS 						  */
 	/*--------------------------------------------*/
@@ -67,7 +68,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		/**
 		 * @example simple profile matching
 		 */
-		it('companies looking for a similar skill set (than mine ;-))', () => {
+		it('companies looking for a similar skill set', () => {
 			const sims_exp = [
 				[ 'Tom Lemke', 'Schroeder-Corwin', 10, 0.76923 ],
 				[ 'Tom Lemke', 'Carter-McGlynn', 11, 0.73333 ],
@@ -94,7 +95,28 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Most influential people amongst employees of potential employers (Pagerank)', () => {
+		it('companies employing people I know (k^th degree)', () => {
+			const myFriends = g.outs(me, EDGE_TYPES.Knows);
+			const employers = Array.from(myFriends).map(f => ({
+				company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
+			}));
+			// console.log(employers);
+		});
+
+
+		it('companies employing people knowing people I know', () => {
+			const myFriends = g.outs(me, EDGE_TYPES.Knows);
+			const peopleKnowingThem = g.expand(myFriends, DIR.in, EDGE_TYPES.Knows);
+			const employers = Array.from(peopleKnowingThem)
+				.slice(0, 10)
+				.map(f => ({
+					company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
+				}));
+			// console.log(employers);
+		});
+
+
+		it('most influential people amongst employees of potential employers (Pagerank)', () => {
 			// 1) potential employers
 			const allSets = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
 			allSets[me.label] = g.outs(me, EDGE_TYPES.HasSkill);
@@ -124,9 +146,15 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 		/**
+		 * @todo can only answer this after graph enrichment...
+		 */
+		it.todo('Most influential people amongst potential employers (Pagerank)');
+
+
+		/**
 		 * @example MOST URGENT DEMAND
 		 */
-		it('Companies looking for ~my skill set whose workforce is bad at it (urgency)', () => {
+		it('companies looking for similar skill set whose workforce is bad at it (urgency)', () => {
 			const tic = +new Date();
 
 			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
@@ -156,12 +184,12 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies employing people of a similar skill set to mine (where would I fit in)', () => {
+		it('companies whose workforce has a similar skill set to mine (where would I fit in)', () => {
 			const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
 			const employees = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			const employeeSkills = ex.accumulateSetsFromSets(employees, DIR.out, EDGE_TYPES.HasSkill);
 			employeeSkills[me.id] = mySkills;
-			const sims = simSource(setSimFuncs.overlap, me.label, employeeSkills, {knn: 10});
+			const sims = simSource(setSimFuncs.jaccard, me.id, employeeSkills, {knn: 10});
 			// Just for test...
 			// const sims = simSource(setSimFuncs.overlap, me.label, employeeSkills, {knn: 10, cutoff: 0.99, cutFunc: cutFuncs.below});
 			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
@@ -169,7 +197,33 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies employing people I know (k-th degree) AND looking for my skills (Referral 1)', () => {
+		it('companies employing the top-K similar people to me (by skill set)', () => {
+			const allSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const mostSimToMeBySkills = simSource(setSimFuncs.overlap, me.id, allSkills, {knn: 10});
+			// console.log(mostSimToMe);
+			const employers = mostSimToMeBySkills.map(e => ({
+				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'),
+				isect: e.isect,
+				sim: e.sim
+			}));
+			// console.log(employers);
+		});
+
+
+		/* Could be interesting for personal recommendations */
+		it('companies employing the top-K similar people to me (by social sphere overlap)', () => {
+			const allFriends = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
+			const mostSimToMeByFriends = simSource(setSimFuncs.overlap, me.id, allFriends, {knn: 10});
+			const employers = mostSimToMeByFriends.map(e => ({
+				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'),
+				isect: e.isect,
+				sim: e.sim
+			}));
+			// console.log(employers);
+		});
+
+
+		it('companies employing people I know (k-th degree) AND looking for my skills (Referral 1)', () => {
 			// 1) Companies looking for my skills
 			const allSets = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
 			allSets[me.label] = g.outs(me, EDGE_TYPES.HasSkill);
@@ -206,7 +260,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		/**
 		 * @example GETTING REFERRED by non-competitors
 		 */
-		it('Companies employing people I know whose workforce is bad at my skills (Referral 2)', () => {
+		it('companies employing people I know whose workforce is bad at my skills (Referral 2)', () => {
 			const res_exp = [
 				{
 					me: '583',
@@ -269,7 +323,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 *          competition, so the weaker their skill overlap is with mine, the better!
 		 *          (yet their company should be looking for that skill...)
 		 */
-		it('Companies employing people I know whose workforce is bad at their skill demand (Referral 2)', () => {
+		it('companies employing people I know whose workforce is bad at their skill demand (Referral 3)', () => {
 			// 1) Get people overlap
 			const allEmployees = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			allEmployees[me.id] = g.outs(me, EDGE_TYPES.Knows);
@@ -302,53 +356,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const sims = simSource(setSimFuncs.jaccard, me.id, skillDemands, {knn: 10});
 			const sim_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
 			// console.log(sim_res);
-		});
-
-
-		it('companies employing people similar to me (by skill set)', () => {
-			const allSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			const mostSimToMeBySkills = simSource(setSimFuncs.overlap, me.id, allSkills, {knn: 10});
-			// console.log(mostSimToMe);
-			const employers = mostSimToMeBySkills.map(e => ({
-				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'), 
-				isect: e.isect, 
-				sim: e.sim
-			}));
-			// console.log(employers);
-		});
-
-
-		/* Could be interesting for personal recommendations */
-		it('companies employing people similar to me (by the people they know)', () => {
-			const allFriends = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
-			const mostSimToMeByFriends = simSource(setSimFuncs.overlap, me.id, allFriends, {knn: 10});
-			const employers = mostSimToMeByFriends.map(e => ({
-				company: Array.from(g.outs(g.n(e.to), EDGE_TYPES.WorksFor))[0].f('name'), 
-				isect: e.isect, 
-				sim: e.sim
-			}));
-			// console.log(employers);
-		});
-
-
-		it('companies employing people I know (k^th degree)', () => {
-			const myFriends = g.outs(me, EDGE_TYPES.Knows);
-			const employers = Array.from(myFriends).map(f => ({
-				company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
-			}));
-			// console.log(employers);
-		});
-
-
-		it('companies employing people knowing people I know', () => {
-			const myFriends = g.outs(me, EDGE_TYPES.Knows);
-			const peopleKnowingThem = g.expand(myFriends, DIR.in, EDGE_TYPES.Knows);
-			const employers = Array.from(peopleKnowingThem)
-				.slice(0, 10)
-				.map(f => ({
-					company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
-				}));
-			// console.log(employers);
 		});
 
 
@@ -435,7 +442,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies similar to my current employer (by skill demand)', () => {
+		it('Companies (DIS-)similar to my current employer (by skill demand)', () => {
 			const skillDemandByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
 			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
 			const sims = simSource(setSimFuncs.jaccard, myEmployer.id, skillDemandByCompany, {knn: 10});
@@ -444,7 +451,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies most similar to my current employer (by skill supply)', () => {
+		it('Companies (DIS-) similar to my current employer (by skill supply)', () => {
 			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			const skillSets = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
 			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
@@ -454,24 +461,8 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('Companies most DISsimilar to my current employer (by skill supply)', () => {
-			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
-			const skillSets = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
-			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
-			const sims = simSource(setSimFuncs.jaccard, myEmployer.id, skillSets, {knn: 10, sort: sortFuncs.asc});
-			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
-			// console.log(sims_res);
-		});
-
-
 		/**
-		 * @todo can only answer this after graph enrichment...
-		 */
-		it.todo('Most influential people amongst potential employers (Pagerank)');
-
-
-		/**
-		 * @todo enrichment...
+		 * @todo waiting for graph enrichment...
 		 */
 		it.todo('Same companies BUT DISsimilar to my current employerdescription `enrichment possibilities`');
 
@@ -482,7 +473,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*							PERSON -> SKILLS	 					  */
 	/*--------------------------------------------*/
-	describe.only('Skill-centered recommendations (what could I learn / offer to teach)', () => {
+	describe.skip('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
 		describe('skills required by companies ', () => {
 
@@ -498,9 +489,11 @@ describe('real-world job/skill - based recommendations - ', () => {
 				console.log(result);
 			});
 
+
 			it('employing my k^th degree friends', () => {
 
 			});
+
 
 			it('employing similar people than me (itself by skill overlap)', () => {
 
@@ -515,6 +508,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 			});
 
+
 			it('where my k^th degree friends work', () => {
 
 			});
@@ -527,6 +521,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			it('working at companies I am interested in', () => {
 
 			});
+
 
 			it('where my k^th degree friends work', () => {
 
@@ -581,6 +576,59 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	describe('Employee-centered recommendations', () => {
 
+		it('People having skills we seek', () => {
+
+		});
+
+
+		it('People having a similar skill set to our workforce (fitting in)', () => {
+
+		});
+
+
+		it('People having a similar skill set to our workforce & knowing them', () => {
+
+		});
+
+
+		it('People having a similar skill set to our workforce who know them', () => {
+
+		});
+
+
+		it('People having a different skill set to our workforce (complement)', () => {
+
+		});
+
+
+		it('People having a different skill set to our workforce & knowing them', () => {
+
+		});
+
+
+		it('People having a different skill set to our workforce who know them', () => {
+
+		});
+
+
+		it('People coming from a similar company culture (by skills possessed)', () => {
+
+		});
+
+
+		it('People coming from a different company culture', () => {
+
+		});
+
+
+		it('People coming from a similar country culture', () => {
+
+		});
+
+
+		it('People coming from a different country culture', () => {
+
+		});
 
 	});
 
@@ -594,7 +642,39 @@ describe('real-world job/skill - based recommendations - ', () => {
 	 */
 	describe('Location-centered recommendations', () => {
 
-	});
+		it('People (individuals) with a skill set our companies need', () => {
 
+		});
+
+
+		it('People (individuals) with a skill set our workforce has not', () => {
+
+		});
+
+
+		/**
+		 * @example What people do we want to attract?
+		 */
+		it('Companies seeking skills our people have but our economies is not providing chances for', () => {
+
+		});
+
+
+		/**
+		 * @example Which of our citizens could potentially leave the country
+		 */
+		it('Countries seeking skills our people have but our economies is not providing chances for', () => {
+
+		});
+
+
+		/**
+		 * @example international competition
+		 */
+		it('Peoples (collective) with a skill set our workforce has not', () => {
+
+		});
+
+	});
 
 });
