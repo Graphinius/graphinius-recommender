@@ -16,7 +16,6 @@ class TheExpanse {
    * @todo transfer to graphinius (core)?
    * @todo isn't the `set of nodes` version the same as our normal expander? Except we have a map here...?
    *       -> where is multiple dispatch when you need it !?
-   *
    */
   accumulateSetsFromNodes(nodes: string | Map<string, ITypedNode>, dir: DIR, rel: string): {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};

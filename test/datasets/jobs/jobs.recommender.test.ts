@@ -726,7 +726,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
 			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
 			const allSkills = g.getNodesT(NODE_TYPES.Skill);
-
 			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.has(s));
 			// console.log(skillsOuttaDemand.length);
 
@@ -748,20 +747,77 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 * @example Which countries could attract our talented people?
 		 */
 		it('Countries seeking skills our people have but our economy has no / low demand for', () => {
+			// 1) skills our economy is not demanding
+			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
+			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
+			const allSkills = g.getNodesT(NODE_TYPES.Skill);
+			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.has(s));
 
+			// 2) Countries seeking those skills
+			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+			const skillsSoughtByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillsSoughtByCountry[myCountry.id] = new Set(skillsOuttaDemand);
+			const sims = simSource(setSimFuncs.overlap, myCountry.id, skillsSoughtByCountry);
+			// console.log(sims.length);
+			// console.log('Countries seeking our underappreciated talent: ', sims);
+
+			const sims_read = sims.map(e => ({
+				country: g.n(e.to).f('name'),
+				isect: e.isect,
+				sim: e.sim
+			}));
+			// console.log(sims_read);
 		});
 
 
 		/**
-		 * @example from where should we try to attract talent?
+		 * @example where could we try to attract talent from?
 		 */
-		it.todo('Countries with people talented at what our companies seek');
+		it('Countries with talents our industry seeks', () => {
+			// 1) Our skill demand
+			const ourIndustry = g.ins(myCountry, EDGE_TYPES.LocatedIn);
+			const ourSkillDemand = g.expand(ourIndustry, DIR.out, EDGE_TYPES.LooksForSkill);
+
+			// 2) skills by country
+			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+			const workforceByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const skillBaseByCountry = ex.accumulateSetsFromSets(workforceByCountry, DIR.out, EDGE_TYPES.HasSkill);
+			/**
+			 * @todo not elegant... not elegant at all...
+			 */
+			skillBaseByCountry[myCountry.id] = ourSkillDemand;
+			const sims = simSource(setSimFuncs.jaccard, myCountry.id, skillBaseByCountry);
+			const sims_read = sims.map(e => ({country: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+		});
 
 
 		/**
+		 * @description gap between a country's skill demand & supply
 		 * @example which country has a `mobile` workforce we could use?
 		 */
-		it.todo('Countries with people whose talents are not appreciated at home');
+		it('Countries with talents not appreciated at home', () => {
+			const results = [];
+			const countries = g.getNodesT(NODE_TYPES.Country);
+			countries.forEach(c => {
+				// console.log(c.f('name'));
+				const people = g.ins(c, EDGE_TYPES.LivesIn);
+				const companies = g.ins(c, EDGE_TYPES.LocatedIn);
+				if ( !people || people.size === 0 || !companies || companies.size === 0 ) {
+					return;
+				}
+				const skillSupply = g.expand(people, DIR.out, EDGE_TYPES.HasSkill);
+				const skillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
+				results.push({
+					country: c.f('name'),
+					supply: skillSupply.size,
+					demand: skillDemand.size,
+					...sim(setSimFuncs.jaccard, skillSupply, skillDemand)
+				});
+			});
+			results.sort((a, b) => a.sim - b.sim);
+			// console.log(results);
+		});
 
 
 		/**
