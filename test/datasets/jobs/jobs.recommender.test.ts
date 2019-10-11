@@ -11,6 +11,7 @@ import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilariti
 import {sim, simSource, sortFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
+import {BaseRecommender} from "../../../src/recommender/BaseRecommender";
 
 
 const
@@ -575,15 +576,38 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*						COMPANY -> EMPLOYEES					  */
 	/*--------------------------------------------*/
-	describe('Employee-centered recommendations', () => {
+	describe.only('Employee-centered recommendations', () => {
 
+		let
+			br: BaseRecommender,
+			myCompany;
+
+		beforeAll(() => {
+			br = new BaseRecommender(g);
+			myCompany = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+		});
+
+
+		/**
+		 *
+		 */
 		it('People having skills we seek', () => {
-
+			// 1) Entry & Expand in one...
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
+			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
 		});
 
 
 		it('People having a similar skill set to our workforce (fitting in)', () => {
-
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
+			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
 		});
 
 
@@ -598,16 +622,21 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 		it('People having a different skill set to our workforce (complement)', () => {
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10, sort: sortFuncs.asc});
+			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+		});
+
+
+		it('People having a different skill set to our workforce AND knowing them', () => {
 
 		});
 
 
-		it('People having a different skill set to our workforce & knowing them', () => {
-
-		});
-
-
-		it('People having a different skill set to our workforce who know them', () => {
+		it('People having a different skill set to our workforce AND who know them', () => {
 
 		});
 
@@ -641,7 +670,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/**
 	 * @description from the vie-point of countries / governments
 	 */
-	describe.only('Country-centered recommendations', () => {
+	describe('Country-centered recommendations', () => {
 
 		beforeAll(() => {
 			// it's Congo...
