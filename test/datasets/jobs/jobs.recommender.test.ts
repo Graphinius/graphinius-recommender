@@ -585,6 +585,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		beforeAll(() => {
 			br = new BaseRecommender(g);
 			myCompany = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
+			myCountry = Array.from(g.outs(me, EDGE_TYPES.LivesIn))[0];
 		});
 
 
@@ -601,6 +602,44 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
+		it('People having skills we seek & knowing them', () => {
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
+
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			const friendsOfOurEmps = g.expand(ourEmployees, DIR.in, EDGE_TYPES.Knows);
+
+			const result = [];
+			sims.forEach(e => {
+				const person = g.n(e.to);
+				if ( friendsOfOurEmps.has(person) ) {
+					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
+				}
+			});
+			console.log(result);
+		});
+
+
+		it('People having skills we seek who know them', () => {
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
+
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			const friendsOfOurEmps = g.expand(ourEmployees, DIR.out, EDGE_TYPES.Knows);
+
+			const result = [];
+			sims.forEach(e => {
+				const person = g.n(e.to);
+				if ( friendsOfOurEmps.has(person) ) {
+					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
+				}
+			});
+			console.log(result);
+		});
+
+
 		it('People having a similar skill set to our workforce (fitting in)', () => {
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
@@ -612,12 +651,50 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 		it('People having a similar skill set to our workforce & knowing them', () => {
+			// 1) Similar skills to our workforce
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
+			// 2) Also knowing them (inwards)
+			const friendsOfOurEmps = g.expand(ourEmployees, DIR.in, EDGE_TYPES.Knows);
+			// const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+
+			// 3) Match sims who are in friendsOfOurEmps
+			const result = [];
+			sims.forEach(e => {
+				const person = g.n(e.to);
+				if ( friendsOfOurEmps.has(person) ) {
+					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
+				}
+			});
+			console.log(result);
 		});
 
 
 		it('People having a similar skill set to our workforce who know them', () => {
+			// 1) Similar skills to our workforce
+			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
+			// 2) Also knowing them (inwards)
+			const friendsOfOurEmps = g.expand(ourEmployees, DIR.out, EDGE_TYPES.Knows);
+			// const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+			// console.log(sims_read);
+
+			// 3) Match sims who are in friendsOfOurEmps
+			const result = [];
+			sims.forEach(e => {
+				const person = g.n(e.to);
+				if ( friendsOfOurEmps.has(person) ) {
+					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
+				}
+			});
+			console.log(result);
 		});
 
 
@@ -631,33 +708,53 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it('People having a different skill set to our workforce AND knowing them', () => {
+		it.skip('People having a different skill set to our workforce & knowing them', () => {
 
 		});
 
 
-		it('People having a different skill set to our workforce AND who know them', () => {
+		it.skip('People having a different skill set to our workforce who know them', () => {
 
 		});
 
 
-		it('People coming from a similar company culture (by skills possessed)', () => {
-
+		it('People coming from a similar / different company culture (by skills possessed)', () => {
+			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+			const allSkillSets = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCompany.id, allSkillSets, {knn: 10}); // , sort: sortFuncs.asc
+			const result = [];
+			sims.forEach(e => {
+				const c = g.n(e.to);
+				const emps = Array.from(employeesByCompany[c.id]);
+				if ( !emps || emps.length === 0 ) {
+					return;
+				}
+				result.push({
+					company: c.f('name'),
+					people: emps.map(e => e.f('name'))
+				})
+			});
+			// console.log(result);
 		});
 
 
-		it('People coming from a different company culture', () => {
-
-		});
-
-
-		it('People coming from a similar country culture', () => {
-
-		});
-
-
-		it('People coming from a different country culture', () => {
-
+		it.only('People coming from a similar / different country culture (by skills possessed)', () => {
+			const peopleByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LivesIn);
+			const allSkillSets = ex.accumulateSetsFromSets(peopleByCountry, DIR.out, EDGE_TYPES.HasSkill);
+			const sims = simSource(setSimFuncs.jaccard, myCountry.id, allSkillSets, {knn: 10}); // , sort: sortFuncs.asc
+			const result = [];
+			sims.forEach(e => {
+				const c = g.n(e.to);
+				const peeps = Array.from(peopleByCountry[myCountry.id]);
+				if ( !peeps || peeps.length === 0 ) {
+					return;
+				}
+				result.push({
+					country: c.f('name'),
+					people: peeps.map(e => e.f('name'))
+				})
+			});
+			// console.log(result);
 		});
 
 	});
