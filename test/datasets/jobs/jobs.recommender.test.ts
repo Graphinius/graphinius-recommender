@@ -12,6 +12,7 @@ import {sim, simSource, sortFuncs} from 'graphinius/lib/similarities/SimilarityC
 import {TheExpanse} from '../../../src/recommender/TheExpanse';
 import {EDGE_TYPES, NODE_TYPES} from './common';
 import {BaseRecommender} from "../../../src/recommender/BaseRecommender";
+import {kFromHist} from '../../../src/recommender/Utils';
 
 
 const
@@ -493,17 +494,121 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 			it('employing my k^th degree friends', () => {
-
+				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows);
+				const employers = new Set<ITypedNode>();
+				myFriends.forEach(f => {
+					// if one worked for more than one company, this would be better (not in this dataset)
+					Array.from(g.outs(f, EDGE_TYPES.WorksFor)).forEach(c => employers.add(c));
+				});
+				// console.log(Array.from(employers).map(e => e.f('name')));
 			});
 
 
-			it('employing similar people than me (itself by skill overlap)', () => {
-
+			it('employing similar people than me (by skill overlap)', () => {
+				const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+				const sims = simSource(setSimFuncs.jaccard, me.id, skillsByPeople, {knn: 10});
+				const employers = new Set<ITypedNode>();
+				sims.forEach(f => {
+					Array.from(g.outs(g.n(f.to), EDGE_TYPES.WorksFor)).forEach(c => employers.add(c));
+				});
+				// console.log(Array.from(employers).map(e => e.f('name')));
 			});
 
 		});
 
 
+		describe('searching for interesting skills to learn / teach'	, () => {
+
+			/**
+			 * @description since `slice()` also iterates over empty positions,
+			 * 							we need to iterate manually and
+			 */
+			it('which skills should I learn (are most in demand)', () => {
+				const skillsHist = g.inHistT(NODE_TYPES.Skill, EDGE_TYPES.LooksForSkill);
+				const best10 = kFromHist(skillsHist, 10, true);
+				expect(best10.length).toBe(10);
+				// console.log(best10.map(b => ({skill: b.item.f('name'), freq: b.freq})));
+			});
+
+
+			it('which skills are irrelevant in today\'s marketplace', () => {
+				const skillsHist = g.inHistT(NODE_TYPES.Skill, EDGE_TYPES.LooksForSkill);
+				const best10 = kFromHist(skillsHist, 10);
+				expect(best10.length).toBe(10);
+				// console.log(best10.map(b => ({skill: b.item.f('name'), freq: b.freq})));
+			});
+
+
+			/**
+			 * @description the top-k in demand which I know (& the companies looking for them)
+			 */
+			it('which skills could I teach (at what companies)', () => {
+				const skillsHist = g.inHistT(NODE_TYPES.Skill, EDGE_TYPES.LooksForSkill);
+				const best10 = kFromHist(skillsHist, 10, true);
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+				const result = [];
+				const companiesTotal = new Set<ITypedNode>();
+				best10.forEach(e => {
+					if ( mySkills.has(e.item) ) {
+						const companies = g.ins(e.item, EDGE_TYPES.LooksForSkill);
+						result.push({
+							skill: e.item.f('name'),
+							companies: Array.from(companies).map(c => c.f('name'))
+						});
+						companies.forEach(c => companiesTotal.add(c));
+					}
+				});
+				// console.log(result);
+				// console.log(Array.from(companiesTotal).map((c => c.f('name'))));
+			});
+
+
+			/**
+			 * @description the top-k in demand which I know, the companies looking for them
+			 * 							AND where their own workforce don't have it (at all)
+			 *
+			 * @description skipping because there is no company where NO-ONE knows my skills (dataset too small?)
+			 *
+			 * @todo improve by `whose workforce is bad at it (threshold)`
+			 * @todo wait for graphinius `expandKStrength` method
+			 */
+			it.skip('which skills could I teach (at what companies whose workfoce don\'t have it)', () => {
+				const skillsHist = g.inHistT(NODE_TYPES.Skill, EDGE_TYPES.LooksForSkill);
+				const best10 = kFromHist(skillsHist, 10, true);
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+				const result = [];
+				const companiesTotal = new Set<ITypedNode>();
+				best10.forEach(e => {
+					const skill = e.item;
+					if ( mySkills.has(skill) ) {
+						const companies = g.ins(e.item, EDGE_TYPES.LooksForSkill);
+
+						/**
+						 * todo replace this with better method(s)
+						 */
+						const employees = g.expand(companies, DIR.in, EDGE_TYPES.WorksFor);
+						const employeeSkills = g.expand(employees, DIR.out, EDGE_TYPES.HasSkill);
+						if ( employeeSkills.has(skill) ) {
+							return;
+						}
+
+						result.push({
+							skill: e.item.f('name'),
+							companies: Array.from(companies).map(c => c.f('name'))
+						});
+						companies.forEach(c => companiesTotal.add(c));
+					}
+				});
+				console.log(result);
+				console.log(Array.from(companiesTotal).map((c => c.f('name'))));
+			});
+
+		});
+
+
+		/**
+		 * @description simple similarity measures are found in jobs.similarities.test...
+		 */
 		describe('Which people possess skills I don\'t have? - ', () => {
 
 			it('working at companies I am interested in', () => {
@@ -576,7 +681,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	/*						COMPANY -> EMPLOYEES					  */
 	/*--------------------------------------------*/
-	describe.only('Employee-centered recommendations', () => {
+	describe('Employee-centered recommendations', () => {
 
 		let
 			br: BaseRecommender,
@@ -589,9 +694,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		/**
-		 *
-		 */
 		it('People having skills we seek', () => {
 			// 1) Entry & Expand in one...
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
@@ -738,7 +840,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		it.only('People coming from a similar / different country culture (by skills possessed)', () => {
+		it('People coming from a similar / different country culture (by skills possessed)', () => {
 			const peopleByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LivesIn);
 			const allSkillSets = ex.accumulateSetsFromSets(peopleByCountry, DIR.out, EDGE_TYPES.HasSkill);
 			const sims = simSource(setSimFuncs.jaccard, myCountry.id, allSkillSets, {knn: 10}); // , sort: sortFuncs.asc
