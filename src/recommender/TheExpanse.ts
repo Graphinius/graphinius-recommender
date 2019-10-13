@@ -1,11 +1,38 @@
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
 import {DIR} from 'graphinius/lib/core/interfaces';
+import {EDGE_TYPES} from "../../test/datasets/jobs/common";
 
 
 class TheExpanse {
 
   constructor(private _g: TypedGraph) {}
+
+
+  accumulateNodesFromIDs(ids: string[]) : Map<string, ITypedNode> {
+    let result = new Map<string, ITypedNode>();
+    ids.forEach(id => result.set(id, this._g.n(id)));
+    return result;
+  }
+
+
+  accumulateNodesFromNodes(nodes: string[] | Set<ITypedNode> | Map<string, ITypedNode>,
+                           dir: DIR, rel: EDGE_TYPES) : Map<string, ITypedNode> {
+    let result = new Map<string, ITypedNode>();
+    nodes.forEach(node => {
+      let targets;
+      if ( typeof node === 'string' ) {
+        targets = this._g[dir](this._g.n(node), rel);
+      } else {
+        targets = this._g[dir](node, rel);
+      }
+      if ( targets ) {
+        targets.forEach(t => result.set(t.id, t));
+      }
+    });
+    return result;
+  }
+
 
   /**
    * @param nodes either a node type as string or a Map of ITypedNodes

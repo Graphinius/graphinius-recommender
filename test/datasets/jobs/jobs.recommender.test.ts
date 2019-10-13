@@ -489,7 +489,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const companies = new Set<ITypedNode>([g.n("244"), g.n("283")]);
 				const skillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
 				const result = Array.from(skillDemand).map(s => g.n(s.id).f('name'));
-				console.log(result);
+				// console.log(result);
 			});
 
 
@@ -599,8 +599,8 @@ describe('real-world job/skill - based recommendations - ', () => {
 						companies.forEach(c => companiesTotal.add(c));
 					}
 				});
-				console.log(result);
-				console.log(Array.from(companiesTotal).map((c => c.f('name'))));
+				// console.log(result);
+				// console.log(Array.from(companiesTotal).map((c => c.f('name'))));
 			});
 
 		});
@@ -609,7 +609,50 @@ describe('real-world job/skill - based recommendations - ', () => {
 		/**
 		 * @description simple similarity measures are found in jobs.similarities.test...
 		 */
-		describe('Which people possess skills I don\'t have? - ', () => {
+		describe('Which people possess similar / different skills than me? - ', () => {
+
+			const interestingCompanyIDs = ['244', '283'];
+			let interestingCompanies: Map<string, ITypedNode>;
+
+			beforeAll(() => {
+				interestingCompanies = ex.accumulateNodesFromIDs(interestingCompanyIDs);
+			});
+
+
+			it('Which people possess different skills than me?', () => {
+				const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+				const lowSims = simSource(setSimFuncs.jaccard, me.id, skillsByPeople, {knn: 10, sort: sortFuncs.asc});
+				// const lowSimsClear = lowSims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+				// console.log(lowSimsClear);
+			});
+
+
+			it('working at companies I am interested in', () => {
+				// get the employees of interesting companies
+				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
+				const employeeSkills = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.HasSkill);
+				employeeSkills[me.id] = g.outs(me, EDGE_TYPES.HasSkill);
+				const lowSims = simSource(setSimFuncs.jaccard, me.id, employeeSkills, {knn: 10, sort: sortFuncs.asc});
+				// const lowSimsClear = lowSims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+				// console.log(lowSimsClear);
+			});
+
+
+			it('where my k^th degree friends work', () => {
+				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows, 1);
+				const employers = ex.accumulateNodesFromNodes(myFriends, DIR.out, EDGE_TYPES.WorksFor);
+				const employees = ex.accumulateNodesFromNodes(employers, DIR.in, EDGE_TYPES.WorksFor);
+				const employeeSkills = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.HasSkill);
+				employeeSkills[me.id] = g.outs(me, EDGE_TYPES.HasSkill);
+				const lowSims = simSource(setSimFuncs.jaccard, me.id, employeeSkills, {knn: 10, sort: sortFuncs.asc}); // , sort: sortFuncs.asc
+				// const lowSimsClear = lowSims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
+				// console.log(lowSimsClear);
+			});
+
+		});
+
+
+		describe.skip('Which people don\'t possess skills I got? - ', () => {
 
 			it('working at companies I am interested in', () => {
 
@@ -623,21 +666,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		describe('Which people don\'t possess skills I got? - ', () => {
-
-			it('working at companies I am interested in', () => {
-
-			});
-
-
-			it('where my k^th degree friends work', () => {
-
-			});
-
-		});
-
-
-		describe('company / country skill comparisons', () => {
+		describe.skip('company / country skill comparisons', () => {
 
 			it('Companies possessing skills I don\'t have (via their employees)', () => {
 
@@ -661,7 +690,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		describe('Brian Tracy - ', () => {
+		describe.skip('Brian Tracy - ', () => {
 
 			it('At which companies would I be special (less than k% of employees have a skill overlap > m with me)', () => {
 
@@ -719,7 +748,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
-			console.log(result);
+			// console.log(result);
 		});
 
 
@@ -738,7 +767,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
-			console.log(result);
+			// console.log(result);
 		});
 
 
@@ -772,7 +801,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
-			console.log(result);
+			// console.log(result);
 		});
 
 
@@ -796,7 +825,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
-			console.log(result);
+			// console.log(result);
 		});
 
 
