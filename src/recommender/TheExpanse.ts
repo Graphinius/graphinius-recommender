@@ -8,7 +8,10 @@ class TheExpanse {
 
   constructor(private _g: TypedGraph) {}
 
-
+  /**
+   * @description `expand` IDs to ITypedNodes -> 1:1 mapping
+   * @param ids
+   */
   accumulateNodesFromIDs(ids: string[]) : Map<string, ITypedNode> {
     let result = new Map<string, ITypedNode>();
     ids.forEach(id => result.set(id, this._g.n(id)));
@@ -16,6 +19,18 @@ class TheExpanse {
   }
 
 
+  /**
+   * @description expand & replace nodes with target nodes, for further expansion
+   *
+   * @example we want to
+   *
+   * @param nodes
+   * @param dir
+   * @param rel
+   *
+   * @todo incorporate frequencies ??
+   *
+   */
   accumulateNodesFromNodes(nodes: string[] | Set<ITypedNode> | Map<string, ITypedNode>,
                            dir: DIR, rel: EDGE_TYPES) : Map<string, ITypedNode> {
     let result = new Map<string, ITypedNode>();
@@ -35,6 +50,11 @@ class TheExpanse {
 
 
   /**
+   * @description replace a node with a set of target nodes, but keep the original ID
+   *
+   * @example Map<companyID, Company> would be replaced with Map<companyID, Set<Employees>> through the 'WORKS_FOR' relation
+   *          Map<personID, Person> would be replace with Map<personID, Set<Friends>> through the 'KNOWS' relation
+   *
    * @param nodes either a node type as string or a Map of ITypedNodes
    * @param dir
    * @param rel
@@ -48,7 +68,7 @@ class TheExpanse {
     const result: {[key: string]: Set<ITypedNode>} = {};
     let sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
     sourceNodes.forEach(n => {
-      let targets = this._g.expand(n, dir, rel);
+      let targets = this._g.expand(n, dir, rel).set;
       if ( targets.size ) {
         result[n.label] = targets;
       }
@@ -58,7 +78,11 @@ class TheExpanse {
   
 
   /**
-   * @description we get a map/dict of Set<ITypedNode>, a direction & a relation 
+   * @description we get a map/dict of Set<ITypedNode>, a direction & a relation
+   *
+   * @example Map<companyID, Set<Employees>> would be replaced with Map<companyID, Set<Countries>> through the 'LIVES_IN' relation
+   *          Map<personID, Set<Friends>> would be replaced with Map<personID, Set<Skills>> through the 'HAS_SKILL' relation
+   *
    * @returns a object of key : Set<ITypedNode>, where each Set is an expansion of one input Set
    * 
    * @todo transfer to graphinius (core)?

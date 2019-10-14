@@ -110,7 +110,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		it('companies employing people knowing people I know', () => {
 			const myFriends = g.outs(me, EDGE_TYPES.Knows);
 			const peopleKnowingThem = g.expand(myFriends, DIR.in, EDGE_TYPES.Knows);
-			const employers = Array.from(peopleKnowingThem)
+			const employers = Array.from(peopleKnowingThem.set)
 				.slice(0, 10)
 				.map(f => ({
 					company: Array.from(g.outs(f, EDGE_TYPES.WorksFor))[0].f('name')
@@ -177,7 +177,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const companySkillDemand = allSetsSkillDemand[entry.to];
 				const employees = g.expand(company, DIR.in, EDGE_TYPES.WorksFor);
 				const employeeSkills = g.expand(employees, DIR.out, EDGE_TYPES.HasSkill);
-				const simSupplyDemand = sim(setSimFuncs.overlap, companySkillDemand, employeeSkills);
+				const simSupplyDemand = sim(setSimFuncs.overlap, companySkillDemand, employeeSkills.set);
 				skillDemandSupplyOverlaps.push({company: company.f('name'), myOverlap: entry.sim,internalOverlap: simSupplyDemand.sim});
 			}
 			skillDemandSupplyOverlaps.sort((a, b) => a.internalOverlap - b.internalOverlap);
@@ -355,7 +355,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const myFriends = g.outs(me, EDGE_TYPES.Knows);
 			const friendsSkills = g.expand(myFriends, DIR.out, EDGE_TYPES.HasSkill);
 			const skillDemands = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
-			skillDemands[me.id] = friendsSkills;		
+			skillDemands[me.id] = friendsSkills.set;
 			const sims = simSource(setSimFuncs.jaccard, me.id, skillDemands, {knn: 10});
 			const sim_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
 			// console.log(sim_res);
@@ -398,7 +398,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const country = Array.from(g.outs(g.n(e.to), EDGE_TYPES.LocatedIn))[0];
 				const companies = g.ins(country, EDGE_TYPES.LocatedIn);
 				const countrySkillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
-				const overlap = sim(setSimFuncs.jaccard, mySkills, countrySkillDemand);
+				const overlap = sim(setSimFuncs.jaccard, mySkills, countrySkillDemand.set);
 				// console.log(overlap);
 				countriesInDemandOfMySkills.push({
 					company: g.n(e.to).f('name'),
@@ -430,7 +430,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const companies = g.ins(country, EDGE_TYPES.LocatedIn);
 				const employees = g.expand(companies, DIR.in, EDGE_TYPES.WorksFor);
 				const countrySkillSupply = g.expand(employees, DIR.out, EDGE_TYPES.HasSkill);
-				const overlap = sim(setSimFuncs.jaccard, mySkills, countrySkillSupply);
+				const overlap = sim(setSimFuncs.jaccard, mySkills, countrySkillSupply.set);
 				countriesInDemandOfMySkills.push({
 					company: g.n(e.to).f('name'),
 					country: country.f('name'),
@@ -474,7 +474,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 	/*--------------------------------------------*/
-	/*							PERSON -> SKILLS	 					  */
+	/*				PERSON -> SKILLS (related)				  */
 	/*--------------------------------------------*/
 	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
@@ -488,7 +488,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			it('that interest me (particular company) - start with full text search (simulated)', () => {
 				const companies = new Set<ITypedNode>([g.n("244"), g.n("283")]);
 				const skillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
-				const result = Array.from(skillDemand).map(s => g.n(s.id).f('name'));
+				const result = Array.from(skillDemand.set).map(s => g.n(s.id).f('name'));
 				// console.log(result);
 			});
 
@@ -496,7 +496,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			it('employing my k^th degree friends', () => {
 				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows);
 				const employers = new Set<ITypedNode>();
-				myFriends.forEach(f => {
+				myFriends.set.forEach(f => {
 					// if one worked for more than one company, this would be better (not in this dataset)
 					Array.from(g.outs(f, EDGE_TYPES.WorksFor)).forEach(c => employers.add(c));
 				});
@@ -588,7 +588,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 						 */
 						const employees = g.expand(companies, DIR.in, EDGE_TYPES.WorksFor);
 						const employeeSkills = g.expand(employees, DIR.out, EDGE_TYPES.HasSkill);
-						if ( employeeSkills.has(skill) ) {
+						if ( employeeSkills.set.has(skill) ) {
 							return;
 						}
 
@@ -639,7 +639,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 			it('where my k^th degree friends work', () => {
-				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows, 1);
+				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows, {k: 1}).set;
 				const employers = ex.accumulateNodesFromNodes(myFriends, DIR.out, EDGE_TYPES.WorksFor);
 				const employees = ex.accumulateNodesFromNodes(employers, DIR.in, EDGE_TYPES.WorksFor);
 				const employeeSkills = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.HasSkill);
@@ -652,7 +652,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		describe.skip('Which people don\'t possess skills I got? - ', () => {
+		describe.skip('Which skills do / don\'t people possess that I (have\'nt) got? - ', () => {
 
 			it('working at companies I am interested in', () => {
 
@@ -726,7 +726,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		it('People having skills we seek', () => {
 			// 1) Entry & Expand in one...
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -735,7 +735,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 		it('People having skills we seek & knowing them', () => {
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
@@ -744,7 +744,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const result = [];
 			sims.forEach(e => {
 				const person = g.n(e.to);
-				if ( friendsOfOurEmps.has(person) ) {
+				if ( friendsOfOurEmps.set.has(person) ) {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
@@ -754,7 +754,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 		it('People having skills we seek who know them', () => {
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(myCompany, DIR.out, EDGE_TYPES.LooksForSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
@@ -763,7 +763,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const result = [];
 			sims.forEach(e => {
 				const person = g.n(e.to);
-				if ( friendsOfOurEmps.has(person) ) {
+				if ( friendsOfOurEmps.set.has(person) ) {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
@@ -774,7 +774,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		it('People having a similar skill set to our workforce (fitting in)', () => {
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
-			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -785,7 +785,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			// 1) Similar skills to our workforce
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
-			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
 			// 2) Also knowing them (inwards)
@@ -797,7 +797,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const result = [];
 			sims.forEach(e => {
 				const person = g.n(e.to);
-				if ( friendsOfOurEmps.has(person) ) {
+				if ( friendsOfOurEmps.set.has(person) ) {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
@@ -809,7 +809,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			// 1) Similar skills to our workforce
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
-			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10});
 
 			// 2) Also knowing them (inwards)
@@ -821,7 +821,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const result = [];
 			sims.forEach(e => {
 				const person = g.n(e.to);
-				if ( friendsOfOurEmps.has(person) ) {
+				if ( friendsOfOurEmps.set.has(person) ) {
 					result.push({person: person.f('name'), isect: e.isect, sim: e.sim });
 				}
 			});
@@ -832,7 +832,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		it('People having a different skill set to our workforce (complement)', () => {
 			const skillSetsToCompare = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 			const ourEmployees = g.expand(myCompany, DIR.in, EDGE_TYPES.WorksFor);
-			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill);
+			skillSetsToCompare[myCompany.id] = g.expand(ourEmployees, DIR.out, EDGE_TYPES.HasSkill).set;
 			const sims = simSource(setSimFuncs.jaccard, myCompany.id, skillSetsToCompare, {knn: 10, sort: sortFuncs.asc});
 			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -945,7 +945,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
 			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
 			const allPeopleSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			allPeopleSkills[myCountry.id] = ourSkillDemand;
+			allPeopleSkills[myCountry.id] = ourSkillDemand.set;
 			const sims = simSource(setSimFuncs.overlap, myCountry.id, allPeopleSkills, {knn: 10});
 			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -964,7 +964,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const ourPeople = g.ins(myCountry, EDGE_TYPES.LivesIn);
 			const ourSkills = g.expand(ourPeople, DIR.out, EDGE_TYPES.HasSkill);
 			const allPeopleSkills = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			allPeopleSkills[myCountry.id] = ourSkills;
+			allPeopleSkills[myCountry.id] = ourSkills.set;
 			const sims = simSource(setSimFuncs.jaccard, myCountry.id, allPeopleSkills, {knn: 10, sort: sortFuncs.asc});
 			const sims_read = sims.map(e => ({person: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -983,7 +983,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
 			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
 			const allSkills = g.getNodesT(NODE_TYPES.Skill);
-			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.has(s));
+			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.set.has(s));
 			// console.log(skillsOuttaDemand.length);
 
 			// 2 companies seeking those skills
@@ -1008,7 +1008,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const firms = g.ins(myCountry, EDGE_TYPES.LocatedIn);
 			const ourSkillDemand = g.expand(firms, DIR.out, EDGE_TYPES.LooksForSkill);
 			const allSkills = g.getNodesT(NODE_TYPES.Skill);
-			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.has(s));
+			const skillsOuttaDemand = Array.from(allSkills.values()).filter(s => !ourSkillDemand.set.has(s));
 
 			// 2) Countries seeking those skills
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
@@ -1042,7 +1042,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			/**
 			 * @todo not elegant... not elegant at all...
 			 */
-			skillBaseByCountry[myCountry.id] = ourSkillDemand;
+			skillBaseByCountry[myCountry.id] = ourSkillDemand.set;
 			const sims = simSource(setSimFuncs.jaccard, myCountry.id, skillBaseByCountry);
 			const sims_read = sims.map(e => ({country: g.n(e.to).f('name'), isect: e.isect, sim: e.sim}));
 			// console.log(sims_read);
@@ -1067,9 +1067,9 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const skillDemand = g.expand(companies, DIR.out, EDGE_TYPES.LooksForSkill);
 				results.push({
 					country: c.f('name'),
-					supply: skillSupply.size,
-					demand: skillDemand.size,
-					...sim(setSimFuncs.jaccard, skillSupply, skillDemand)
+					supply: skillSupply.set.size,
+					demand: skillDemand.set.size,
+					...sim(setSimFuncs.jaccard, skillSupply.set, skillDemand.set)
 				});
 			});
 			results.sort((a, b) => a.sim - b.sim);

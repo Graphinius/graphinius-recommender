@@ -250,7 +250,7 @@ describe('jobs dataset tests - ', () => {
 		 RETURN count(peeps2), collect(peeps2.name)
 		 */
 		it('people known by people known by Judy Brekke', () => {
-			const peeps = g.expandK(judy, DIR.out, 'KNOWS', 2);
+			const peeps = g.expandK(judy, DIR.out, 'KNOWS', {k: 2}).set
 			expect(peeps.size).toBe(judy_sphere_out_2);
 
 			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();
@@ -263,7 +263,7 @@ describe('jobs dataset tests - ', () => {
 		 * Judy <- intermediaries <- peeps
 		 */
 		it('people knowing people knowing Judy Brekke', () => {
-			const peeps = g.expandK(judy, DIR.in, 'KNOWS', 2);
+			const peeps = g.expandK(judy, DIR.in, 'KNOWS', {k: 2}).set;
 			expect(peeps.size).toBe(judy_sphere_in_2);
 
 			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();
@@ -278,7 +278,7 @@ describe('jobs dataset tests - ', () => {
 		it('people known by people knowing Judy Brekke', () => {
 			const intermediaries = g.ins(judy, 'KNOWS');
 			expect(intermediaries.size).toBe(knowing_judy);
-			const peeps = g.expand(intermediaries, DIR.out, 'KNOWS');
+			const peeps = g.expand(intermediaries, DIR.out, 'KNOWS').set;
 
 			peeps.delete(judy);
 			expect(peeps.size).toBe(judy_sphere_inOut_2);
@@ -294,7 +294,7 @@ describe('jobs dataset tests - ', () => {
 		it('people knowing people Judy Brekke knows', () => {
 			const intermediaries = g.outs(judy, 'KNOWS');
 			expect(intermediaries.size).toBe(judy_knows);
-			const peeps = g.expand(intermediaries, DIR.in, 'KNOWS');
+			const peeps = g.expand(intermediaries, DIR.in, 'KNOWS').set;
 
 			peeps.delete(judy);
 			expect(peeps.size).toBe(judy_sphere_outIn_2);
@@ -313,7 +313,7 @@ describe('jobs dataset tests - ', () => {
 			expect(employees.size).toBe(6);
 			// Now we need to collect the SET of all Skills that those employees have
 			// However, the graph has duplicate nodes for the same skill NAME, so we need to post-process..
-			const skills_dup = g.expand(employees, DIR.out, 'HAS_SKILL');
+			const skills_dup = g.expand(employees, DIR.out, 'HAS_SKILL').set;
 			const skills = new Set<ITypedNode>();
 			Array.from(skills_dup).map(s => skills.add(s.getFeature('name')));
 			expect(skills.size).toBe(27);

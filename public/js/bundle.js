@@ -5133,6 +5133,7 @@
     var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         sortFuncs: SimilarityCommons_1,
@@ -5199,6 +5200,7 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5421,6 +5423,7 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5805,6 +5808,7 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -7377,6 +7381,7 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });

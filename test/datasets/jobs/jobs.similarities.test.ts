@@ -117,7 +117,7 @@ describe('similarity measures - ', () => {
 			const skillsCongo = g.expand(g.ins(congo, EDGE_TYPES.LivesIn), DIR.out, EDGE_TYPES.HasSkill);
 			const italy = g.n('309');
 			const skillsItaly = g.expand(g.ins(italy, EDGE_TYPES.LivesIn), DIR.out, EDGE_TYPES.HasSkill);
-			const sim_res = sim(setSimFuncs.jaccard, skillsCongo, skillsItaly);
+			const sim_res = sim(setSimFuncs.jaccard, skillsCongo.set, skillsItaly.set);
 			console.log(sim_res);
 			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 } );
 		});
@@ -187,7 +187,7 @@ describe('similarity measures - ', () => {
 			const employeesItaly = g.expand(companiesItaly, DIR.in, EDGE_TYPES.WorksFor);
 			const skillsItaly = g.expand(employeesItaly, DIR.out, EDGE_TYPES.HasSkill);
 
-			const sim_res = sim(setSimFuncs.jaccard, skillsCongo, skillsItaly);
+			const sim_res = sim(setSimFuncs.jaccard, skillsCongo.set, skillsItaly.set);
 			console.log(sim_res);
 			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 } );
 		});
@@ -255,7 +255,7 @@ describe('similarity measures - ', () => {
 			const italy = g.n('309');
 			const companiesItaly = g.expand(italy, DIR.in, EDGE_TYPES.LocatedIn);
 			const skillsItaly = g.expand(companiesItaly, DIR.out, EDGE_TYPES.LooksForSkill);
-			const sim_res = sim(setSimFuncs.jaccard, skillsCongo, skillsItaly);
+			const sim_res = sim(setSimFuncs.jaccard, skillsCongo.set, skillsItaly.set);
 			// console.log(sim_res);
 			expect(sim_res).toEqual({ isect: 15, sim: 0.55556 });
 		});
@@ -318,7 +318,7 @@ describe('similarity measures - ', () => {
 
 
 		it('people living in a similar country (by skill demands of their companies) to mine', () => {
-			const myCountry = Array.from(g.expand(me, DIR.out, EDGE_TYPES.LivesIn))[0];
+			const myCountry = Array.from(g.expand(me, DIR.out, EDGE_TYPES.LivesIn).set)[0];
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 			const skillDemandByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
 			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillDemandByCountry, {knn: 10});
@@ -326,7 +326,7 @@ describe('similarity measures - ', () => {
 			const similarCountries = new Set([...Array.from(sims).map(sc => g.n(sc.to))]);
 			const inhabitants = g.expand(similarCountries, DIR.in, EDGE_TYPES.LivesIn);
 			// console.log(`There are ${inhabitants.size} people living in countries similar to mine (by skills demand)`);
-			expect(inhabitants.size).toBe(78); // check via Neo4j
+			expect(inhabitants.set.size).toBe(78); // check via Neo4j
 		});
 
 
@@ -622,13 +622,10 @@ describe('similarity measures - ', () => {
 
 
 
-	/**
-	 * @todo test something useful.. !!
-	 */
 	describe('person-company related similarity', () => {
 
 		it('my co-workers', () => {
-			const myEmployer = Array.from(g.expand(me, DIR.out, EDGE_TYPES.WorksFor))[0];
+			const myEmployer = Array.from(g.expand(me, DIR.out, EDGE_TYPES.WorksFor).set)[0];
 			const coworkers = g.ins(myEmployer, EDGE_TYPES.WorksFor);
 			coworkers.delete(me);
 			// console.log(Array.from(coworkers).map(cw => cw.f('name')));
@@ -652,7 +649,7 @@ describe('similarity measures - ', () => {
 
 
 		it('companies located in the country I live in', () => {
-			const myCountry = Array.from(g.expand(me, DIR.out, EDGE_TYPES.LivesIn))[0];
+			const myCountry = Array.from(g.expand(me, DIR.out, EDGE_TYPES.LivesIn).set)[0];
 			const cmen = g.ins(myCountry, EDGE_TYPES.LivesIn);
 			cmen.delete(me);
 			// console.log(Array.from(cmen).map(cw => cw.f('name')));
@@ -661,12 +658,12 @@ describe('similarity measures - ', () => {
 
 
 		it('people known by my coworkers', () => {
-			const myEmployer = Array.from(g.expand(me, DIR.out, EDGE_TYPES.WorksFor))[0];
+			const myEmployer = Array.from(g.expand(me, DIR.out, EDGE_TYPES.WorksFor).set)[0];
 			const coworkers = g.ins(myEmployer, EDGE_TYPES.WorksFor);
 			coworkers.delete(me);
 			const cowFriends = g.expand(coworkers, DIR.out, EDGE_TYPES.Knows);
 			// console.log(Array.from(cowFriends).map(cw => cw.f('name')));
-			expect(cowFriends.size).toBe(74);
+			expect(cowFriends.set.size).toBe(74);
 		});
 
 
