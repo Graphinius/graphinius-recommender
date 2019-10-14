@@ -478,6 +478,14 @@ describe('real-world job/skill - based recommendations - ', () => {
 	/*--------------------------------------------*/
 	describe('Skill-centered recommendations (what could I learn / offer to teach)', () => {
 
+		const interestingCompanyIDs = ['244', '283'];
+		let interestingCompanies: Map<string, ITypedNode>;
+
+		beforeAll(() => {
+			interestingCompanies = ex.accumulateNodesFromIDs(interestingCompanyIDs);
+		});
+
+
 		describe('skills required by companies ', () => {
 
 			/**
@@ -494,7 +502,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 			it('employing my k^th degree friends', () => {
-				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows);
+				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows, {k: 1});
 				const employers = new Set<ITypedNode>();
 				myFriends.set.forEach(f => {
 					// if one worked for more than one company, this would be better (not in this dataset)
@@ -611,14 +619,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 */
 		describe('Which people possess similar / different skills than me? - ', () => {
 
-			const interestingCompanyIDs = ['244', '283'];
-			let interestingCompanies: Map<string, ITypedNode>;
-
-			beforeAll(() => {
-				interestingCompanies = ex.accumulateNodesFromIDs(interestingCompanyIDs);
-			});
-
-
 			it('Which people possess different skills than me?', () => {
 				const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
 				const lowSims = simSource(setSimFuncs.jaccard, me.id, skillsByPeople, {knn: 10, sort: sortFuncs.asc});
@@ -661,6 +661,43 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 			it('where my k^th degree friends work', () => {
 
+			});
+
+		});
+
+
+		/**
+		 * @description if this works, it could be VERY useful....
+		 * @todo => TODO...................
+		 */
+		describe('Which skills are groups of people weak / good at - ', () => {
+
+			it('skills of friends of people working at companies I am interested in', () => {
+				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
+				const employeeFriends = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.Knows);
+				const friendsSkills = ex.accumulateSetsFromSetsFreq(employeeFriends, DIR.out, EDGE_TYPES.HasSkill);
+				// console.log(friendsSkills);
+			});
+
+
+			it.only('skills of company workforces', () => {
+				const tic = Date.now();
+				const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+				const skillsByCompany = ex.accumulateSetsFromSetsFreq(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+				const toc = Date.now();
+				console.log(`Skills by company workforce with frequencies took ${toc - tic} ms.`);
+				// console.log(skillsByCompany);
+			});
+
+
+			it.only('skills of country workforces', () => {
+				const tic = Date.now();
+				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+				const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+				const skillsByCompany = ex.accumulateSetsFromSetsFreq(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
+				const toc = Date.now();
+				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
+				// console.log(skillsByCompany);
 			});
 
 		});

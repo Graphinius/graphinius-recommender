@@ -1,6 +1,6 @@
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {DIR, ExpansionResult} from 'graphinius/lib/core/interfaces';
+import {DIR, ExpansionInput, ExpansionResult} from 'graphinius/lib/core/interfaces';
 import {EDGE_TYPES} from "../../test/datasets/jobs/common";
 
 
@@ -83,7 +83,7 @@ class TheExpanse {
    * @example Map<companyID, Set<Employees>> would be replaced with Map<companyID, Set<Countries>> through the 'LIVES_IN' relation
    *          Map<personID, Set<Friends>> would be replaced with Map<personID, Set<Skills>> through the 'HAS_SKILL' relation
    *
-   * @returns a object of key : Set<ITypedNode>, where each Set is an expansion of one input Set
+   * @returns a object of key : Set<ITypedNode>, where each ex.set is an expansion of one input Set
    *
    * @todo this should give back sets with frequencies, so ExpansionResult objects
    */
@@ -103,6 +103,50 @@ class TheExpanse {
           result[i].add(target);
         }
       }
+    }
+    return result;
+  }
+
+
+  /**
+   * @todo figure out how often we'll need that & test it !!!
+   *
+   * @param sources
+   * @param dir
+   * @param rel
+   */
+  accumulateSetsFromSetsFreq(sources: {[key: string]: ExpansionInput}, dir: DIR, rel: string) : {[key: string]: ExpansionResult} {
+    const result: {[key: string]: ExpansionResult} = {};
+    const keys = Object.keys(sources);
+
+    for ( let i of keys ) {
+      if ( !result[i] ) {
+        result[i] = {set: new Set<ITypedNode>(), freq: new Map<ITypedNode, number>()};
+      }
+      let res = result[i];
+      // convert each ExpansionInput into a properly formatted object
+      const input_i = TypedGraph.convertToExpansionResult(sources[i]);
+
+      // iterate over the set only? => Why not, it's the ITypedNode anyways...
+      for ( let source of input_i.set ) {
+
+        let targets = this._g.expand(source, dir, rel);
+        if ( !targets.set.size ) {
+          continue;
+        }
+
+        for (let nodeRef of targets.set) {
+          if (!res.freq.has(nodeRef)) {
+            res.freq.set(nodeRef, targets.freq.get(nodeRef));
+          }
+          if (res.set.has(nodeRef)) {
+            res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
+          }
+          res.set.add(nodeRef);
+        }
+
+      }
+
     }
     return result;
   }

@@ -2795,7 +2795,7 @@
                 return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
             }
         };
-        TypedGraph.prototype.convertToExpansionResult = function (input) {
+        TypedGraph.convertToExpansionResult = function (input) {
             if (BaseNode_1.BaseNode.isTyped(input)) {
                 return { set: new Set([input]), freq: new Map() };
             }
@@ -2806,18 +2806,9 @@
                 return input;
             }
         };
-        TypedGraph.prototype.addTargetUpdateFreqs = function (resultSet, freqMap, nodeRef) {
-            if (!freqMap.has(nodeRef)) {
-                freqMap.set(nodeRef, 1);
-            }
-            if (resultSet.has(nodeRef)) {
-                freqMap.set(nodeRef, freqMap.get(nodeRef) + 1);
-            }
-            resultSet.add(nodeRef);
-        };
         TypedGraph.prototype.expand = function (input, dir, type) {
             var e_1, _a, e_2, _b;
-            var nodes = this.convertToExpansionResult(input);
+            var nodes = TypedGraph.convertToExpansionResult(input);
             var resultSet = new Set();
             var freqMap = new Map();
             try {
@@ -2831,10 +2822,18 @@
                         for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
                             var target = targets_1_1.value;
                             var nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
-                            this.addTargetUpdateFreqs(resultSet, freqMap, nodeRef);
-                            if (resultSet.size >= this._nr_nodes) {
-                                return { set: resultSet, freq: freqMap };
+                            if (!freqMap.has(nodeRef)) {
+                                if (nodes.freq.get(node)) {
+                                    freqMap.set(nodeRef, nodes.freq.get(node));
+                                }
+                                else {
+                                    freqMap.set(nodeRef, 1);
+                                }
                             }
+                            if (resultSet.has(nodeRef)) {
+                                freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(node));
+                            }
+                            resultSet.add(nodeRef);
                         }
                     }
                     catch (e_2_1) { e_2 = { error: e_2_1 }; }
@@ -2861,17 +2860,22 @@
             if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
-            var nodes = this.convertToExpansionResult(input);
+            var nodes = TypedGraph.convertToExpansionResult(input);
             var resultSet = new Set();
             var freqMap = new Map();
-            var k = cfg.k || this._nr_nodes - 1;
-            while (k-- || resultSet.size >= this._nr_nodes) {
+            var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
+            while (k--) {
                 nodes = this.expand(nodes, dir, type);
-                var old_size = resultSet.size;
                 try {
                     for (var _b = __values(nodes.set), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var target = _c.value;
-                        this.addTargetUpdateFreqs(resultSet, freqMap, target);
+                        var nodeRef = _c.value;
+                        if (!freqMap.has(nodeRef)) {
+                            freqMap.set(nodeRef, nodes.freq.get(nodeRef));
+                        }
+                        if (resultSet.has(nodeRef)) {
+                            freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(nodeRef));
+                        }
+                        resultSet.add(nodeRef);
                     }
                 }
                 catch (e_3_1) { e_3 = { error: e_3_1 }; }
@@ -2881,9 +2885,6 @@
                     }
                     finally { if (e_3) throw e_3.error; }
                 }
-                if (old_size === resultSet.size) {
-                    break;
-                }
             }
             return { set: resultSet, freq: freqMap };
         };
@@ -2892,8 +2893,8 @@
             if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
-            var nodes = this.convertToExpansionResult(input);
-            var k = cfg.k || this._nr_nodes - 1;
+            var nodes = TypedGraph.convertToExpansionResult(input);
+            var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
             while (k-- || nodes.set.size >= this._nr_nodes) {
                 nodes = this.expand(nodes, dir, type);
             }
@@ -5153,7 +5154,6 @@
     var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         sortFuncs: SimilarityCommons_1,
@@ -5220,7 +5220,6 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5443,7 +5442,6 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5828,7 +5826,6 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -5960,6 +5957,64 @@
                     if (keys_1_1 && !keys_1_1.done && (_a = keys_1.return)) _a.call(keys_1);
                 }
                 finally { if (e_1) throw e_1.error; }
+            }
+            return result;
+        };
+        TheExpanse.prototype.accumulateSetsFromSetsFreq = function (sources, dir, rel) {
+            var e_4, _a, e_5, _b, e_6, _c;
+            var result = {};
+            var keys = Object.keys(sources);
+            try {
+                for (var keys_2 = __values(keys), keys_2_1 = keys_2.next(); !keys_2_1.done; keys_2_1 = keys_2.next()) {
+                    var i = keys_2_1.value;
+                    if (!result[i]) {
+                        result[i] = { set: new Set(), freq: new Map() };
+                    }
+                    var res = result[i];
+                    var input_i = TypedGraph_2.convertToExpansionResult(sources[i]);
+                    try {
+                        for (var _d = (e_5 = void 0, __values(input_i.set)), _e = _d.next(); !_e.done; _e = _d.next()) {
+                            var source = _e.value;
+                            var targets = this._g.expand(source, dir, rel);
+                            if (!targets.set.size) {
+                                continue;
+                            }
+                            try {
+                                for (var _f = (e_6 = void 0, __values(targets.set)), _h = _f.next(); !_h.done; _h = _f.next()) {
+                                    var nodeRef = _h.value;
+                                    if (!res.freq.has(nodeRef)) {
+                                        res.freq.set(nodeRef, targets.freq.get(nodeRef));
+                                    }
+                                    if (res.set.has(nodeRef)) {
+                                        res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
+                                    }
+                                    res.set.add(nodeRef);
+                                }
+                            }
+                            catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                            finally {
+                                try {
+                                    if (_h && !_h.done && (_c = _f.return)) _c.call(_f);
+                                }
+                                finally { if (e_6) throw e_6.error; }
+                            }
+                        }
+                    }
+                    catch (e_5_1) { e_5 = { error: e_5_1 }; }
+                    finally {
+                        try {
+                            if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+                        }
+                        finally { if (e_5) throw e_5.error; }
+                    }
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (keys_2_1 && !keys_2_1.done && (_a = keys_2.return)) _a.call(keys_2);
+                }
+                finally { if (e_4) throw e_4.error; }
             }
             return result;
         };
@@ -7400,7 +7455,6 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
-        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });
