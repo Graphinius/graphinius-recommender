@@ -1,6 +1,6 @@
 import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {DIR} from 'graphinius/lib/core/interfaces';
+import {DIR, ExpansionResult} from 'graphinius/lib/core/interfaces';
 import {EDGE_TYPES} from "../../test/datasets/jobs/common";
 
 
@@ -84,9 +84,8 @@ class TheExpanse {
    *          Map<personID, Set<Friends>> would be replaced with Map<personID, Set<Skills>> through the 'HAS_SKILL' relation
    *
    * @returns a object of key : Set<ITypedNode>, where each Set is an expansion of one input Set
-   * 
-   * @todo transfer to graphinius (core)?
-   * @todo rename -> !? ...
+   *
+   * @todo this should give back sets with frequencies, so ExpansionResult objects
    */
   accumulateSetsFromSets(sources: {[key: string]: Set<ITypedNode>}, dir: DIR, rel: string) : {[key: string]: Set<ITypedNode>} {
     const result: {[key: string]: Set<ITypedNode>} = {};
@@ -96,11 +95,11 @@ class TheExpanse {
         if ( !result[i] ) {
           result[i] = new Set<ITypedNode>();
         }
-        let targets = this._g[dir](source, rel);
+        let targets = this._g.expand(source, dir, rel);
         if ( !targets ) {
           continue;
         }
-        for ( let target of targets ) {
+        for ( let target of targets.set ) {
           result[i].add(target);
         }
       }

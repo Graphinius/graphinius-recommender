@@ -2795,14 +2795,34 @@
                 return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
             }
         };
+        TypedGraph.prototype.convertToExpansionResult = function (input) {
+            if (BaseNode_1.BaseNode.isTyped(input)) {
+                return { set: new Set([input]), freq: new Map() };
+            }
+            else if (input instanceof Set) {
+                return { set: input, freq: new Map() };
+            }
+            else {
+                return input;
+            }
+        };
+        TypedGraph.prototype.addTargetUpdateFreqs = function (resultSet, freqMap, nodeRef) {
+            if (!freqMap.has(nodeRef)) {
+                freqMap.set(nodeRef, 1);
+            }
+            if (resultSet.has(nodeRef)) {
+                freqMap.set(nodeRef, freqMap.get(nodeRef) + 1);
+            }
+            resultSet.add(nodeRef);
+        };
         TypedGraph.prototype.expand = function (input, dir, type) {
             var e_1, _a, e_2, _b;
-            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
+            var nodes = this.convertToExpansionResult(input);
             var resultSet = new Set();
-            var nodeRef;
+            var freqMap = new Map();
             try {
-                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
-                    var node = nodes_1_1.value;
+                for (var _c = __values(nodes.set), _d = _c.next(); !_d.done; _d = _c.next()) {
+                    var node = _d.value;
                     var targets = node[dir](type);
                     if (!targets) {
                         continue;
@@ -2810,10 +2830,10 @@
                     try {
                         for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
                             var target = targets_1_1.value;
-                            nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
-                            resultSet.add(nodeRef);
+                            var nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
+                            this.addTargetUpdateFreqs(resultSet, freqMap, nodeRef);
                             if (resultSet.size >= this._nr_nodes) {
-                                return resultSet;
+                                return { set: resultSet, freq: freqMap };
                             }
                         }
                     }
@@ -2829,34 +2849,35 @@
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            return resultSet;
+            return { set: resultSet, freq: freqMap };
         };
-        TypedGraph.prototype.expandK = function (input, dir, type, k) {
+        TypedGraph.prototype.expandK = function (input, dir, type, cfg) {
+            if (cfg === void 0) { cfg = {}; }
             var e_3, _a;
-            if (k < 0) {
+            if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
-            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
+            var nodes = this.convertToExpansionResult(input);
             var resultSet = new Set();
-            var periphery = nodes;
-            k = k || this._nr_nodes - 1;
+            var freqMap = new Map();
+            var k = cfg.k || this._nr_nodes - 1;
             while (k-- || resultSet.size >= this._nr_nodes) {
-                periphery = this.expand(periphery, dir, type);
+                nodes = this.expand(nodes, dir, type);
                 var old_size = resultSet.size;
                 try {
-                    for (var periphery_1 = __values(periphery), periphery_1_1 = periphery_1.next(); !periphery_1_1.done; periphery_1_1 = periphery_1.next()) {
-                        var target = periphery_1_1.value;
-                        resultSet.add(target);
+                    for (var _b = __values(nodes.set), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var target = _c.value;
+                        this.addTargetUpdateFreqs(resultSet, freqMap, target);
                     }
                 }
                 catch (e_3_1) { e_3 = { error: e_3_1 }; }
                 finally {
                     try {
-                        if (periphery_1_1 && !periphery_1_1.done && (_a = periphery_1.return)) _a.call(periphery_1);
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                     }
                     finally { if (e_3) throw e_3.error; }
                 }
@@ -2864,20 +2885,19 @@
                     break;
                 }
             }
-            return resultSet;
+            return { set: resultSet, freq: freqMap };
         };
-        TypedGraph.prototype.peripheryAtK = function (input, dir, type, k) {
-            if (k < 0) {
+        TypedGraph.prototype.peripheryAtK = function (input, dir, type, cfg) {
+            if (cfg === void 0) { cfg = {}; }
+            if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
-            var nodes = BaseNode_1.BaseNode.isTyped(input) ? new Set([input]) : input;
-            var resultSet = new Set();
-            var periphery = nodes;
-            k = k || this._nr_nodes - 1;
-            while (k-- || resultSet.size >= this._nr_nodes) {
-                periphery = this.expand(periphery, dir, type);
+            var nodes = this.convertToExpansionResult(input);
+            var k = cfg.k || this._nr_nodes - 1;
+            while (k-- || nodes.set.size >= this._nr_nodes) {
+                nodes = this.expand(nodes, dir, type);
             }
-            return periphery;
+            return nodes;
         };
         TypedGraph.prototype.inHistT = function (nType, eType) {
             return this.degreeHistT(interfaces.DIR.in, nType, eType);
@@ -5853,7 +5873,6 @@
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
     var TheExpanse = (function () {
         function TheExpanse(_g) {
@@ -5887,7 +5906,7 @@
             var result = {};
             var sourceNodes = typeof nodes === 'string' ? this._g.getNodesT(nodes) : nodes;
             sourceNodes.forEach(function (n) {
-                var targets = _this._g.expand(n, dir, rel);
+                var targets = _this._g.expand(n, dir, rel).set;
                 if (targets.size) {
                     result[n.label] = targets;
                 }
@@ -5907,20 +5926,20 @@
                             if (!result[i]) {
                                 result[i] = new Set();
                             }
-                            var targets = this._g[dir](source, rel);
+                            var targets = this._g.expand(source, dir, rel);
                             if (!targets) {
                                 continue;
                             }
                             try {
-                                for (var targets_1 = (e_3 = void 0, __values(targets)), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
-                                    var target = targets_1_1.value;
+                                for (var _f = (e_3 = void 0, __values(targets.set)), _h = _f.next(); !_h.done; _h = _f.next()) {
+                                    var target = _h.value;
                                     result[i].add(target);
                                 }
                             }
                             catch (e_3_1) { e_3 = { error: e_3_1 }; }
                             finally {
                                 try {
-                                    if (targets_1_1 && !targets_1_1.done && (_c = targets_1.return)) _c.call(targets_1);
+                                    if (_h && !_h.done && (_c = _f.return)) _c.call(_f);
                                 }
                                 finally { if (e_3) throw e_3.error; }
                             }
@@ -5991,7 +6010,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -6029,7 +6048,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -6075,7 +6094,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -6113,7 +6132,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -6150,7 +6169,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -6188,7 +6207,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -6217,7 +6236,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -6252,7 +6271,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6429,7 +6448,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6528,7 +6547,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6557,7 +6576,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -6601,7 +6620,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6655,7 +6674,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6796,7 +6815,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6849,7 +6868,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -6887,7 +6906,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -7142,7 +7161,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -7265,7 +7284,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7375,7 +7394,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
@@ -7413,7 +7432,6 @@
         window['idx'] = indexes;
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
     var jobsModels;
     (function (jobsModels) {
@@ -7444,7 +7462,6 @@
             fields: ['name']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphExt = "json";
@@ -7456,7 +7473,6 @@
         models: jobsModels,
         searchModel: jobsModels.skill
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     console.log('Graphinius: ', $G);
@@ -7543,7 +7559,6 @@
         });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
 }));
 //# sourceMappingURL=bundle.js.map

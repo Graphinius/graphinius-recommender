@@ -1057,7 +1057,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 			const results = [];
 			const countries = g.getNodesT(NODE_TYPES.Country);
 			countries.forEach(c => {
-				// console.log(c.f('name'));
 				const people = g.ins(c, EDGE_TYPES.LivesIn);
 				const companies = g.ins(c, EDGE_TYPES.LocatedIn);
 				if ( !people || people.size === 0 || !companies || companies.size === 0 ) {
