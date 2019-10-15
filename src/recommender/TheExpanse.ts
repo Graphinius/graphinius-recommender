@@ -151,6 +151,14 @@ class TheExpanse {
     return result;
   }
 
+
+  readableSetsFromSetsFreq(obj: {[key: string]: ExpansionResult}, idName: string, collectionName: string, itemName: string) {
+    return Object.entries(obj).map(e => ({
+      [idName]: this._g.n(e[0]).f('name'),
+      [collectionName]: Array.from(e[1].freq).map(v => ({freq: v[1], [itemName]: v[0].f('name')})) 
+    }));
+  }
+
 }
 
 

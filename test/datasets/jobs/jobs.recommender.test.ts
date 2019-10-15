@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as util from 'util';
 import {DIR} from 'graphinius/lib/core/interfaces';
 import {ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
@@ -652,7 +653,10 @@ describe('real-world job/skill - based recommendations - ', () => {
 		});
 
 
-		describe.skip('Which skills do / don\'t people possess that I (have\'nt) got? - ', () => {
+		/**
+		 * @description one-hot decision boundary
+		 */
+		describe.skip('Which skills do / dont people possess that I (have/nt) got? - ', () => {
 
 			it('working at companies I am interested in', () => {
 
@@ -667,37 +671,48 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 		/**
-		 * @description if this works, it could be VERY useful....
-		 * @todo => TODO...................
+		 * @description filter out top-k best / worst skills
+		 * 
+		 * @todo refactor out test cases into similarities?
+		 * @todo still filter ;-)
 		 */
 		describe('Which skills are groups of people weak / good at - ', () => {
 
 			it('skills of friends of people working at companies I am interested in', () => {
+				const tic = Date.now();
 				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
 				const employeeFriends = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.Knows);
 				const friendsSkills = ex.accumulateSetsFromSetsFreq(employeeFriends, DIR.out, EDGE_TYPES.HasSkill);
-				// console.log(friendsSkills);
+				const toc = Date.now();
+				console.log(`Skills by friends of employees of selected companies with frequencies took ${toc - tic} ms.`);
+
+				// const skillsReadable = ex.readableSetsFromSetsFreq(friendsSkills, 'person', 'friendSkills', 'skill');
+				// console.dir(util.inspect(skillsReadable, {depth: 3}));
 			});
 
 
-			it.only('skills of company workforces', () => {
+			it('skills of company workforces', () => {
 				const tic = Date.now();
 				const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 				const skillsByCompany = ex.accumulateSetsFromSetsFreq(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
 				const toc = Date.now();
 				console.log(`Skills by company workforce with frequencies took ${toc - tic} ms.`);
-				// console.log(skillsByCompany);
+				
+				// const skillsReadable = ex.readableSetsFromSetsFreq(skillsByCompany, 'company', 'companySkills', 'skill');
+				// console.dir(util.inspect(skillsReadable, {depth: 3}));
 			});
 
 
-			it.only('skills of country workforces', () => {
+			it('skills of country workforces', () => {
 				const tic = Date.now();
 				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 				const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
-				const skillsByCompany = ex.accumulateSetsFromSetsFreq(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
+				const skillsByCountry = ex.accumulateSetsFromSetsFreq(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
 				const toc = Date.now();
 				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
-				// console.log(skillsByCompany);
+				
+				// const skillsReadable = ex.readableSetsFromSetsFreq(skillsByCountry, 'country', 'population skills', 'skill');
+				// console.dir(util.inspect(skillsReadable, {depth: 3}));
 			});
 
 		});
