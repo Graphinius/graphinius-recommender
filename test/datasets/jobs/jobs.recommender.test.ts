@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as util from 'util';
 import {DIR} from 'graphinius/lib/core/interfaces';
 import {ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
@@ -470,6 +469,20 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 */
 		it.todo('Same companies BUT DISsimilar to my current employerdescription `enrichment possibilities`');
 
+
+		describe.skip('Brian Tracy - ', () => {
+
+			it('At which companies would I be special (less than k% of employees have a skill overlap > m with me)', () => {
+
+			});
+
+
+			it('At which companies would I be SUPER special (I got at least k (1) skills **nobody** there possesses)', () => {
+
+			});
+
+		});
+
 	});
 
 
@@ -618,7 +631,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 		/**
 		 * @description simple similarity measures are found in jobs.similarities.test...
 		 */
-		describe('Which people possess similar / different skills than me? - ', () => {
+		describe('Which people possess similar / different skill sets than me? - ', () => {
 
 			it('Which people possess different skills than me?', () => {
 				const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
@@ -628,7 +641,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			});
 
 
-			it('working at companies I am interested in', () => {
+			it('...working at companies I am interested in', () => {
 				// get the employees of interesting companies
 				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
 				const employeeSkills = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.HasSkill);
@@ -639,7 +652,7 @@ describe('real-world job/skill - based recommendations - ', () => {
 			});
 
 
-			it('where my k^th degree friends work', () => {
+			it('...where my k^th degree friends work', () => {
 				const myFriends = g.expandK(me, DIR.out, EDGE_TYPES.Knows, {k: 1}).set;
 				const employers = ex.accumulateNodesFromNodes(myFriends, DIR.out, EDGE_TYPES.WorksFor);
 				const employees = ex.accumulateNodesFromNodes(employers, DIR.in, EDGE_TYPES.WorksFor);
@@ -654,27 +667,106 @@ describe('real-world job/skill - based recommendations - ', () => {
 
 
 		/**
-		 * @description one-hot decision boundary
+		 * @description one-hot decision boundary (have or have not)
 		 */
-		describe.skip('Which skills do / dont people possess that I (have/nt) got? - ', () => {
+		describe('Which skills do people / companies / countries (NOT) possess that I have (NOT) got? - ', () => {
 
-			it('working at companies I am interested in', () => {
+			it('people working at companies I am interested in - collectively', () => {
+				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
+				// console.log(Array.from(employees).map(e => e[1].f('name')));
+				const theirSkills = g.expand(new Set([...employees.values()]), DIR.out, EDGE_TYPES.HasSkill).set;
+				// g.expand(..) would work, but .freq would only contain 1's
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+				const combinedSkills = new Set([...theirSkills, ...mySkills]);
 
+				const theyGotIDont = [];
+				const iGotTheyDont = [];
+				theirSkills.forEach(s => !mySkills.has(s) && theyGotIDont.push(s.f('name')));
+				mySkills.forEach(s => !theirSkills.has(s) && iGotTheyDont.push(s.f('name')));
+				// console.log('My skills: ', Array.from(mySkills).map(s => s.f('name')));
+				// console.log('They got skills I dont: ', theyGotIDont);
+				// console.log('I got skills they dont: ', iGotTheyDont);
+				expect(mySkills.size + theyGotIDont.length).toBe(combinedSkills.size);
 			});
 
 
-			it('where my k^th degree friends work', () => {
+			it('people - individually', () => {
+				const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
+				const mySkills = skillsByPeople[me.id];
 
+				const theyGotIDont = {};
+				const iGotTheyDont = {};
+
+				for ( let [companyID, skills] of Object.entries(skillsByPeople) ) {
+					const companyName = g.n(companyID).f('name');
+					theyGotIDont[companyName] = [];
+					skills.forEach(s => !mySkills.has(s) && theyGotIDont[companyName].push(s.f('name')));
+
+					iGotTheyDont[companyName] = [];
+					mySkills.forEach(s => !skills.has(s) && iGotTheyDont[companyName].push(s.f('name')));
+				}
+
+				// console.log('They got skills I dont: ', theyGotIDont);
+				// console.log('I got skills they dont: ', iGotTheyDont);
+			});
+
+
+			it('companies (NOT) possessing skills I do (not) have (via their employees)', () => {
+				const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+				const theirSkills = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+
+				const theyGotIDont = {};
+				const iGotTheyDont = {};
+
+				for ( let [companyID, skills] of Object.entries(theirSkills) ) {
+					const companyName = g.n(companyID).f('name');
+					theyGotIDont[companyName] = [];
+					skills.forEach(s => !mySkills.has(s) && theyGotIDont[companyName].push(s.f('name')));
+
+					iGotTheyDont[companyName] = [];
+					mySkills.forEach(s => !skills.has(s) && iGotTheyDont[companyName].push(s.f('name')));
+				}
+
+				// console.log('They got skills I dont: ', theyGotIDont);
+				// console.log('I got skills they dont: ', iGotTheyDont);
+			});
+
+
+			/**
+			 * @description same thing as above, just different entry point
+			 */
+			it('countries (NOT) possessing skills I do (NOT) have (via employees of their companies)', () => {
+				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+				const employeesByCompany = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+				const theirSkills = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+
+				const theyGotIDont = {};
+				const iGotTheyDont = {};
+
+				for ( let [companyID, skills] of Object.entries(theirSkills) ) {
+					const companyName = g.n(companyID).f('name');
+					theyGotIDont[companyName] = [];
+					skills.forEach(s => !mySkills.has(s) && theyGotIDont[companyName].push(s.f('name')));
+
+					iGotTheyDont[companyName] = [];
+					mySkills.forEach(s => !skills.has(s) && iGotTheyDont[companyName].push(s.f('name')));
+				}
+
+				// console.log('They got skills I dont: ', theyGotIDont);
+				// console.log('I got skills they dont: ', iGotTheyDont);
 			});
 
 		});
 
 
 		/**
-		 * @description filter out top-k best / worst skills
+		 * @description frequencies of entities in an expanded set
+		 * 							plus filtering out top/bottom-k occurring skills
 		 * 
 		 * @todo refactor out test cases into similarities?
-		 * @todo still filter ;-)
+		 * @todo use the filtered SoSs for further processing
 		 */
 		describe('Which skills are groups of people weak / good at - ', () => {
 
@@ -684,26 +776,31 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const skillsByCompany = ex.accumulateSetsFromSetsFreq(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
 				const toc = Date.now();
 				console.log(`Skills by company workforce with frequencies took ${toc - tic} ms.`);
-				
-				// const skillsReadable = ex.readableSetsFromSetsFreq(skillsByCompany, 'company', 'companySkills', 'skill');
-				// console.dir(util.inspect(skillsReadable, {depth: 3}));
+
+				// const topKSkills = ex.setFromSetsTopK(skillsByCompany);
+				// const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'company', 'employee skills', 'skill');
+				// console.log(util.inspect(topKReadable, {depth: 3}));
+				//
+				// const bottomKSkills = ex.setFromSetsTopK(skillsByCompany, {k: 5, top: false});
+				// const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'company', 'employee skills', 'skill');
+				// console.log(util.inspect(bottomReadable, {depth: 3}));
 			});
 
 
-			it.only('skills least / most demanded by country', () => {
+			it('skills least / most demanded by country', () => {
 				const tic = Date.now();
 				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 				const skillDemandByCountry = ex.accumulateSetsFromSetsFreq(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
 				const toc = Date.now();
 				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
 
-				const topKSkills = ex.setFromSetsTopK(skillDemandByCountry);
-				const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'country', 'population skills', 'skill');
-				console.log(util.inspect(topKReadable, {depth: 3}));
-
-				const bottomKSkills = ex.setFromSetsTopK(skillDemandByCountry, {k: 5, top: false});
-				const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'country', 'population skills', 'skill');
-				console.log(util.inspect(bottomReadable, {depth: 3}));
+				// const topKSkills = ex.setFromSetsTopK(skillDemandByCountry);
+				// const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'country', 'population skills', 'skill');
+				// console.log(util.inspect(topKReadable, {depth: 3}));
+				//
+				// const bottomKSkills = ex.setFromSetsTopK(skillDemandByCountry, {k: 5, top: false});
+				// const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'country', 'population skills', 'skill');
+				// console.log(util.inspect(bottomReadable, {depth: 3}));
 			});
 
 
@@ -714,9 +811,14 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const skillsByCountry = ex.accumulateSetsFromSetsFreq(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
 				const toc = Date.now();
 				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
-				
-				// const skillsReadable = ex.readableSetsFromSetsFreq(skillsByCountry, 'country', 'population skills', 'skill');
-				// console.dir(util.inspect(skillsReadable, {depth: 3}));
+
+				// const topKSkills = ex.setFromSetsTopK(skillsByCountry);
+				// const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'country', 'population skills', 'skill');
+				// console.log(util.inspect(topKReadable, {depth: 3}));
+				//
+				// const bottomKSkills = ex.setFromSetsTopK(skillsByCountry, {k: 5, top: false});
+				// const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'country', 'population skills', 'skill');
+				// console.log(util.inspect(bottomReadable, {depth: 3}));
 			});
 
 
@@ -728,46 +830,33 @@ describe('real-world job/skill - based recommendations - ', () => {
 				const toc = Date.now();
 				console.log(`Skills by friends of employees of selected companies with frequencies took ${toc - tic} ms.`);
 
-				// const skillsReadable = ex.readableSetsFromSetsFreq(friendsSkills, 'person', 'friendSkills', 'skill');
-				// console.dir(util.inspect(skillsReadable, {depth: 3}));
-			});
-
-		});
-
-
-		describe.skip('company / country skill comparisons', () => {
-
-			it('Companies possessing skills I don\'t have (via their employees)', () => {
-
+				// const topKSkills = ex.setFromSetsTopK(friendsSkills);
+				// const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'person', 'friend skills', 'skill');
+				// console.log(util.inspect(topKReadable, {depth: 3}));
+				//
+				// const bottomKSkills = ex.setFromSetsTopK(friendsSkills, {k: 5, top: false});
+				// const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'person', 'friend skills', 'skill');
+				// console.log(util.inspect(bottomReadable, {depth: 3}));
 			});
 
 
-			it('Companies NOT possessing skills I\'ve got (via their employees)', () => {
+			it('should take the top-K country skills and compare to the top-k country skill demands', () => {
+				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+				const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+				const skillsByCountry = ex.accumulateSetsFromSetsFreq(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
+				const skillDemandByCountry = ex.accumulateSetsFromSetsFreq(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
 
-			});
+				const top5SkillsSupplyByCountry = ex.setFromSetsTopK(skillsByCountry);
+				const top5SkillDemandByCountry = ex.setFromSetsTopK(skillDemandByCountry);
 
+				const top5SupplyRead = ex.readableSetsFromSetsFreq(top5SkillsSupplyByCountry, 'country', 'people skills', 'skill');
+				const top5CompanyRead = ex.readableSetsFromSetsFreq(top5SkillDemandByCountry, 'country', 'skills demand', 'skill');
+				// console.log(util.inspect(top5SupplyRead, {depth: 3}));
+				// console.log(util.inspect(top5CompanyRead, {depth: 3}));
 
-			it('Countries possessing skills I don\'t have (via employees of their companies)', () => {
-
-			});
-
-
-			it('Countries NOT possessing skills I\'ve got (via employees of their companies)', () => {
-
-			});
-
-		});
-
-
-		describe.skip('Brian Tracy - ', () => {
-
-			it('At which companies would I be special (less than k% of employees have a skill overlap > m with me)', () => {
-
-			});
-
-
-			it('At which companies would I be SUPER special (I got at least k (1) skills **nobody** there possesses)', () => {
-
+				/**
+				 * @todo pairwise similarities considering frequency as well
+				 */
 			});
 
 		});

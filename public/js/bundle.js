@@ -73,6 +73,29 @@
         };
     }
 
+    function __read(o, n) {
+        var m = typeof Symbol === "function" && o[Symbol.iterator];
+        if (!m) return o;
+        var i = m.call(o), r, ar = [], e;
+        try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+        }
+        catch (error) { e = { error: error }; }
+        finally {
+            try {
+                if (r && !r.done && (m = i["return"])) m.call(i);
+            }
+            finally { if (e) throw e.error; }
+        }
+        return ar;
+    }
+
+    function __spread() {
+        for (var ar = [], i = 0; i < arguments.length; i++)
+            ar = ar.concat(__read(arguments[i]));
+        return ar;
+    }
+
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
     function unwrapExports (x) {
@@ -6017,6 +6040,41 @@
                 finally { if (e_4) throw e_4.error; }
             }
             return result;
+        };
+        TheExpanse.prototype.setFromSetsTopK = function (obj, cfg) {
+            var e_7, _a;
+            if (cfg === void 0) { cfg = { k: 5, top: true }; }
+            var sortFunc = cfg.top ? function (a, b) { return b[1] - a[1]; } : function (a, b) { return a[1] - b[1]; };
+            var result = {};
+            try {
+                for (var _b = __values(Object.entries(obj)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var _d = __read(_c.value, 2), id = _d[0], e = _d[1];
+                    result[id] = { set: new Set(), freq: new Map() };
+                    result[id].freq = new Map(__spread(e.freq.entries()).sort(sortFunc).slice(0, cfg.k));
+                    result[id].set = new Set(__spread(result[id].freq.keys()));
+                }
+            }
+            catch (e_7_1) { e_7 = { error: e_7_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_7) throw e_7.error; }
+            }
+            return result;
+        };
+        TheExpanse.prototype.readableSetsFromSetsFreq = function (obj, idName, collectionName, itemName) {
+            var _this = this;
+            return Object.entries(obj).map(function (e) {
+                var _a;
+                return (_a = {},
+                    _a[idName] = _this._g.n(e[0]).f('name'),
+                    _a[collectionName] = Array.from(e[1].freq).map(function (v) {
+                        var _a;
+                        return (_a = { freq: v[1] }, _a[itemName] = v[0].f('name'), _a);
+                    }),
+                    _a);
+            });
         };
         return TheExpanse;
     }());
