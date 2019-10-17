@@ -678,19 +678,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 */
 		describe('Which skills are groups of people weak / good at - ', () => {
 
-			it('skills of friends of people working at companies I am interested in', () => {
-				const tic = Date.now();
-				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
-				const employeeFriends = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.Knows);
-				const friendsSkills = ex.accumulateSetsFromSetsFreq(employeeFriends, DIR.out, EDGE_TYPES.HasSkill);
-				const toc = Date.now();
-				console.log(`Skills by friends of employees of selected companies with frequencies took ${toc - tic} ms.`);
-
-				// const skillsReadable = ex.readableSetsFromSetsFreq(friendsSkills, 'person', 'friendSkills', 'skill');
-				// console.dir(util.inspect(skillsReadable, {depth: 3}));
-			});
-
-
 			it('skills of company workforces', () => {
 				const tic = Date.now();
 				const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
@@ -703,6 +690,23 @@ describe('real-world job/skill - based recommendations - ', () => {
 			});
 
 
+			it.only('skills least / most demanded by country', () => {
+				const tic = Date.now();
+				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
+				const skillDemandByCountry = ex.accumulateSetsFromSetsFreq(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
+				const toc = Date.now();
+				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
+
+				const topKSkills = ex.setFromSetsTopK(skillDemandByCountry);
+				const topKReadable = ex.readableSetsFromSetsFreq(topKSkills, 'country', 'population skills', 'skill');
+				console.log(util.inspect(topKReadable, {depth: 3}));
+
+				const bottomKSkills = ex.setFromSetsTopK(skillDemandByCountry, {k: 5, top: false});
+				const bottomReadable = ex.readableSetsFromSetsFreq(bottomKSkills, 'country', 'population skills', 'skill');
+				console.log(util.inspect(bottomReadable, {depth: 3}));
+			});
+
+
 			it('skills of country workforces', () => {
 				const tic = Date.now();
 				const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
@@ -712,6 +716,19 @@ describe('real-world job/skill - based recommendations - ', () => {
 				console.log(`Skills by country workforce with frequencies took ${toc - tic} ms.`);
 				
 				// const skillsReadable = ex.readableSetsFromSetsFreq(skillsByCountry, 'country', 'population skills', 'skill');
+				// console.dir(util.inspect(skillsReadable, {depth: 3}));
+			});
+
+
+			it('skills of friends of people working at companies I am interested in', () => {
+				const tic = Date.now();
+				const employees = ex.accumulateNodesFromNodes(interestingCompanyIDs, DIR.in, EDGE_TYPES.WorksFor);
+				const employeeFriends = ex.accumulateSetsFromNodes(employees, DIR.out, EDGE_TYPES.Knows);
+				const friendsSkills = ex.accumulateSetsFromSetsFreq(employeeFriends, DIR.out, EDGE_TYPES.HasSkill);
+				const toc = Date.now();
+				console.log(`Skills by friends of employees of selected companies with frequencies took ${toc - tic} ms.`);
+
+				// const skillsReadable = ex.readableSetsFromSetsFreq(friendsSkills, 'person', 'friendSkills', 'skill');
 				// console.dir(util.inspect(skillsReadable, {depth: 3}));
 			});
 

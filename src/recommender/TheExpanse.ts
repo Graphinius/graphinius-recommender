@@ -4,6 +4,12 @@ import {DIR, ExpansionInput, ExpansionResult} from 'graphinius/lib/core/interfac
 import {EDGE_TYPES} from "../../test/datasets/jobs/common";
 
 
+export interface TopKConfig {
+	k		: number;
+	top	: boolean;
+}
+
+
 class TheExpanse {
 
   constructor(private _g: TypedGraph) {}
@@ -115,49 +121,76 @@ class TheExpanse {
    * @param dir
    * @param rel
    */
-  accumulateSetsFromSetsFreq(sources: {[key: string]: ExpansionInput}, dir: DIR, rel: string) : {[key: string]: ExpansionResult} {
-    const result: {[key: string]: ExpansionResult} = {};
-    const keys = Object.keys(sources);
+	accumulateSetsFromSetsFreq(sources: {[key: string]: ExpansionInput}, dir: DIR, rel: string) : {[key: string]: ExpansionResult} {
+		const result: {[key: string]: ExpansionResult} = {};
+		const keys = Object.keys(sources);
 
-    for ( let i of keys ) {
-      if ( !result[i] ) {
-        result[i] = {set: new Set<ITypedNode>(), freq: new Map<ITypedNode, number>()};
-      }
-      let res = result[i];
-      // convert each ExpansionInput into a properly formatted object
-      const input_i = TypedGraph.convertToExpansionResult(sources[i]);
+		for ( let i of keys ) {
+			if ( !result[i] ) {
+				result[i] = {set: new Set<ITypedNode>(), freq: new Map<ITypedNode, number>()};
+			}
+			let res = result[i];
+			// convert each ExpansionInput into a properly formatted object
+			const input_i = TypedGraph.convertToExpansionResult(sources[i]);
 
-      // iterate over the set only? => Why not, it's the ITypedNode anyways...
-      for ( let source of input_i.set ) {
-
-        let targets = this._g.expand(source, dir, rel);
-        if ( !targets.set.size ) {
-          continue;
-        }
-
-        for (let nodeRef of targets.set) {
-          if (!res.freq.has(nodeRef)) {
-            res.freq.set(nodeRef, targets.freq.get(nodeRef));
-          }
-          if (res.set.has(nodeRef)) {
-            res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
-          }
-          res.set.add(nodeRef);
-        }
-
-      }
-
-    }
-    return result;
-  }
+			// iterate over the set only? => Why not, it's delivering ITypedNodes
+			// which simultaneously are the keys in the freq Map
+			for ( let source of input_i.set ) {
+				let targets = this._g.expand(source, dir, rel);
+				if ( !targets.set.size ) {
+					continue;
+				}
+				for ( let nodeRef of targets.set ) {
+					if ( !res.freq.has(nodeRef) ) {
+						res.freq.set(nodeRef, targets.freq.get(nodeRef));
+					}
+					if ( res.set.has(nodeRef) ) {
+						res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
+					}
+					res.set.add(nodeRef);
+				}
+			}
+		}
+		return result;
+	}
 
 
+	/**
+	 *
+	 * @param obj
+	 * @param cfg
+	 */
+	setFromSetsTopK(obj: {[key: string]: ExpansionResult}, cfg: TopKConfig = {k: 5, top: true}) : {[key: string]: ExpansionResult} {
+		const sortFunc = cfg.top ? (a, b) => b[1] - a[1] : (a, b) => a[1] - b[1];
+		const result: {[key: string]: ExpansionResult} = {};
+		for ( let [id, e] of Object.entries(obj) ) {
+			result[id] = {set: new Set<ITypedNode>(), freq: new Map<ITypedNode, number>()};
+			result[id].freq = new Map([...e.freq.entries()].sort(sortFunc).slice(0, cfg.k));
+			result[id].set = new Set([...result[id].freq.keys()]);
+		}
+		return result;
+	}
+
+
+	/**
+	 * @description get a readable version of a SetFromSetsFreq object
+	 *
+	 * @param obj
+	 * @param idName
+	 * @param collectionName
+	 * @param itemName
+	 *
+	 * @returns object with source name & a list of plain item names with item frequencies
+	 *
+	 * @todo specify return value
+	 */
   readableSetsFromSetsFreq(obj: {[key: string]: ExpansionResult}, idName: string, collectionName: string, itemName: string) {
-    return Object.entries(obj).map(e => ({
+  	return Object.entries(obj).map(e => ({
       [idName]: this._g.n(e[0]).f('name'),
-      [collectionName]: Array.from(e[1].freq).map(v => ({freq: v[1], [itemName]: v[0].f('name')})) 
+      [collectionName]: Array.from(e[1].freq).map(v => ({freq: v[1], [itemName]: v[0].f('name')}))
     }));
   }
+
 
 }
 
