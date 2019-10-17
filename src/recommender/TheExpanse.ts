@@ -55,7 +55,17 @@ class TheExpanse {
   }
 
 
-  /**
+	/**
+	 * @todo factor in / out / whatever
+	 */
+	nodeSetToMap(set: Set<ITypedNode>) : Map<string, ITypedNode> {
+		const result = new Map<string, ITypedNode>();
+		set.forEach(el => result.set(el.id, el));
+		return result;
+	}
+
+
+	/**
    * @description replace a node with a set of target nodes, but keep the original ID
    *
    * @example Map<companyID, Company> would be replaced with Map<companyID, Set<Employees>> through the 'WORKS_FOR' relation

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as util from 'util';
 import {DIR} from 'graphinius/lib/core/interfaces';
 import {ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
 import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
@@ -469,20 +470,6 @@ describe('real-world job/skill - based recommendations - ', () => {
 		 */
 		it.todo('Same companies BUT DISsimilar to my current employerdescription `enrichment possibilities`');
 
-
-		describe.skip('Brian Tracy - ', () => {
-
-			it('At which companies would I be special (less than k% of employees have a skill overlap > m with me)', () => {
-
-			});
-
-
-			it('At which companies would I be SUPER special (I got at least k (1) skills **nobody** there possesses)', () => {
-
-			});
-
-		});
-
 	});
 
 
@@ -857,6 +844,53 @@ describe('real-world job/skill - based recommendations - ', () => {
 				/**
 				 * @todo pairwise similarities considering frequency as well
 				 */
+			});
+
+		});
+
+
+		describe('Brian Tracy - ', () => {
+
+			/**
+			 * @todo add additional information to result struct
+			 */
+			it('At which companies would I be special (less than k% of employees have a skill overlap > t with me)', () => {
+				// actually we have to do this for each single company, don't we?
+				const k = 0.5, t = 0.3;
+				const companies = g.getNodesT(NODE_TYPES.Company);
+				const result = {};
+
+				companies.forEach(c => {
+					const employees = g.ins(c, EDGE_TYPES.WorksFor);
+					if ( !employees || employees.size === 0 ) {
+						return;
+					}
+					const skillSets = ex.accumulateSetsFromNodes(ex.nodeSetToMap(employees), DIR.out, EDGE_TYPES.HasSkill);
+					skillSets[me.id] = g.outs(me, EDGE_TYPES.HasSkill);
+					const sims = simSource(setSimFuncs.jaccard, me.id, skillSets);
+					const simsAboveThres = Array.from(sims).filter(s => s.sim > t);
+					if ( simsAboveThres.length < employees.size * k ) {
+						result[c.f('name')] = simsAboveThres.map(s => ({employee: g.n(s.to).f('name'), sim: s.sim}));
+					}
+				});
+
+				// console.log(result);
+			});
+
+
+			it('At which companies would I be SUPER special (I got at least k (1) skills **nobody** there possesses)', () => {
+				const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
+				const theirSkills = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
+				const mySkills = g.outs(me, EDGE_TYPES.HasSkill);
+
+				const iGotTheyDonts = {};
+				for ( let [companyID, skills] of Object.entries(theirSkills) ) {
+					const mySpecialSkills = Array.from(mySkills).filter(s => !skills.has(s)).map(s => s.f('name'));
+					if ( mySpecialSkills.length ) {
+						iGotTheyDonts[g.n(companyID).f('name')] = mySpecialSkills;
+					}
+				}
+				// console.log(util.inspect(iGotTheyDonts, {depth: 3}));
 			});
 
 		});
