@@ -11,7 +11,7 @@ import { DFS } from 'graphinius/lib/search/DFS';
 import { PFS } from 'graphinius/lib/search/PFS';
 import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
 import { importGraph } from './common/importGraph';
-import {TheExpanse} from '../src/recommender/TheExpanse';
+import {TheExpanse} from './recommender/TheExpanse';
 
 import { AppConfig } from './indexers/interfaces';
 import { buildIdxJSSearch } from './indexers/buildJSSearch';
@@ -20,6 +20,7 @@ import { beerConfig } from './indexers/beer/appConfig';
 import { jobsConfig } from './indexers/jobs/appConfig';
 import { meetupConfig } from './indexers/meetup/appConfig';
 import { northwindConfig } from './indexers/northwind/appConfig';
+import { shopifyConfig } from './indexers/shopify/appConfig';
 
 import * as $comSim from 'graphinius/lib/similarities/SimilarityCommons';
 import * as $setSim from 'graphinius/lib/similarities/SetSimilarities';
@@ -33,14 +34,14 @@ window.scoSim = $scoSim;
 
 
 (() => {
-  [jobsConfig].forEach(async config => { // jobsConfig , northwindConfig , beerConfig , meetupConfig
+  [shopifyConfig].forEach(async config => { // jobsConfig , northwindConfig , beerConfig , meetupConfig
     const graph: TypedGraph = await importGraph(config) as TypedGraph;
     window.ex = new TheExpanse(graph);
     const indexes = createJSSearchIndex(graph, config);
     const searchRes = executeSearch(indexes, config, graph);
     testBDPFS(graph);
     testPagerank(graph);
-    await testTransitivityCc(graph);
+    // await testTransitivityCc(graph);
   });
 })();
 

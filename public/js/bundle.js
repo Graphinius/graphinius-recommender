@@ -5177,6 +5177,7 @@
     var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
 
     var $comSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SimilarityCommons$1,
         __moduleExports: SimilarityCommons,
         sortFuncs: SimilarityCommons_1,
@@ -5243,6 +5244,7 @@
     var SetSimilarities_1 = SetSimilarities.simFuncs;
 
     var $setSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': SetSimilarities$1,
         __moduleExports: SetSimilarities,
         simFuncs: SetSimilarities_1
@@ -5465,6 +5467,7 @@
     var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
 
     var $scoSim = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': ScoreSimilarities$1,
         __moduleExports: ScoreSimilarities,
         simFuncs: ScoreSimilarities_1
@@ -5849,6 +5852,7 @@
     var graphinius = out.$G;
 
     var $G = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': graphinius,
         __moduleExports: graphinius
     });
@@ -6084,6 +6088,7 @@
         };
         return TheExpanse;
     }());
+    //# sourceMappingURL=TheExpanse.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -7519,6 +7524,7 @@
     var index = unwrapExports(commonjs);
 
     var JSSearch = /*#__PURE__*/Object.freeze({
+        __proto__: null,
         'default': index,
         __moduleExports: commonjs
     });
@@ -7552,48 +7558,53 @@
     }
     //# sourceMappingURL=buildJSSearch.js.map
 
-    var jobsModels;
-    (function (jobsModels) {
-        jobsModels["person"] = "person";
-        jobsModels["company"] = "company";
-        jobsModels["country"] = "country";
-        jobsModels["skill"] = "skill";
-    })(jobsModels || (jobsModels = {}));
-    var jobsIdxConfig = {
-        company: {
-            string: 'company',
-            id: 'id',
-            fields: ['name', 'desc']
-        },
-        country: {
-            string: 'country',
+    var shopifyModels;
+    (function (shopifyModels) {
+        shopifyModels["tag"] = "tag";
+        shopifyModels["vendor"] = "vendor";
+        shopifyModels["product"] = "product";
+        shopifyModels["product_type"] = "product_type";
+    })(shopifyModels || (shopifyModels = {}));
+    var shopifyIdxConfig = {
+        tag: {
+            string: 'tag',
             id: 'id',
             fields: ['name']
         },
-        person: {
-            string: 'person',
+        vendor: {
+            string: 'vendor',
             id: 'id',
-            fields: ['name', 'age']
+            fields: ['label']
         },
-        skill: {
-            string: 'skill',
+        product_type: {
+            string: 'product_type',
             id: 'id',
-            fields: ['name']
+            fields: ['label']
+        },
+        product: {
+            string: 'product',
+            id: 'id',
+            fields: ['label', 'body_sanitized']
         }
     };
     //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
+    var graphs = [
+        'hauslondon',
+        'mvmtwatches',
+        'skinnydip'
+    ];
+    var graph = graphs[0];
     var graphExt = "json";
-    var jobsConfig = {
-        graphName: "jobs",
-        graphFile: testGraphDir + "/jobs." + graphExt,
-        searchTerm: "TypeScript",
-        idxConfig: jobsIdxConfig,
-        models: jobsModels,
-        searchModel: jobsModels.skill
+    var shopifyConfig = {
+        graphName: graph,
+        graphFile: testGraphDir + "/" + graph + "." + graphExt,
+        searchTerm: "swan",
+        idxConfig: shopifyIdxConfig,
+        models: shopifyModels,
+        searchModel: shopifyModels.product
     };
-    //# sourceMappingURL=appConfig.js.map
 
     var _this = undefined;
     console.log('Graphinius: ', $G);
@@ -7602,7 +7613,7 @@
     window.setSim = $setSim;
     window.scoSim = $scoSim;
     (function () {
-        [jobsConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+        [shopifyConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
             var graph, indexes, searchRes;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -7614,9 +7625,6 @@
                         searchRes = executeSearch(indexes, config, graph);
                         testBDPFS(graph);
                         testPagerank(graph);
-                        return [4, testTransitivityCc(graph)];
-                    case 2:
-                        _a.sent();
                         return [2];
                 }
             });
@@ -7637,30 +7645,6 @@
         PR.computePR();
         var toc = +new Date;
         console.log("Pagerank on " + g.label + " graph took " + (toc - tic) + " ms.");
-    }
-    function testTransitivityCc(g) {
-        return __awaiter(this, void 0, void 0, function () {
-            var tic, toc, cg;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        cg = new ComputeGraph_2(g, window.tf);
-                        tic = +new Date;
-                        return [4, cg.clustCoef(true)];
-                    case 1:
-                        _a.sent();
-                        toc = +new Date;
-                        console.log("Clustering coefficient on " + g.label + " graph took " + (toc - tic) + " ms.");
-                        tic = +new Date;
-                        return [4, cg.transitivity(true)];
-                    case 2:
-                        _a.sent();
-                        toc = +new Date;
-                        console.log("Transitivity on " + g.label + " graph took " + (toc - tic) + " ms.");
-                        return [2];
-                }
-            });
-        });
     }
     function createJSSearchIndex(graph, config) {
         var tic = +new Date;
