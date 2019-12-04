@@ -2883,10 +2883,10 @@
             if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
+            var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
             var nodes = TypedGraph.convertToExpansionResult(input);
             var resultSet = new Set();
             var freqMap = new Map();
-            var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
             while (k--) {
                 nodes = this.expand(nodes, dir, type);
                 try {
@@ -2918,7 +2918,7 @@
             }
             var nodes = TypedGraph.convertToExpansionResult(input);
             var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
-            while (k-- || nodes.set.size >= this._nr_nodes) {
+            for (var it_1 = 0; it_1 < k; it_1++) {
                 nodes = this.expand(nodes, dir, type);
             }
             return nodes;
@@ -4244,7 +4244,8 @@
         e_dir: 'd',
         e_weight: 'w',
         e_label: 'l',
-        e_type: 'y'
+        e_type: 'y',
+        e_features: 'f'
     };
     });
 
@@ -4778,6 +4779,9 @@
                         _c[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
                         _c[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _c);
+                    if (Object.keys(edge.getFeatures()).length) {
+                        edgeStruct[interfaces$1.labelKeys.e_features] = JSON.stringify(edge.getFeatures());
+                    }
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
                     }
@@ -4795,6 +4799,9 @@
                         _d[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
                         _d[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _d);
+                    if (Object.keys(edge.getFeatures()).length) {
+                        edgeStruct[interfaces$1.labelKeys.e_features] = JSON.stringify(edge.getFeatures());
+                    }
                     if (edge.getID() !== edge.getLabel()) {
                         edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
                     }
@@ -7592,15 +7599,15 @@
     var testGraphDir = "../test-data/graphs";
     var graphs = [
         'hauslondon',
-        'mvmtwatches',
-        'skinnydip'
+        'www.mvmtwatches',
+        'skinnydiplondon'
     ];
-    var graph = graphs[0];
+    var graph = graphs[1];
     var graphExt = "json";
     var shopifyConfig = {
         graphName: graph,
-        graphFile: testGraphDir + "/" + graph + "." + graphExt,
-        searchTerm: "swan",
+        graphFile: testGraphDir + "/" + graph + ".com." + graphExt,
+        searchTerm: "caramel",
         idxConfig: shopifyIdxConfig,
         models: shopifyModels,
         searchModel: shopifyModels.product

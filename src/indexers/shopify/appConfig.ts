@@ -4,17 +4,17 @@ import { shopifyIdxConfig, shopifyModels } from './interfaces';
 const testGraphDir = `../test-data/graphs`;
 const graphs = [
 	'hauslondon',
-	'mvmtwatches',
-	'skinnydip'
+	'www.mvmtwatches',
+	'skinnydiplondon'
 ];
-const graph = graphs[0];
+const graph = graphs[1];
 const graphExt = `json`;
 
 
 const shopifyConfig: AppConfig = {
 	graphName: graph,
-	graphFile: `${testGraphDir}/${graph}.${graphExt}`,
-	searchTerm: `swan`,
+	graphFile: `${testGraphDir}/${graph}.com.${graphExt}`,
+	searchTerm: `caramel`,
 	idxConfig: shopifyIdxConfig,
 	models: shopifyModels,
 	searchModel: shopifyModels.product

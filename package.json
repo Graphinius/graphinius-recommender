@@ -6,9 +6,8 @@
   "main": "index.ts",
   "scripts": {
     "build": "rollup -c",
-    "watch": "rollup -cw",
+    "dev": "rollup -cw",
     "prod": "NODE_ENV=production rollup -cw",
-    "dev": "ts-node-dev src/recs/simpleGroupRecs.ts",
     "test:jobs": "G_LOG=debug jest -c jest.config.js --watch jobs",
     "test:all": "jest && jest -c jest.config.js"
   },
