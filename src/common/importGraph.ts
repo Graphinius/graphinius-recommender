@@ -1,6 +1,4 @@
-import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
-import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
-import { JSONInput, JSONGraph, JSONNode } from 'graphinius/lib/io/input/JSONInput';
+import { IGraph, TypedGraph, JSONInput } from 'graphinius';
 import { IndexConfig, AppConfig } from '../indexers/interfaces';
 
 

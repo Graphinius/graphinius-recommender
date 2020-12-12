@@ -1,16 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {DIR} from 'graphinius/lib/core/interfaces';
-import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
-import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
-import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
-import {jobsConfig} from '../../../src/indexers/jobs/appConfig';
-import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
-import {viaSharedPrefs, simSource, simPairwise, cutFuncs} from 'graphinius/lib/similarities/SimilarityCommons';
-import {NODE_TYPES, EDGE_TYPES} from './common';
 
+import { DIR, ITypedNode, TypedGraph, JSONInput, JSONGraph } from 'graphinius';
+
+import { buildIdxJSSearch } from '../../../src/indexers/buildJSSearch';
+import { jobsIdxConfig, jobsModels } from '../../../src/indexers/jobs/interfaces';
+import { jobsConfig } from '../../../src/indexers/jobs/appConfig';
+
+import { NODE_TYPES, EDGE_TYPES } from './common';
 
 const
 	graphFile = path.join(__dirname, '../../../public/test-data/graphs/jobs.json'),
@@ -250,7 +247,7 @@ describe('jobs dataset tests - ', () => {
 		 RETURN count(peeps2), collect(peeps2.name)
 		 */
 		it('people known by people known by Judy Brekke', () => {
-			const peeps = g.expandK(judy, DIR.out, 'KNOWS', {k: 2}).set
+			const peeps = g.expandK(judy, DIR.out, 'KNOWS', { k: 2 }).set
 			expect(peeps.size).toBe(judy_sphere_out_2);
 
 			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();
@@ -263,7 +260,7 @@ describe('jobs dataset tests - ', () => {
 		 * Judy <- intermediaries <- peeps
 		 */
 		it('people knowing people knowing Judy Brekke', () => {
-			const peeps = g.expandK(judy, DIR.in, 'KNOWS', {k: 2}).set;
+			const peeps = g.expandK(judy, DIR.in, 'KNOWS', { k: 2 }).set;
 			expect(peeps.size).toBe(judy_sphere_in_2);
 
 			// const people_arr = Array.from(people).map(p => p.getFeature('name')).sort();

@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {TypedNode} from 'graphinius/lib/core/typed/TypedNode';
-import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONInput, JSONGraph} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../../src/indexers/buildJSSearch';
-import {beerIdxConfig, beerModels} from '../../src/indexers/beer/interfaces';
-import {beerConfig} from '../../src/indexers/beer/appConfig';
+
+import { buildIdxJSSearch } from '../../src/indexers/buildJSSearch';
+import { beerIdxConfig, beerModels } from '../../src/indexers/beer/interfaces';
+import { beerConfig } from '../../src/indexers/beer/appConfig';
+
+import { TypedNode, TypedGraph, JSONInput, JSONGraph } from 'graphinius';
 
 const graphFile = path.join(__dirname, '../../public/test-data/graphs/beer.json');
 
@@ -59,7 +59,7 @@ describe('BEER example index tests', () => {
 		// console.log(searchRes);
 		expect(searchRes).toContain(newDoc);
 		// just to be absolutely sure
-		let blaDoc = {...newDoc};
+		let blaDoc = { ...newDoc };
 		blaDoc.id = 123;
 		expect(searchRes).not.toContain(blaDoc);
 	});

@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {DIR} from 'graphinius/lib/core/interfaces';
-import {ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
-import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import {JSONGraph, JSONInput} from 'graphinius/lib/io/input/JSONInput';
-import {buildIdxJSSearch} from '../../../src/indexers/buildJSSearch';
-import {jobsIdxConfig, jobsModels} from '../../../src/indexers/jobs/interfaces';
-import {simFuncs as setSimFuncs} from 'graphinius/lib/similarities/SetSimilarities';
+import { DIR } from 'graphinius/lib/core/interfaces';
+import { ITypedNode } from 'graphinius/lib/core/typed/TypedNode';
+import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
+import { JSONGraph, JSONInput } from 'graphinius/lib/io/input/JSONInput';
+import { buildIdxJSSearch } from '../../../src/indexers/buildJSSearch';
+import { jobsIdxConfig, jobsModels } from '../../../src/indexers/jobs/interfaces';
+import { setSimFuncs } from 'graphinius/lib/similarities/SetSimilarities';
 import {
 	cutFuncs,
 	sim,
@@ -15,9 +15,9 @@ import {
 	sortFuncs,
 	viaSharedPrefs
 } from 'graphinius/lib/similarities/SimilarityCommons';
-import {TheExpanse} from '../../../src/recommender/TheExpanse';
-import {Pagerank} from 'graphinius/lib/centralities/Pagerank';
-import {EDGE_TYPES, NODE_TYPES} from './common';
+import { TheExpanse } from '../../../src/recommender/TheExpanse';
+import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
+import { EDGE_TYPES, NODE_TYPES } from './common';
 
 
 const
@@ -66,14 +66,14 @@ describe('similarity measures - ', () => {
 
 		it('by overlap of people possessing them', () => {
 			const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.HasSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, skillsByPeople, {knn: 10});
+			const sims = simPairwise(setSimFuncs.jaccard, skillsByPeople, { knn: 10 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
 
 		it('by overlap of companies seeking them', () => {
 			const skillsSoughtByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.LooksForSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCompany, {knn: 10});
+			const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCompany, { knn: 10 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -87,7 +87,7 @@ describe('similarity measures - ', () => {
 		it('by overlap of countries seeking them', () => {
 			const skillsSoughtByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.LooksForSkill);
 			const skillsSoughtByCountry = ex.accumulateSetsFromSets(skillsSoughtByCompany, DIR.out, EDGE_TYPES.LocatedIn);
-			const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCountry, {knn: 10});
+			const sims = simPairwise(setSimFuncs.jaccard, skillsSoughtByCountry, { knn: 10 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -98,7 +98,7 @@ describe('similarity measures - ', () => {
 		it('by overlap of countries possessing them', () => {
 			const skillsByPeople = ex.accumulateSetsFromNodes(NODE_TYPES.Skill, DIR.in, EDGE_TYPES.HasSkill);
 			const skillsByCountry = ex.accumulateSetsFromSets(skillsByPeople, DIR.out, EDGE_TYPES.LivesIn);
-			const sims = simPairwise(setSimFuncs.jaccard, skillsByCountry, {knn: 10, cutoff: 0.99, cutFunc: cutFuncs.below});
+			const sims = simPairwise(setSimFuncs.jaccard, skillsByCountry, { knn: 10, cutoff: 0.99, cutFunc: cutFuncs.below });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -119,27 +119,27 @@ describe('similarity measures - ', () => {
 			const skillsItaly = g.expand(g.ins(italy, EDGE_TYPES.LivesIn), DIR.out, EDGE_TYPES.HasSkill);
 			const sim_res = sim(setSimFuncs.jaccard, skillsCongo.set, skillsItaly.set);
 			console.log(sim_res);
-			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 } );
+			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 });
 		});
 
 
 		it('by citizens possessing similar skill sets - by source', () => {
 			const sims_exp = [
-				[ 'Congo', 'Italy', 26, 0.86667 ],
-				[ 'Congo', 'Kyrgyz Republic', 27, 0.9 ],
-				[ 'Congo', 'Ukraine', 28, 0.93333 ],
-				[ 'Congo', 'Guernsey', 29, 0.96667 ],
-				[	'Congo', 'South Georgia and the South Sandwich Islands', 29, 0.96667 ],
-				[ 'Congo', 'Turks and Caicos Islands', 29, 0.96667 ],
-				[ 'Congo', 'Palestinian Territory', 29, 0.96667 ],
-				[ 'Congo', 'Anguilla', 29, 0.96667 ],
-				[ 'Congo', 'Mozambique', 30, 1 ],
-				[ 'Congo', 'Norway', 30, 1 ]
+				['Congo', 'Italy', 26, 0.86667],
+				['Congo', 'Kyrgyz Republic', 27, 0.9],
+				['Congo', 'Ukraine', 28, 0.93333],
+				['Congo', 'Guernsey', 29, 0.96667],
+				['Congo', 'South Georgia and the South Sandwich Islands', 29, 0.96667],
+				['Congo', 'Turks and Caicos Islands', 29, 0.96667],
+				['Congo', 'Palestinian Territory', 29, 0.96667],
+				['Congo', 'Anguilla', 29, 0.96667],
+				['Congo', 'Mozambique', 30, 1],
+				['Congo', 'Norway', 30, 1]
 			];
 			const myCountry = Array.from(g.outs(me, 'LIVES_IN'))[0];
 			const peopleByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LivesIn);
 			const skillSupplyByCountry = ex.accumulateSetsFromSets(peopleByCountry, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillSupplyByCountry, {knn: 10, sort: sortFuncs.asc});
+			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillSupplyByCountry, { knn: 10, sort: sortFuncs.asc });
 			const sims_res = Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]);
 			// console.log(sims_res);
 			expect(sims.length).toBe(10);
@@ -149,20 +149,20 @@ describe('similarity measures - ', () => {
 
 		it('by citizens possessing similar skill sets - pairwise', () => {
 			const sims_exp = [
-				[ 'Kyrgyz Republic', 'Italy', 23, 0.76667 ],
-				[	'Italy', 'South Georgia and the South Sandwich Islands', 25, 0.83333],
-				[ 'Italy', 'Turks and Caicos Islands', 25, 0.83333 ],
-				[ 'Anguilla', 'Italy', 25, 0.83333 ],
-				[ 'Kyrgyz Republic', 'Ukraine', 25, 0.83333 ],
-				[ 'Italy', 'Ukraine', 25, 0.86207 ],
-				[ 'Italy', 'Mozambique', 26, 0.86667 ],
-				[ 'Italy', 'Congo', 26, 0.86667 ],
-				[ 'Italy', 'Norway', 26, 0.86667 ],
-				[ 'Italy', 'Iceland', 26, 0.86667 ]
+				['Kyrgyz Republic', 'Italy', 23, 0.76667],
+				['Italy', 'South Georgia and the South Sandwich Islands', 25, 0.83333],
+				['Italy', 'Turks and Caicos Islands', 25, 0.83333],
+				['Anguilla', 'Italy', 25, 0.83333],
+				['Kyrgyz Republic', 'Ukraine', 25, 0.83333],
+				['Italy', 'Ukraine', 25, 0.86207],
+				['Italy', 'Mozambique', 26, 0.86667],
+				['Italy', 'Congo', 26, 0.86667],
+				['Italy', 'Norway', 26, 0.86667],
+				['Italy', 'Iceland', 26, 0.86667]
 			];
 			const peopleByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LivesIn);
 			const skillSupplyByCountry = ex.accumulateSetsFromSets(peopleByCountry, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, {knn: 10, sort: sortFuncs.asc});
+			const sims = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, { knn: 10, sort: sortFuncs.asc });
 			const sims_res = Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]);
 			// console.log(sims_res);
 			expect(sims.length).toBe(10);
@@ -189,34 +189,34 @@ describe('similarity measures - ', () => {
 
 			const sim_res = sim(setSimFuncs.jaccard, skillsCongo.set, skillsItaly.set);
 			console.log(sim_res);
-			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 } );
+			expect(sim_res).toEqual({ isect: 26, sim: 0.86667 });
 		});
 
 
 		/**
 		 * @todo we have to standardize a template here
 		 * 			 {
-		 						?????
+									?????
 		 * 			 }
 		 */
 		it('skill SUPPLY similarity of countries (via their companies) - by source', () => {
 			const sims_exp = [
-				[ 'Congo', 'Iran', 15, 0.51724 ],
-				[ 'Congo', 'British Virgin Islands', 14, 0.51852 ],
-				[ 'Congo', 'Anguilla', 21, 0.72414 ],
-				[ 'Congo', 'Hong Kong', 22, 0.73333 ],
-				[ 'Congo', 'Norfolk Island', 23, 0.76667 ],
-				[ 'Congo', 'Guatemala', 22, 0.78571 ],
-				[ 'Congo', 'Guernsey', 26, 0.86667 ],
-				[ 'Congo', 'Mozambique', 26, 0.86667 ],
-				[	'Congo', 'South Georgia and the South Sandwich Islands', 26, 0.86667 ],
-				[ 'Congo', 'Bouvet Island (Bouvetoya)', 26, 0.86667 ]
+				['Congo', 'Iran', 15, 0.51724],
+				['Congo', 'British Virgin Islands', 14, 0.51852],
+				['Congo', 'Anguilla', 21, 0.72414],
+				['Congo', 'Hong Kong', 22, 0.73333],
+				['Congo', 'Norfolk Island', 23, 0.76667],
+				['Congo', 'Guatemala', 22, 0.78571],
+				['Congo', 'Guernsey', 26, 0.86667],
+				['Congo', 'Mozambique', 26, 0.86667],
+				['Congo', 'South Georgia and the South Sandwich Islands', 26, 0.86667],
+				['Congo', 'Bouvet Island (Bouvetoya)', 26, 0.86667]
 			];
 			const myCountry = Array.from(g.outs(me, 'LIVES_IN'))[0];
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
-			const employeesByCountry   = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
 			const skillSupplyByCountry = ex.accumulateSetsFromSets(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillSupplyByCountry, {knn: 10, sort: sortFuncs.asc});
+			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillSupplyByCountry, { knn: 10, sort: sortFuncs.asc });
 			const sims_res = Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]);
 			// console.log(sims_res);
 			expect(sims.length).toBe(10);
@@ -226,21 +226,21 @@ describe('similarity measures - ', () => {
 
 		it('skill SUPPLY similarity of countries (via their companies) - pairwise', () => {
 			const sims_exp = [
-				[ 'Iran', 'British Virgin Islands', 8, 0.32 ],
-				[ 'Guatemala', 'British Virgin Islands', 11, 0.39286 ],
-				[ 'Hong Kong', 'British Virgin Islands', 12, 0.41379 ],
-				[ 'Norfolk Island', 'British Virgin Islands', 13, 0.44828 ],
-				[ 'Iran', 'Guatemala', 13, 0.44828 ],
-				[ 'Iran', 'Hong Kong', 14, 0.46667 ],
-				[ 'British Virgin Islands', 'Guernsey', 15, 0.5 ],
-				[ 'British Virgin Islands', 'Mozambique', 15, 0.5 ],
-				[	'British Virgin Islands',	'South Georgia and the South Sandwich Islands',	15,	0.5	],
-				[ 'British Virgin Islands', 'Bouvet Island (Bouvetoya)', 15, 0.5 ]
+				['Iran', 'British Virgin Islands', 8, 0.32],
+				['Guatemala', 'British Virgin Islands', 11, 0.39286],
+				['Hong Kong', 'British Virgin Islands', 12, 0.41379],
+				['Norfolk Island', 'British Virgin Islands', 13, 0.44828],
+				['Iran', 'Guatemala', 13, 0.44828],
+				['Iran', 'Hong Kong', 14, 0.46667],
+				['British Virgin Islands', 'Guernsey', 15, 0.5],
+				['British Virgin Islands', 'Mozambique', 15, 0.5],
+				['British Virgin Islands', 'South Georgia and the South Sandwich Islands', 15, 0.5],
+				['British Virgin Islands', 'Bouvet Island (Bouvetoya)', 15, 0.5]
 			];
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
-			const employeesByCountry   = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
 			const skillSupplyByCountry = ex.accumulateSetsFromSets(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, {knn: 10, sort: sortFuncs.asc});
+			const sims = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, { knn: 10, sort: sortFuncs.asc });
 			const sims_res = Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]);
 			// console.log(sims_res);
 			expect(sims.length).toBe(10);
@@ -274,7 +274,7 @@ describe('similarity measures - ', () => {
 		it('skill DEMAND similarity of countries (via their companies) - pairwise', () => {
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 			const skillDemandByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, skillDemandByCountry, {knn: 10});
+			const sims = simPairwise(setSimFuncs.jaccard, skillDemandByCountry, { knn: 10 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 			expect(sims.length).toBe(10);
 		});
@@ -286,15 +286,15 @@ describe('similarity measures - ', () => {
 
 		it('people having a similar skill set -> by source', () => {
 			const sims_exp = [
-				[ 'Tom Lemke', 'Mandy Kiehn', 11, 0.55 ],
-				[ 'Tom Lemke', 'Asa Botsford', 11, 0.55 ],
-				[ 'Tom Lemke', 'Tristin Kohler', 11, 0.55 ],
-				[ 'Tom Lemke', 'Randi Mosciski', 10, 0.52632 ],
-				[ 'Tom Lemke', 'Olaf Jacobson', 11, 0.52381 ],
-				[ 'Tom Lemke', 'Carolyn Hessel', 11, 0.52381 ]
+				['Tom Lemke', 'Mandy Kiehn', 11, 0.55],
+				['Tom Lemke', 'Asa Botsford', 11, 0.55],
+				['Tom Lemke', 'Tristin Kohler', 11, 0.55],
+				['Tom Lemke', 'Randi Mosciski', 10, 0.52632],
+				['Tom Lemke', 'Olaf Jacobson', 11, 0.52381],
+				['Tom Lemke', 'Carolyn Hessel', 11, 0.52381]
 			];
 			const allSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simSource(setSimFuncs.jaccard, me.id, allSets, {knn: 6});
+			const sims = simSource(setSimFuncs.jaccard, me.id, allSets, { knn: 6 });
 			const sims_res = sims.map(e => [g.n(e.from).f('name'), g.n(e.to).f('name'), e.isect, e.sim]);
 			// console.log(sims_res);
 			expect(sims_res).toEqual(sims_exp);
@@ -321,7 +321,7 @@ describe('similarity measures - ', () => {
 			const myCountry = Array.from(g.expand(me, DIR.out, EDGE_TYPES.LivesIn).set)[0];
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 			const skillDemandByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
-			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillDemandByCountry, {knn: 10});
+			const sims = simSource(setSimFuncs.jaccard, myCountry.label, skillDemandByCountry, { knn: 10 });
 			// console.log(sims);
 			const similarCountries = new Set([...Array.from(sims).map(sc => g.n(sc.to))]);
 			const inhabitants = g.expand(similarCountries, DIR.in, EDGE_TYPES.LivesIn);
@@ -344,7 +344,7 @@ describe('similarity measures - ', () => {
 
 		it('people knowing similar people - pairwise', () => {
 			const allPeopleSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
-			const top10SimPeople = simSource(setSimFuncs.jaccard, me.label, allPeopleSets, {knn: 10});
+			const top10SimPeople = simSource(setSimFuncs.jaccard, me.label, allPeopleSets, { knn: 10 });
 			// console.log(Array.from(top10SimPeople).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -397,7 +397,7 @@ describe('similarity measures - ', () => {
 
 			// 1) get the people with most similar skill set to me
 			let allSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.HasSkill);
-			let sims = simSource(setSimFuncs.jaccard, me.label, allSets, {knn: 15});
+			let sims = simSource(setSimFuncs.jaccard, me.label, allSets, { knn: 15 });
 
 			// 2) Extact the top-k people from this set
 			const topK = new Map<string, ITypedNode>();
@@ -412,7 +412,7 @@ describe('similarity measures - ', () => {
 
 			// 4) perform a `normal` simSource over the people they know / are known by
 			allSets = ex.accumulateSetsFromNodes(topK, DIR.out, EDGE_TYPES.Knows);
-			sims = simSource(setSimFuncs.jaccard, me.label, allSets, {knn: 5});
+			sims = simSource(setSimFuncs.jaccard, me.label, allSets, { knn: 5 });
 
 			const toc = +new Date;
 			console.log(`Computing the social group overlap to the top-K most similarly skilled people took ${toc - tic} ms.`);
@@ -442,7 +442,7 @@ describe('similarity measures - ', () => {
 			 */
 			const myEmployer = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
 			const skillsDemandByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.out, EDGE_TYPES.LooksForSkill);
-			const sims = simSource(setSimFuncs.jaccard, myEmployer.label, skillsDemandByCompany, {knn: 5});
+			const sims = simSource(setSimFuncs.jaccard, myEmployer.label, skillsDemandByCompany, { knn: 5 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 
 			/**
@@ -461,7 +461,7 @@ describe('similarity measures - ', () => {
 			/**
 			 * collect the most important ones of them according to Pagerank
 			 */
-			const pr = new Pagerank(g, {normalize: true, epsilon: 1e-5}).computePR().map;
+			const pr = new Pagerank(g, { normalize: true, epsilon: 1e-5 }).computePR().map;
 			const prSorted = Array.from(Object.entries(pr)).filter(e => g.n(e[0]).type === NODE_TYPES.Person).sort((a, b) => b[1] - a[1]);
 			const prSortedTop10 = prSorted.slice(0, 10);
 			const top10Influencers = prSortedTop10.map(e => g.n(e[0]));
@@ -494,9 +494,9 @@ describe('similarity measures - ', () => {
 		it('companies located in a similar country by skill supply', () => {
 			// 1)
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
-			const employeesByCountry   = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
+			const employeesByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.in, EDGE_TYPES.WorksFor);
 			const skillSupplyByCountry = ex.accumulateSetsFromSets(employeesByCountry, DIR.out, EDGE_TYPES.HasSkill);
-			const simCountries = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, {knn: 10});
+			const simCountries = simPairwise(setSimFuncs.jaccard, skillSupplyByCountry, { knn: 10 });
 
 			// 2)
 			let land1, land2, comps1, comps2;
@@ -515,7 +515,7 @@ describe('similarity measures - ', () => {
 			// 1)
 			const companiesByCountry = ex.accumulateSetsFromNodes(NODE_TYPES.Country, DIR.in, EDGE_TYPES.LocatedIn);
 			const skillDemandByCountry = ex.accumulateSetsFromSets(companiesByCountry, DIR.out, EDGE_TYPES.LooksForSkill);
-			const simCountries = simPairwise(setSimFuncs.jaccard, skillDemandByCountry, {knn: 10});
+			const simCountries = simPairwise(setSimFuncs.jaccard, skillDemandByCountry, { knn: 10 });
 
 			// 2)
 			let land1, land2, comps1, comps2;
@@ -541,7 +541,7 @@ describe('similarity measures - ', () => {
 		 ORDER BY similarity DESC
 		 */
 		it('Two companies looking for a similar skill set', () => {
-			let sim_exp = [0.2608695652173913, 0.4, 0.23809523809523808, 0.20833333333333334, 0.34782608695652173, 0.20833333333333334, 0.2916666666666667, 0.2857142857142857, 0.38095238095238093, 0.3333333333333333, 0.25, 0.30434782608695654, 0.3181818181818182, 0.30434782608695654, 0.34782608695652173, 0.23809523809523808, 0.2857142857142857, 0.22727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2608695652173913, 0.2857142857142857, 0.22727272727272727, 0.36363636363636365, 0.2727272727272727, 0.5, 0.16666666666666666, 0.25, 0.45, 0.30434782608695654, 0.47368421052631576, 0.18181818181818182, 0.42105263157894735, 0.47368421052631576, 0.5238095238095238, 0.16, 0.22727272727272727,0.2727272727272727, 0.36363636363636365, 0.35, 0.4, 0.4, 0.2727272727272727, 0.4, 0.22727272727272727, 0.21739130434782608];
+			let sim_exp = [0.2608695652173913, 0.4, 0.23809523809523808, 0.20833333333333334, 0.34782608695652173, 0.20833333333333334, 0.2916666666666667, 0.2857142857142857, 0.38095238095238093, 0.3333333333333333, 0.25, 0.30434782608695654, 0.3181818181818182, 0.30434782608695654, 0.34782608695652173, 0.23809523809523808, 0.2857142857142857, 0.22727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2727272727272727, 0.2727272727272727, 0.2608695652173913, 0.2608695652173913, 0.2857142857142857, 0.22727272727272727, 0.36363636363636365, 0.2727272727272727, 0.5, 0.16666666666666666, 0.25, 0.45, 0.30434782608695654, 0.47368421052631576, 0.18181818181818182, 0.42105263157894735, 0.47368421052631576, 0.5238095238095238, 0.16, 0.22727272727272727, 0.2727272727272727, 0.36363636363636365, 0.35, 0.4, 0.4, 0.2727272727272727, 0.4, 0.22727272727272727, 0.21739130434782608];
 
 			const tic = +new Date;
 
@@ -562,21 +562,21 @@ describe('similarity measures - ', () => {
 		 */
 		it('companies looking for similar skill sets - by source', () => {
 			const sims_exp = [
-				[ 'Kovacek-Aufderhar', 'Hahn and Sons', 13, 0.43333 ],
-				[ 'Kovacek-Aufderhar', 'Rutherford, Gerlach and Jones', 14, 0.46667 ],
-				[ 'Kovacek-Aufderhar', 'Hirthe Group', 15, 0.5 ],
-				[ 'Kovacek-Aufderhar', 'Boehm LLC', 16, 0.53333 ],
-				[ 'Kovacek-Aufderhar', 'Jaskolski Inc', 16, 0.53333 ],
-				[ 'Kovacek-Aufderhar', 'Pouros PLC', 18, 0.6 ],
-				[ 'Kovacek-Aufderhar', "O'Kon, Cormier and Jast", 23, 0.76667 ],
-				[ 'Kovacek-Aufderhar', 'Hilll-Schiller', 23, 0.76667 ],
-				[ 'Kovacek-Aufderhar', 'Rippin Group', 23, 0.76667 ],
-				[ 'Kovacek-Aufderhar', 'Durgan LLC', 23, 0.76667 ]
+				['Kovacek-Aufderhar', 'Hahn and Sons', 13, 0.43333],
+				['Kovacek-Aufderhar', 'Rutherford, Gerlach and Jones', 14, 0.46667],
+				['Kovacek-Aufderhar', 'Hirthe Group', 15, 0.5],
+				['Kovacek-Aufderhar', 'Boehm LLC', 16, 0.53333],
+				['Kovacek-Aufderhar', 'Jaskolski Inc', 16, 0.53333],
+				['Kovacek-Aufderhar', 'Pouros PLC', 18, 0.6],
+				['Kovacek-Aufderhar', "O'Kon, Cormier and Jast", 23, 0.76667],
+				['Kovacek-Aufderhar', 'Hilll-Schiller', 23, 0.76667],
+				['Kovacek-Aufderhar', 'Rippin Group', 23, 0.76667],
+				['Kovacek-Aufderhar', 'Durgan LLC', 23, 0.76667]
 			];
 			const myCompany = Array.from(g.outs(me, EDGE_TYPES.WorksFor))[0];
 			const employeesByCompany = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			const skillsByCompany = ex.accumulateSetsFromSets(employeesByCompany, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simSource(setSimFuncs.jaccard, myCompany.label, skillsByCompany, {knn: 10, sort: sortFuncs.asc});
+			const sims = simSource(setSimFuncs.jaccard, myCompany.label, skillsByCompany, { knn: 10, sort: sortFuncs.asc });
 			const sims_res = Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]);
 			// console.log(sims_res);
 			expect(sims_res.length).toBe(10);
@@ -606,7 +606,7 @@ describe('similarity measures - ', () => {
 		it('companies employing people with overlapping skill sets', () => {
 			const employees = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			const empSkills = ex.accumulateSetsFromSets(employees, DIR.out, EDGE_TYPES.HasSkill);
-			const sims = simPairwise(setSimFuncs.jaccard, empSkills, {knn: 10, cutFunc: cutFuncs.below, cutoff: 0.99});
+			const sims = simPairwise(setSimFuncs.jaccard, empSkills, { knn: 10, cutFunc: cutFuncs.below, cutoff: 0.99 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -614,7 +614,7 @@ describe('similarity measures - ', () => {
 		it('companies employing people with overlapping social groups', () => {
 			const employees = ex.accumulateSetsFromNodes(NODE_TYPES.Company, DIR.in, EDGE_TYPES.WorksFor);
 			const empFriends = ex.accumulateSetsFromSets(employees, DIR.out, EDGE_TYPES.Knows);
-			const sims = simPairwise(setSimFuncs.jaccard, empFriends, {knn: 10, cutFunc: cutFuncs.below, cutoff: 0.99});
+			const sims = simPairwise(setSimFuncs.jaccard, empFriends, { knn: 10, cutFunc: cutFuncs.below, cutoff: 0.99 });
 			// console.log(Array.from(sims).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -711,7 +711,7 @@ describe('similarity measures - ', () => {
 		it('via overlapping social group employers - by source', () => {
 			const allPeopleSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
 			const employers = ex.accumulateSetsFromSets(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
-			const simPeopleByEmployer = simSource(setSimFuncs.jaccard, me.label, employers, {knn: 10});
+			const simPeopleByEmployer = simSource(setSimFuncs.jaccard, me.label, employers, { knn: 10 });
 			// console.log(Array.from(simPeopleByEmployer).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -722,7 +722,7 @@ describe('similarity measures - ', () => {
 		it('via overlapping social group employers - pairwise', () => {
 			const allPeopleSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
 			const employers = ex.accumulateSetsFromSets(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
-			const simPeopleByEmployer = simPairwise(setSimFuncs.jaccard, employers, {knn: 10});
+			const simPeopleByEmployer = simPairwise(setSimFuncs.jaccard, employers, { knn: 10 });
 			// console.log(Array.from(simPeopleByEmployer).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 
@@ -734,7 +734,7 @@ describe('similarity measures - ', () => {
 			const allPeopleSets = ex.accumulateSetsFromNodes(NODE_TYPES.Person, DIR.out, EDGE_TYPES.Knows);
 			const employers = ex.accumulateSetsFromSets(allPeopleSets, DIR.out, EDGE_TYPES.WorksFor);
 			const countries = ex.accumulateSetsFromSets(employers, DIR.out, EDGE_TYPES.LocatedIn);
-			const simPeopleByEmployerCountry = simSource(setSimFuncs.jaccard, me.label, countries, {knn: 10});
+			const simPeopleByEmployerCountry = simSource(setSimFuncs.jaccard, me.label, countries, { knn: 10 });
 			// console.log(Array.from(simPeopleByEmployerCountry).map(c => [g.n(c.from).f('name'), g.n(c.to).f('name'), c.isect, c.sim]));
 		});
 

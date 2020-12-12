@@ -1,18 +1,22 @@
 module.exports = {
   preset: 'ts-jest',
+  // transform: {
+  //   '^.+\\.ts?$': 'babel-jest',
+  // },
   testEnvironment: 'jsdom',
   verbose: true,
   collectCoverage: false,
   watchPathIgnorePatterns: [
     "/lib",
-    // "/data",
-    "/public",
-    "/scripts"
+    "/public"
   ],
   "globals": {
     "window": {}
   },
   testMatch: [
-    '**/test/datasets/**/*.test.ts'
+    '**/test/**/*.test.ts'
   ],
+  transform: {
+    ".(js|ts)": "ts-jest"
+  },
 };

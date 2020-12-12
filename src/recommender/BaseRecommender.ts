@@ -1,9 +1,4 @@
-import {TypedEdge, ITypedEdge} from 'graphinius/lib/core/typed/TypedEdge';
-import {TypedNode, ITypedNode} from 'graphinius/lib/core/typed/TypedNode';
-import {TypedGraph} from 'graphinius/lib/core/typed/TypedGraph';
-import * as $I from 'graphinius/lib/similarities/interfaces';
-import {simFuncs as setSims} from 'graphinius/lib/similarities/SetSimilarities';
-import {simFuncs as scoreSims} from 'graphinius/lib/similarities/ScoreSimilarities';
+import {ITypedNode, TypedGraph, setSimFuncs, scoreSimFuncs } from 'graphinius';
 import {TheExpanse} from "./TheExpanse";
 
 

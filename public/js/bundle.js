@@ -1,35 +1,57 @@
 
-(function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('path'), require('fs'), require('https')) :
-    typeof define === 'function' && define.amd ? define(['path', 'fs', 'https'], factory) :
-    (global = global || self, factory(global.path, global.fs, global.https));
-}(this, function (path, fs, https) { 'use strict';
-
-    path = path && path.hasOwnProperty('default') ? path['default'] : path;
-    fs = fs && fs.hasOwnProperty('default') ? fs['default'] : fs;
-    https = https && https.hasOwnProperty('default') ? https['default'] : https;
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('fs'), require('path'), require('https')) :
+    typeof define === 'function' && define.amd ? define(['fs', 'path', 'https'], factory) :
+    (global = global || self, factory(global.fs, global.path, global.https));
+}(this, (function (fs, path, https) { 'use strict';
 
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    var __assign = function() {
+        __assign = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
 
     function __awaiter(thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
             function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
@@ -62,85 +84,48 @@
         }
     }
 
-    function __values(o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
+    function __spreadArrays() {
+        for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+        for (var r = Array(s), k = 0, i = 0; i < il; i++)
+            for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+                r[k] = a[j];
+        return r;
     }
 
-    function __read(o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    }
-
-    function __spread() {
-        for (var ar = [], i = 0; i < arguments.length; i++)
-            ar = ar.concat(__read(arguments[i]));
-        return ar;
-    }
-
-    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-    function unwrapExports (x) {
-    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-    }
-
-    function createCommonjsModule(fn, module) {
-    	return module = { exports: {} }, fn(module, module.exports), module.exports;
-    }
-
-    var interfaces = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
+    /*----------------------------------------*/
+    /*							BASE GRAPH								*/
+    /*----------------------------------------*/
+    /**
+     * @todo maybe refactor to more sensible value(type)s...
+     */
     var DIR;
     (function (DIR) {
         DIR["in"] = "ins";
         DIR["out"] = "outs";
         DIR["und"] = "unds";
-    })(DIR = exports.DIR || (exports.DIR = {}));
+    })(DIR || (DIR = {}));
     var GraphMode;
     (function (GraphMode) {
         GraphMode[GraphMode["INIT"] = 0] = "INIT";
         GraphMode[GraphMode["DIRECTED"] = 1] = "DIRECTED";
         GraphMode[GraphMode["UNDIRECTED"] = 2] = "UNDIRECTED";
         GraphMode[GraphMode["MIXED"] = 3] = "MIXED";
-    })(GraphMode = exports.GraphMode || (exports.GraphMode = {}));
-    });
+    })(GraphMode || (GraphMode = {}));
 
-    unwrapExports(interfaces);
-    var interfaces_1 = interfaces.DIR;
-    var interfaces_2 = interfaces.GraphMode;
-
-    var run_config = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
     var CMD_ENV_LOG = 'G_LOG';
     var GENERIC_TYPES = {
         Node: 'GENERIC',
         Edge: 'GENERIC',
         Graph: 'GENERIC'
     };
-    exports.GENERIC_TYPES = GENERIC_TYPES;
     var LOG_LEVELS = {
         debug: 'debug',
         production: 'production'
     };
-    exports.LOG_LEVELS = LOG_LEVELS;
+    /**
+     * Also checking if CMD line argument is given, which might not be the case
+     * when running automated test cases.
+     */
     function runLevel() {
         var log_level = LOG_LEVELS.production;
         if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env && process.env[CMD_ENV_LOG]) {
@@ -148,16 +133,6 @@
         }
         return log_level;
     }
-    exports.runLevel = runLevel;
-    });
-
-    unwrapExports(run_config);
-    var run_config_1 = run_config.GENERIC_TYPES;
-    var run_config_2 = run_config.LOG_LEVELS;
-    var run_config_3 = run_config.runLevel;
-
-    var Logger_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
 
     var LogColors;
     (function (LogColors) {
@@ -177,17 +152,17 @@
         LogColors[LogColors["BgMagenta"] = 45] = "BgMagenta";
         LogColors[LogColors["BgCyan"] = 46] = "BgCyan";
         LogColors[LogColors["BgWhite"] = 47] = "BgWhite";
-    })(LogColors = exports.LogColors || (exports.LogColors = {}));
-    var DEFAULT_COLOR = 37;
-    var Logger = (function () {
+    })(LogColors || (LogColors = {}));
+    var DEFAULT_COLOR = 37; // white
+    var Logger = /** @class */ (function () {
         function Logger(config) {
             this.config = config || {
-                log_level: run_config.runLevel()
+                log_level: runLevel()
             };
         }
         Logger.prototype.log = function (msg, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     console.log.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
                 }
@@ -200,7 +175,7 @@
         };
         Logger.prototype.error = function (err, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     console.error.call(console, Logger.colorize(color, err, bright));
                 }
@@ -213,7 +188,7 @@
         };
         Logger.prototype.dir = function (obj, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     console.dir.call(console, Logger.colorize(DEFAULT_COLOR, obj, bright));
                 }
@@ -226,7 +201,7 @@
         };
         Logger.prototype.info = function (msg, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     console.info.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
                 }
@@ -239,7 +214,7 @@
         };
         Logger.prototype.warn = function (msg, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     console.warn.call(console, Logger.colorize(DEFAULT_COLOR, msg, bright));
                 }
@@ -252,7 +227,7 @@
         };
         Logger.prototype.write = function (msg, color, bright) {
             if (bright === void 0) { bright = false; }
-            if (this.config.log_level === run_config.LOG_LEVELS.debug) {
+            if (this.config.log_level === LOG_LEVELS.debug) {
                 if (color) {
                     process.stdout.write.call(process.stdout, Logger.colorize(DEFAULT_COLOR, msg, bright));
                 }
@@ -263,254 +238,25 @@
             }
             return false;
         };
+        /**
+         * @todo this one prevents objects from being output in detail ([object Object])
+         * @param color
+         * @param output
+         * @param bright
+         */
         Logger.colorize = function (color, output, bright) {
             var out_bright = bright ? '\x1b[1m' : null;
             return [out_bright, '\x1b[', color, 'm', output, '\x1b[0m'].join('');
         };
         return Logger;
     }());
-    exports.Logger = Logger;
-    });
 
-    unwrapExports(Logger_1);
-    var Logger_2 = Logger_1.LogColors;
-    var Logger_3 = Logger_1.Logger;
+    var logger = new Logger();
 
-    var ComputeGraph_1 = createCommonjsModule(function (module, exports) {
-    var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
-        return new (P || (P = Promise))(function (resolve, reject) {
-            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-            function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
-    var __generator = (commonjsGlobal && commonjsGlobal.__generator) || function (thisArg, body) {
-        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-        function verb(n) { return function (v) { return step([n, v]); }; }
-        function step(op) {
-            if (f) throw new TypeError("Generator is already executing.");
-            while (_) try {
-                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-                if (y = 0, t) op = [op[0] & 2, t.value];
-                switch (op[0]) {
-                    case 0: case 1: t = op; break;
-                    case 4: _.label++; return { value: op[1], done: false };
-                    case 5: _.label++; y = op[1]; op = [0]; continue;
-                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                    default:
-                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                        if (t[2]) _.ops.pop();
-                        _.trys.pop(); continue;
-                }
-                op = body.call(thisArg, _);
-            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-        }
-    };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var logger = new Logger_1.Logger();
-    var DEFAULT_WEIGHT = 1;
-    var ComputeGraph = (function () {
-        function ComputeGraph(_g, _tf) {
-            this._g = _g;
-            this._tf = _tf;
-        }
-        ComputeGraph.prototype.nextArray = function (incoming) {
-            if (incoming === void 0) { incoming = false; }
-            var next = [], node_keys = Object.keys(this._g.getNodes());
-            var adjDict = this.adjListW(incoming, true, 0);
-            for (var i = 0; i < this._g.nrNodes(); ++i) {
-                next.push([]);
-                for (var j = 0; j < this._g.nrNodes(); ++j) {
-                    next[i].push([]);
-                    next[i][j].push(i === j ? j : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? j : null);
-                }
-            }
-            return next;
-        };
-        ComputeGraph.prototype.adjMatrix = function () {
-            var adjList = [], node_keys = Object.keys(this._g.getNodes());
-            var adjDict = this.adjListW();
-            for (var i = 0; i < this._g.nrNodes(); ++i) {
-                adjList.push([]);
-                for (var j = 0; j < this._g.nrNodes(); ++j) {
-                    adjList[i].push(i === j ? 0 : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? 1 : 0);
-                }
-            }
-            return adjList;
-        };
-        ComputeGraph.prototype.adjMatrixW = function (incoming, include_self, self_dist) {
-            if (incoming === void 0) { incoming = false; }
-            if (include_self === void 0) { include_self = false; }
-            if (self_dist === void 0) { self_dist = 0; }
-            var adjList = [], node_keys = Object.keys(this._g.getNodes());
-            var adjDict = this.adjListW(incoming, include_self, self_dist);
-            for (var i = 0; i < this._g.nrNodes(); ++i) {
-                adjList.push([]);
-                for (var j = 0; j < this._g.nrNodes(); ++j) {
-                    adjList[i].push(i === j ? self_dist : isFinite(adjDict[node_keys[i]][node_keys[j]]) ? adjDict[node_keys[i]][node_keys[j]] : Number.POSITIVE_INFINITY);
-                }
-            }
-            return adjList;
-        };
-        ComputeGraph.prototype.adjListW = function (incoming, include_self, self_dist) {
-            if (incoming === void 0) { incoming = false; }
-            if (include_self === void 0) { include_self = false; }
-            if (self_dist === void 0) { self_dist = 0; }
-            var adj_list_dict = {}, nodes = this._g.getNodes(), cur_dist, key, cur_edge_weight;
-            for (key in nodes) {
-                adj_list_dict[key] = {};
-                if (include_self) {
-                    adj_list_dict[key][key] = self_dist;
-                }
-            }
-            for (key in nodes) {
-                var neighbors = incoming ? nodes[key].reachNodes().concat(nodes[key].prevNodes()) : nodes[key].reachNodes();
-                neighbors.forEach(function (ne) {
-                    cur_dist = adj_list_dict[key][ne.node.getID()] || Number.POSITIVE_INFINITY;
-                    cur_edge_weight = isNaN(ne.edge.getWeight()) ? DEFAULT_WEIGHT : ne.edge.getWeight();
-                    if (cur_edge_weight < cur_dist) {
-                        adj_list_dict[key][ne.node.getID()] = cur_edge_weight;
-                        if (incoming) {
-                            adj_list_dict[ne.node.getID()][key] = cur_edge_weight;
-                        }
-                    }
-                    else {
-                        adj_list_dict[key][ne.node.getID()] = cur_dist;
-                        if (incoming) {
-                            adj_list_dict[ne.node.getID()][key] = cur_dist;
-                        }
-                    }
-                });
-            }
-            return adj_list_dict;
-        };
-        ComputeGraph.prototype.triadCount = function (directed) {
-            if (directed === void 0) { directed = false; }
-            var e_1, _a;
-            var triangle_count = 0;
-            var nodes = Object.values(this._g.getNodes());
-            var deg;
-            try {
-                for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
-                    var n = nodes_1_1.value;
-                    if (directed) {
-                        triangle_count += (n.in_deg - n.self_in_deg) * (n.out_deg - n.self_out_deg);
-                    }
-                    else {
-                        deg = n.deg - n.self_deg;
-                        triangle_count += deg * (deg - 1) / 2;
-                    }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            return triangle_count;
-        };
-        ComputeGraph.prototype.triangleCount = function (directed) {
-            if (directed === void 0) { directed = false; }
-            return __awaiter(this, void 0, void 0, function () {
-                var adj_list, a, aux2, aux3, trace, i;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!this._tf || !this._tf.matMul) {
-                                throw new Error("Tensorflow & TF matMul function must be present in order to compute transitivity.");
-                            }
-                            adj_list = this.adjMatrix();
-                            a = this._tf.tensor2d(adj_list);
-                            return [4, a.matMul(a).array()];
-                        case 1:
-                            aux2 = _a.sent();
-                            return [4, a.matMul(aux2).array()];
-                        case 2:
-                            aux3 = _a.sent();
-                            trace = 0;
-                            for (i = 0; i < aux3.length; i++) {
-                                trace += aux3[i][i];
-                            }
-                            return [2, directed ? trace / 3 : trace / 6];
-                    }
-                });
-            });
-        };
-        ComputeGraph.prototype.transitivity = function (directed) {
-            if (directed === void 0) { directed = false; }
-            return __awaiter(this, void 0, void 0, function () {
-                var triangles, triads;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4, this.triangleCount(directed)];
-                        case 1:
-                            triangles = _a.sent();
-                            triads = this.triadCount(directed);
-                            return [2, 3 * triangles / triads];
-                    }
-                });
-            });
-        };
-        ComputeGraph.prototype.clustCoef = function (directed) {
-            if (directed === void 0) { directed = false; }
-            return __awaiter(this, void 0, void 0, function () {
-                var result, adj_list, a, aux2, aux3, deg, node, cci, keys, i;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!this._tf || !this._tf.matMul) {
-                                throw new Error("Tensorflow & TF matMul function must be present in order to compute clustering coef.");
-                            }
-                            result = {};
-                            adj_list = this.adjMatrix();
-                            a = this._tf.tensor2d(adj_list);
-                            return [4, a.matMul(a).array()];
-                        case 1:
-                            aux2 = _a.sent();
-                            return [4, a.matMul(aux2).array()];
-                        case 2:
-                            aux3 = _a.sent();
-                            keys = Object.keys(this._g.getNodes());
-                            for (i in aux3[0]) {
-                                node = this._g.getNodeById(keys[i]);
-                                deg = directed ? node.in_deg + node.out_deg : node.deg;
-                                cci = (aux3[i][i] / (deg * (deg - 1))) || 0;
-                                result[i] = directed ? 2 * cci : cci;
-                            }
-                            return [2, result];
-                    }
-                });
-            });
-        };
-        return ComputeGraph;
-    }());
-    exports.ComputeGraph = ComputeGraph;
-    });
-
-    unwrapExports(ComputeGraph_1);
-    var ComputeGraph_2 = ComputeGraph_1.ComputeGraph;
-
-    var CallbackUtils = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * @param cbs
+     * @param context this pointer to the DFS or DFSVisit function
+     */
     function execCallbacks(cbs, context) {
         cbs.forEach(function (cb) {
             if (typeof cb === 'function') {
@@ -521,27 +267,39 @@
             }
         });
     }
-    exports.execCallbacks = execCallbacks;
-    });
 
-    unwrapExports(CallbackUtils);
-    var CallbackUtils_1 = CallbackUtils.execCallbacks;
-
-    var BFS_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
+    /**
+     * Breadth first search - usually performed to see
+     * reachability etc. Therefore we do not want 'segments'
+     * or 'components' of our graph, but simply one well
+     * defined result segment covering the whole graph.
+     *
+     * @param graph the graph to perform BFS on
+     * @param v the vertex to use as a start vertex
+     * @param config an optional config object, will be
+     * automatically instantiated if not passed by caller
+     * @returns {{}}
+     * @constructor
+     */
     function BFS(graph, v, config) {
         config = config || prepareBFSStandardConfig();
         var callbacks = config.callbacks;
         var dir_mode = config.dir_mode;
-        if (graph.getMode() === interfaces.GraphMode.INIT) {
+        /**
+         * We are not traversing an empty graph...
+         */
+        if (graph.getMode() === GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === interfaces.GraphMode.INIT) {
+        /**
+         * We are not traversing a graph taking NO edges into account
+         */
+        if (dir_mode === GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
+        // scope to pass to callbacks at different stages of execution
         var bfsScope = {
+            // marked: {},
             nodes: graph.getNodes(),
             queue: [],
             current: null,
@@ -550,46 +308,61 @@
             root_node: v,
             adj_nodes: []
         };
+        /**
+           * HOOK 1: BFS INIT
+           */
         if (callbacks.init_bfs) {
-            CallbackUtils.execCallbacks(callbacks.init_bfs, bfsScope);
+            execCallbacks(callbacks.init_bfs, bfsScope);
         }
         bfsScope.queue.push(v);
         var i = 0;
         while (i < bfsScope.queue.length) {
             bfsScope.current = bfsScope.queue[i++];
-            if (dir_mode === interfaces.GraphMode.MIXED) {
+            /**
+             * Do we move only in the directed subgraph,
+             * undirected subgraph or complete (mixed) graph?
+             */
+            if (dir_mode === GraphMode.MIXED) {
                 bfsScope.adj_nodes = bfsScope.current.reachNodes();
             }
-            else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
+            else if (dir_mode === GraphMode.UNDIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.connNodes();
             }
-            else if (dir_mode === interfaces.GraphMode.DIRECTED) {
+            else if (dir_mode === GraphMode.DIRECTED) {
                 bfsScope.adj_nodes = bfsScope.current.nextNodes();
             }
             else {
                 bfsScope.adj_nodes = [];
             }
+            /**
+             * HOOK 2 - Sort adjacent nodes
+             */
             if (typeof callbacks.sort_nodes === 'function') {
                 callbacks.sort_nodes(bfsScope);
             }
             for (var adj_idx in bfsScope.adj_nodes) {
                 bfsScope.next_node = bfsScope.adj_nodes[adj_idx].node;
                 bfsScope.next_edge = bfsScope.adj_nodes[adj_idx].edge;
+                /**
+                 * HOOK 3 - Node unmarked
+                 */
                 if (config.result[bfsScope.next_node.getID()].distance === Number.POSITIVE_INFINITY) {
                     if (callbacks.node_unmarked) {
-                        CallbackUtils.execCallbacks(callbacks.node_unmarked, bfsScope);
+                        execCallbacks(callbacks.node_unmarked, bfsScope);
                     }
                 }
                 else {
+                    /**
+                     * HOOK 4 - Node marked
+                     */
                     if (callbacks.node_marked) {
-                        CallbackUtils.execCallbacks(callbacks.node_marked, bfsScope);
+                        execCallbacks(callbacks.node_marked, bfsScope);
                     }
                 }
             }
         }
         return config.result;
     }
-    exports.BFS = BFS;
     function prepareBFSStandardConfig() {
         var config = {
             result: {},
@@ -599,7 +372,7 @@
                 node_marked: [],
                 sort_nodes: undefined
             },
-            dir_mode: interfaces.GraphMode.MIXED,
+            dir_mode: GraphMode.MIXED,
             messages: {},
             filters: {}
         }, result = config.result, callbacks = config.callbacks;
@@ -607,6 +380,9 @@
         var counter = function () {
             return count++;
         };
+        /**
+         * Standard INIT callback
+         */
         var initBFS = function (context) {
             for (var key in context.nodes) {
                 config.result[key] = {
@@ -615,6 +391,7 @@
                     counter: -1
                 };
             }
+            // initialize root node entry
             config.result[context.root_node.getID()] = {
                 distance: 0,
                 parent: context.root_node,
@@ -622,6 +399,8 @@
             };
         };
         callbacks.init_bfs.push(initBFS);
+        // Standard Node unmarked callback
+        // have to populate respective result entry
         var nodeUnmarked = function (context) {
             config.result[context.next_node.getID()] = {
                 distance: result[context.current.getID()].distance + 1,
@@ -633,18 +412,19 @@
         callbacks.node_unmarked.push(nodeUnmarked);
         return config;
     }
-    exports.prepareBFSStandardConfig = prepareBFSStandardConfig;
-    });
 
-    unwrapExports(BFS_1);
-    var BFS_2 = BFS_1.BFS;
-    var BFS_3 = BFS_1.prepareBFSStandardConfig;
-
-    var DFS_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
+    /**
+     * DFS Visit - one run to see what nodes are reachable
+     * from a given "current" root node
+     *
+     * @param graph
+     * @param current_root
+     * @param config
+     * @returns {{}}
+     * @constructor
+     */
     function DFSVisit(graph, current_root, config) {
+        // scope to pass to callbacks at different stages of execution
         var dfsVisitScope = {
             stack: [],
             adj_nodes: [],
@@ -654,40 +434,65 @@
         };
         config = config || prepareDFSVisitStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === interfaces.GraphMode.INIT) {
+        /**
+         * We are not traversing an empty graph...
+         */
+        if (graph.getMode() === GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === interfaces.GraphMode.INIT) {
+        /**
+           * We are not traversing a graph taking NO edges into account
+           */
+        if (dir_mode === GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
+        /**
+         * HOOK 1 - INIT (INNER DFS VISIT):
+         * Initializing a possible result object,
+         * possibly with the current_root;
+         */
         if (callbacks.init_dfs_visit) {
-            CallbackUtils.execCallbacks(callbacks.init_dfs_visit, dfsVisitScope);
+            execCallbacks(callbacks.init_dfs_visit, dfsVisitScope);
         }
+        // Start by pushing current root to the stack
         dfsVisitScope.stack.push({
             node: current_root,
             parent: current_root,
-            weight: 0
+            weight: 0 // initial weight cost from current_root
         });
         while (dfsVisitScope.stack.length) {
             dfsVisitScope.stack_entry = dfsVisitScope.stack.pop();
             dfsVisitScope.current = dfsVisitScope.stack_entry.node;
+            /**
+             * HOOK 2 - AQUIRED CURRENT NODE / POPPED NODE
+             */
             if (callbacks.node_popped) {
-                CallbackUtils.execCallbacks(callbacks.node_popped, dfsVisitScope);
+                execCallbacks(callbacks.node_popped, dfsVisitScope);
             }
             if (!config.dfs_visit_marked[dfsVisitScope.current.getID()]) {
                 config.dfs_visit_marked[dfsVisitScope.current.getID()] = true;
+                /**
+                 * HOOK 3 - CURRENT NODE UNMARKED
+                 */
                 if (callbacks.node_unmarked) {
-                    CallbackUtils.execCallbacks(callbacks.node_unmarked, dfsVisitScope);
+                    execCallbacks(callbacks.node_unmarked, dfsVisitScope);
                 }
-                if (dir_mode === interfaces.GraphMode.MIXED) {
+                /**
+                 * Do we move only in the directed subgraph,
+                 * undirected subgraph or complete (mixed) graph?
+                 */
+                if (dir_mode === GraphMode.MIXED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.reachNodes();
                 }
-                else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
+                else if (dir_mode === GraphMode.UNDIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.connNodes();
                 }
-                else if (dir_mode === interfaces.GraphMode.DIRECTED) {
+                else if (dir_mode === GraphMode.DIRECTED) {
                     dfsVisitScope.adj_nodes = dfsVisitScope.current.nextNodes();
                 }
+                /**
+                 * HOOK 4 - SORT ADJACENT NODES
+                 */
                 if (typeof callbacks.sort_nodes === 'function') {
                     callbacks.sort_nodes(dfsVisitScope);
                 }
@@ -698,74 +503,117 @@
                         weight: dfsVisitScope.adj_nodes[adj_idx].edge.getWeight()
                     });
                 }
+                /**
+                 * HOOK 6 - ADJACENT NODES PUSHED - LEAVING CURRENT NODE
+                 */
                 if (callbacks.adj_nodes_pushed) {
-                    CallbackUtils.execCallbacks(callbacks.adj_nodes_pushed, dfsVisitScope);
+                    execCallbacks(callbacks.adj_nodes_pushed, dfsVisitScope);
                 }
             }
             else {
+                /**
+                 * HOOK 7 - CURRENT NODE ALREADY MARKED
+                 */
                 if (callbacks.node_marked) {
-                    CallbackUtils.execCallbacks(callbacks.node_marked, dfsVisitScope);
+                    execCallbacks(callbacks.node_marked, dfsVisitScope);
                 }
             }
         }
         return config.visit_result;
     }
-    exports.DFSVisit = DFSVisit;
+    /**
+     * Depth first search - used for reachability / exploration
+     * of graph structure and as a basis for topological sorting
+     * and component / community analysis.
+     * Because DFS can be used as a basis for many other algorithms,
+     * we want to keep the result as generic as possible to be
+     * populated by the caller rather than the core DFS algorithm.
+     *
+     * @param graph
+     * @param root
+     * @param config
+     * @returns {{}[]}
+     * @constructor
+     */
     function DFS(graph, root, config) {
         config = config || prepareDFSStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode;
-        if (graph.getMode() === interfaces.GraphMode.INIT) {
+        if (graph.getMode() === GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === interfaces.GraphMode.INIT) {
+        if (dir_mode === GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
         var dfsScope = {
             marked: {},
             nodes: graph.getNodes()
         };
+        /**
+         * HOOK 1 - INIT (OUTER DFS)
+         */
         if (callbacks.init_dfs) {
-            CallbackUtils.execCallbacks(callbacks.init_dfs, dfsScope);
+            execCallbacks(callbacks.init_dfs, dfsScope);
         }
         callbacks.adj_nodes_pushed = callbacks.adj_nodes_pushed || [];
         var markNode = function (context) {
             dfsScope.marked[context.current.getID()] = true;
         };
         callbacks.adj_nodes_pushed.push(markNode);
+        // We need to put our results into segments
+        // for easy counting of 'components'
+        // TODO refactor for count & counter...
         var dfs_result = [{}];
         var dfs_idx = 0;
         var count = 0;
         var counter = function () {
             return count++;
         };
+        /**
+         * We not only add new nodes to the result object
+         * of DFSVisit, but also to it's appropriate
+         * segment of the dfs_result object
+         */
         var addToProperSegment = function (context) {
             dfs_result[dfs_idx][context.current.getID()] = {
                 parent: context.stack_entry.parent,
                 counter: counter()
             };
         };
+        // check if a callbacks object has been instantiated
         if (callbacks && callbacks.node_unmarked) {
             callbacks.node_unmarked.push(addToProperSegment);
         }
+        // Start with root node, no matter what
         DFSVisit(graph, root, config);
+        // Now take the rest in 'normal' order
         for (var node_key in dfsScope.nodes) {
             if (!dfsScope.marked[node_key]) {
+                // Next segment in dfs_results
                 dfs_idx++;
                 dfs_result.push({});
+                // Explore and fill next subsegment
                 DFSVisit(graph, dfsScope.nodes[node_key], config);
             }
         }
+        // console.dir(config.visit_result);
         return dfs_result;
     }
-    exports.DFS = DFS;
+    /**
+     * This is the only place in which a config object
+     * is instantiated (except manually, of course)
+     *
+     * Therefore, we do not take any arguments
+     */
     function prepareDFSVisitStandardConfig() {
         var config = {
             visit_result: {},
             callbacks: {},
             messages: {},
             dfs_visit_marked: {},
-            dir_mode: interfaces.GraphMode.MIXED
+            dir_mode: GraphMode.MIXED
         }, result = config.visit_result, callbacks = config.callbacks;
+        // internal letiable for order of visit
+        // during DFS Visit                      
         var count = 0;
         var counter = function () {
             return count++;
@@ -787,32 +635,45 @@
         callbacks.node_unmarked.push(setResultEntry);
         return config;
     }
-    exports.prepareDFSVisitStandardConfig = prepareDFSVisitStandardConfig;
+    /**
+     * First instantiates config file for DFSVisit, then
+     * enhances it with outer DFS init callback
+     */
     function prepareDFSStandardConfig() {
+        // First prepare DFS Visit callbacks
         var config = prepareDFSVisitStandardConfig(), callbacks = config.callbacks;
+        // result = config.visit_result;
+        // Now add outer DFS INIT callback
         callbacks.init_dfs = callbacks.init_dfs || [];
         var setInitialResultEntries = function (context) {
+            // for ( let node_id in context.nodes ) {
+            // 	result[node_id] = {
+            // 		parent: null,
+            // 		counter: -1
+            // 	}
+            // }
         };
         callbacks.init_dfs.push(setInitialResultEntries);
         return config;
     }
-    exports.prepareDFSStandardConfig = prepareDFSStandardConfig;
-    });
 
-    unwrapExports(DFS_1);
-    var DFS_2 = DFS_1.DFSVisit;
-    var DFS_3 = DFS_1.DFS;
-    var DFS_4 = DFS_1.prepareDFSVisitStandardConfig;
-    var DFS_5 = DFS_1.prepareDFSStandardConfig;
-
-    var BinaryHeap_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
     var BinaryHeapMode;
     (function (BinaryHeapMode) {
         BinaryHeapMode[BinaryHeapMode["MIN"] = 0] = "MIN";
         BinaryHeapMode[BinaryHeapMode["MAX"] = 1] = "MAX";
-    })(BinaryHeapMode = exports.BinaryHeapMode || (exports.BinaryHeapMode = {}));
-    var BinaryHeap = (function () {
+    })(BinaryHeapMode || (BinaryHeapMode = {}));
+    /**
+     * We only support unique object ID's for now !!!
+     * @TODO Rename into "ObjectBinaryHeap" or such...
+     */
+    var BinaryHeap = /** @class */ (function () {
+        /**
+         * Mode of a min heap should only be set upon
+         * instantiation and never again afterwards...
+         * @param _mode MIN or MAX heap
+         * @param _evalObjID function to determine an object's identity
+         * @param _evalPriority function to determine an objects score
+         */
         function BinaryHeap(_mode, _evalPriority, _evalObjID) {
             if (_mode === void 0) { _mode = BinaryHeapMode.MIN; }
             if (_evalPriority === void 0) { _evalPriority = function (obj) {
@@ -830,7 +691,7 @@
             this._mode = _mode;
             this._evalPriority = _evalPriority;
             this._evalObjID = _evalObjID;
-            this._nr_removes = 0;
+            this._nr_removes = 0; // just for debugging
             this._array = [];
             this._positions = {};
         }
@@ -870,10 +731,18 @@
             var pos = this.getNodePosition(obj);
             return this._array[pos];
         };
+        /**
+         * Insert - Adding an object to the heap
+         * @param obj the obj to add to the heap
+         * @returns {number} the objects index in the internal array
+         */
         BinaryHeap.prototype.insert = function (obj) {
             if (isNaN(this._evalPriority(obj))) {
                 throw new Error("Cannot insert object without numeric priority.");
             }
+            /**
+             * @todo if we keep the unique ID stuff, check for it here and throw an Error if needed...
+             */
             this._array.push(obj);
             this.setNodePosition(obj, this.size() - 1);
             this.trickleUp(this.size() - 1);
@@ -901,9 +770,11 @@
             var parent = this._array[i];
             while (true) {
                 var right_child_idx = (i + 1) * 2, left_child_idx = right_child_idx - 1, right_child = this._array[right_child_idx], left_child = this._array[left_child_idx], swap = null;
+                // check if left child exists && is larger than parent
                 if (left_child_idx < this.size() && !this.orderCorrect(parent, left_child)) {
                     swap = left_child_idx;
                 }
+                // check if right child exists && is larger than parent
                 if (right_child_idx < this.size() && !this.orderCorrect(parent, right_child)
                     && !this.orderCorrect(left_child, right_child)) {
                     swap = right_child_idx;
@@ -911,8 +782,10 @@
                 if (swap === null) {
                     break;
                 }
+                // we only have to swap one child, doesn't matter which one
                 this._array[i] = this._array[swap];
                 this._array[swap] = parent;
+                // console.log(`Trickle down: swapping ${this._array[i]} and ${this._array[swap]}`);
                 this.setNodePosition(this._array[i], i);
                 this.setNodePosition(this._array[swap], swap);
                 i = swap;
@@ -920,16 +793,18 @@
         };
         BinaryHeap.prototype.trickleUp = function (i) {
             var child = this._array[i];
+            // Can only trickle up from positive levels
             while (i) {
-                var parent_idx = Math.floor((i + 1) / 2) - 1, parent_1 = this._array[parent_idx];
-                if (this.orderCorrect(parent_1, child)) {
+                var parent_idx = Math.floor((i + 1) / 2) - 1, parent = this._array[parent_idx];
+                if (this.orderCorrect(parent, child)) {
                     break;
                 }
                 else {
                     this._array[parent_idx] = child;
-                    this._array[i] = parent_1;
+                    this._array[i] = parent;
+                    // console.log(`Trickle up: swapping ${child} and ${parent}`);
                     this.setNodePosition(child, parent_idx);
-                    this.setNodePosition(parent_1, i);
+                    this.setNodePosition(parent, i);
                     i = parent_idx;
                 }
             }
@@ -944,6 +819,11 @@
                 return obj_a_pr >= obj_b_pr;
             }
         };
+        /**
+         * Superstructure to enable search in BinHeap in O(1)
+         * @param obj
+         * @param pos
+         */
         BinaryHeap.prototype.setNodePosition = function (obj, pos) {
             if (obj == null || pos == null || pos !== (pos | 0)) {
                 throw new Error('minium required arguments are obj and new_pos');
@@ -955,47 +835,63 @@
             var obj_key = this.evalInputObjID(obj);
             this._positions[obj_key] = pos_obj;
         };
+        /**
+         *
+         */
         BinaryHeap.prototype.getNodePosition = function (obj) {
             var obj_key = this.evalInputObjID(obj);
+            // console.log(obj_key);
             var occurrence = this._positions[obj_key];
+            // console.log(occurrence);
             return occurrence ? occurrence.position : null;
         };
+        /**
+         * @param obj
+         * @returns {number}
+         */
         BinaryHeap.prototype.removeNodePosition = function (obj) {
             var obj_key = this.evalInputObjID(obj);
             delete this._positions[obj_key];
         };
         return BinaryHeap;
     }());
-    exports.BinaryHeap = BinaryHeap;
-    });
 
-    unwrapExports(BinaryHeap_1);
-    var BinaryHeap_2 = BinaryHeap_1.BinaryHeapMode;
-    var BinaryHeap_3 = BinaryHeap_1.BinaryHeap;
-
-    var PFS_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-    exports.DEFAULT_WEIGHT = 1;
+    var DEFAULT_WEIGHT = 1;
+    /**
+     * Priority first search
+     *
+     * Like BFS, we are not necessarily visiting the
+     * whole graph, but only what's reachable from
+     * a given start node.
+     *
+     * @param graph the graph to perform PFS only
+     * @param v the node from which to start PFS
+     * @param config a config object similar to that used
+     * in BFS, automatically instantiated if not given..
+     */
     function PFS(graph, v, config) {
         config = config || preparePFSStandardConfig();
         var callbacks = config.callbacks, dir_mode = config.dir_mode, evalPriority = config.evalPriority, evalObjID = config.evalObjID;
-        if (graph.getMode() === interfaces.GraphMode.INIT) {
+        /**
+           * We are not traversing an empty graph...
+           */
+        if (graph.getMode() === GraphMode.INIT) {
             throw new Error('Cowardly refusing to traverse graph without edges.');
         }
-        if (dir_mode === interfaces.GraphMode.INIT) {
+        /**
+           * We are not traversing a graph taking NO edges into account
+           */
+        if (dir_mode === GraphMode.INIT) {
             throw new Error('Cannot traverse a graph with dir_mode set to INIT.');
         }
+        // Root NeighborEntries
         var start_ne = {
             node: v,
-            edge: new BaseEdge_1.BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
+            edge: new BaseEdge('virtual start edge', v, v, { weighted: true, weight: 0 }),
             best: 0
         };
         var scope = {
-            OPEN_HEAP: new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID),
+            OPEN_HEAP: new BinaryHeap(BinaryHeapMode.MIN, evalPriority, evalObjID),
             OPEN: {},
             CLOSED: {},
             nodes: graph.getNodes(),
@@ -1005,63 +901,116 @@
             next: null,
             proposed_dist: Number.POSITIVE_INFINITY,
         };
-        callbacks.init_pfs && CallbackUtils.execCallbacks(callbacks.init_pfs, scope);
+        /**
+           * HOOK 1: PFS INIT
+           */
+        callbacks.init_pfs && execCallbacks(callbacks.init_pfs, scope);
+        //initializes the result entry, gives the start node the final values, and default values for all others
         scope.OPEN_HEAP.insert(start_ne);
         scope.OPEN[start_ne.node.getID()] = start_ne;
+        /**
+         * Main loop
+         */
         while (scope.OPEN_HEAP.size()) {
             scope.current = scope.OPEN_HEAP.pop();
-            callbacks.new_current && CallbackUtils.execCallbacks(callbacks.new_current, scope);
+            // console.log(`node: ${scope.current.node.getID()}`); //LOG!
+            // console.log(`best: ${scope.current.best}`); //LOG!
+            /**
+             * HOOK 2: NEW CURRENT
+             */
+            callbacks.new_current && execCallbacks(callbacks.new_current, scope);
             if (scope.current == null) {
                 console.log("HEAP popped undefined - HEAP size: " + scope.OPEN_HEAP.size());
             }
+            // remove from OPEN
             scope.OPEN[scope.current.node.getID()] = undefined;
+            // add it to CLOSED
             scope.CLOSED[scope.current.node.getID()] = scope.current;
+            // TODO what if we already reached the goal?
             if (scope.current.node === config.goal_node) {
-                config.callbacks.goal_reached && CallbackUtils.execCallbacks(config.callbacks.goal_reached, scope);
+                /**
+                 * HOOK 3: Goal node reached
+                 */
+                config.callbacks.goal_reached && execCallbacks(config.callbacks.goal_reached, scope);
+                // If a goal node is set from the outside & we reach it, we stop.
                 return config.result;
             }
-            if (dir_mode === interfaces.GraphMode.MIXED) {
+            /**
+             * Extend the current node, also called
+             * "create n's successors"...
+                 */
+            // TODO: Reverse callback logic to NOT merge anything by default!!!
+            if (dir_mode === GraphMode.MIXED) {
                 scope.adj_nodes = scope.current.node.reachNodes();
             }
-            else if (dir_mode === interfaces.GraphMode.UNDIRECTED) {
+            else if (dir_mode === GraphMode.UNDIRECTED) {
                 scope.adj_nodes = scope.current.node.connNodes();
             }
-            else if (dir_mode === interfaces.GraphMode.DIRECTED) {
+            else if (dir_mode === GraphMode.DIRECTED) {
                 scope.adj_nodes = scope.current.node.nextNodes();
             }
             else {
                 throw new Error('Unsupported traversal mode. Please use directed, undirected, or mixed');
             }
+            /**
+             * EXPAND AND EXAMINE NEIGHBORHOOD
+             */
             for (var adj_idx in scope.adj_nodes) {
                 scope.next = scope.adj_nodes[adj_idx];
+                // console.log("scopeNext now:"); //LOG!
+                // console.log(scope.next.node.getID());
                 if (scope.CLOSED[scope.next.node.getID()]) {
-                    config.callbacks.node_closed && CallbackUtils.execCallbacks(config.callbacks.node_closed, scope);
+                    /**
+                     * HOOK 4: Goal node already closed
+                     */
+                    config.callbacks.node_closed && execCallbacks(config.callbacks.node_closed, scope);
                     continue;
                 }
                 if (scope.OPEN[scope.next.node.getID()]) {
+                    // First let's recover the previous best solution from our OPEN structure,
+                    // as the node's neighborhood-retrieving function cannot know it...
+                    // console.log("MARKER - ALREADY OPEN"); //LOG!
                     scope.next.best = scope.OPEN[scope.next.node.getID()].best;
-                    config.callbacks.node_open && CallbackUtils.execCallbacks(config.callbacks.node_open, scope);
-                    scope.proposed_dist = scope.current.best + (isNaN(scope.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : scope.next.edge.getWeight());
+                    /**
+                     * HOOK 5: Goal node already visited, but not yet closed
+                     */
+                    config.callbacks.node_open && execCallbacks(config.callbacks.node_open, scope);
+                    scope.proposed_dist = scope.current.best + (isNaN(scope.next.edge.getWeight()) ? DEFAULT_WEIGHT : scope.next.edge.getWeight());
+                    /**
+                     * HOOK 6: Better path found
+                     */
                     if (scope.next.best > scope.proposed_dist) {
-                        config.callbacks.better_path && CallbackUtils.execCallbacks(config.callbacks.better_path, scope);
+                        config.callbacks.better_path && execCallbacks(config.callbacks.better_path, scope);
+                        // HEAP operations are necessary for internal traversal,
+                        // so we handle them here in the main loop
+                        // removing next with the old weight and re-adding it with updated value
                         scope.OPEN_HEAP.remove(scope.next);
+                        // console.log("MARKER - BETTER DISTANCE");
+                        // console.log(scope.OPEN_HEAP);
                         scope.next.best = scope.proposed_dist;
                         scope.OPEN_HEAP.insert(scope.next);
                         scope.OPEN[scope.next.node.getID()].best = scope.proposed_dist;
                     }
+                    /**
+                     * HOOK 7: Equal path found (same weight)
+                     */
+                    //at the moment, this callback array is empty here in the PFS and in the Dijkstra, but used in the Johnsons
                     else if (scope.next.best === scope.proposed_dist) {
-                        config.callbacks.equal_path && CallbackUtils.execCallbacks(config.callbacks.equal_path, scope);
+                        config.callbacks.equal_path && execCallbacks(config.callbacks.equal_path, scope);
                     }
                     continue;
                 }
-                config.callbacks.not_encountered && CallbackUtils.execCallbacks(config.callbacks.not_encountered, scope);
+                // NODE NOT ENCOUNTERED
+                config.callbacks.not_encountered && execCallbacks(config.callbacks.not_encountered, scope);
+                // HEAP operations are necessary for internal traversal,
+                // so we handle them here in the main loop
                 scope.OPEN_HEAP.insert(scope.next);
                 scope.OPEN[scope.next.node.getID()] = scope.next;
+                // console.log("MARKER-NOT ENCOUNTERED"); //LOG!
             }
         }
         return config.result;
     }
-    exports.PFS = PFS;
     function preparePFSStandardConfig() {
         var config = {
             result: {},
@@ -1085,10 +1034,10 @@
                 equal_path_msgs: [],
                 goal_reached_msgs: []
             },
-            dir_mode: interfaces.GraphMode.MIXED,
+            dir_mode: GraphMode.MIXED,
             goal_node: null,
             evalPriority: function (ne) {
-                return ne.best || exports.DEFAULT_WEIGHT;
+                return ne.best || DEFAULT_WEIGHT;
             },
             evalObjID: function (ne) {
                 return ne.node.getID();
@@ -1099,7 +1048,9 @@
         var counter = function () {
             return count++;
         };
+        // Standard INIT callback
         var initPFS = function (context) {
+            // initialize all nodes to infinite distance
             for (var key in context.nodes) {
                 config.result[key] = {
                     distance: Number.POSITIVE_INFINITY,
@@ -1107,6 +1058,8 @@
                     counter: -1
                 };
             }
+            // initialize root node entry
+            // maybe take heuristic into account right here...??
             config.result[context.root_node.getID()] = {
                 distance: 0,
                 parent: context.root_node,
@@ -1114,8 +1067,11 @@
             };
         };
         callbacks.init_pfs.push(initPFS);
+        // Node not yet encountered callback
         var notEncountered = function (context) {
-            context.next.best = context.current.best + (isNaN(context.next.edge.getWeight()) ? exports.DEFAULT_WEIGHT : context.next.edge.getWeight());
+            // setting it's best score to actual distance + edge weight
+            // and update result structure
+            context.next.best = context.current.best + (isNaN(context.next.edge.getWeight()) ? DEFAULT_WEIGHT : context.next.edge.getWeight());
             config.result[context.next.node.getID()] = {
                 distance: context.next.best,
                 parent: context.current.node,
@@ -1123,6 +1079,7 @@
             };
         };
         callbacks.not_encountered.push(notEncountered);
+        // Callback for when we find a better solution
         var betterPathFound = function (context) {
             config.result[context.next.node.getID()].distance = context.proposed_dist;
             config.result[context.next.node.getID()].parent = context.current.node;
@@ -1130,17 +1087,12 @@
         callbacks.better_path.push(betterPathFound);
         return config;
     }
-    exports.preparePFSStandardConfig = preparePFSStandardConfig;
-    });
 
-    unwrapExports(PFS_1);
-    var PFS_2 = PFS_1.DEFAULT_WEIGHT;
-    var PFS_3 = PFS_1.PFS;
-    var PFS_4 = PFS_1.preparePFSStandardConfig;
-
-    var BellmanFord = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
+    /**
+     *
+     * @param graph
+     * @param start
+     */
     function BFSanityChecks(graph, start) {
         if (graph == null || start == null) {
             throw new Error('Graph as well as start node have to be valid objects.');
@@ -1160,6 +1112,7 @@
             distances[n_idx] = (node === start) ? 0 : Number.POSITIVE_INFINITY;
             id_idx_map[node.getID()] = n_idx;
         }
+        // Initialize an edge array just holding the node indices, weight and directed
         var graph_edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
         var bf_edges = [];
         for (var e_idx = 0; e_idx < graph_edges.length; ++e_idx) {
@@ -1167,7 +1120,7 @@
             var bf_edge_entry_1 = bf_edges.push([
                 id_idx_map[edge.getNodes().a.getID()],
                 id_idx_map[edge.getNodes().b.getID()],
-                isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT,
+                isFinite(edge.getWeight()) ? edge.getWeight() : DEFAULT_WEIGHT,
                 edge.isDirected()
             ]);
         }
@@ -1196,11 +1149,15 @@
         }
         return { distances: distances, neg_cycle: neg_cycle };
     }
-    exports.BellmanFordArray = BellmanFordArray;
+    /**
+     *
+     * @param graph
+     * @param start
+     */
     function BellmanFordDict(graph, start) {
         BFSanityChecks(graph, start);
         var distances = {}, edges, edge, a, b, weight, new_weight, nodes_size, neg_cycle = false;
-        distances = {};
+        distances = {}; // Reset dists, TODO refactor
         edges = graph.getDirEdgesArray().concat(graph.getUndEdgesArray());
         nodes_size = graph.nrNodes();
         for (var node in graph.getNodes()) {
@@ -1212,7 +1169,7 @@
                 edge = edges[e_idx];
                 a = edge.getNodes().a.getID();
                 b = edge.getNodes().b.getID();
-                weight = isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT;
+                weight = isFinite(edge.getWeight()) ? edge.getWeight() : DEFAULT_WEIGHT;
                 updateDist(a, b, weight);
                 !edge.isDirected() && updateDist(b, a, weight);
             }
@@ -1221,7 +1178,7 @@
             edge = edges[edgeID];
             a = edge.getNodes().a.getID();
             b = edge.getNodes().b.getID();
-            weight = isFinite(edge.getWeight()) ? edge.getWeight() : PFS_1.DEFAULT_WEIGHT;
+            weight = isFinite(edge.getWeight()) ? edge.getWeight() : DEFAULT_WEIGHT;
             if (betterDist(a, b, weight) || (!edge.isDirected() && betterDist(b, a, weight))) {
                 neg_cycle = true;
             }
@@ -1237,55 +1194,19 @@
         }
         return { distances: distances, neg_cycle: neg_cycle };
     }
-    exports.BellmanFordDict = BellmanFordDict;
-    });
 
-    unwrapExports(BellmanFord);
-    var BellmanFord_1 = BellmanFord.BellmanFordArray;
-    var BellmanFord_2 = BellmanFord.BellmanFordDict;
-
-    var Johnsons_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-
-    function Johnsons(graph) {
-        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
-            throw new Error("Cowardly refusing to traverse graph without edges.");
-        }
-        if (graph.hasNegativeEdge()) {
-            var extraNode = new BaseNode_1.BaseNode("extraNode");
-            graph = addExtraNandE(graph, extraNode);
-            var BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
-            if (BFresult.neg_cycle) {
-                throw new Error("The graph contains a negative cycle, thus it can not be processed");
-            }
-            else {
-                var newWeights = BFresult.distances;
-                graph = reWeighGraph(graph, newWeights, extraNode);
-                graph.deleteNode(extraNode);
-                return PFSFromAllNodes(graph);
-            }
-        }
-        return PFSFromAllNodes(graph);
-    }
-    exports.Johnsons = Johnsons;
+    /**
+     *
+     * @param target
+     * @param nodeToAdd
+     *
+     * @todo check if
+     */
     function addExtraNandE(target, nodeToAdd) {
         var allNodes = target.getNodes();
         target.addNode(nodeToAdd);
         var tempCounter = 0;
+        //now add a directed edge from the extranode to all graph nodes, excluding itself
         for (var nodeKey in allNodes) {
             if (allNodes[nodeKey].getID() != nodeToAdd.getID()) {
                 target.addEdgeByNodeIDs("temp" + tempCounter, nodeToAdd.getID(), allNodes[nodeKey].getID(), { directed: true, weighted: true, weight: 0 });
@@ -1294,101 +1215,42 @@
         }
         return target;
     }
-    exports.addExtraNandE = addExtraNandE;
     function reWeighGraph(target, distDict, tempNode) {
-        var e_1, _a;
+        //reminder: w(e)'=w(e)+dist(a)-dist(b), a and b the start and end nodes of the edge
         var edges = target.getDirEdgesArray().concat(target.getUndEdgesArray());
-        try {
-            for (var edges_1 = __values(edges), edges_1_1 = edges_1.next(); !edges_1_1.done; edges_1_1 = edges_1.next()) {
-                var edge = edges_1_1.value;
-                var a = edge.getNodes().a.getID();
-                var b = edge.getNodes().b.getID();
-                if (a !== tempNode.getID() && edge.isWeighted) {
-                    var oldWeight = edge.getWeight();
-                    var newWeight = oldWeight + distDict[a] - distDict[b];
-                    edge.setWeight(newWeight);
-                }
-                else {
-                    var newWeight = PFS_1.DEFAULT_WEIGHT + distDict[a] - distDict[b];
-                    var edgeID = edge.getID();
-                    var dirNess = edge.isDirected();
-                    target.deleteEdge(edge);
-                    target.addEdgeByNodeIDs(edgeID, a, b, { directed: dirNess, weighted: true, weight: newWeight });
-                }
+        for (var _i = 0, edges_1 = edges; _i < edges_1.length; _i++) {
+            var edge = edges_1[_i];
+            var a = edge.getNodes().a.getID();
+            var b = edge.getNodes().b.getID();
+            /**
+             * no need to re-weigh the temporary edges starting from the extraNode, they will be deleted anyway
+             * assuming that the node keys in the distDict correspond to the nodeIDs
+             */
+            if (a !== tempNode.getID() && edge.isWeighted) {
+                var oldWeight = edge.getWeight();
+                var newWeight = oldWeight + distDict[a] - distDict[b];
+                edge.setWeight(newWeight);
             }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (edges_1_1 && !edges_1_1.done && (_a = edges_1.return)) _a.call(edges_1);
+            else {
+                var newWeight = DEFAULT_WEIGHT + distDict[a] - distDict[b];
+                //collecting edgeID and directedness for later re-use
+                var edgeID = edge.getID();
+                var dirNess = edge.isDirected();
+                // one does not simply change an edge to being weighted
+                target.deleteEdge(edge);
+                target.addEdgeByNodeIDs(edgeID, a, b, { directed: dirNess, weighted: true, weight: newWeight });
             }
-            finally { if (e_1) throw e_1.error; }
         }
         return target;
     }
-    exports.reWeighGraph = reWeighGraph;
-    function PFSFromAllNodes(graph) {
-        var cg = new ComputeGraph_1.ComputeGraph(graph);
-        var dists = cg.adjMatrixW();
-        var next = cg.nextArray();
-        var nodesDict = graph.getNodes();
-        var nodeIDIdxMap = {};
-        var i = 0;
-        for (var key in nodesDict) {
-            nodeIDIdxMap[nodesDict[key].getID()] = i++;
-        }
-        var specialConfig = PFS_1.preparePFSStandardConfig();
-        var notEncounteredJohnsons = function (context) {
-            context.next.best = context.current.best + context.next.edge.getWeight();
-            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
-            if (context.current.node == context.root_node) {
-                dists[i][j] = context.next.best;
-                next[i][j][0] = j;
-            }
-            else {
-                dists[i][j] = context.next.best;
-                next[i][j][0] = nodeIDIdxMap[context.current.node.getID()];
-            }
-        };
-        specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredJohnsons);
-        var betterPathJohnsons = function (context) {
-            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
-            dists[i][j] = context.proposed_dist;
-            if (context.current.node !== context.root_node) {
-                next[i][j].splice(0, next[i][j].length, nodeIDIdxMap[context.current.node.getID()]);
-            }
-        };
-        specialConfig.callbacks.better_path.splice(0, 1, betterPathJohnsons);
-        var equalPathJohnsons = function (context) {
-            var i = nodeIDIdxMap[context.root_node.getID()], j = nodeIDIdxMap[context.next.node.getID()];
-            if (context.current.node !== context.root_node) {
-                next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], [nodeIDIdxMap[context.current.node.getID()]]);
-            }
-        };
-        specialConfig.callbacks.equal_path.push(equalPathJohnsons);
-        for (var key in nodesDict) {
-            PFS_1.PFS(graph, nodesDict[key], specialConfig);
-        }
-        return [dists, next];
-    }
-    exports.PFSFromAllNodes = PFSFromAllNodes;
-    });
 
-    unwrapExports(Johnsons_1);
-    var Johnsons_2 = Johnsons_1.Johnsons;
-    var Johnsons_3 = Johnsons_1.addExtraNandE;
-    var Johnsons_4 = Johnsons_1.reWeighGraph;
-    var Johnsons_5 = Johnsons_1.PFSFromAllNodes;
-
-    var BaseGraph_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var BaseGraph = (function () {
+    var BaseGraph = /** @class */ (function () {
         function BaseGraph(_label) {
             this._label = _label;
             this._nr_nodes = 0;
             this._nr_dir_edges = 0;
             this._nr_und_edges = 0;
-            this._mode = interfaces.GraphMode.INIT;
+            this._mode = GraphMode.INIT;
             this._nodes = {};
             this._dir_edges = {};
             this._und_edges = {};
@@ -1400,42 +1262,42 @@
             get: function () {
                 return this._label;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "mode", {
             get: function () {
                 return this._mode;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "stats", {
             get: function () {
                 return this.getStats();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "inHist", {
             get: function () {
-                return this.degreeHist(interfaces.DIR.in);
+                return this.degreeHist(DIR.in);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "outHist", {
             get: function () {
-                return this.degreeHist(interfaces.DIR.out);
+                return this.degreeHist(DIR.out);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseGraph.prototype, "connHist", {
             get: function () {
-                return this.degreeHist(interfaces.DIR.und);
+                return this.degreeHist(DIR.und);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         BaseGraph.prototype.degreeHist = function (dir) {
@@ -1444,10 +1306,10 @@
                 var node = this._nodes[nid];
                 var deg = void 0;
                 switch (dir) {
-                    case interfaces.DIR.in:
+                    case DIR.in:
                         deg = node.in_deg;
                         break;
-                    case interfaces.DIR.out:
+                    case DIR.out:
                         deg = node.out_deg;
                         break;
                     default:
@@ -1462,37 +1324,60 @@
             }
             return result;
         };
+        /**
+         *
+         * @param clone
+         *
+         * @comment Convenience method -
+         * Tests to be found in test suites for
+         * BaseGraph, BellmanFord and Johnsons
+         */
         BaseGraph.prototype.reweighIfHasNegativeEdge = function (clone) {
             if (clone === void 0) { clone = false; }
             if (this.hasNegativeEdge()) {
                 var result_graph = clone ? this.cloneStructure() : this;
-                var extraNode = new BaseNode_1.BaseNode("extraNode");
-                result_graph = Johnsons_1.addExtraNandE(result_graph, extraNode);
-                var BFresult = BellmanFord.BellmanFordDict(result_graph, extraNode);
+                var extraNode = new BaseNode("extraNode");
+                result_graph = addExtraNandE(result_graph, extraNode);
+                var BFresult = BellmanFordDict(result_graph, extraNode);
                 if (BFresult.neg_cycle) {
                     throw new Error("The graph contains a negative cycle, thus it can not be processed");
                 }
                 else {
                     var newWeights = BFresult.distances;
-                    result_graph = Johnsons_1.reWeighGraph(result_graph, newWeights, extraNode);
+                    result_graph = reWeighGraph(result_graph, newWeights, extraNode);
                     result_graph.deleteNode(extraNode);
                 }
                 return result_graph;
             }
         };
+        /**
+         * Version 1: do it in-place (to the object you receive)
+         * Version 2: clone the graph first, return the mutated clone
+         */
         BaseGraph.prototype.toDirectedGraph = function (copy) {
             if (copy === void 0) { copy = false; }
             var result_graph = copy ? this.cloneStructure() : this;
+            // if graph has no edges, we want to throw an exception
             if (this._nr_dir_edges === 0 && this._nr_und_edges === 0) {
                 throw new Error("Cowardly refusing to re-interpret an empty graph.");
             }
             return result_graph;
         };
+        /**
+         * @todo implement!!!
+         */
         BaseGraph.prototype.toUndirectedGraph = function () {
             return this;
         };
+        /**
+         * what to do if some edges are not weighted at all?
+         * Since graph traversal algortihms (and later maybe graphs themselves)
+         * use default weights anyways, I am simply ignoring them for now...
+         * @todo figure out how to test this...
+         */
         BaseGraph.prototype.hasNegativeEdge = function () {
             var has_neg_edge = false, edge;
+            // negative und_edges are always negative cycles
             for (var edge_id in this._und_edges) {
                 edge = this._und_edges[edge_id];
                 if (!edge.isWeighted()) {
@@ -1514,13 +1399,20 @@
             }
             return has_neg_edge;
         };
+        /**
+         * Do we want to throw an error if an edge is unweighted?
+         * Or shall we let the traversal algorithm deal with DEFAULT weights like now?
+         */
         BaseGraph.prototype.hasNegativeCycles = function (node) {
             var _this = this;
             if (!this.hasNegativeEdge()) {
                 return false;
             }
             var negative_cycle = false, start = node ? node : this.getRandomNode();
-            DFS_1.DFS(this, start).forEach(function (comp) {
+            /**
+             * Now do Bellman Ford over all graph components
+             */
+            DFS(this, start).forEach(function (comp) {
                 var min_count = Number.POSITIVE_INFINITY, comp_start_node = "";
                 Object.keys(comp).forEach(function (node_id) {
                     if (min_count > comp[node_id].counter) {
@@ -1528,7 +1420,7 @@
                         comp_start_node = node_id;
                     }
                 });
-                if (BellmanFord.BellmanFordArray(_this, _this._nodes[comp_start_node]).neg_cycle) {
+                if (BellmanFordArray(_this, _this._nodes[comp_start_node]).neg_cycle) {
                     negative_cycle = true;
                 }
             });
@@ -1556,11 +1448,18 @@
         BaseGraph.prototype.nrUndEdges = function () {
             return this._nr_und_edges;
         };
+        /**
+         *
+         * @param id
+         * @param opts
+         *
+         * @todo addNode functions should check if a node with a given ID already exists -> node IDs have to be unique...
+         */
         BaseGraph.prototype.addNodeByID = function (id, opts) {
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            var node = new BaseNode_1.BaseNode(id, opts);
+            var node = new BaseNode(id, opts);
             return this.addNode(node) ? node : null;
         };
         BaseGraph.prototype.addNode = function (node) {
@@ -1583,6 +1482,9 @@
         BaseGraph.prototype.getNodes = function () {
             return this._nodes;
         };
+        /**
+         * CAUTION - This function takes linear time in # nodes
+         */
         BaseGraph.prototype.getRandomNode = function () {
             return this.pickRandomProperty(this._nodes);
         };
@@ -1591,9 +1493,11 @@
             if (!rem_node) {
                 throw new Error('Cannot remove a foreign node.');
             }
+            // Edges?
             var in_deg = node.in_deg;
             var out_deg = node.out_deg;
             var deg = node.deg;
+            // Delete all edges brutally...
             if (in_deg) {
                 this.deleteInEdgesOf(node);
             }
@@ -1624,10 +1528,12 @@
                 throw new Error("Cannot find edge. Node B does not exist (in graph).");
             }
         };
+        // get the edge from node_a to node_b (or undirected)
         BaseGraph.prototype.getDirEdgeByNodeIDs = function (node_a_id, node_b_id) {
             var node_a = this.getNodeById(node_a_id);
             var node_b = this.getNodeById(node_b_id);
             BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
+            // check for outgoing directed edges
             var edges_dir = node_a.outEdges(), edges_dir_keys = Object.keys(edges_dir);
             for (var i = 0; i < edges_dir_keys.length; i++) {
                 var edge = edges_dir[edges_dir_keys[i]];
@@ -1635,12 +1541,14 @@
                     return edge;
                 }
             }
+            // if we managed to arrive here, there is no edge!
             throw new Error("Cannot find edge. There is no edge between Node " + node_a_id + " and " + node_b_id + ".");
         };
         BaseGraph.prototype.getUndEdgeByNodeIDs = function (node_a_id, node_b_id) {
             var node_a = this.getNodeById(node_a_id);
             var node_b = this.getNodeById(node_b_id);
             BaseGraph.checkExistanceOfEdgeNodes(node_a, node_b);
+            // check for undirected edges
             var edges_und = node_a.undEdges(), edges_und_keys = Object.keys(edges_und);
             for (var i = 0; i < edges_und_keys.length; i++) {
                 var edge = edges_und[edges_und_keys[i]];
@@ -1683,24 +1591,34 @@
                 return this.addEdgeByID(label, node_a, node_b, opts);
             }
         };
+        /**
+         * @description now all test cases pertaining addEdge() call this one...
+         */
         BaseGraph.prototype.addEdgeByID = function (id, node_a, node_b, opts) {
-            var edge = new BaseEdge_1.BaseEdge(id, node_a, node_b, opts || {});
+            var edge = new BaseEdge(id, node_a, node_b, opts || {});
             return this.addEdge(edge) ? edge : null;
         };
+        /**
+         * @todo test cases should be reversed / completed
+         * @todo make transactional
+         */
         BaseGraph.prototype.addEdge = function (edge) {
             var node_a = edge.getNodes().a, node_b = edge.getNodes().b;
             if (!this.hasNodeID(node_a.getID()) || !this.hasNodeID(node_b.getID())
                 || this._nodes[node_a.getID()] !== node_a || this._nodes[node_b.getID()] !== node_b) {
                 throw new Error("can only add edge between two nodes existing in graph");
             }
+            // connect edge to first node anyways
             node_a.addEdge(edge);
             if (edge.isDirected()) {
+                // add edge to second node too
                 node_b.addEdge(edge);
                 this._dir_edges[edge.getID()] = edge;
                 this._nr_dir_edges += 1;
                 this.updateGraphMode();
             }
             else {
+                // add edge to both nodes, except they are the same...
                 if (node_a !== node_b) {
                     node_b.addEdge(edge);
                 }
@@ -1731,6 +1649,7 @@
             }
             this.updateGraphMode();
         };
+        // Some atomicity / rollback feature would be nice here...
         BaseGraph.prototype.deleteInEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
             var in_edges = node.inEdges();
@@ -1744,6 +1663,7 @@
             node.clearInEdges();
             this.updateGraphMode();
         };
+        // Some atomicity / rollback feature would be nice here...
         BaseGraph.prototype.deleteOutEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
             var out_edges = node.outEdges();
@@ -1757,10 +1677,12 @@
             node.clearOutEdges();
             this.updateGraphMode();
         };
+        // Some atomicity / rollback feature would be nice here...
         BaseGraph.prototype.deleteDirEdgesOf = function (node) {
             this.deleteInEdgesOf(node);
             this.deleteOutEdgesOf(node);
         };
+        // Some atomicity / rollback feature would be nice here...
         BaseGraph.prototype.deleteUndEdgesOf = function (node) {
             this.checkConnectedNodeOrThrow(node);
             var und_edges = node.undEdges();
@@ -1778,10 +1700,14 @@
             node.clearUndEdges();
             this.updateGraphMode();
         };
+        // Some atomicity / rollback feature would be nice here...
         BaseGraph.prototype.deleteAllEdgesOf = function (node) {
             this.deleteDirEdgesOf(node);
             this.deleteUndEdgesOf(node);
         };
+        /**
+         * Remove all the (un)directed edges in the graph
+         */
         BaseGraph.prototype.clearAllDirEdges = function () {
             for (var edge in this._dir_edges) {
                 this.deleteEdge(this._dir_edges[edge]);
@@ -1796,9 +1722,15 @@
             this.clearAllDirEdges();
             this.clearAllUndEdges();
         };
+        /**
+         * CAUTION - This function is linear in # directed edges
+         */
         BaseGraph.prototype.getRandomDirEdge = function () {
             return this.pickRandomProperty(this._dir_edges);
         };
+        /**
+         * CAUTION - This function is linear in # undirected edges
+         */
         BaseGraph.prototype.getRandomUndEdge = function () {
             return this.pickRandomProperty(this._und_edges);
         };
@@ -1819,17 +1751,17 @@
         };
         BaseGraph.prototype.cloneSubGraphStructure = function (root, cutoff) {
             var new_graph = new BaseGraph(this._label);
-            var config = BFS_1.prepareBFSStandardConfig();
+            var config = prepareBFSStandardConfig();
             var bfsNodeUnmarkedTestCallback = function (context) {
                 if (config.result[context.next_node.getID()].counter > cutoff) {
                     context.queue = [];
                 }
-                else {
+                else { //This means we only add cutoff -1 nodes to the cloned graph, # of nodes is then equal to cutoff
                     new_graph.addNode(context.next_node.clone());
                 }
             };
             config.callbacks.node_unmarked.push(bfsNodeUnmarkedTestCallback);
-            BFS_1.BFS(this, root, config);
+            BFS(this, root, config);
             var old_edge, new_node_a = null, new_node_b = null;
             [this.getDirEdges(), this.getUndEdges()].forEach(function (old_edges) {
                 for (var edge_id in old_edges) {
@@ -1851,16 +1783,16 @@
         BaseGraph.prototype.updateGraphMode = function () {
             var nr_dir = this._nr_dir_edges, nr_und = this._nr_und_edges;
             if (nr_dir && nr_und) {
-                this._mode = interfaces.GraphMode.MIXED;
+                this._mode = GraphMode.MIXED;
             }
             else if (nr_dir) {
-                this._mode = interfaces.GraphMode.DIRECTED;
+                this._mode = GraphMode.DIRECTED;
             }
             else if (nr_und) {
-                this._mode = interfaces.GraphMode.UNDIRECTED;
+                this._mode = GraphMode.UNDIRECTED;
             }
             else {
-                this._mode = interfaces.GraphMode.INIT;
+                this._mode = GraphMode.INIT;
             }
         };
         BaseGraph.prototype.pickRandomProperty = function (propList) {
@@ -1868,6 +1800,30 @@
             var randomPropertyName = tmpList[Math.floor(Math.random() * tmpList.length)];
             return propList[randomPropertyName];
         };
+        /**
+         * In some cases we need to return a large number of objects
+         * in one swoop, as calls to Object.keys() are really slow
+         * for large input objects.
+         *
+         * In order to do this, we only extract the keys once and then
+         * iterate over the key list and add them to a result array
+         * with probability = amount / keys.length
+         *
+         * We also mark all used keys in case we haven't picked up
+         * enough entities for the result array after the first round.
+         * We then just fill up the rest of the result array linearly
+         * with as many unused keys as necessary
+         *
+         *
+         * @todo include generic Test Cases
+         * @todo check if amount is larger than propList size
+         * @todo This seems like a simple hack - filling up remaining objects
+         * Could be replaced by a better fraction-increasing function above...
+         *
+         * @param propList
+         * @param amount
+         * @returns {Array}
+         */
         BaseGraph.prototype.pickRandomProperties = function (propList, amount) {
             var ids = [];
             var keys = Object.keys(propList);
@@ -1890,22 +1846,23 @@
         };
         return BaseGraph;
     }());
-    exports.BaseGraph = BaseGraph;
-    });
 
-    unwrapExports(BaseGraph_1);
-    var BaseGraph_2 = BaseGraph_1.BaseGraph;
-
-    var StructUtils = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
+    /**
+     * Method to deep clone an object
+     *
+     * @param obj
+     * @returns {*}
+     *
+     */
     function clone(obj) {
         if (obj === null || typeof obj !== 'object') {
             return obj;
         }
-        if (obj instanceof BaseGraph_1.BaseGraph || obj instanceof BaseNode_1.BaseNode || obj instanceof BaseEdge_1.BaseEdge) {
+        /**
+         * @description for the sake of cloning graph structures, we have specialized
+       *              clone methods within the BaseGraph, BaseNode & BaseEdge classes
+         */
+        if (obj instanceof BaseGraph || obj instanceof BaseNode || obj instanceof BaseEdge) {
             return null;
         }
         var cloneObj = Array.isArray(obj) ? [] : {};
@@ -1922,17 +1879,14 @@
         }
         return cloneObj;
     }
-    exports.clone = clone;
-    function shuffleArray(arr) {
-        for (var i = arr.length - 1; i >= 0; i--) {
-            var randomIndex = Math.floor(Math.random() * (i + 1));
-            var itemAtIndex = arr[randomIndex];
-            arr[randomIndex] = arr[i];
-            arr[i] = itemAtIndex;
-        }
-        return arr;
-    }
-    exports.shuffleArray = shuffleArray;
+    /**
+     * @args an Array of any kind of objects
+     * @cb callback to return a unique identifier;
+     * if this is duplicate, the object will not be stored in result.
+     * @returns {Array}
+     *
+     * @todo
+     */
     function mergeArrays(args, cb) {
         if (cb === void 0) { cb = undefined; }
         for (var arg_idx in args) {
@@ -1952,7 +1906,11 @@
         }
         return result;
     }
-    exports.mergeArrays = mergeArrays;
+    /**
+     * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
+     * @param args Array of all the object to take keys from
+     * @returns result object
+     */
     function mergeObjects(args) {
         for (var i = 0; i < args.length; i++) {
             if (Object.prototype.toString.call(args[i]) !== '[object Object]') {
@@ -1969,73 +1927,12 @@
         }
         return result;
     }
-    exports.mergeObjects = mergeObjects;
-    function mergeOrderedArraysNoDups(a, b) {
-        var ret = [];
-        var idx_a = 0;
-        var idx_b = 0;
-        if (a[0] != null && b[0] != null) {
-            while (true) {
-                if (idx_a >= a.length || idx_b >= b.length) {
-                    break;
-                }
-                if (a[idx_a] == b[idx_b]) {
-                    if (ret[ret.length - 1] != a[idx_a]) {
-                        ret.push(a[idx_a]);
-                    }
-                    idx_a++;
-                    idx_b++;
-                    continue;
-                }
-                if (a[idx_a] < b[idx_b]) {
-                    ret.push(a[idx_a]);
-                    idx_a++;
-                    continue;
-                }
-                if (b[idx_b] < a[idx_a]) {
-                    ret.push(b[idx_b]);
-                    idx_b++;
-                }
-            }
-        }
-        while (idx_a < a.length) {
-            if (a[idx_a] != null) {
-                ret.push(a[idx_a]);
-            }
-            idx_a++;
-        }
-        while (idx_b < b.length) {
-            if (b[idx_b] != null) {
-                ret.push(b[idx_b]);
-            }
-            idx_b++;
-        }
-        return ret;
-    }
-    exports.mergeOrderedArraysNoDups = mergeOrderedArraysNoDups;
-    });
 
-    unwrapExports(StructUtils);
-    var StructUtils_1 = StructUtils.clone;
-    var StructUtils_2 = StructUtils.shuffleArray;
-    var StructUtils_3 = StructUtils.mergeArrays;
-    var StructUtils_4 = StructUtils.mergeObjects;
-    var StructUtils_5 = StructUtils.mergeOrderedArraysNoDups;
-
-    var BaseNode_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var BaseNode = (function () {
+    var BaseNode = /** @class */ (function () {
+        /**
+         * @param _id
+         * @param config
+         */
         function BaseNode(_id, config) {
             if (config === void 0) { config = {}; }
             this._id = _id;
@@ -2049,7 +1946,7 @@
             this._out_edges = {};
             this._und_edges = {};
             this._label = config.label || _id;
-            this._features = config.features != null ? StructUtils.clone(config.features) : {};
+            this._features = config.features != null ? clone(config.features) : {};
         }
         BaseNode.isTyped = function (arg) {
             return !!arg.type;
@@ -2058,21 +1955,21 @@
             get: function () {
                 return this._id;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "label", {
             get: function () {
                 return this._label;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "features", {
             get: function () {
                 return this._features;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         BaseNode.prototype.getID = function () {
@@ -2094,7 +1991,7 @@
             return this.getFeature(key);
         };
         BaseNode.prototype.setFeatures = function (features) {
-            this._features = StructUtils.clone(features);
+            this._features = clone(features);
         };
         BaseNode.prototype.setFeature = function (key, value) {
             this._features[key] = value;
@@ -2111,44 +2008,51 @@
             get: function () {
                 return this._deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "in_deg", {
             get: function () {
                 return this._in_deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "out_deg", {
             get: function () {
                 return this._out_deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "self_deg", {
             get: function () {
                 return this._self_deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "self_in_deg", {
             get: function () {
                 return this._self_in_deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseNode.prototype, "self_out_deg", {
             get: function () {
                 return this._self_out_deg;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
+        /**
+         * We have to:
+         * 1. throw an error if the edge is already attached
+         * 2. add it to the edge array
+         * 3. check type of edge (directed / undirected)
+         * 4. update our degrees accordingly
+         */
         BaseNode.prototype.addEdge = function (edge) {
             var ends = edge.getNodes();
             if (ends.a !== this && ends.b !== this) {
@@ -2156,9 +2060,11 @@
             }
             var id = edge.id;
             if (edge.isDirected()) {
+                // is it outgoing or incoming?
                 if (ends.a === this && !this._out_edges[id]) {
                     this._out_edges[id] = edge;
                     this._out_deg += 1;
+                    // Directed self loop ?
                     if (ends.b === this && !this._in_edges[id]) {
                         this._in_edges[id] = edge;
                         this._in_deg += 1;
@@ -2166,11 +2072,13 @@
                         this._self_out_deg += 1;
                     }
                 }
-                else if (!this._in_edges[id]) {
+                // No self loop
+                else if (!this._in_edges[id]) { // nodes.b === this
                     this._in_edges[id] = edge;
                     this._in_deg += 1;
                 }
             }
+            // UNdirected
             else {
                 if (this._und_edges[edge.id]) {
                     throw new Error("Cannot add same undirected edge multiple times.");
@@ -2206,11 +2114,15 @@
             return this._und_edges;
         };
         BaseNode.prototype.dirEdges = function () {
-            return StructUtils.mergeObjects([this._in_edges, this._out_edges]);
+            return mergeObjects([this._in_edges, this._out_edges]);
         };
         BaseNode.prototype.allEdges = function () {
-            return StructUtils.mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
+            return mergeObjects([this._in_edges, this._out_edges, this._und_edges]);
         };
+        /**
+         * @description automatically takes care of self-loops (since looking up in all internal data structures)
+         * @param edge
+         */
         BaseNode.prototype.removeEdge = function (edge) {
             if (!this.hasEdge(edge)) {
                 throw new Error("Cannot remove unconnected edge.");
@@ -2242,36 +2154,22 @@
             }
             this.removeEdge(this.getEdge(id));
         };
+        /**
+         * @description slow -> if possible, just clear ALL edges instead
+         */
         BaseNode.prototype.clearOutEdges = function () {
-            var e_1, _a;
-            try {
-                for (var _b = __values(Object.values(this.outEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var e = _c.value;
-                    this.removeEdge(e);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_1) throw e_1.error; }
+            for (var _i = 0, _a = Object.values(this.outEdges()); _i < _a.length; _i++) {
+                var e = _a[_i];
+                this.removeEdge(e);
             }
         };
+        /**
+         * @description slow -> if possible, just clear ALL edges instead
+         */
         BaseNode.prototype.clearInEdges = function () {
-            var e_2, _a;
-            try {
-                for (var _b = __values(Object.values(this.inEdges())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var e = _c.value;
-                    this.removeEdge(e);
-                }
-            }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_2) throw e_2.error; }
+            for (var _i = 0, _a = Object.values(this.inEdges()); _i < _a.length; _i++) {
+                var e = _a[_i];
+                this.removeEdge(e);
             }
         };
         BaseNode.prototype.clearUndEdges = function () {
@@ -2285,6 +2183,10 @@
             this._out_edges = {};
             this._deg = this._self_deg = this._in_deg = this._self_in_deg = this._out_deg = this._self_out_deg = 0;
         };
+        /**
+         * return the set of all nodes that have
+         * directed edges coming into this node
+         */
         BaseNode.prototype.prevNodes = function () {
             var prevs = [];
             var key, edge;
@@ -2299,6 +2201,10 @@
             }
             return prevs;
         };
+        /**
+         * return the set of all nodes that have
+         * directed edges going out from this node
+         */
         BaseNode.prototype.nextNodes = function () {
             var nexts = [];
             var key, edge;
@@ -2313,6 +2219,10 @@
             }
             return nexts;
         };
+        /**
+         * return the set of all nodes that are
+         * connected to this node via undirected edges
+         */
         BaseNode.prototype.connNodes = function () {
             var conns = [];
             var key, edge;
@@ -2336,66 +2246,76 @@
             }
             return conns;
         };
+        /**
+         * return the set of all nodes 'reachable' from this node,
+         * either via unconnected or outgoing edges
+         *
+         * @param identityFunc can be used to remove 'duplicates' from resulting array,
+         * if necessary
+         * @returns {Array}
+         *
+       */
         BaseNode.prototype.reachNodes = function (identityFunc) {
             var identity = 0;
-            return StructUtils.mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (function (ne) { return identity++; }));
+            return mergeArrays([this.nextNodes(), this.connNodes()], identityFunc || (function (ne) { return identity++; }));
         };
+        /**
+         * return the set of all nodes connected to this node
+         *
+         * @param identityFunc can be used to remove 'duplicates' from resulting array,
+         * if necessary
+         * @returns {Array}
+         *
+       */
         BaseNode.prototype.allNeighbors = function (identityFunc) {
             var identity = 0;
-            return StructUtils.mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
+            // console.log(this.nextNodes());
+            return mergeArrays([this.prevNodes(), this.nextNodes(), this.connNodes()], identityFunc || function (ne) { return identity++; });
         };
         BaseNode.prototype.clone = function () {
             var new_node = new BaseNode(this._id);
             new_node._label = this._label;
-            new_node.setFeatures(StructUtils.clone(this.getFeatures()));
+            new_node.setFeatures(clone(this.getFeatures()));
             return new_node;
         };
         return BaseNode;
     }());
-    exports.BaseNode = BaseNode;
-    });
 
-    unwrapExports(BaseNode_1);
-    var BaseNode_2 = BaseNode_1.BaseNode;
-
-    var BaseEdge_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var BaseEdge = (function () {
+    var BaseEdge = /** @class */ (function () {
         function BaseEdge(_id, _node_a, _node_b, config) {
             this._id = _id;
             this._node_a = _node_a;
             this._node_b = _node_b;
-            if (!(_node_a instanceof BaseNode_1.BaseNode) || !(_node_b instanceof BaseNode_1.BaseNode)) {
+            if (!(_node_a instanceof BaseNode) || !(_node_b instanceof BaseNode)) {
                 throw new Error("cannot instantiate edge without two valid node objects");
             }
             config = config || {};
             this._directed = config.directed || false;
             this._weighted = config.weighted || false;
+            // @NOTE isNaN and Number.isNaN confusion...
             this._weight = this._weighted ? (isNaN(config.weight) ? 1 : config.weight) : undefined;
             this._label = config.label || this._id;
-            this._features = config.features != null ? StructUtils.clone(config.features) : {};
+            this._features = config.features != null ? clone(config.features) : {};
         }
         Object.defineProperty(BaseEdge.prototype, "id", {
             get: function () {
                 return this._id;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseEdge.prototype, "label", {
             get: function () {
                 return this._label;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(BaseEdge.prototype, "features", {
             get: function () {
                 return this._features;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         BaseEdge.prototype.getID = function () {
@@ -2417,7 +2337,7 @@
             return this.getFeature(key);
         };
         BaseEdge.prototype.setFeatures = function (features) {
-            this._features = StructUtils.clone(features);
+            this._features = clone(features);
         };
         BaseEdge.prototype.setFeature = function (key, value) {
             this._features[key] = value;
@@ -2449,7 +2369,7 @@
             return { a: this._node_a, b: this._node_b };
         };
         BaseEdge.prototype.clone = function (new_node_a, new_node_b) {
-            if (!(new_node_a instanceof BaseNode_1.BaseNode) || !(new_node_b instanceof BaseNode_1.BaseNode)) {
+            if (!(new_node_a instanceof BaseNode) || !(new_node_b instanceof BaseNode)) {
                 throw new Error("refusing to clone edge if any new node is invalid");
             }
             return new BaseEdge(this._id, new_node_a, new_node_b, {
@@ -2464,30 +2384,8 @@
         };
         return BaseEdge;
     }());
-    exports.BaseEdge = BaseEdge;
-    });
 
-    unwrapExports(BaseEdge_1);
-    var BaseEdge_2 = BaseEdge_1.BaseEdge;
-
-    var TypedEdge_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var TypedEdge = (function (_super) {
+    var TypedEdge = /** @class */ (function (_super) {
         __extends(TypedEdge, _super);
         function TypedEdge(_id, _node_a, _node_b, config) {
             if (config === void 0) { config = {}; }
@@ -2495,81 +2393,29 @@
             _this._id = _id;
             _this._node_a = _node_a;
             _this._node_b = _node_b;
-            _this._type = config.type || run_config.GENERIC_TYPES.Edge;
+            _this._type = config.type || GENERIC_TYPES.Edge;
             return _this;
         }
         Object.defineProperty(TypedEdge.prototype, "type", {
             get: function () {
                 return this._type;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return TypedEdge;
-    }(BaseEdge_1.BaseEdge));
-    exports.TypedEdge = TypedEdge;
-    });
+    }(BaseEdge));
 
-    unwrapExports(TypedEdge_1);
-    var TypedEdge_2 = TypedEdge_1.TypedEdge;
-
-    var TypedNode_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var TypedNode = (function (_super) {
+    var TypedNode = /** @class */ (function (_super) {
         __extends(TypedNode, _super);
         function TypedNode(_id, config) {
             var _a;
             if (config === void 0) { config = {}; }
             var _this = _super.call(this, _id, config) || this;
             _this._id = _id;
-            _this._type = config.type || run_config.GENERIC_TYPES.Node;
+            _this._type = config.type || GENERIC_TYPES.Node;
             _this._typedAdjSets = (_a = {},
-                _a[run_config.GENERIC_TYPES.Edge] = {
+                _a[GENERIC_TYPES.Edge] = {
                     ins: new Set(),
                     outs: new Set(),
                     conns: new Set()
@@ -2581,41 +2427,31 @@
             get: function () {
                 return this._type;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(TypedNode.prototype, "stats", {
             get: function () {
-                var e_1, _a;
                 var result = {
                     typed_edges: {}
                 };
-                try {
-                    for (var _b = __values(Object.keys(this._typedAdjSets)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var type = _c.value;
-                        result.typed_edges[type] = { ins: 0, outs: 0, conns: 0 };
-                        result.typed_edges[type].ins = this._typedAdjSets[type].ins ? this._typedAdjSets[type].ins.size : 0;
-                        result.typed_edges[type].outs = this._typedAdjSets[type].outs ? this._typedAdjSets[type].outs.size : 0;
-                        result.typed_edges[type].conns = this._typedAdjSets[type].conns ? this._typedAdjSets[type].conns.size : 0;
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                    }
-                    finally { if (e_1) throw e_1.error; }
+                for (var _i = 0, _a = Object.keys(this._typedAdjSets); _i < _a.length; _i++) {
+                    var type = _a[_i];
+                    result.typed_edges[type] = { ins: 0, outs: 0, conns: 0 };
+                    result.typed_edges[type].ins = this._typedAdjSets[type].ins ? this._typedAdjSets[type].ins.size : 0;
+                    result.typed_edges[type].outs = this._typedAdjSets[type].outs ? this._typedAdjSets[type].outs.size : 0;
+                    result.typed_edges[type].conns = this._typedAdjSets[type].conns ? this._typedAdjSets[type].conns.size : 0;
                 }
                 return result;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TypedNode.prototype.addEdge = function (edge) {
             if (!_super.prototype.addEdge.call(this, edge)) {
                 return null;
             }
-            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var type = edge.type || GENERIC_TYPES.Edge;
             var dir = edge.isDirected();
             var uid = this.uniqueNID(edge);
             if (!this._typedAdjSets[type]) {
@@ -2639,11 +2475,18 @@
                 }
                 this._typedAdjSets[type].ins.add(uid);
             }
+            // logger.log(this._typedAdjSets);
             return edge;
         };
+        /**
+         * @description we assume
+         * 							- type is present if super removes edge without throwing
+         * @param edge
+         */
         TypedNode.prototype.removeEdge = function (edge) {
+            // Throws when something happens...
             _super.prototype.removeEdge.call(this, edge);
-            var type = edge.type || run_config.GENERIC_TYPES.Edge;
+            var type = edge.type || GENERIC_TYPES.Edge;
             var dir = edge.isDirected();
             var uid = this.uniqueNID(edge);
             if (!dir) {
@@ -2655,10 +2498,13 @@
             else {
                 this._typedAdjSets[type].ins.delete(uid);
             }
-            if (type !== run_config.GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
+            if (type !== GENERIC_TYPES.Edge && this.noEdgesOfTypeLeft(type)) {
                 delete this._typedAdjSets[type];
             }
         };
+        // removeEdgeByID(id: string): void {
+        // 	super.removeEdgeByID(id);
+        // }
         TypedNode.prototype.ins = function (type) {
             return this._typedAdjSets[type] ? this._typedAdjSets[type].ins : undefined;
         };
@@ -2669,14 +2515,20 @@
             return this._typedAdjSets[type] ? this._typedAdjSets[type].conns : undefined;
         };
         TypedNode.prototype.all = function (type) {
-            var result = new Set();
+            var result = new Set(); // spread operator has a problem with Set<string>...
             if (this._typedAdjSets[type]) {
-                this._typedAdjSets[type].ins && result.add(__spread(this._typedAdjSets[type].ins));
-                this._typedAdjSets[type].outs && result.add(__spread(this._typedAdjSets[type].outs));
-                this._typedAdjSets[type].conns && result.add(__spread(this._typedAdjSets[type].conns));
+                this._typedAdjSets[type].ins && result.add(__spreadArrays(this._typedAdjSets[type].ins));
+                this._typedAdjSets[type].outs && result.add(__spreadArrays(this._typedAdjSets[type].outs));
+                this._typedAdjSets[type].conns && result.add(__spreadArrays(this._typedAdjSets[type].conns));
             }
             return result;
         };
+        /**
+         * Unique ID for Neighbor (traversal)
+         * @param e ITypedEdge
+         * @description {node} `other / target` node
+         * @returns unique neighbor entry ID
+         */
         TypedNode.prototype.uniqueNID = function (e) {
             var _a = e.getNodes(), a = _a.a, b = _a.b;
             var node = a === this ? b : a;
@@ -2693,88 +2545,47 @@
                 && (!this._typedAdjSets[type].conns || !this._typedAdjSets[type].conns.size);
         };
         return TypedNode;
-    }(BaseNode_1.BaseNode));
-    exports.TypedNode = TypedNode;
-    });
+    }(BaseNode));
 
-    unwrapExports(TypedNode_1);
-    var TypedNode_2 = TypedNode_1.TypedNode;
-
-    var TypedGraph_1 = createCommonjsModule(function (module, exports) {
-    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
-        __assign = Object.assign || function(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                    t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-
-
-
-    var TypedGraph = (function (_super) {
+    /**
+     * @description TypedGraph only takes TypedNodes & TypedEdges
+     * @description coding standard: following Neo4j / Cypher standard,
+     * node types should be in capital letters & edge types expressive
+     * two-pieces separated by underscore (except 'GENERIC')
+     * @todo enforce uppercase?
+     * @description we could couple edge type & direction in order to
+     * make the system more stringent, but this would result in a more
+     * complex setup with the possibility of too many Errors thrown.
+     * @solution for now, leave the type / direction combination to the
+     * programmer & just assume internal consistency
+     * @todo how to handle traversal when direction given goes against
+     *       direction information in the edge object ?
+     * @todo just don't specify direction in traversal / expand and only
+     *       follow the direction specified in edge !?
+     * @todo in the last case, how to handle undirected edges ?
+     * @todo allow 'GENERIC' edge types ? => yes!
+     */
+    var TypedGraph = /** @class */ (function (_super) {
         __extends(TypedGraph, _super);
         function TypedGraph(_label) {
             var _this = _super.call(this, _label) || this;
             _this._label = _label;
+            /**
+             * We don't need an extra array of registered types, since an
+             * acceptable recommendation graph will only contain a few single
+             * up to a few dozen different types, which are quickly obtained
+             * via Object.keys()
+             */
             _this._typedNodes = new Map();
             _this._typedEdges = new Map();
-            _this._type = run_config.GENERIC_TYPES.Graph;
-            _this._typedNodes.set(run_config.GENERIC_TYPES.Node, new Map());
-            _this._typedEdges.set(run_config.GENERIC_TYPES.Edge, new Map());
+            _this._type = GENERIC_TYPES.Graph;
+            _this._typedNodes.set(GENERIC_TYPES.Node, new Map());
+            _this._typedEdges.set(GENERIC_TYPES.Edge, new Map());
             return _this;
         }
+        /**
+         * convenience methods
+         */
         TypedGraph.prototype.n = function (id) {
             return this.getNodeById(id);
         };
@@ -2782,7 +2593,7 @@
             get: function () {
                 return this._type;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TypedGraph.prototype.nodeTypes = function () {
@@ -2799,27 +2610,33 @@
             type = type.toUpperCase();
             return this._typedEdges.get(type) ? this._typedEdges.get(type).size : null;
         };
+        /**
+         * Neighbor nodes depending on type
+         */
         TypedGraph.prototype.ins = function (node, type) {
             var _this = this;
             var targets = node.ins(type);
             if (targets) {
-                return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+                return new Set(__spreadArrays(targets).map(function (uid) { return _this.n(TypedNode.nIDFromUID(uid)); }));
             }
         };
         TypedGraph.prototype.outs = function (node, type) {
             var _this = this;
             var targets = node.outs(type);
-            return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+            return new Set(__spreadArrays(targets).map(function (uid) { return _this.n(TypedNode.nIDFromUID(uid)); }));
         };
         TypedGraph.prototype.unds = function (node, type) {
             var _this = this;
             var targets = node.unds(type);
             if (targets) {
-                return new Set(__spread(targets).map(function (uid) { return _this.n(TypedNode_1.TypedNode.nIDFromUID(uid)); }));
+                return new Set(__spreadArrays(targets).map(function (uid) { return _this.n(TypedNode.nIDFromUID(uid)); }));
             }
         };
+        /**
+         * @todo abomination...
+         */
         TypedGraph.convertToExpansionResult = function (input) {
-            if (BaseNode_1.BaseNode.isTyped(input)) {
+            if (BaseNode.isTyped(input)) {
                 return { set: new Set([input]), freq: new Map() };
             }
             else if (input instanceof Set) {
@@ -2829,57 +2646,70 @@
                 return input;
             }
         };
+        /**
+         * Neighbor nodes depending on type
+         * @description takes either a single TypedNode or a Set of TypedNodes as input
+         * @description we have to start with node objects, since dupe-checkable strings
+         *              are only available once we deal with edge/neighborhood entries
+         *              However, we then need to switch to an `intermediate representation`
+         *              using those strings for dupe checking, and in the end map back to
+         *              a node set...
+         * @description In case of multiple input nodes, they could reference each other...
+         *       -> Neo4j allows that, so we allow it as well (for now ;-))
+         *
+         * @todo decide if this difference in representation between node->neighbors &
+         *       graph->nodeNeighbors is a problem or not (also performance-wise) !?
+         * @todo decide if method call via [dir] is an abomination or not
+         *       -> definitely screws up code assist / intellisense !
+         *       -> (we all know it is...)
+         *
+         *
+         *
+         * @TODO draw a decision diagram...!
+         * @TODO create a small, manageable test graph for expand(K)/periphery@K scenarios
+         * 			 -> and put those test cases into the SYNC suite
+         */
         TypedGraph.prototype.expand = function (input, dir, type) {
-            var e_1, _a, e_2, _b;
+            // const expansionInbounds : ExpansionInbounds = {};
             var nodes = TypedGraph.convertToExpansionResult(input);
             var resultSet = new Set();
             var freqMap = new Map();
-            try {
-                for (var _c = __values(nodes.set), _d = _c.next(); !_d.done; _d = _c.next()) {
-                    var node = _d.value;
-                    var targets = node[dir](type);
-                    if (!targets) {
-                        continue;
-                    }
-                    try {
-                        for (var targets_1 = __values(targets), targets_1_1 = targets_1.next(); !targets_1_1.done; targets_1_1 = targets_1.next()) {
-                            var target = targets_1_1.value;
-                            var nodeRef = this.n(TypedNode_1.TypedNode.nIDFromUID(target));
-                            if (!freqMap.has(nodeRef)) {
-                                if (nodes.freq.get(node)) {
-                                    freqMap.set(nodeRef, nodes.freq.get(node));
-                                }
-                                else {
-                                    freqMap.set(nodeRef, 1);
-                                }
-                            }
-                            if (resultSet.has(nodeRef)) {
-                                freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(node));
-                            }
-                            resultSet.add(nodeRef);
+            for (var _i = 0, _a = nodes.set; _i < _a.length; _i++) {
+                var node = _a[_i];
+                var targets = node[dir](type);
+                if (!targets) {
+                    continue;
+                }
+                for (var _b = 0, targets_1 = targets; _b < targets_1.length; _b++) {
+                    var target = targets_1[_b];
+                    var nodeRef = this.n(TypedNode.nIDFromUID(target));
+                    if (!freqMap.has(nodeRef)) {
+                        // if we already have a frequency entry for this source node, we'll use it for initialization
+                        // since if #paths already led to this node, and we have a path from this node to the
+                        // target, then we got #paths to the target from whatever original source
+                        if (nodes.freq.get(node)) {
+                            freqMap.set(nodeRef, nodes.freq.get(node));
+                        }
+                        else {
+                            freqMap.set(nodeRef, 1);
                         }
                     }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (targets_1_1 && !targets_1_1.done && (_b = targets_1.return)) _b.call(targets_1);
-                        }
-                        finally { if (e_2) throw e_2.error; }
+                    if (resultSet.has(nodeRef)) {
+                        freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(node));
                     }
+                    resultSet.add(nodeRef);
                 }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-                }
-                finally { if (e_1) throw e_1.error; }
             }
             return { set: resultSet, freq: freqMap };
         };
+        /**
+         * expand over k steps
+         *
+         * @description like neo4j's `-[:REL*1..k]->`
+         *              returning the node sets at distance <= `k`
+         */
         TypedGraph.prototype.expandK = function (input, dir, type, cfg) {
             if (cfg === void 0) { cfg = {}; }
-            var e_3, _a;
             if (cfg.k < 0) {
                 throw new Error('cowardly refusing to expand a negative number of steps.');
             }
@@ -2889,28 +2719,23 @@
             var freqMap = new Map();
             while (k--) {
                 nodes = this.expand(nodes, dir, type);
-                try {
-                    for (var _b = __values(nodes.set), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var nodeRef = _c.value;
-                        if (!freqMap.has(nodeRef)) {
-                            freqMap.set(nodeRef, nodes.freq.get(nodeRef));
-                        }
-                        if (resultSet.has(nodeRef)) {
-                            freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(nodeRef));
-                        }
-                        resultSet.add(nodeRef);
+                for (var _i = 0, _a = nodes.set; _i < _a.length; _i++) {
+                    var nodeRef = _a[_i];
+                    if (!freqMap.has(nodeRef)) {
+                        freqMap.set(nodeRef, nodes.freq.get(nodeRef));
                     }
-                }
-                catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    if (resultSet.has(nodeRef)) {
+                        freqMap.set(nodeRef, freqMap.get(nodeRef) + nodes.freq.get(nodeRef));
                     }
-                    finally { if (e_3) throw e_3.error; }
+                    resultSet.add(nodeRef);
                 }
             }
             return { set: resultSet, freq: freqMap };
         };
+        /**
+         * @description like neo4j's `-[:REL*k]->`
+         *              only returning the node set at distance `k`
+         */
         TypedGraph.prototype.peripheryAtK = function (input, dir, type, cfg) {
             if (cfg === void 0) { cfg = {}; }
             if (cfg.k < 0) {
@@ -2918,68 +2743,71 @@
             }
             var nodes = TypedGraph.convertToExpansionResult(input);
             var k = cfg.k && cfg.k < this._nr_nodes ? cfg.k : this._nr_nodes - 1;
-            for (var it_1 = 0; it_1 < k; it_1++) {
+            for (var it = 0; it < k; it++) {
                 nodes = this.expand(nodes, dir, type);
             }
             return nodes;
         };
+        /**
+         * TYPED HISTOGRAMS
+         */
         TypedGraph.prototype.inHistT = function (nType, eType) {
-            return this.degreeHistT(interfaces.DIR.in, nType, eType);
+            return this.degreeHistT(DIR.in, nType, eType);
         };
         TypedGraph.prototype.outHistT = function (nType, eType) {
-            return this.degreeHistT(interfaces.DIR.out, nType, eType);
+            return this.degreeHistT(DIR.out, nType, eType);
         };
         TypedGraph.prototype.connHistT = function (nType, eType) {
-            return this.degreeHistT(interfaces.DIR.und, nType, eType);
+            return this.degreeHistT(DIR.und, nType, eType);
         };
         TypedGraph.prototype.degreeHistT = function (dir, nType, eType) {
-            var e_4, _a;
             var result = [];
-            try {
-                for (var _b = __values(this._typedNodes.get(nType)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var _d = __read(_c.value, 2), node_id = _d[0], node = _d[1];
-                    var deg = void 0;
-                    switch (dir) {
-                        case interfaces.DIR.in:
-                            deg = node.ins(eType) ? node.ins(eType).size : 0;
-                            break;
-                        case interfaces.DIR.out:
-                            deg = node.outs(eType) ? node.outs(eType).size : 0;
-                            break;
-                        default:
-                            deg = node.unds(eType) ? node.unds(eType).size : 0;
-                    }
-                    if (!result[deg]) {
-                        result[deg] = new Set([node]);
-                    }
-                    else {
-                        result[deg].add(node);
-                    }
+            for (var _i = 0, _a = this._typedNodes.get(nType); _i < _a.length; _i++) {
+                var _b = _a[_i], node_id = _b[0], node = _b[1];
+                var deg = void 0;
+                switch (dir) {
+                    case DIR.in:
+                        deg = node.ins(eType) ? node.ins(eType).size : 0;
+                        break;
+                    case DIR.out:
+                        deg = node.outs(eType) ? node.outs(eType).size : 0;
+                        break;
+                    default:
+                        deg = node.unds(eType) ? node.unds(eType).size : 0;
                 }
-            }
-            catch (e_4_1) { e_4 = { error: e_4_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                if (!result[deg]) {
+                    result[deg] = new Set([node]);
                 }
-                finally { if (e_4) throw e_4.error; }
+                else {
+                    result[deg].add(node);
+                }
             }
             return result;
         };
+        /**
+         * @todo difference to super ??
+         * @param id
+         * @param opts
+         */
         TypedGraph.prototype.addNodeByID = function (id, opts) {
             if (this.hasNodeID(id)) {
                 throw new Error("Won't add node with duplicate ID.");
             }
-            var node = new TypedNode_1.TypedNode(id, opts);
+            var node = new TypedNode(id, opts);
             return this.addNode(node) ? node : null;
         };
         TypedGraph.prototype.addNode = function (node) {
             if (!_super.prototype.addNode.call(this, node)) {
                 return null;
             }
+            // logger.log(JSON.stringify(node));
             var id = node.getID(), type = node.type ? node.type.toUpperCase() : null;
+            /**
+             *  Untyped nodes will be treated as `generic` type
+             */
             if (!type) {
-                this._typedNodes.get(run_config.GENERIC_TYPES.Node).set(id, node);
+                // logger.log(`Received node type: ${type}`);
+                this._typedNodes.get(GENERIC_TYPES.Node).set(id, node);
             }
             else {
                 if (!this._typedNodes.get(type)) {
@@ -2999,7 +2827,7 @@
             return this._typedEdges.get(type.toUpperCase());
         };
         TypedGraph.prototype.deleteNode = function (node) {
-            var id = node.getID(), type = node.type ? node.type.toUpperCase() : run_config.GENERIC_TYPES.Node;
+            var id = node.getID(), type = node.type ? node.type.toUpperCase() : GENERIC_TYPES.Node;
             if (!this._typedNodes.get(type)) {
                 throw Error('Node type does not exist on this TypedGraph.');
             }
@@ -3014,7 +2842,7 @@
             _super.prototype.deleteNode.call(this, node);
         };
         TypedGraph.prototype.addEdgeByID = function (id, a, b, opts) {
-            var edge = new TypedEdge_1.TypedEdge(id, a, b, opts || {});
+            var edge = new TypedEdge(id, a, b, opts || {});
             return this.addEdge(edge);
         };
         TypedGraph.prototype.addEdge = function (edge) {
@@ -3022,12 +2850,17 @@
                 return null;
             }
             var id = edge.getID();
-            var type = run_config.GENERIC_TYPES.Edge;
-            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+            var type = GENERIC_TYPES.Edge;
+            if (BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
+            // logger.log('Got edge label: ' + edge.label);
+            // logger.log('Got edge type: ' + type);
+            /**
+             *  Same procedure as every node...
+             */
             if (id === type) {
-                this._typedEdges.get(run_config.GENERIC_TYPES.Edge).set(id, edge);
+                this._typedEdges.get(GENERIC_TYPES.Edge).set(id, edge);
             }
             else {
                 if (!this._typedEdges.get(type)) {
@@ -3039,8 +2872,8 @@
         };
         TypedGraph.prototype.deleteEdge = function (edge) {
             var id = edge.getID();
-            var type = run_config.GENERIC_TYPES.Edge;
-            if (BaseEdge_1.BaseEdge.isTyped(edge) && edge.type) {
+            var type = GENERIC_TYPES.Edge;
+            if (BaseEdge.isTyped(edge) && edge.type) {
                 type = edge.type.toUpperCase();
             }
             if (!this._typedEdges.get(type)) {
@@ -3060,570 +2893,14 @@
             var typed_nodes = {}, typed_edges = {};
             this._typedNodes.forEach(function (k, v) { return typed_nodes[v] = k.size; });
             this._typedEdges.forEach(function (k, v) { return typed_edges[v] = k.size; });
-            return __assign({}, _super.prototype.getStats.call(this), { typed_nodes: typed_nodes,
+            return __assign(__assign({}, _super.prototype.getStats.call(this)), { 
+                // node_types: this.nodeTypes(),
+                // edge_types: this.edgeTypes(),
+                typed_nodes: typed_nodes,
                 typed_edges: typed_edges });
         };
         return TypedGraph;
-    }(BaseGraph_1.BaseGraph));
-    exports.TypedGraph = TypedGraph;
-    });
-
-    unwrapExports(TypedGraph_1);
-    var TypedGraph_2 = TypedGraph_1.TypedGraph;
-
-    var FloydWarshall = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function FloydWarshallAPSP(graph) {
-        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
-            throw new Error("Cowardly refusing to traverse graph without edges.");
-        }
-        var cg = new ComputeGraph_1.ComputeGraph(graph);
-        var dists = cg.adjMatrixW();
-        var next = cg.nextArray();
-        var N = dists.length;
-        for (var k = 0; k < N; ++k) {
-            for (var i = 0; i < N; ++i) {
-                for (var j = 0; j < N; ++j) {
-                    if (k != i && k != j && i != j && dists[i][j] == (dists[i][k] + dists[k][j])) {
-                        if (dists[i][j] !== Number.POSITIVE_INFINITY) {
-                            next[i][j] = StructUtils.mergeOrderedArraysNoDups(next[i][j], next[i][k]);
-                        }
-                    }
-                    if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
-                        next[i][j] = next[i][k].slice(0);
-                        dists[i][j] = dists[i][k] + dists[k][j];
-                    }
-                }
-            }
-        }
-        return [dists, next];
-    }
-    exports.FloydWarshallAPSP = FloydWarshallAPSP;
-    function FloydWarshallArray(graph) {
-        if (graph.nrDirEdges() === 0 && graph.nrUndEdges() === 0) {
-            throw new Error("Cowardly refusing to traverse graph without edges.");
-        }
-        var cg = new ComputeGraph_1.ComputeGraph(graph);
-        var dists = cg.adjMatrixW();
-        var N = dists.length;
-        for (var k = 0; k < N; ++k) {
-            for (var i = 0; i < N; ++i) {
-                for (var j = 0; j < N; ++j) {
-                    if (k != i && k != j && i != j && dists[i][j] > dists[i][k] + dists[k][j]) {
-                        dists[i][j] = dists[i][k] + dists[k][j];
-                    }
-                }
-            }
-        }
-        return dists;
-    }
-    exports.FloydWarshallArray = FloydWarshallArray;
-    function changeNextToDirectParents(input) {
-        var output = [];
-        for (var a = 0; a < input.length; a++) {
-            output.push([]);
-            for (var b = 0; b < input.length; b++) {
-                output[a].push([]);
-                output[a][b] = input[a][b];
-            }
-        }
-        for (var a = 0; a < input.length; a++) {
-            for (var b = 0; b < input.length; b++) {
-                if (input[a][b][0] != null
-                    && a != b && !(input[a][b].length === 1
-                    && input[a][b][0] === b)) {
-                    output[a][b] = [];
-                    findDirectParents(a, b, input, output);
-                }
-            }
-        }
-        return output;
-    }
-    exports.changeNextToDirectParents = changeNextToDirectParents;
-    function findDirectParents(u, v, inNext, outNext) {
-        var nodesInTracking = [u];
-        var counter = 0;
-        while (nodesInTracking.length > 0) {
-            var currNode = nodesInTracking.pop();
-            if (currNode == u && counter > 0) {
-                continue;
-            }
-            else {
-                for (var e = 0; e < inNext[currNode][v].length; e++) {
-                    if (inNext[currNode][v][e] == v && counter == 0) {
-                        outNext[u][v] = StructUtils.mergeOrderedArraysNoDups(outNext[u][v], [v]);
-                    }
-                    else if (inNext[currNode][v][e] == v) {
-                        outNext[u][v] = StructUtils.mergeOrderedArraysNoDups(outNext[u][v], [currNode]);
-                    }
-                    else {
-                        nodesInTracking = StructUtils.mergeOrderedArraysNoDups(nodesInTracking, [inNext[currNode][v][e]]);
-                    }
-                }
-            }
-            counter++;
-        }
-    }
-    });
-
-    unwrapExports(FloydWarshall);
-    var FloydWarshall_1 = FloydWarshall.FloydWarshallAPSP;
-    var FloydWarshall_2 = FloydWarshall.FloydWarshallArray;
-    var FloydWarshall_3 = FloydWarshall.changeNextToDirectParents;
-
-    var Betweenness = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    function betweennessCentrality(graph, directed, sparse) {
-        var paths;
-        sparse = sparse || false;
-        if (sparse) {
-            paths = Johnsons_1.Johnsons(graph)[1];
-        }
-        else {
-            paths = FloydWarshall.changeNextToDirectParents(FloydWarshall.FloydWarshallAPSP(graph)[1]);
-        }
-        var nodes = graph.getNodes();
-        var nodeKeys = Object.keys(nodes);
-        var map = {};
-        for (var key in nodes) {
-            map[key] = 0;
-        }
-        var N = paths.length;
-        for (var a = 0; a < N; ++a) {
-            for (var b = 0; b < N; ++b) {
-                if (a != b && !(paths[a][b].length == 1 && paths[a][b][0] == b) && paths[a][b][0] != null) {
-                    var tempMap = {};
-                    var leadArray = [];
-                    var pathCount = 0;
-                    do {
-                        var tracer = b;
-                        var leadCounter = 0;
-                        pathCount++;
-                        while (true) {
-                            var previous = paths[a][tracer];
-                            var terminate = false;
-                            if (previous.length == 1 && previous[0] == tracer) {
-                                break;
-                            }
-                            else if (previous.length == 1) {
-                                tracer = previous[0];
-                                tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
-                            }
-                            if (previous.length > 1) {
-                                if (leadArray.length == 0) {
-                                    leadArray.push([0, previous.length]);
-                                    if (previous[0] == tracer) {
-                                        terminate = true;
-                                    }
-                                    else {
-                                        tracer = previous[0];
-                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
-                                    }
-                                    leadCounter++;
-                                }
-                                else if (leadCounter < leadArray.length) {
-                                    var choice = leadArray[leadCounter][0];
-                                    if (previous[choice] == tracer) {
-                                        terminate = true;
-                                    }
-                                    else {
-                                        tracer = previous[choice];
-                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
-                                    }
-                                    leadCounter++;
-                                }
-                                else {
-                                    leadArray.push([0, previous.length]);
-                                    if (previous[0] == tracer) {
-                                        terminate = true;
-                                    }
-                                    else {
-                                        tracer = previous[0];
-                                        tracer in tempMap ? tempMap[tracer] += 1 : tempMap[tracer] = 1;
-                                    }
-                                    leadCounter++;
-                                }
-                            }
-                            if (terminate) {
-                                break;
-                            }
-                        }
-                        if (leadArray.length > 0) {
-                            leadArray[leadArray.length - 1][0]++;
-                            while (leadArray[leadArray.length - 1][0] == leadArray[leadArray.length - 1][1]) {
-                                leadArray.splice(leadArray.length - 1, 1);
-                                if (leadArray.length == 0) {
-                                    break;
-                                }
-                                leadArray[leadArray.length - 1][0]++;
-                            }
-                        }
-                    } while (leadArray.length != 0);
-                    for (var key in tempMap) {
-                        var mapKey = nodeKeys[key];
-                        map[mapKey] += tempMap[key] / pathCount;
-                    }
-                }
-            }
-        }
-        return map;
-    }
-    exports.betweennessCentrality = betweennessCentrality;
-    });
-
-    unwrapExports(Betweenness);
-    var Betweenness_1 = Betweenness.betweennessCentrality;
-
-    var Brandes_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-
-
-    var Brandes = (function () {
-        function Brandes(_graph) {
-            this._graph = _graph;
-            this._cg = new ComputeGraph_1.ComputeGraph(this._graph);
-        }
-        Brandes.prototype.computeUnweighted = function (normalize, directed) {
-            if (normalize === void 0) { normalize = false; }
-            if (directed === void 0) { directed = false; }
-            var e_1, _a;
-            if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
-                throw new Error("Cowardly refusing to traverse graph without edges.");
-            }
-            var nodes = this._graph.getNodes();
-            var adjList = this._cg.adjListW();
-            var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, Q = [], S = [], CB = {};
-            var closedNodes = {};
-            for (var n in nodes) {
-                var node_id = nodes[n].getID();
-                CB[node_id] = 0;
-                dist[node_id] = Number.POSITIVE_INFINITY;
-                sigma[node_id] = 0;
-                delta[node_id] = 0;
-                Pred[node_id] = [];
-                closedNodes[node_id] = false;
-            }
-            for (var i in nodes) {
-                s = nodes[i];
-                var id = s.getID();
-                dist[id] = 0;
-                sigma[id] = 1;
-                Q.push(id);
-                closedNodes[id] = true;
-                while (Q.length) {
-                    v = Q.shift();
-                    S.push(v);
-                    var neighbors = adjList[v];
-                    closedNodes[v] = true;
-                    for (var w_1 in neighbors) {
-                        if (closedNodes[w_1]) {
-                            continue;
-                        }
-                        if (dist[w_1] === Number.POSITIVE_INFINITY) {
-                            Q.push(w_1);
-                            dist[w_1] = dist[v] + 1;
-                        }
-                        if (dist[w_1] === dist[v] + 1) {
-                            sigma[w_1] += sigma[v];
-                            Pred[w_1].push(v);
-                        }
-                    }
-                }
-                while (S.length >= 1) {
-                    w = S.pop();
-                    try {
-                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var parent_1 = _c.value;
-                            delta[parent_1] += (sigma[parent_1] / sigma[w] * (1 + delta[w]));
-                        }
-                    }
-                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                    finally {
-                        try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                        }
-                        finally { if (e_1) throw e_1.error; }
-                    }
-                    if (w != s.getID()) {
-                        CB[w] += delta[w];
-                    }
-                    sigma[w] = 0;
-                    delta[w] = 0;
-                    dist[w] = Number.POSITIVE_INFINITY;
-                    Pred[w] = [];
-                    closedNodes[w] = false;
-                }
-            }
-            if (normalize) {
-                this.normalizeScores(CB, this._graph.nrNodes(), directed);
-            }
-            return CB;
-        };
-        Brandes.prototype.computeWeighted = function (normalize, directed) {
-            var e_2, _a;
-            if (this._graph.nrDirEdges() === 0 && this._graph.nrUndEdges() === 0) {
-                throw new Error("Cowardly refusing to traverse graph without edges.");
-            }
-            if (this._graph.hasNegativeEdge()) {
-                var extraNode = new BaseNode_1.BaseNode("extraNode");
-                var graph = Johnsons_1.addExtraNandE(this._graph, extraNode);
-                var BFresult = BellmanFord.BellmanFordDict(graph, extraNode);
-                if (BFresult.neg_cycle) {
-                    throw new Error("The graph contains a negative cycle, thus it can not be processed");
-                }
-                else {
-                    var newWeights = BFresult.distances;
-                    graph = Johnsons_1.reWeighGraph(graph, newWeights, extraNode);
-                    graph.deleteNode(extraNode);
-                }
-                this._graph = graph;
-            }
-            var nodes = this._graph.getNodes();
-            var N = Object.keys(nodes).length;
-            var adjList = this._cg.adjListW();
-            var evalPriority = function (nb) { return nb.best; };
-            var evalObjID = function (nb) { return nb.id; };
-            var s, v, w, Pred = {}, sigma = {}, delta = {}, dist = {}, S = [], CB = {}, closedNodes = {}, Q = new BinaryHeap_1.BinaryHeap(BinaryHeap_1.BinaryHeapMode.MIN, evalPriority, evalObjID);
-            for (var n in nodes) {
-                var currID = nodes[n].getID();
-                CB[currID] = 0;
-                dist[currID] = Number.POSITIVE_INFINITY;
-                sigma[currID] = 0;
-                delta[currID] = 0;
-                Pred[currID] = [];
-                closedNodes[currID] = false;
-            }
-            for (var i in nodes) {
-                s = nodes[i];
-                var id_s = s.getID();
-                dist[id_s] = 0;
-                sigma[id_s] = 1;
-                var source = { id: id_s, best: 0 };
-                Q.insert(source);
-                closedNodes[id_s] = true;
-                while (Q.size() > 0) {
-                    v = Q.pop();
-                    var current_id = v.id;
-                    S.push(current_id);
-                    closedNodes[current_id] = true;
-                    var neighbors = adjList[current_id];
-                    for (var w_2 in neighbors) {
-                        if (closedNodes[w_2]) {
-                            continue;
-                        }
-                        var new_dist = dist[current_id] + neighbors[w_2];
-                        var nextNode = { id: w_2, best: dist[w_2] };
-                        if (dist[w_2] > new_dist) {
-                            if (isFinite(dist[w_2])) {
-                                var x = Q.remove(nextNode);
-                                nextNode.best = new_dist;
-                                Q.insert(nextNode);
-                            }
-                            else {
-                                nextNode.best = new_dist;
-                                Q.insert(nextNode);
-                            }
-                            sigma[w_2] = 0;
-                            dist[w_2] = new_dist;
-                            Pred[w_2] = [];
-                        }
-                        if (dist[w_2] === new_dist) {
-                            sigma[w_2] += sigma[current_id];
-                            Pred[w_2].push(current_id);
-                        }
-                    }
-                }
-                while (S.length >= 1) {
-                    w = S.pop();
-                    try {
-                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var parent_2 = _c.value;
-                            delta[parent_2] += (sigma[parent_2] / sigma[w] * (1 + delta[w]));
-                        }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                        }
-                        finally { if (e_2) throw e_2.error; }
-                    }
-                    if (w != s.getID()) {
-                        CB[w] += delta[w];
-                    }
-                    sigma[w] = 0;
-                    delta[w] = 0;
-                    dist[w] = Number.POSITIVE_INFINITY;
-                    Pred[w] = [];
-                    closedNodes[w] = false;
-                }
-            }
-            if (normalize) {
-                this.normalizeScores(CB, N, directed);
-            }
-            return CB;
-        };
-        Brandes.prototype.computePFSbased = function (normalize, directed) {
-            var e_3, _a;
-            var nodes = this._graph.getNodes();
-            var adjList = this._cg.adjListW();
-            var Pred = {}, sigma = {}, delta = {}, S = [], CB = {};
-            for (var n in nodes) {
-                var currID = nodes[n].getID();
-                CB[currID] = 0;
-                sigma[currID] = 0;
-                delta[currID] = 0;
-                Pred[currID] = [];
-            }
-            var specialConfig = PFS_1.preparePFSStandardConfig();
-            var notEncounteredBrandes = function (context) {
-                context.next.best =
-                    context.current.best + (isNaN(context.next.edge.getWeight()) ? PFS_1.DEFAULT_WEIGHT : context.next.edge.getWeight());
-                var next_id = context.next.node.getID();
-                var current_id = context.current.node.getID();
-                Pred[next_id] = [current_id];
-                sigma[next_id] += sigma[current_id];
-            };
-            specialConfig.callbacks.not_encountered.splice(0, 1, notEncounteredBrandes);
-            var newCurrentBrandes = function (context) {
-                S.push(context.current.node.getID());
-            };
-            specialConfig.callbacks.new_current.push(newCurrentBrandes);
-            var betterPathBrandes = function (context) {
-                var next_id = context.next.node.getID();
-                var current_id = context.current.node.getID();
-                sigma[next_id] = 0;
-                sigma[next_id] += sigma[current_id];
-                Pred[next_id] = [];
-                Pred[next_id].push(current_id);
-            };
-            specialConfig.callbacks.better_path.splice(0, 1, betterPathBrandes);
-            var equalPathBrandes = function (context) {
-                var next_id = context.next.node.getID();
-                var current_id = context.current.node.getID();
-                sigma[next_id] += sigma[current_id];
-                if (Pred[next_id].indexOf(current_id) === -1) {
-                    Pred[next_id].push(current_id);
-                }
-            };
-            specialConfig.callbacks.equal_path.push(equalPathBrandes);
-            for (var i in nodes) {
-                var s = nodes[i];
-                sigma[s.getID()] = 1;
-                PFS_1.PFS(this._graph, s, specialConfig);
-                while (S.length >= 1) {
-                    var w = S.pop();
-                    try {
-                        for (var _b = __values(Pred[w]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var parent_3 = _c.value;
-                            delta[parent_3] += (sigma[parent_3] / sigma[w] * (1 + delta[w]));
-                        }
-                    }
-                    catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                    finally {
-                        try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                        }
-                        finally { if (e_3) throw e_3.error; }
-                    }
-                    if (w != s.getID()) {
-                        CB[w] += delta[w];
-                    }
-                    sigma[w] = 0;
-                    delta[w] = 0;
-                    Pred[w] = [];
-                }
-            }
-            if (normalize) {
-                this.normalizeScores(CB, this._graph.nrNodes(), directed);
-            }
-            return CB;
-        };
-        Brandes.prototype.normalizeScores = function (CB, N, directed) {
-            var factor = directed ? ((N - 1) * (N - 2)) : ((N - 1) * (N - 2) / 2);
-            for (var node in CB) {
-                CB[node] /= factor;
-            }
-        };
-        return Brandes;
-    }());
-    exports.Brandes = Brandes;
-    });
-
-    unwrapExports(Brandes_1);
-    var Brandes_2 = Brandes_1.Brandes;
-
-    var Closeness = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var ClosenessCentrality = (function () {
-        function ClosenessCentrality() {
-        }
-        ClosenessCentrality.prototype.getCentralityMapFW = function (graph) {
-            var dists = FloydWarshall.FloydWarshallArray(graph);
-            var ret = [];
-            var N = dists.length;
-            for (var a = 0; a < N; ++a) {
-                var sum = 0;
-                for (var b = 0; b < N; ++b) {
-                    if (dists[a][b] != Number.POSITIVE_INFINITY)
-                        sum += dists[a][b];
-                }
-                ret[a] = 1 / sum;
-            }
-            return ret;
-        };
-        ClosenessCentrality.prototype.getCentralityMap = function (graph) {
-            var pfs_config = PFS_1.preparePFSStandardConfig();
-            var accumulated_distance = 0;
-            var not_encountered = function (context) {
-                accumulated_distance += context.current.best + (isNaN(context.next.edge.getWeight()) ? 1 : context.next.edge.getWeight());
-            };
-            var betterPathFound = function (context) {
-                accumulated_distance -= pfs_config.result[context.next.node.getID()].distance - context.proposed_dist;
-            };
-            var bp = pfs_config.callbacks.better_path.pop();
-            pfs_config.callbacks.better_path.push(betterPathFound);
-            pfs_config.callbacks.better_path.push(bp);
-            pfs_config.callbacks.not_encountered.push(not_encountered);
-            var ret = {};
-            for (var key in graph.getNodes()) {
-                var node = graph.getNodeById(key);
-                if (node != null) {
-                    accumulated_distance = 0;
-                    PFS_1.PFS(graph, node, pfs_config);
-                    ret[key] = 1 / accumulated_distance;
-                }
-            }
-            return ret;
-        };
-        return ClosenessCentrality;
-    }());
-    exports.ClosenessCentrality = ClosenessCentrality;
-    });
-
-    unwrapExports(Closeness);
-    var Closeness_1 = Closeness.ClosenessCentrality;
-
-    var Degree = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
+    }(BaseGraph));
 
     var DegreeMode;
     (function (DegreeMode) {
@@ -3632,176 +2909,34 @@
         DegreeMode[DegreeMode["und"] = 2] = "und";
         DegreeMode[DegreeMode["dir"] = 3] = "dir";
         DegreeMode[DegreeMode["all"] = 4] = "all";
-    })(DegreeMode = exports.DegreeMode || (exports.DegreeMode = {}));
-    var DegreeCentrality = (function () {
-        function DegreeCentrality() {
-        }
-        DegreeCentrality.prototype.getCentralityMap = function (graph, weighted, conf) {
-            weighted = (weighted != null) ? !!weighted : true;
-            conf = (conf == null) ? DegreeMode.all : conf;
-            var ret = {};
-            switch (conf) {
-                case DegreeMode.in:
-                    for (var key in graph.getNodes()) {
-                        var node = graph.getNodeById(key);
-                        if (node != null) {
-                            if (!weighted) {
-                                ret[key] = node.in_deg;
-                            }
-                            else {
-                                ret[key] = ret[key] || 0;
-                                for (var k in node.inEdges()) {
-                                    ret[key] += node.inEdges()[k].getWeight();
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case DegreeMode.out:
-                    for (var key in graph.getNodes()) {
-                        var node = graph.getNodeById(key);
-                        if (node != null) {
-                            if (!weighted) {
-                                ret[key] = node.out_deg;
-                            }
-                            else {
-                                ret[key] = ret[key] || 0;
-                                for (var k in node.outEdges()) {
-                                    ret[key] += node.outEdges()[k].getWeight();
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case DegreeMode.und:
-                    for (var key in graph.getNodes()) {
-                        var node = graph.getNodeById(key);
-                        if (node != null) {
-                            if (!weighted) {
-                                ret[key] = node.deg;
-                            }
-                            else {
-                                ret[key] = ret[key] || 0;
-                                for (var k in node.undEdges()) {
-                                    ret[key] += node.undEdges()[k].getWeight();
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case DegreeMode.dir:
-                    for (var key in graph.getNodes()) {
-                        var node = graph.getNodeById(key);
-                        if (node != null) {
-                            if (!weighted) {
-                                ret[key] = node.in_deg + node.out_deg;
-                            }
-                            else {
-                                ret[key] = ret[key] || 0;
-                                var comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges()]);
-                                for (var k in comb) {
-                                    ret[key] += comb[k].getWeight();
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case DegreeMode.all:
-                    for (var key in graph.getNodes()) {
-                        var node = graph.getNodeById(key);
-                        if (node != null) {
-                            if (!weighted) {
-                                ret[key] = node.deg + node.in_deg + node.out_deg;
-                            }
-                            else {
-                                ret[key] = ret[key] || 0;
-                                var comb = StructUtils.mergeObjects([node.inEdges(), node.outEdges(), node.undEdges()]);
-                                for (var k in comb) {
-                                    ret[key] += comb[k].getWeight();
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-            return ret;
-        };
-        DegreeCentrality.prototype.degreeDistribution = function (graph) {
-            var max_deg = 0, key, nodes = graph.getNodes(), node, all_deg;
-            for (key in nodes) {
-                node = nodes[key];
-                all_deg = node.in_deg + node.out_deg + node.deg + 1;
-                max_deg = all_deg > max_deg ? all_deg : max_deg;
-            }
-            var deg_dist = {
-                in: new Uint32Array(max_deg),
-                out: new Uint32Array(max_deg),
-                dir: new Uint32Array(max_deg),
-                und: new Uint32Array(max_deg),
-                all: new Uint32Array(max_deg)
-            };
-            for (key in nodes) {
-                node = nodes[key];
-                deg_dist.in[node.in_deg]++;
-                deg_dist.out[node.out_deg]++;
-                deg_dist.dir[node.in_deg + node.out_deg]++;
-                deg_dist.und[node.deg]++;
-                deg_dist.all[node.in_deg + node.out_deg + node.deg]++;
-            }
-            return deg_dist;
-        };
-        return DegreeCentrality;
-    }());
-    exports.DegreeCentrality = DegreeCentrality;
-    });
+    })(DegreeMode || (DegreeMode = {}));
 
-    unwrapExports(Degree);
-    var Degree_1 = Degree.DegreeMode;
-    var Degree_2 = Degree.DegreeCentrality;
-
-    var Pagerank_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
+    // import { Logger } from "../utils/Logger";
+    // const logger = new Logger();
     var DEFAULT_WEIGHTED = false;
     var DEFAULT_ALPHA = 0.15;
     var DEFAULT_MAX_ITERATIONS = 1e3;
     var DEFAULT_EPSILON = 1e-6;
     var DEFAULT_NORMALIZE = false;
     var defaultInit = function (graph) { return 1 / graph.nrNodes(); };
-    var Pagerank = (function () {
+    /**
+     * PageRank for all nodes of a given graph by performing Random Walks
+     * Implemented to give the same results as the NetworkX implementation, just faster!
+     *
+     * @description We assume that all necessary properties of a node's feature vector
+     *              has been incorporated into it's initial rank or the link structure
+     *              of the graph. This means we carefully have to construct our graph
+     *              before interpreting Pagerank as anything meaninful for a particular
+     *              application.
+     *
+     * @todo find a paper / article detailing this implementation (it's the networkx numpy version...)
+     * @todo compute a ground truth for our sample social networks (python!)
+     * @todo compute a ground truth for our jobs / beer / northwind / meetup sample graphs (neo4j / networkx)
+     */
+    var Pagerank = /** @class */ (function () {
         function Pagerank(_graph, config) {
             this._graph = _graph;
-            config = config || {};
+            config = config || {}; // just so we don't get `property of undefined` errors below
             this._weighted = config.weighted || DEFAULT_WEIGHTED;
             this._alpha = config.alpha || DEFAULT_ALPHA;
             this._maxIterations = config.maxIterations || DEFAULT_MAX_ITERATIONS;
@@ -3824,6 +2959,7 @@
                 tele_size: config.tele_set ? 0 : null
             };
             config.PRArrays || this.constructPRArrayDataStructs(config);
+            // logger.log(JSON.stringify(this._PRArrayDS));
         }
         Pagerank.prototype.getConfig = function () {
             return {
@@ -3844,6 +2980,7 @@
             var init_sum = 0;
             for (var key in nodes) {
                 var node = this._graph.getNodeById(key);
+                // set identifier to re-map later..
                 node.setFeature('PR_index', i);
                 if (config.init_map) {
                     if (config.init_map[key] == null) {
@@ -3859,6 +2996,12 @@
                     this._PRArrayDS.old[i] = defaultInit(this._graph);
                 }
                 this._PRArrayDS.out_deg[i] = node.out_deg + node.deg;
+                /**
+                 * @todo enhance this to actual weights!?
+                 * @todo networkX requires a dict the size of the inputs, which is cumbersome for larger graphs
+                 *       we want to do this smarter, but can we omit large parts of the (pseudo-)sparse matrix?
+                 *       - where pseudo-sparse means containing only implicit values (jump chances)
+                 */
                 if (this._personalized) {
                     var tele_prob_node = config.tele_set[node.getID()] || 0;
                     this._PRArrayDS.teleport[i] = tele_prob_node;
@@ -3867,19 +3010,25 @@
                 }
                 ++i;
             }
+            // normalize init values
             if (config.init_map && init_sum !== 1) {
                 this._PRArrayDS.curr = this._PRArrayDS.curr.map(function (n) { return n /= init_sum; });
                 this._PRArrayDS.old = this._PRArrayDS.old.map(function (n) { return n /= init_sum; });
             }
+            // normalize teleport probabilities
             if (this._personalized && teleport_prob_sum !== 1) {
                 this._PRArrayDS.teleport = this._PRArrayDS.teleport.map(function (n) { return n /= teleport_prob_sum; });
             }
+            /**
+             * We can only do this once all the mappings [node_id => arr_idx] have been established!
+             */
             for (var key in nodes) {
                 var node = this._graph.getNodeById(key);
                 var node_idx = node.getFeature('PR_index');
+                // set nodes to pull from
                 var pull_i = [];
                 var pull_weight_i = [];
-                var incoming_edges = StructUtils.mergeObjects([node.inEdges(), node.undEdges()]);
+                var incoming_edges = mergeObjects([node.inEdges(), node.undEdges()]);
                 for (var edge_key in incoming_edges) {
                     var edge = incoming_edges[edge_key];
                     var source = edge.getNodes().a;
@@ -3893,10 +3042,14 @@
                     pull_i.push(parent_idx);
                 }
                 this._PRArrayDS.pull[node_idx] = pull_i;
+                /**
+                 * @todo test!
+                 */
                 if (this._weighted) {
                     this._PRArrayDS.pull_weight[node_idx] = pull_weight_i;
                 }
             }
+            // logger.log(`PR Array DS init took ${toc - tic} ms.`);
         };
         Pagerank.prototype.getRankMapFromArray = function () {
             var result = {};
@@ -3916,68 +3069,55 @@
             }
         };
         Pagerank.prototype.pull2DTo1D = function () {
-            var e_1, _a;
             var p1d = [];
             var p2d = this._PRArrayDS.pull;
             for (var n in p2d) {
-                try {
-                    for (var _b = __values(p2d[n]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var i = _c.value;
-                        p1d.push(i);
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                    }
-                    finally { if (e_1) throw e_1.error; }
+                for (var _i = 0, _a = p2d[n]; _i < _a.length; _i++) {
+                    var i = _a[_i];
+                    p1d.push(i);
                 }
                 +n !== p2d.length - 1 && p1d.push(-1);
             }
             return p1d;
         };
         Pagerank.prototype.computePR = function () {
-            var e_2, _a;
             var ds = this._PRArrayDS;
             var N = this._graph.nrNodes();
-            var visits = 0;
             var delta_iter;
             for (var i = 0; i < this._maxIterations; ++i) {
                 delta_iter = 0.0;
+                // node is number...
                 for (var node in ds.curr) {
                     var pull_rank = 0;
-                    visits++;
                     var idx = 0;
-                    try {
-                        for (var _b = __values(ds.pull[node]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var source = _c.value;
-                            visits++;
-                            if (ds.out_deg[source] === 0) {
-                                throw ('Encountered zero divisor!');
-                            }
-                            var weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
-                            pull_rank += ds.old[source] * weight / ds.out_deg[source];
+                    for (var _i = 0, _a = ds.pull[node]; _i < _a.length; _i++) {
+                        var source = _a[_i];
+                        /**
+                         * This should never happen....
+                         * IF the data structure _PRArrayDS was properly constructed
+                         *
+                         * @todo properly test _PRArrayDS as well as this beauty
+                         *       (using a contrived, wrongly constructed pull 2D array)
+                         */
+                        if (ds.out_deg[source] === 0) {
+                            throw ('Encountered zero divisor!');
                         }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                        }
-                        finally { if (e_2) throw e_2.error; }
+                        var weight = this._weighted ? ds.pull_weight[node][idx++] : 1.0;
+                        pull_rank += ds.old[source] * weight / ds.out_deg[source];
                     }
                     var link_pr = (1 - this._alpha) * pull_rank;
                     if (this._personalized) {
-                        var jump_chance = ds.teleport[node] / ds.tele_size;
+                        var jump_chance = ds.teleport[node] / ds.tele_size; // 0/x = 0
                         ds.curr[node] = link_pr + jump_chance;
                     }
                     else {
+                        // logger.log(`Pulling PR for node ${node}: ${link_pr  + this._alpha / N}`);
                         ds.curr[node] = link_pr + this._alpha / N;
                     }
                     delta_iter += Math.abs(ds.curr[node] - ds.old[node]);
                 }
                 if (delta_iter <= this._epsilon) {
+                    // logger.log(`CONVERGED after ${i} iterations with ${visits} visits and a final delta of ${delta_iter}.`);
                     return {
                         config: this.getConfig(),
                         map: this.getRankMapFromArray(),
@@ -3985,8 +3125,9 @@
                         delta: delta_iter
                     };
                 }
-                ds.old = __spread(ds.curr);
+                ds.old = __spreadArrays(ds.curr);
             }
+            // logger.log(`ABORTED after ${this._maxIterations} iterations with ${visits} visits.`);
             return {
                 config: this.getConfig(),
                 map: this.getRankMapFromArray(),
@@ -3996,23 +3137,21 @@
         };
         return Pagerank;
     }());
-    exports.Pagerank = Pagerank;
-    });
 
-    unwrapExports(Pagerank_1);
-    var Pagerank_2 = Pagerank_1.Pagerank;
-
-    var RemoteUtils = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-    var logger = new Logger_1.Logger();
+    var logger$1 = new Logger();
     var SSL_PORT = '443';
+    /**
+     * @TODO: Test it !!!
+     *
+     * @param url
+     * @param cb
+     * @returns {ClientRequest}
+     */
     function retrieveRemoteFile(config, cb) {
         if (typeof cb !== 'function') {
             throw new Error('Provided callback is not a function.');
         }
-        logger.log("Requesting file via NodeJS request: " + config.remote_host + config.remote_path + config.file_name);
+        logger$1.log("Requesting file via NodeJS request: " + config.remote_host + config.remote_path + config.file_name);
         var options = {
             host: config.remote_host,
             port: SSL_PORT,
@@ -4020,221 +3159,29 @@
             method: 'GET'
         };
         var req = https.get(options, function (response) {
+            // Continuously update stream with data
             var body = '';
             response.setEncoding('utf8');
             response.on('data', function (d) {
                 body += d;
             });
             response.on('end', function () {
+                // Received data in body...
                 cb(body);
             });
         });
         req.on('error', function (e) {
-            logger.log("Request error: " + e.message);
+            logger$1.log("Request error: " + e.message);
         });
         return req;
     }
-    exports.retrieveRemoteFile = retrieveRemoteFile;
     function checkNodeEnvironment() {
         if (typeof window !== 'undefined') {
             throw new Error('When in Browser, do as the Browsers do! (use fetch and call readFromJSON() directly...) ');
         }
     }
-    exports.checkNodeEnvironment = checkNodeEnvironment;
-    });
 
-    unwrapExports(RemoteUtils);
-    var RemoteUtils_1 = RemoteUtils.retrieveRemoteFile;
-    var RemoteUtils_2 = RemoteUtils.checkNodeEnvironment;
-
-    var CSVInput_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-    var DEFAULT_WEIGHT = 1;
-    var CSVInput = (function () {
-        function CSVInput(config) {
-            if (config === void 0) { config = {}; }
-            this._config = {
-                separator: config.separator != null ? config.separator : ',',
-                explicit_direction: config.explicit_direction != null ? config.explicit_direction : true,
-                direction_mode: config.direction_mode != null ? config.direction_mode : false,
-                weighted: config.weighted != null ? config.weighted : false
-            };
-        }
-        CSVInput.prototype.readFromAdjacencyListURL = function (config, cb) {
-            this.readGraphFromURL(config, cb, this.readFromAdjacencyList);
-        };
-        CSVInput.prototype.readFromEdgeListURL = function (config, cb) {
-            this.readGraphFromURL(config, cb, this.readFromEdgeList);
-        };
-        CSVInput.prototype.readGraphFromURL = function (config, cb, localFun) {
-            var self = this, graph_name = config.file_name, graph;
-            RemoteUtils.checkNodeEnvironment();
-            RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
-                var input = raw_graph.toString().split('\n');
-                graph = localFun.apply(self, [input, graph_name]);
-                cb(graph, undefined);
-            });
-        };
-        CSVInput.prototype.readFromAdjacencyListFile = function (filepath) {
-            return this.readFileAndReturn(filepath, this.readFromAdjacencyList);
-        };
-        CSVInput.prototype.readFromEdgeListFile = function (filepath) {
-            return this.readFileAndReturn(filepath, this.readFromEdgeList);
-        };
-        CSVInput.prototype.readFileAndReturn = function (filepath, func) {
-            RemoteUtils.checkNodeEnvironment();
-            var graph_name = path.basename(filepath);
-            var input = fs.readFileSync(filepath).toString().split('\n');
-            return func.apply(this, [input, graph_name]);
-        };
-        CSVInput.prototype.readFromAdjacencyList = function (input, graph_name) {
-            var graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (var idx in input) {
-                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator), node_id = elements[0], node = void 0, edge_array = elements.slice(1), edge = void 0, target_node_id = void 0, target_node = void 0, dir_char = void 0, directed = void 0, edge_id = void 0, edge_id_u2 = void 0;
-                if (!node_id) {
-                    continue;
-                }
-                node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                for (var e = 0; e < edge_array.length;) {
-                    if (this._config.explicit_direction && (!edge_array || edge_array.length % 2)) {
-                        throw new Error('Every edge entry has to contain its direction info in explicit mode.');
-                    }
-                    target_node_id = edge_array[e++];
-                    target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
-                    dir_char = this._config.explicit_direction ? edge_array[e++] : this._config.direction_mode ? 'd' : 'u';
-                    if (dir_char !== 'd' && dir_char !== 'u') {
-                        throw new Error("Specification of edge direction invalid (d and u are valid).");
-                    }
-                    directed = dir_char === 'd';
-                    edge_id = node_id + "_" + target_node_id + "_" + dir_char;
-                    edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
-                    if (graph.hasEdgeID(edge_id) || (!directed && graph.hasEdgeID(edge_id_u2))) {
-                        continue;
-                    }
-                    else {
-                        edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed });
-                    }
-                }
-            }
-            return graph;
-        };
-        CSVInput.prototype.readFromEdgeList = function (input, graph_name, weighted) {
-            var graph = new BaseGraph_1.BaseGraph(graph_name);
-            for (var idx in input) {
-                var line = input[idx], elements = this._config.separator.match(/\s+/g) ? line.match(/\S+/g) : line.replace(/\s+/g, '').split(this._config.separator);
-                if (!elements) {
-                    continue;
-                }
-                if (elements.length < 2 || elements.length > 3) {
-                    throw new Error('Edge list is in wrong format - every line has to consist of two entries (the 2 nodes)');
-                }
-                var node_id = elements[0], node = void 0, target_node = void 0, edge = void 0, target_node_id = elements[1], dir_char = this._config.explicit_direction ? elements[2] : this._config.direction_mode ? 'd' : 'u', directed = void 0, edge_id = void 0, edge_id_u2 = void 0, parse_weight = void 0, edge_weight = void 0;
-                node = graph.hasNodeID(node_id) ? graph.getNodeById(node_id) : graph.addNodeByID(node_id);
-                target_node = graph.hasNodeID(target_node_id) ? graph.getNodeById(target_node_id) : graph.addNodeByID(target_node_id);
-                if (dir_char !== 'd' && dir_char !== 'u') {
-                    throw new Error("Specification of edge direction invalid (d and u are valid).");
-                }
-                directed = dir_char === 'd';
-                edge_id = node_id + "_" + target_node_id + "_" + dir_char;
-                edge_id_u2 = target_node_id + "_" + node_id + "_" + dir_char;
-                parse_weight = parseFloat(elements[2]);
-                edge_weight = this._config.weighted ? (isNaN(parse_weight) ? DEFAULT_WEIGHT : parse_weight) : null;
-                if (graph.hasEdgeID(edge_id) || (!directed && graph.hasEdgeID(edge_id_u2))) {
-                    continue;
-                }
-                else if (this._config.weighted) {
-                    edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed, weighted: true, weight: edge_weight });
-                }
-                else {
-                    edge = graph.addEdgeByID(edge_id, node, target_node, { directed: directed });
-                }
-            }
-            return graph;
-        };
-        return CSVInput;
-    }());
-    exports.CSVInput = CSVInput;
-    });
-
-    unwrapExports(CSVInput_1);
-    var CSVInput_2 = CSVInput_1.CSVInput;
-
-    var CSVOutput_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var CSVOutput = (function () {
-        function CSVOutput(config) {
-            this._config = config || {
-                separator: config && config.separator || ',',
-                explicit_direction: config && config.explicit_direction || true,
-                direction_mode: config && config.direction_mode || false
-            };
-        }
-        CSVOutput.prototype.writeToAdjacencyListFile = function (filepath, graph) {
-            if (typeof window !== 'undefined' && window !== null) {
-                throw new Error('cannot write to File inside of Browser');
-            }
-            fs.writeFileSync(filepath, this.writeToAdjacencyList(graph));
-        };
-        CSVOutput.prototype.writeToAdjacencyList = function (graph) {
-            var graphString = "";
-            var nodes = graph.getNodes(), node = null, adj_nodes = null, adj_node = null;
-            for (var node_key in nodes) {
-                node = nodes[node_key];
-                graphString += node.getID();
-                adj_nodes = node.reachNodes(this.mergeFunc);
-                for (var adj_idx in adj_nodes) {
-                    adj_node = adj_nodes[adj_idx].node;
-                    graphString += this._config.separator + adj_node.getID();
-                }
-                graphString += "\n";
-            }
-            return graphString;
-        };
-        CSVOutput.prototype.writeToEdgeListFile = function (filepath, graph, weighted) {
-            if (weighted === void 0) { weighted = false; }
-            if (typeof window !== 'undefined' && window !== null) {
-                throw new Error('cannot write to File inside of Browser');
-            }
-            fs.writeFileSync(filepath, this.writeToEdgeList(graph, weighted));
-        };
-        CSVOutput.prototype.writeToEdgeList = function (graph, weighted) {
-            if (weighted === void 0) { weighted = false; }
-            var graphString = "", nodes = graph.getNodes(), node = null, adj_nodes = null, adj_entry, adj_node = null, weight_str;
-            for (var node_key in nodes) {
-                node = nodes[node_key];
-                adj_nodes = node.reachNodes(this.mergeFunc);
-                for (var adj_idx in adj_nodes) {
-                    adj_entry = adj_nodes[adj_idx];
-                    adj_node = adj_entry.node;
-                    weight_str = '';
-                    if (weighted) {
-                        weight_str = this._config.separator;
-                        weight_str += adj_entry.edge.isWeighted() ? adj_entry.edge.getWeight() : 1;
-                    }
-                    graphString += node.getID() + this._config.separator + adj_node.getID() + weight_str + '\n';
-                }
-            }
-            return graphString;
-        };
-        CSVOutput.prototype.mergeFunc = function (ne) {
-            return ne.node.getID();
-        };
-        return CSVOutput;
-    }());
-    exports.CSVOutput = CSVOutput;
-    });
-
-    unwrapExports(CSVOutput_1);
-    var CSVOutput_2 = CSVOutput_1.CSVOutput;
-
-    var interfaces$1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.labelKeys = {
+    var labelKeys = {
         coords: 'c',
         n_label: 'l',
         n_type: 'x',
@@ -4247,49 +3194,23 @@
         e_type: 'y',
         e_features: 'f'
     };
-    });
 
-    unwrapExports(interfaces$1);
-    var interfaces_1$1 = interfaces$1.labelKeys;
-
-    var Dupes = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var EdgeDupeChecker = (function () {
+    var EdgeDupeChecker = /** @class */ (function () {
         function EdgeDupeChecker(_graph) {
             this._graph = _graph;
         }
         EdgeDupeChecker.prototype.isDupe = function (e) {
-            var e_1, _a;
             var pds = this.potentialEndpoints(e);
             if (!pds.size) {
                 return false;
             }
-            try {
-                for (var _b = __values(pds.values()), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var pd = _c.value;
-                    if (!EdgeDupeChecker.checkTypeWeightEquality(e, pd)
-                        || !EdgeDupeChecker.typeWeightDupe(e, pd)) {
-                        pds.delete(pd);
-                    }
+            // logger.log(`Got ${pds.size} potential edge dupe`);
+            for (var _i = 0, _a = pds.values(); _i < _a.length; _i++) {
+                var pd = _a[_i];
+                if (!EdgeDupeChecker.checkTypeWeightEquality(e, pd)
+                    || !EdgeDupeChecker.typeWeightDupe(e, pd)) {
+                    pds.delete(pd);
                 }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_1) throw e_1.error; }
             }
             return !!pds.size;
         };
@@ -4307,23 +3228,33 @@
             }
             return result;
         };
+        /**
+         * @todo has no effect on test cases - either
+         * 			 -) test cases are not granular enough
+         * 			 -) typed-weighted-equality is irrelevant
+         * @param e struct with potential edge info
+         * @param oe other edge: IBaseEdge
+         */
         EdgeDupeChecker.checkTypeWeightEquality = function (e, oe) {
-            return BaseEdge_1.BaseEdge.isTyped(oe) === e.typed && e.weighted === oe.isWeighted();
+            return BaseEdge.isTyped(oe) === e.typed && e.weighted === oe.isWeighted();
         };
         EdgeDupeChecker.typeWeightDupe = function (e, oe) {
             var neitherTypedNorWeighted = !e.typed && !e.weighted;
             var notTypedButWeighted = !e.typed && e.weighted;
             var weightEqual = e.weight === oe.getWeight();
-            var typeEqual = e.typed && BaseEdge_1.BaseEdge.isTyped(oe) && e.type === oe.type;
+            var typeEqual = e.typed && BaseEdge.isTyped(oe) && e.type === oe.type;
             return (neitherTypedNorWeighted || notTypedButWeighted && weightEqual || typeEqual);
         };
         return EdgeDupeChecker;
     }());
-    exports.EdgeDupeChecker = EdgeDupeChecker;
-    });
 
-    unwrapExports(Dupes);
-    var Dupes_1 = Dupes.EdgeDupeChecker;
+    function unwrapExports (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
+    function createCommonjsModule(fn, module) {
+    	return module = { exports: {} }, fn(module, module.exports), module.exports;
+    }
 
     var rngBrowser = createCommonjsModule(function (module) {
     // Unique ID creation requires a high quality random # generator.  In the
@@ -4375,14 +3306,16 @@
       var i = offset || 0;
       var bth = byteToHex;
       // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-      return ([bth[buf[i++]], bth[buf[i++]], 
-    	bth[buf[i++]], bth[buf[i++]], '-',
-    	bth[buf[i++]], bth[buf[i++]], '-',
-    	bth[buf[i++]], bth[buf[i++]], '-',
-    	bth[buf[i++]], bth[buf[i++]], '-',
-    	bth[buf[i++]], bth[buf[i++]],
-    	bth[buf[i++]], bth[buf[i++]],
-    	bth[buf[i++]], bth[buf[i++]]]).join('');
+      return ([
+        bth[buf[i++]], bth[buf[i++]],
+        bth[buf[i++]], bth[buf[i++]], '-',
+        bth[buf[i++]], bth[buf[i++]], '-',
+        bth[buf[i++]], bth[buf[i++]], '-',
+        bth[buf[i++]], bth[buf[i++]], '-',
+        bth[buf[i++]], bth[buf[i++]],
+        bth[buf[i++]], bth[buf[i++]],
+        bth[buf[i++]], bth[buf[i++]]
+      ]).join('');
     }
 
     var bytesToUuid_1 = bytesToUuid;
@@ -4399,7 +3332,7 @@
     var _lastMSecs = 0;
     var _lastNSecs = 0;
 
-    // See https://github.com/broofa/node-uuid for API details
+    // See https://github.com/uuidjs/uuid for API details
     function v1(options, buf, offset) {
       var i = buf && offset || 0;
       var b = buf || [];
@@ -4527,12 +3460,15 @@
 
     var uuid_1 = uuid;
 
-    var JSONInput_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
+    var uuid$1 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        'default': uuid_1,
+        __moduleExports: uuid_1
+    });
 
-    var logger = new Logger_1.Logger();
-    var DEFAULT_WEIGHT = 1;
-    var JSONInput = (function () {
+    var logger$2 = new Logger();
+    var DEFAULT_WEIGHT$1 = 1;
+    var JSONInput = /** @class */ (function () {
         function JSONInput(config) {
             if (config === void 0) { config = {}; }
             this._config = {
@@ -4543,38 +3479,51 @@
             };
         }
         JSONInput.prototype.readFromJSONFile = function (filepath, graph) {
-            RemoteUtils.checkNodeEnvironment();
+            checkNodeEnvironment();
+            // TODO test for existing file...
             var json = JSON.parse(fs.readFileSync(filepath).toString());
             return this.readFromJSON(json, graph);
         };
         JSONInput.prototype.readFromJSONURL = function (config, cb, graph) {
             var self = this;
-            RemoteUtils.checkNodeEnvironment();
-            RemoteUtils.retrieveRemoteFile(config, function (raw_graph) {
+            // Assert we are in Node.js environment
+            checkNodeEnvironment();
+            // Node.js
+            retrieveRemoteFile(config, function (raw_graph) {
                 graph = self.readFromJSON(JSON.parse(raw_graph), graph);
                 cb(graph, undefined);
             });
         };
         JSONInput.prototype.readFromJSON = function (json, graph) {
-            graph = graph || new BaseGraph_1.BaseGraph(json.name);
-            var edc = new Dupes.EdgeDupeChecker(graph);
+            graph = graph || new BaseGraph(json.name);
+            var edc = new EdgeDupeChecker(graph);
             var rlt = json.typeRLT;
+            // logger.log(rlt);
             this.addNodesToGraph(json, graph);
             for (var node_id in json.data) {
                 var node = graph.getNodeById(node_id);
-                var edges = json.data[node_id][interfaces$1.labelKeys.edges];
+                // Reading and instantiating edges
+                var edges = json.data[node_id][labelKeys.edges];
                 for (var e in edges) {
                     var edge_input = edges[e];
+                    // BASE INFO
                     var target_node = this.getTargetNode(graph, edge_input);
-                    var edge_label = edge_input[interfaces$1.labelKeys.e_label];
-                    var edge_type = rlt && rlt.edges[edge_input[interfaces$1.labelKeys.e_type]] || null;
-                    var directed = this._config.explicit_direction ? !!edge_input[interfaces$1.labelKeys.e_dir] : this._config.directed;
+                    var edge_label = edge_input[labelKeys.e_label];
+                    var edge_type = rlt && rlt.edges[edge_input[labelKeys.e_type]] || null;
+                    // DIRECTION
+                    var directed = this._config.explicit_direction ? !!edge_input[labelKeys.e_dir] : this._config.directed;
+                    // WEIGHTS
                     var weight_float = JSONInput.handleEdgeWeights(edge_input);
-                    var weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT;
+                    var weight_info = weight_float === weight_float ? weight_float : DEFAULT_WEIGHT$1;
                     var edge_weight = this._config.weighted ? weight_info : undefined;
-                    var target_node_id = edge_input[interfaces$1.labelKeys.e_to];
+                    // EDGE_ID creation
+                    /**
+                     * @todo replace with uuid v4() -> then clean up the mess... ;-)
+                     */
+                    var target_node_id = edge_input[labelKeys.e_to];
                     var dir_char = directed ? 'd' : 'u';
                     var edge_id = node_id + "_" + target_node_id + "_" + dir_char;
+                    // DUPLICATE or CREATE ??
                     var newEdge = {
                         a: node,
                         b: target_node,
@@ -4586,6 +3535,8 @@
                         type: edge_type
                     };
                     if (this._config.dupeCheck && edc.isDupe(newEdge)) {
+                        // Don't throw, just log
+                        // logger.log(`Edge ${edge_id} is a duplicate according to assumptions... omitting.`);
                         continue;
                     }
                     graph.addEdgeByID(edge_id, node, target_node, {
@@ -4604,35 +3555,46 @@
             var rlt = json.typeRLT;
             var coords_json, coords, coord_idx, features;
             for (var node_id in json.data) {
-                var type = BaseGraph_1.BaseGraph.isTyped(graph) ? rlt && rlt.nodes[json.data[node_id][interfaces$1.labelKeys.n_type]] : null;
-                var label = json.data[node_id][interfaces$1.labelKeys.n_label];
+                var type = BaseGraph.isTyped(graph) ? rlt && rlt.nodes[json.data[node_id][labelKeys.n_type]] : null;
+                var label = json.data[node_id][labelKeys.n_label];
                 var node = graph.addNodeByID(node_id, { label: label, type: type });
-                features = json.data[node_id][interfaces$1.labelKeys.n_features];
+                // Here we set the reference...?
+                features = json.data[node_id][labelKeys.n_features];
                 if (features) {
                     node.setFeatures(features);
                 }
-                coords_json = json.data[node_id][interfaces$1.labelKeys.coords];
+                // Here we copy...?
+                coords_json = json.data[node_id][labelKeys.coords];
                 if (coords_json) {
                     coords = {};
                     for (coord_idx in coords_json) {
                         coords[coord_idx] = +coords_json[coord_idx];
                     }
-                    node.setFeature(interfaces$1.labelKeys.coords, coords);
+                    node.setFeature(labelKeys.coords, coords);
                 }
             }
         };
+        /**
+         * @todo implicitly add nodes referenced by edge
+         *       but not present in graph input JSON ?
+         */
         JSONInput.prototype.getTargetNode = function (graph, edge_input) {
-            var target_node_id = edge_input[interfaces$1.labelKeys.e_to];
+            var target_node_id = edge_input[labelKeys.e_to];
             var target_node = graph.getNodeById(target_node_id);
             if (!target_node) {
                 throw new Error('Node referenced by edge does not exist');
             }
             return target_node;
         };
+        /**
+         * Infinity & -Infinity cases are redundant, as JavaScript
+         * handles them correctly anyways (for now)
+         * @param edge_input
+         */
         JSONInput.handleEdgeWeights = function (edge_input) {
-            switch (edge_input[interfaces$1.labelKeys.e_weight]) {
+            switch (edge_input[labelKeys.e_weight]) {
                 case "undefined":
-                    return DEFAULT_WEIGHT;
+                    return DEFAULT_WEIGHT$1;
                 case "Infinity":
                     return Number.POSITIVE_INFINITY;
                 case "-Infinity":
@@ -4642,56 +3604,18 @@
                 case "MIN":
                     return Number.MIN_VALUE;
                 default:
-                    return parseFloat(edge_input[interfaces$1.labelKeys.e_weight]);
+                    return parseFloat(edge_input[labelKeys.e_weight]);
             }
         };
         return JSONInput;
     }());
-    exports.JSONInput = JSONInput;
-    });
-
-    unwrapExports(JSONInput_1);
-    var JSONInput_2 = JSONInput_1.JSONInput;
-
-    var JSONOutput_1 = createCommonjsModule(function (module, exports) {
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
 
     var startChar = 64;
-    var JSONOutput = (function () {
+    var JSONOutput = /** @class */ (function () {
         function JSONOutput() {
         }
+        // constructor() {}
         JSONOutput.prototype.constructTypeRLUT = function (g) {
-            var e_1, _a, e_2, _b;
             var nchar = startChar;
             var echar = startChar;
             var lut = {
@@ -4703,34 +3627,16 @@
                 edges: {}
             };
             var ntypes = g.nodeTypes();
-            try {
-                for (var ntypes_1 = __values(ntypes), ntypes_1_1 = ntypes_1.next(); !ntypes_1_1.done; ntypes_1_1 = ntypes_1.next()) {
-                    var t = ntypes_1_1.value;
-                    lut.nodes[t] = String.fromCharCode(nchar);
-                    rlut.nodes[String.fromCharCode(nchar++)] = t;
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (ntypes_1_1 && !ntypes_1_1.done && (_a = ntypes_1.return)) _a.call(ntypes_1);
-                }
-                finally { if (e_1) throw e_1.error; }
+            for (var _i = 0, ntypes_1 = ntypes; _i < ntypes_1.length; _i++) {
+                var t = ntypes_1[_i];
+                lut.nodes[t] = String.fromCharCode(nchar);
+                rlut.nodes[String.fromCharCode(nchar++)] = t;
             }
             var etypes = g.edgeTypes();
-            try {
-                for (var etypes_1 = __values(etypes), etypes_1_1 = etypes_1.next(); !etypes_1_1.done; etypes_1_1 = etypes_1.next()) {
-                    var t = etypes_1_1.value;
-                    lut.edges[t] = String.fromCharCode(echar);
-                    rlut.edges[String.fromCharCode(echar++)] = t;
-                }
-            }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (etypes_1_1 && !etypes_1_1.done && (_b = etypes_1.return)) _b.call(etypes_1);
-                }
-                finally { if (e_2) throw e_2.error; }
+            for (var _a = 0, etypes_1 = etypes; _a < etypes_1.length; _a++) {
+                var t = etypes_1[_a];
+                lut.edges[t] = String.fromCharCode(echar);
+                rlut.edges[String.fromCharCode(echar++)] = t;
             }
             return [lut, rlut];
         };
@@ -4752,67 +3658,76 @@
                 und_e: graph.nrUndEdges(),
                 data: {}
             };
-            if (BaseGraph_1.BaseGraph.isTyped(graph)) {
-                _a = __read(this.constructTypeRLUT(graph), 2), lut = _a[0], rlt = _a[1];
+            if (BaseGraph.isTyped(graph)) {
+                _a = this.constructTypeRLUT(graph), lut = _a[0], rlt = _a[1];
             }
             if (rlt) {
                 result['typeRLT'] = rlt;
             }
+            // Go through all nodes 
             nodes = graph.getNodes();
             for (var node_key in nodes) {
                 node = nodes[node_key];
                 node_struct = result.data[node.getID()] = (_b = {},
-                    _b[interfaces$1.labelKeys.edges] = [],
+                    _b[labelKeys.edges] = [],
                     _b);
                 if (node.getID() !== node.getLabel()) {
-                    node_struct[interfaces$1.labelKeys.n_label] = node.label;
+                    node_struct[labelKeys.n_label] = node.label;
                 }
-                if (BaseNode_1.BaseNode.isTyped(node)) {
-                    node_struct[interfaces$1.labelKeys.n_type] = lut && lut.nodes[node.type];
+                if (BaseNode.isTyped(node)) {
+                    node_struct[labelKeys.n_type] = lut && lut.nodes[node.type];
                 }
+                /* -------------------------------------- */
+                /*					 UNDIRECTED edges							*/
+                /* -------------------------------------- */
                 und_edges = node.undEdges();
                 for (var edge_key in und_edges) {
                     edge = und_edges[edge_key];
                     var endPoints = edge.getNodes();
                     var edgeStruct = (_c = {},
-                        _c[interfaces$1.labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
-                        _c[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
-                        _c[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _c[labelKeys.e_to] = endPoints.a.getID() === node.getID() ? endPoints.b.getID() : endPoints.a.getID(),
+                        _c[labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _c[labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _c);
                     if (Object.keys(edge.getFeatures()).length) {
-                        edgeStruct[interfaces$1.labelKeys.e_features] = JSON.stringify(edge.getFeatures());
+                        edgeStruct[labelKeys.e_features] = JSON.stringify(edge.getFeatures());
                     }
                     if (edge.getID() !== edge.getLabel()) {
-                        edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
+                        edgeStruct[labelKeys.e_label] = edge.getLabel();
                     }
-                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces$1.labelKeys.e_type] = lut && lut.edges[edge.type];
+                    if (BaseEdge.isTyped(edge)) {
+                        edgeStruct[labelKeys.e_type] = lut && lut.edges[edge.type];
                     }
-                    node_struct[interfaces$1.labelKeys.edges].push(edgeStruct);
+                    node_struct[labelKeys.edges].push(edgeStruct);
                 }
+                /* -------------------------------------- */
+                /*						DIRECTED edges							*/
+                /* -------------------------------------- */
                 dir_edges = node.outEdges();
                 for (var edge_key in dir_edges) {
                     edge = dir_edges[edge_key];
                     var endPoints = edge.getNodes();
                     var edgeStruct = (_d = {},
-                        _d[interfaces$1.labelKeys.e_to] = endPoints.b.getID(),
-                        _d[interfaces$1.labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
-                        _d[interfaces$1.labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
+                        _d[labelKeys.e_to] = endPoints.b.getID(),
+                        _d[labelKeys.e_dir] = edge.isDirected() ? 1 : 0,
+                        _d[labelKeys.e_weight] = JSONOutput.handleEdgeWeight(edge),
                         _d);
                     if (Object.keys(edge.getFeatures()).length) {
-                        edgeStruct[interfaces$1.labelKeys.e_features] = JSON.stringify(edge.getFeatures());
+                        edgeStruct[labelKeys.e_features] = JSON.stringify(edge.getFeatures());
                     }
                     if (edge.getID() !== edge.getLabel()) {
-                        edgeStruct[interfaces$1.labelKeys.e_label] = edge.getLabel();
+                        edgeStruct[labelKeys.e_label] = edge.getLabel();
                     }
-                    if (BaseEdge_1.BaseEdge.isTyped(edge)) {
-                        edgeStruct[interfaces$1.labelKeys.e_type] = lut && lut.edges[edge.type];
+                    if (BaseEdge.isTyped(edge)) {
+                        edgeStruct[labelKeys.e_type] = lut && lut.edges[edge.type];
                     }
-                    node_struct[interfaces$1.labelKeys.edges].push(edgeStruct);
+                    node_struct[labelKeys.edges].push(edgeStruct);
                 }
-                node_struct[interfaces$1.labelKeys.n_features] = node.getFeatures();
-                if ((coords = node.getFeature(interfaces$1.labelKeys.coords)) != null) {
-                    node_struct[interfaces$1.labelKeys.coords] = coords;
+                // Features
+                node_struct[labelKeys.n_features] = node.getFeatures();
+                // Coords (shall we really?)
+                if ((coords = node.getFeature(labelKeys.coords)) != null) {
+                    node_struct[labelKeys.coords] = coords;
                 }
             }
             return JSON.stringify(result);
@@ -4836,396 +3751,22 @@
         };
         return JSONOutput;
     }());
-    exports.JSONOutput = JSONOutput;
-    });
 
-    unwrapExports(JSONOutput_1);
-    var JSONOutput_2 = JSONOutput_1.JSONOutput;
-
-    var Dijkstra_1 = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    function Dijkstra(graph, source, target) {
-        var config = PFS_1.preparePFSStandardConfig();
-        if (target) {
-            config.goal_node = target;
-        }
-        return PFS_1.PFS(graph, source, config);
-    }
-    exports.Dijkstra = Dijkstra;
-    });
-
-    unwrapExports(Dijkstra_1);
-    var Dijkstra_2 = Dijkstra_1.Dijkstra;
-
-    var SimilarityCommons = createCommonjsModule(function (module, exports) {
-    var __assign = (commonjsGlobal && commonjsGlobal.__assign) || function () {
-        __assign = Object.assign || function(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                    t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.sortFuncs = {
-        asc: function (se1, se2) { return se1.sim - se2.sim; },
-        desc: function (se1, se2) { return se2.sim - se1.sim; }
-    };
-    exports.cutFuncs = {
-        above: function (sim, threshold) { return sim >= threshold; },
-        below: function (sim, threshold) { return sim <= threshold; }
-    };
-    function sim(algo, a, b) {
-        return algo(a, b);
-    }
-    exports.sim = sim;
-    function simSource(algo, s, t, cfg) {
-        if (cfg === void 0) { cfg = {}; }
-        var e_1, _a;
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
-        var result = [];
-        var start = t[s];
-        try {
-            for (var _b = __values(Object.entries(t)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var _d = __read(_c.value, 2), k = _d[0], v = _d[1];
-                if (k === s) {
-                    continue;
-                }
-                var sim_1 = algo(start, v);
-                if (cfg.cutoff == null || cutFunc(sim_1.sim, cfg.cutoff)) {
-                    result.push(__assign({ from: s, to: k }, sim_1));
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        result.sort(sort);
-        if (cfg.knn != null && cfg.knn <= result.length) {
-            result = result.slice(0, cfg.knn);
-        }
-        return result;
-    }
-    exports.simSource = simSource;
-    function simPairwise(algo, s, cfg) {
-        if (cfg === void 0) { cfg = {}; }
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
-        var result = [];
-        var keys = Object.keys(s);
-        for (var i in keys) {
-            for (var j = 0; j < +i; j++) {
-                var from = keys[i];
-                var to = keys[j];
-                if (from === to) {
-                    continue;
-                }
-                var sim_2 = algo(s[keys[i]], s[keys[j]], i, j);
-                if (cfg.cutoff == null || cutFunc(sim_2.sim, cfg.cutoff)) {
-                    result.push(__assign({ from: from, to: to }, sim_2));
-                }
-            }
-        }
-        result.sort(sort);
-        if (cfg.knn != null && cfg.knn <= result.length) {
-            result = result.slice(0, cfg.knn);
-        }
-        return result;
-    }
-    exports.simPairwise = simPairwise;
-    function simSubsets(algo, s1, s2, cfg) {
-        if (cfg === void 0) { cfg = {}; }
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
-        var result = [];
-        var keys1 = Object.keys(s1);
-        var keys2 = Object.keys(s2);
-        for (var i in keys1) {
-            var subRes = [];
-            for (var j in keys2) {
-                var from = keys1[i];
-                var to = keys2[j];
-                if (from === to) {
-                    continue;
-                }
-                var sim_3 = algo(s1[keys1[i]], s2[keys2[j]]);
-                if (cfg.cutoff == null || cutFunc(sim_3.sim, cfg.cutoff)) {
-                    subRes.push(__assign({ from: from, to: to }, sim_3));
-                }
-            }
-            subRes.sort(sort);
-            if (cfg.knn != null && cfg.knn <= subRes.length) {
-                subRes = subRes.slice(0, cfg.knn);
-            }
-            result = result.concat(subRes);
-        }
-        return result.sort(sort);
-    }
-    exports.simSubsets = simSubsets;
-    function knnNodeArray(algo, s, cfg) {
-        var e_2, _a;
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var c = cfg.cutoff || 0;
-        var topK = [];
-        var dupes = {};
-        try {
-            for (var _b = __values(Object.keys(s)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var node = _c.value;
-                var topKEntries = simSource(algo, node, s, { knn: cfg.knn || 1, sort: cfg.sort });
-                topKEntries.forEach(function (e) {
-                    if (c == null || e.sim < c) {
-                        return;
-                    }
-                    if (!cfg.dup && (dupes[e.from] && dupes[e.from][e.to] || dupes[e.to] && dupes[e.to][e.from])) {
-                        return;
-                    }
-                    topK.push(e);
-                    dupes[e.from] = dupes[e.from] || {};
-                    dupes[e.from][e.to] = true;
-                });
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
-        return topK.sort(sort);
-    }
-    exports.knnNodeArray = knnNodeArray;
-    function knnNodeDict(algo, s, cfg) {
-        var e_3, _a;
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var c = cfg.cutoff || 0;
-        var topK = {};
-        var _loop_1 = function (node) {
-            var e_4, _a;
-            var topKEntries = simSource(algo, node, s, { knn: cfg.knn || 1, sort: cfg.sort });
-            topKEntries.forEach(function (e) {
-                if (c == null || e.sim < c) {
-                    return;
-                }
-                delete e.from;
-                topK[node] = topK[node] || [];
-                topK[node].push(e);
-            });
-            try {
-                for (var _b = __values(Object.values(topK)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var arr = _c.value;
-                    arr.sort(sort);
-                }
-            }
-            catch (e_4_1) { e_4 = { error: e_4_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_4) throw e_4.error; }
-            }
-        };
-        try {
-            for (var _b = __values(Object.keys(s)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var node = _c.value;
-                _loop_1(node);
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-        return topK;
-    }
-    exports.knnNodeDict = knnNodeDict;
-    function viaSharedPrefs(g, algo, cfg) {
-        var e_5, _a, e_6, _b;
-        var sort = cfg.sort || exports.sortFuncs.desc;
-        var cutoff = cfg.co == null ? 1e-6 : cfg.co;
-        var cutFunc = cfg.cutFunc || exports.cutFuncs.above;
-        var sims = [];
-        var t1Set = g.getNodesT(cfg.t1);
-        var t2Set = g.getNodesT(cfg.t2);
-        var prefCache = new Map();
-        try {
-            for (var _c = __values(t1Set.entries()), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var _e = __read(_d.value, 2), t1Name = _e[0], t1Node = _e[1];
-                try {
-                    for (var _f = __values(t2Set.entries()), _g = _f.next(); !_g.done; _g = _f.next()) {
-                        var _h = __read(_g.value, 2), t2Name = _h[0], t2Node = _h[1];
-                        var prefSet1 = void 0, prefSet2 = void 0;
-                        if (prefCache.get(t1Node.id)) {
-                            prefSet1 = prefCache.get(t1Node.id);
-                        }
-                        else {
-                            prefSet1 = g[cfg.d1](t1Node, cfg.e1.toUpperCase());
-                            prefCache.set(t1Node.id, prefSet1);
-                        }
-                        if (prefCache.get(t2Node.id)) {
-                            prefSet2 = prefCache.get(t2Node.id);
-                        }
-                        else {
-                            prefSet2 = g[cfg.d2](t2Node, cfg.e2.toUpperCase());
-                            prefCache.set(t2Node.id, prefSet2);
-                        }
-                        if (!prefSet1 || !prefSet2 || prefSet1.size === 0 || prefSet2.size === 0) {
-                            continue;
-                        }
-                        var sim_4 = algo(prefSet1, prefSet2);
-                        if (cutFunc(sim_4.sim, cutoff)) {
-                            sims.push(__assign({ from: t1Name, to: t2Name }, sim_4));
-                        }
-                    }
-                }
-                catch (e_6_1) { e_6 = { error: e_6_1 }; }
-                finally {
-                    try {
-                        if (_g && !_g.done && (_b = _f.return)) _b.call(_f);
-                    }
-                    finally { if (e_6) throw e_6.error; }
-                }
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_5) throw e_5.error; }
-        }
-        return sims.sort(sort);
-    }
-    exports.viaSharedPrefs = viaSharedPrefs;
-    function getBsNotInA(a, b) {
-        var e_7, _a, e_8, _b;
-        var result = new Set();
-        var sa = new Set();
-        try {
-            for (var a_1 = __values(a), a_1_1 = a_1.next(); !a_1_1.done; a_1_1 = a_1.next()) {
-                var e = a_1_1.value;
-                sa.add(e.label);
-            }
-        }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
-        finally {
-            try {
-                if (a_1_1 && !a_1_1.done && (_a = a_1.return)) _a.call(a_1);
-            }
-            finally { if (e_7) throw e_7.error; }
-        }
-        try {
-            for (var b_1 = __values(b), b_1_1 = b_1.next(); !b_1_1.done; b_1_1 = b_1.next()) {
-                var e = b_1_1.value;
-                if (!sa.has(e.label)) {
-                    result.add(e);
-                }
-            }
-        }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
-        finally {
-            try {
-                if (b_1_1 && !b_1_1.done && (_b = b_1.return)) _b.call(b_1);
-            }
-            finally { if (e_8) throw e_8.error; }
-        }
-        return result;
-    }
-    exports.getBsNotInA = getBsNotInA;
-    });
-
-    var SimilarityCommons$1 = unwrapExports(SimilarityCommons);
-    var SimilarityCommons_1 = SimilarityCommons.sortFuncs;
-    var SimilarityCommons_2 = SimilarityCommons.cutFuncs;
-    var SimilarityCommons_3 = SimilarityCommons.sim;
-    var SimilarityCommons_4 = SimilarityCommons.simSource;
-    var SimilarityCommons_5 = SimilarityCommons.simPairwise;
-    var SimilarityCommons_6 = SimilarityCommons.simSubsets;
-    var SimilarityCommons_7 = SimilarityCommons.knnNodeArray;
-    var SimilarityCommons_8 = SimilarityCommons.knnNodeDict;
-    var SimilarityCommons_9 = SimilarityCommons.viaSharedPrefs;
-    var SimilarityCommons_10 = SimilarityCommons.getBsNotInA;
-
-    var $comSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': SimilarityCommons$1,
-        __moduleExports: SimilarityCommons,
-        sortFuncs: SimilarityCommons_1,
-        cutFuncs: SimilarityCommons_2,
-        sim: SimilarityCommons_3,
-        simSource: SimilarityCommons_4,
-        simPairwise: SimilarityCommons_5,
-        simSubsets: SimilarityCommons_6,
-        knnNodeArray: SimilarityCommons_7,
-        knnNodeDict: SimilarityCommons_8,
-        viaSharedPrefs: SimilarityCommons_9,
-        getBsNotInA: SimilarityCommons_10
-    });
-
-    var SetSimilarities = createCommonjsModule(function (module, exports) {
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __spread = (commonjsGlobal && commonjsGlobal.__spread) || function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.simFuncs = {
+    /*----------------------------------*/
+    /*							CONSTS							*/
+    /*----------------------------------*/
+    var setSimFuncs = {
         jaccard: jaccard,
         overlap: overlap
     };
     var PRECISION = 5;
+    /*----------------------------------*/
+    /*			SET SIMILARITY MEASURES			*/
+    /*----------------------------------*/
+    /**
+     * @param a set A
+     * @param b set B
+     */
     function jaccard(a, b) {
         var ui = unionIntersect(a, b);
         return {
@@ -5233,6 +3774,11 @@
             sim: +(ui.isectSize / ui.unionSize).toPrecision(PRECISION)
         };
     }
+    /**
+     * @description commonly used to detect sub/super relationships
+     * @param a
+     * @param b
+     */
     function overlap(a, b) {
         var ui = unionIntersect(a, b);
         return {
@@ -5241,52 +3787,13 @@
         };
     }
     function unionIntersect(a, b) {
-        var unionSize = new Set(__spread(a, b)).size;
+        var unionSize = new Set(__spreadArrays(Array.from(a), Array.from(b))).size;
         var isectSize = a.size + b.size - unionSize;
         return { unionSize: unionSize, isectSize: isectSize };
     }
-    });
 
-    var SetSimilarities$1 = unwrapExports(SetSimilarities);
-    var SetSimilarities_1 = SetSimilarities.simFuncs;
-
-    var $setSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': SetSimilarities$1,
-        __moduleExports: SetSimilarities,
-        simFuncs: SetSimilarities_1
-    });
-
-    var ScoreSimilarities = createCommonjsModule(function (module, exports) {
-    var __read = (commonjsGlobal && commonjsGlobal.__read) || function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-    var __values = (commonjsGlobal && commonjsGlobal.__values) || function (o) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-        if (m) return m.call(o);
-        return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PRECISION = 5;
-    exports.simFuncs = {
+    var PRECISION$1 = 5;
+    var scoreSimFuncs = {
         cosine: cosine,
         cosineSets: cosineSets,
         euclidean: euclidean,
@@ -5294,6 +3801,9 @@
         pearson: pearson,
         pearsonSets: pearsonSets
     };
+    /*----------------------------------*/
+    /*			SET SIMILARITY MEASURES			*/
+    /*----------------------------------*/
     function euclidean(a, b) {
         if (a.length !== b.length) {
             throw new Error('Vectors must be of same size');
@@ -5305,9 +3815,15 @@
             diff = at[i] - bt[i];
             sum += diff * diff;
         }
-        var sim = +Math.sqrt(sum).toPrecision(PRECISION);
+        var sim = +Math.sqrt(sum).toPrecision(PRECISION$1);
+        // console.log(sim);
         return { sim: sim };
     }
+    /**
+     *
+     * @param a
+     * @param b
+     */
     function cosine(a, b) {
         if (a.length !== b.length) {
             throw new Error('Vectors must be of same size');
@@ -5325,8 +3841,15 @@
         }
         dena = Math.sqrt(dena);
         denb = Math.sqrt(denb);
-        return { sim: +(numerator / (dena * denb)).toPrecision(PRECISION) };
+        return { sim: +(numerator / (dena * denb)).toPrecision(PRECISION$1) };
     }
+    /**
+     *
+     * @param a scores of user A for common targets
+     * @param b scores of user B for common targets
+     * @param a_mean avg rating for user a across ALL their ratings
+     * @param b_mean avg rating for user b across ALL their ratings
+     */
     function pearson(a, b, a_mean, b_mean) {
         if (a.length !== b.length) {
             throw new Error('Vectors must be of same size');
@@ -5348,523 +3871,96 @@
             diff_b_sq += b_diff * b_diff;
         }
         denominator = Math.sqrt(diff_a_sq) * Math.sqrt(diff_b_sq);
-        sim = +(numerator / denominator).toPrecision(PRECISION);
+        sim = +(numerator / denominator).toPrecision(PRECISION$1);
         return { sim: sim };
     }
+    /**
+     * @description first extract
+     * @param a
+     * @param b
+     */
     function cosineSets(a, b) {
-        var _a = __read(extractCommonTargetScores(a, b), 2), aa = _a[0], ba = _a[1];
+        var _a = extractCommonTargetScores(a, b), aa = _a[0], ba = _a[1];
         if (!aa.length || !ba.length) {
             return { sim: 0 };
         }
         return cosine(aa, ba);
     }
     function euclideanSets(a, b) {
-        var _a = __read(extractCommonTargetScores(a, b), 2), aa = _a[0], ba = _a[1];
+        var _a = extractCommonTargetScores(a, b), aa = _a[0], ba = _a[1];
         if (!aa.length || !ba.length) {
             return { sim: 0 };
         }
         return euclidean(aa, ba);
     }
+    /**
+     *
+     * @param a
+     * @param b
+     */
     function pearsonSets(a, b) {
-        var _a = __read(extractCommonTargetScores(a, b), 4), aa = _a[0], ba = _a[1], a_mean = _a[2], b_mean = _a[3];
+        var _a = extractCommonTargetScores(a, b), aa = _a[0], ba = _a[1], a_mean = _a[2], b_mean = _a[3];
+        // console.log(aa, ba);
         if (!aa.length || !ba.length) {
             return { sim: 0 };
         }
         return pearson(aa, ba, a_mean, b_mean);
     }
+    /**
+     * @description this method implicitly ensures that sets given to cosine
+     *              are always of the same length
+     * @param a
+     * @param b
+     */
     function extractCommonTargetScores(a, b) {
-        var e_1, _a, e_2, _b, e_3, _c, e_4, _d, e_5, _e, e_6, _f;
+        // we need to extract the target IDs first
         var a_id = new Set(), b_id = new Set();
-        try {
-            for (var a_1 = __values(a), a_1_1 = a_1.next(); !a_1_1.done; a_1_1 = a_1.next()) {
-                var e = a_1_1.value;
-                a_id.add(e.split('#')[0]);
-            }
+        for (var _i = 0, a_1 = a; _i < a_1.length; _i++) {
+            var e = a_1[_i];
+            a_id.add(e.split('#')[0]);
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (a_1_1 && !a_1_1.done && (_a = a_1.return)) _a.call(a_1);
-            }
-            finally { if (e_1) throw e_1.error; }
+        for (var _a = 0, b_1 = b; _a < b_1.length; _a++) {
+            var e = b_1[_a];
+            b_id.add(e.split('#')[0]);
         }
-        try {
-            for (var b_1 = __values(b), b_1_1 = b_1.next(); !b_1_1.done; b_1_1 = b_1.next()) {
-                var e = b_1_1.value;
-                b_id.add(e.split('#')[0]);
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (b_1_1 && !b_1_1.done && (_b = b_1.return)) _b.call(b_1);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
+        // now we collect the scores for common targets (in the same order)
         var score, a_map = new Map(), b_map = new Map(), a_vec = [], b_vec = [], earr, a_mean = 0, b_mean = 0;
-        try {
-            for (var a_2 = __values(a), a_2_1 = a_2.next(); !a_2_1.done; a_2_1 = a_2.next()) {
-                var e = a_2_1.value;
-                earr = e.split('#');
-                score = +earr[earr.length - 1];
-                a_mean += score;
-                if (b_id.has(earr[0])) {
-                    a_map.set(earr[0], score);
-                }
+        for (var _b = 0, a_2 = a; _b < a_2.length; _b++) {
+            var e = a_2[_b];
+            earr = e.split('#'); // we can assume 0 is the target...
+            score = +earr[earr.length - 1];
+            a_mean += score;
+            if (b_id.has(earr[0])) {
+                a_map.set(earr[0], score);
             }
         }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (a_2_1 && !a_2_1.done && (_c = a_2.return)) _c.call(a_2);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-        try {
-            for (var b_2 = __values(b), b_2_1 = b_2.next(); !b_2_1.done; b_2_1 = b_2.next()) {
-                var e = b_2_1.value;
-                var earr_1 = e.split('#');
-                score = +earr_1[earr_1.length - 1];
-                b_mean += score;
-                if (a_id.has(earr_1[0])) {
-                    b_map.set(earr_1[0], score);
-                }
+        for (var _c = 0, b_2 = b; _c < b_2.length; _c++) {
+            var e = b_2[_c];
+            var earr_1 = e.split('#');
+            score = +earr_1[earr_1.length - 1];
+            b_mean += score;
+            if (a_id.has(earr_1[0])) {
+                b_map.set(earr_1[0], score);
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
-        finally {
-            try {
-                if (b_2_1 && !b_2_1.done && (_d = b_2.return)) _d.call(b_2);
-            }
-            finally { if (e_4) throw e_4.error; }
-        }
+        // Maps preserve the order in which items were entered
+        // console.log(a_map, b_map);
         var a_keys = Array.from(a_map.keys()).sort();
-        try {
-            for (var a_keys_1 = __values(a_keys), a_keys_1_1 = a_keys_1.next(); !a_keys_1_1.done; a_keys_1_1 = a_keys_1.next()) {
-                var key = a_keys_1_1.value;
-                a_vec.push(a_map.get(key));
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (a_keys_1_1 && !a_keys_1_1.done && (_e = a_keys_1.return)) _e.call(a_keys_1);
-            }
-            finally { if (e_5) throw e_5.error; }
+        for (var _d = 0, a_keys_1 = a_keys; _d < a_keys_1.length; _d++) {
+            var key = a_keys_1[_d];
+            a_vec.push(a_map.get(key));
         }
         var b_keys = Array.from(b_map.keys()).sort();
-        try {
-            for (var b_keys_1 = __values(b_keys), b_keys_1_1 = b_keys_1.next(); !b_keys_1_1.done; b_keys_1_1 = b_keys_1.next()) {
-                var key = b_keys_1_1.value;
-                b_vec.push(b_map.get(key));
-            }
-        }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
-        finally {
-            try {
-                if (b_keys_1_1 && !b_keys_1_1.done && (_f = b_keys_1.return)) _f.call(b_keys_1);
-            }
-            finally { if (e_6) throw e_6.error; }
+        for (var _e = 0, b_keys_1 = b_keys; _e < b_keys_1.length; _e++) {
+            var key = b_keys_1[_e];
+            b_vec.push(b_map.get(key));
         }
         return [a_vec, b_vec, a_mean / a.size, b_mean / b.size];
     }
-    });
 
-    var ScoreSimilarities$1 = unwrapExports(ScoreSimilarities);
-    var ScoreSimilarities_1 = ScoreSimilarities.simFuncs;
+    var v4$1 = undefined;
 
-    var $scoSim = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': ScoreSimilarities$1,
-        __moduleExports: ScoreSimilarities,
-        simFuncs: ScoreSimilarities_1
-    });
-
-    var SimplePerturbations = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var v4 = uuid_1.v4;
-    var SimplePerturber = (function () {
-        function SimplePerturber(_graph) {
-            this._graph = _graph;
-        }
-        SimplePerturber.prototype.deleteNodesPercentage = function (percentage) {
-            if (percentage < 0) {
-                throw new Error('Cowardly refusing to remove a negative amount of nodes');
-            }
-            if (percentage > 100) {
-                percentage = 100;
-            }
-            var nr_nodes_to_delete = Math.ceil(this._graph.nrNodes() * percentage / 100);
-            this.deleteNodesAmount(nr_nodes_to_delete);
-        };
-        SimplePerturber.prototype.deleteUndEdgesPercentage = function (percentage) {
-            if (percentage > 100) {
-                percentage = 100;
-            }
-            var nr_edges_to_delete = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
-            this.deleteUndEdgesAmount(nr_edges_to_delete);
-        };
-        SimplePerturber.prototype.deleteDirEdgesPercentage = function (percentage) {
-            if (percentage > 100) {
-                percentage = 100;
-            }
-            var nr_edges_to_delete = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
-            this.deleteDirEdgesAmount(nr_edges_to_delete);
-        };
-        SimplePerturber.prototype.deleteNodesAmount = function (amount) {
-            if (amount < 0) {
-                throw 'Cowardly refusing to remove a negative amount of nodes';
-            }
-            if (this._graph.nrNodes() === 0) {
-                return;
-            }
-            for (var nodeID = 0, randomNodes = this._graph.pickRandomProperties(this._graph.getNodes(), amount); nodeID < randomNodes.length; nodeID++) {
-                this._graph.deleteNode(this._graph.getNodes()[randomNodes[nodeID]]);
-            }
-        };
-        SimplePerturber.prototype.deleteUndEdgesAmount = function (amount) {
-            if (amount < 0) {
-                throw 'Cowardly refusing to remove a negative amount of edges';
-            }
-            if (this._graph.nrUndEdges() === 0) {
-                return;
-            }
-            for (var edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getUndEdges(), amount); edgeID < randomEdges.length; edgeID++) {
-                this._graph.deleteEdge(this._graph.getUndEdges()[randomEdges[edgeID]]);
-            }
-        };
-        SimplePerturber.prototype.deleteDirEdgesAmount = function (amount) {
-            if (amount < 0) {
-                throw 'Cowardly refusing to remove a negative amount of edges';
-            }
-            if (this._graph.nrDirEdges() === 0) {
-                return;
-            }
-            for (var edgeID = 0, randomEdges = this._graph.pickRandomProperties(this._graph.getDirEdges(), amount); edgeID < randomEdges.length; edgeID++) {
-                this._graph.deleteEdge(this._graph.getDirEdges()[randomEdges[edgeID]]);
-            }
-        };
-        SimplePerturber.prototype.addUndEdgesPercentage = function (percentage) {
-            var nr_und_edges_to_add = Math.ceil(this._graph.nrUndEdges() * percentage / 100);
-            this.addEdgesAmount(nr_und_edges_to_add, { directed: false });
-        };
-        SimplePerturber.prototype.addDirEdgesPercentage = function (percentage) {
-            var nr_dir_edges_to_add = Math.ceil(this._graph.nrDirEdges() * percentage / 100);
-            this.addEdgesAmount(nr_dir_edges_to_add, { directed: true });
-        };
-        SimplePerturber.prototype.addEdgesAmount = function (amount, config) {
-            if (amount <= 0) {
-                throw new Error('Cowardly refusing to add a non-positive amount of edges');
-            }
-            var node_a, node_b;
-            var direction = (config && config.directed) ? config.directed : false, dir = direction ? "_d" : "_u";
-            while (amount > 0) {
-                node_a = this._graph.getRandomNode();
-                while ((node_b = this._graph.getRandomNode()) === node_a) { }
-                var edge_id = node_a.getID() + "_" + node_b.getID() + dir;
-                if (node_a.hasEdgeID(edge_id)) {
-                    continue;
-                }
-                else {
-                    this._graph.addEdgeByID(edge_id, node_a, node_b, { directed: direction });
-                    --amount;
-                }
-            }
-        };
-        SimplePerturber.prototype.addNodesPercentage = function (percentage, config) {
-            if (percentage < 0) {
-                throw 'Cowardly refusing to add a negative amount of nodes';
-            }
-            var nr_nodes_to_add = Math.ceil(this._graph.nrNodes() * percentage / 100);
-            this.addNodesAmount(nr_nodes_to_add, config);
-        };
-        SimplePerturber.prototype.addNodesAmount = function (amount, config) {
-            if (amount < 0) {
-                throw 'Cowardly refusing to add a negative amount of nodes';
-            }
-            var new_nodes = {};
-            while (--amount >= 0) {
-                var new_node_id = v4();
-                new_nodes[new_node_id] = this._graph.addNodeByID(new_node_id);
-            }
-            if (config == null) {
-                return;
-            }
-            else {
-                this.createEdgesByConfig(config, new_nodes);
-            }
-        };
-        SimplePerturber.prototype.createEdgesByConfig = function (config, new_nodes) {
-            var degree, min_degree, max_degree;
-            if (config.und_degree != null ||
-                config.dir_degree != null ||
-                config.min_und_degree != null && config.max_und_degree != null ||
-                config.min_dir_degree != null && config.max_dir_degree != null) {
-                if ((degree = config.und_degree) != null) {
-                    this.createEdgesSpan(degree, degree, false, new_nodes);
-                }
-                else if ((min_degree = config.min_und_degree) != null
-                    && (max_degree = config.max_und_degree) != null) {
-                    this.createEdgesSpan(min_degree, max_degree, false, new_nodes);
-                }
-                if (degree = config.dir_degree) {
-                    this.createEdgesSpan(degree, degree, true, new_nodes);
-                }
-                else if ((min_degree = config.min_dir_degree) != null
-                    && (max_degree = config.max_dir_degree) != null) {
-                    this.createEdgesSpan(min_degree, max_degree, true, new_nodes);
-                }
-            }
-            else {
-                if (config.probability_dir != null) {
-                    this.createEdgesProb(config.probability_dir, true, new_nodes);
-                }
-                if (config.probability_und != null) {
-                    this.createEdgesProb(config.probability_und, false, new_nodes);
-                }
-            }
-        };
-        SimplePerturber.prototype.createEdgesProb = function (probability, directed, new_nodes) {
-            if (0 > probability || 1 < probability) {
-                throw new Error("Probability out of range.");
-            }
-            directed = directed || false;
-            new_nodes = new_nodes || this._graph.getNodes();
-            var all_nodes = this._graph.getNodes(), node_a, node_b, edge_id, dir = directed ? '_d' : '_u';
-            for (node_a in new_nodes) {
-                for (node_b in all_nodes) {
-                    if (node_a !== node_b && Math.random() <= probability) {
-                        edge_id = all_nodes[node_a].getID() + "_" + all_nodes[node_b].getID() + dir;
-                        this._graph.addEdgeByID(edge_id, all_nodes[node_a], all_nodes[node_b], { directed: directed });
-                    }
-                }
-            }
-        };
-        SimplePerturber.prototype.createEdgesSpan = function (min, max, directed, setOfNodes) {
-            if (min < 0) {
-                throw new Error('Minimum degree cannot be negative.');
-            }
-            if (max >= this._graph.nrNodes()) {
-                throw new Error('Maximum degree exceeds number of reachable nodes.');
-            }
-            if (min > max) {
-                throw new Error('Minimum degree cannot exceed maximum degree.');
-            }
-            directed = directed || false;
-            var min = min | 0, max = max | 0, new_nodes = setOfNodes || this._graph.getNodes(), all_nodes = this._graph.getNodes(), idx_a, node_a, node_b, edge_id, node_keys = Object.keys(all_nodes), keys_len = node_keys.length, rand_idx, rand_deg, dir = directed ? '_d' : '_u';
-            for (idx_a in new_nodes) {
-                node_a = new_nodes[idx_a];
-                rand_idx = 0;
-                rand_deg = (Math.random() * (max - min) + min) | 0;
-                while (rand_deg) {
-                    rand_idx = (keys_len * Math.random()) | 0;
-                    node_b = all_nodes[node_keys[rand_idx]];
-                    if (node_a !== node_b) {
-                        edge_id = node_a.getID() + "_" + node_b.getID() + dir;
-                        if (node_a.hasEdgeID(edge_id)) {
-                            continue;
-                        }
-                        this._graph.addEdgeByID(edge_id, node_a, node_b, { directed: directed });
-                        --rand_deg;
-                    }
-                }
-            }
-        };
-        return SimplePerturber;
-    }());
-    exports.SimplePerturber = SimplePerturber;
-    });
-
-    unwrapExports(SimplePerturbations);
-    var SimplePerturbations_1 = SimplePerturbations.SimplePerturber;
-
-    var KroneckerLeskovec = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-
-    var KROL = (function () {
-        function KROL(config) {
-            this._config = config || this.prepareKROLStandardConfig();
-            this._genMat = this._config.genMat;
-            this._cycles = this._config.cycles;
-            this._graph = new BaseGraph_1.BaseGraph('synth');
-        }
-        KROL.prototype.generate = function () {
-            var gen_dims = this._genMat[0].length;
-            var res_dims = Math.pow(gen_dims, this._cycles + 1);
-            for (var index = 0; index < res_dims; index++) {
-                this._graph.addNodeByID(index.toString());
-            }
-            for (var node1 = 0; node1 < res_dims; node1++) {
-                for (var node2 = 0; node2 < res_dims; node2++) {
-                    if (this.addEdge(node1, node2, gen_dims)) {
-                        this._graph.addEdgeByNodeIDs(node1 + '_' + node2, node1.toString(), node2.toString());
-                    }
-                }
-            }
-            var result = {
-                graph: this._graph
-            };
-            return result;
-        };
-        KROL.prototype.addEdge = function (node1, node2, dims) {
-            var rprob = Math.random();
-            var prob = 1.0;
-            for (var level = 0; level < this._cycles; level++) {
-                var id_1 = Math.floor(node1 / Math.pow(dims, level + 1)) % dims;
-                var id_2 = Math.floor(node2 / Math.pow(dims, level + 1)) % dims;
-                prob *= this._genMat[id_1][id_2];
-                if (rprob > prob) {
-                    return false;
-                }
-            }
-            return true;
-        };
-        KROL.prototype.prepareKROLStandardConfig = function () {
-            var genMat = [[0.9, 0.5], [0.5, 0.1]];
-            return {
-                genMat: genMat,
-                cycles: 5
-            };
-        };
-        return KROL;
-    }());
-    exports.KROL = KROL;
-    });
-
-    unwrapExports(KroneckerLeskovec);
-    var KroneckerLeskovec_1 = KroneckerLeskovec.KROL;
-
-    // CORE
-
-
-    // Base
-
-
-
-    // Typed
-
-
-
-    // CENTRALITIES
-
-
-
-
-
-    // IO
-
-
-
-
-    // SEARCH
-
-
-
-
-
-
-
-    // SIMILARITIES
-
-
-
-    // UTILS
-
-
-
-    // DATASTRUCTS
-
-    // PERTURBATION
-
-    // GENERATORS
-
-    // MISC
-    // var MCMFBoykov							= require("./dist/mincutmaxflow/minCutMaxFlowBoykov.js");
-
-
-    // Define global object
-    let out = typeof window !== 'undefined' ? window : commonjsGlobal;
-
-    /**
-     * Inside Global or Window object
-     */
-    out.$G = {
-    	core: {
-    		GraphMode								: interfaces.GraphMode,
-    		DIR											: interfaces.DIR,
-    		base: {
-    			BaseEdge 								: BaseEdge_1.BaseEdge,
-    			BaseNode 								: BaseNode_1.BaseNode,
-    			BaseGraph 							: BaseGraph_1.BaseGraph
-    		},
-    		typed: {
-    			TypedEdge								: TypedEdge_1.TypedEdge,
-    			TypedNode								: TypedNode_1.TypedNode,
-    			TypedGraph							: TypedGraph_1.TypedGraph
-    		},
-    		compute: {
-    			ComputeGraph						: ComputeGraph_1.ComputeGraph
-    		}
-    	},
-    	centralities: {
-    		Betweenness								: Betweenness.betweennessCentrality,
-    		Brandes										: Brandes_1.Brandes,
-    		Closeness									: Closeness.ClosenessCentrality,
-    		Degree										: Degree.DegreeCentrality,
-    		Pagerank									: Pagerank_1.Pagerank
-    	},
-    	input: {
-    		CSVInput 									: CSVInput_1.CSVInput,
-    		JSONInput 								: JSONInput_1.JSONInput
-    	},
-    	output: {							
-    		CSVOutput									: CSVOutput_1.CSVOutput,
-    		JSONOutput								: JSONOutput_1.JSONOutput
-    	},
-    	search: {
-    		BFS												: BFS_1,
-    		DFS 											: DFS_1,
-    		PFS           						: PFS_1,
-    		Dijkstra									: Dijkstra_1,
-    		BellmanFord								: BellmanFord,
-    		FloydWarshall							: FloydWarshall,
-    		Johnsons									: Johnsons_1
-    	},
-    	similarities: {
-    		Commons										: SimilarityCommons,
-    		Sets											: SetSimilarities,
-    		Score											: ScoreSimilarities,
-    	},
-      utils: {						
-        Struct        						: StructUtils,
-    		Remote        						: RemoteUtils,
-        Callback 									: CallbackUtils
-      },
-      datastructs: {
-        BinaryHeap  							: BinaryHeap_1.BinaryHeap
-      },
-    	perturbation: {
-    		SimplePerturber						: SimplePerturbations.SimplePerturber
-    	},
-    	generators: {
-    		Kronecker									: KroneckerLeskovec.KROL
-    	},
-    	// mincut: {
-    	// 	MCMFBoykov							: MCMFBoykov.MCMFBoykov
-    	// },
-    };
-
-    // CommonJS global object
-    var graphinius = out.$G;
-
-    var $G = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': graphinius,
-        __moduleExports: graphinius
-    });
-
-    var jsonIn = new JSONInput_2({ directed: true, explicit_direction: false, weighted: false });
+    var jsonIn = new JSONInput({ directed: true, explicit_direction: false, weighted: false });
     function importGraph(config) {
         return __awaiter(this, void 0, void 0, function () {
             var tic, graph, toc;
@@ -5873,13 +3969,13 @@
                     case 0:
                         console.log("Loading " + config.graphName + "...");
                         tic = +new Date;
-                        return [4, importGraphFromURL(config)];
+                        return [4 /*yield*/, importGraphFromURL(config)];
                     case 1:
                         graph = _a.sent();
                         toc = +new Date;
                         console.log("Importing graph of |V|=" + graph.nrNodes() + " and |E_dir|=" + graph.nrDirEdges() + " took " + (toc - tic) + " ms.");
                         console.log(graph.stats);
-                        return [2, graph];
+                        return [2 /*return*/, graph];
                 }
             });
         });
@@ -5889,33 +3985,48 @@
             var graphBytes, graphString, graph;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, fetch(config.graphFile)];
-                    case 1: return [4, (_a.sent())];
+                    case 0: return [4 /*yield*/, fetch(config.graphFile)];
+                    case 1: return [4 /*yield*/, (_a.sent())];
                     case 2:
                         graphBytes = _a.sent();
-                        return [4, graphBytes.json()];
+                        return [4 /*yield*/, graphBytes.json()];
                     case 3:
                         graphString = _a.sent();
-                        graph = new TypedGraph_2(config.graphName);
+                        graph = new TypedGraph(config.graphName);
                         graph = jsonIn.readFromJSON(graphString, graph);
                         window.g = graph;
-                        return [2, graph];
+                        return [2 /*return*/, graph];
                 }
             });
         });
     }
-    //# sourceMappingURL=importGraph.js.map
 
-    var TheExpanse = (function () {
+    var TheExpanse = /** @class */ (function () {
         function TheExpanse(_g) {
             this._g = _g;
         }
+        /**
+         * @description `expand` IDs to ITypedNodes -> 1:1 mapping
+         * @param ids
+         */
         TheExpanse.prototype.accumulateNodesFromIDs = function (ids) {
             var _this = this;
             var result = new Map();
             ids.forEach(function (id) { return result.set(id, _this._g.n(id)); });
             return result;
         };
+        /**
+         * @description expand & replace nodes with target nodes, for further expansion
+         *
+         * @example we want to
+         *
+         * @param nodes
+         * @param dir
+         * @param rel
+         *
+         * @todo incorporate frequencies ??
+         *
+         */
         TheExpanse.prototype.accumulateNodesFromNodes = function (nodes, dir, rel) {
             var _this = this;
             var result = new Map();
@@ -5933,11 +4044,29 @@
             });
             return result;
         };
+        /**
+         * @todo factor in / out / whatever
+         */
         TheExpanse.prototype.nodeSetToMap = function (set) {
             var result = new Map();
             set.forEach(function (el) { return result.set(el.id, el); });
             return result;
         };
+        /**
+         * @description replace a node with a set of target nodes, but keep the original ID
+         *
+         * @example Map<companyID, Company> would be replaced with Map<companyID, Set<Employees>> through the 'WORKS_FOR' relation
+         *          Map<personID, Person> would be replace with Map<personID, Set<Friends>> through the 'KNOWS' relation
+         *
+         * @param nodes either a node type as string or a Map of ITypedNodes
+         * @param dir
+         * @param rel
+         * @returns expansion from a type of nodes or from a set of nodes
+         *
+         * @todo transfer to graphinius (core)?
+         * @todo isn't the `set of nodes` version the same as our normal expander? Except we have a map here...?
+         *       -> where is multiple dispatch when you need it !?
+         */
         TheExpanse.prototype.accumulateSetsFromNodes = function (nodes, dir, rel) {
             var _this = this;
             var result = {};
@@ -5950,136 +4079,107 @@
             });
             return result;
         };
+        /**
+         * @description we get a map/dict of Set<ITypedNode>, a direction & a relation
+         *
+         * @example Map<companyID, Set<Employees>> would be replaced with Map<companyID, Set<Countries>> through the 'LIVES_IN' relation
+         *          Map<personID, Set<Friends>> would be replaced with Map<personID, Set<Skills>> through the 'HAS_SKILL' relation
+         *
+         * @returns a object of key : Set<ITypedNode>, where each ex.set is an expansion of one input Set
+         *
+         * @todo this should give back sets with frequencies, so ExpansionResult objects
+         */
         TheExpanse.prototype.accumulateSetsFromSets = function (sources, dir, rel) {
-            var e_1, _a, e_2, _b, e_3, _c;
             var result = {};
             var keys = Object.keys(sources);
-            try {
-                for (var keys_1 = __values(keys), keys_1_1 = keys_1.next(); !keys_1_1.done; keys_1_1 = keys_1.next()) {
-                    var i = keys_1_1.value;
-                    try {
-                        for (var _d = (e_2 = void 0, __values(sources[i])), _e = _d.next(); !_e.done; _e = _d.next()) {
-                            var source = _e.value;
-                            if (!result[i]) {
-                                result[i] = new Set();
-                            }
-                            var targets = this._g.expand(source, dir, rel);
-                            if (!targets) {
-                                continue;
-                            }
-                            try {
-                                for (var _f = (e_3 = void 0, __values(targets.set)), _h = _f.next(); !_h.done; _h = _f.next()) {
-                                    var target = _h.value;
-                                    result[i].add(target);
-                                }
-                            }
-                            catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                            finally {
-                                try {
-                                    if (_h && !_h.done && (_c = _f.return)) _c.call(_f);
-                                }
-                                finally { if (e_3) throw e_3.error; }
-                            }
-                        }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
-                        }
-                        finally { if (e_2) throw e_2.error; }
-                    }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (keys_1_1 && !keys_1_1.done && (_a = keys_1.return)) _a.call(keys_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            return result;
-        };
-        TheExpanse.prototype.accumulateSetsFromSetsFreq = function (sources, dir, rel) {
-            var e_4, _a, e_5, _b, e_6, _c;
-            var result = {};
-            var keys = Object.keys(sources);
-            try {
-                for (var keys_2 = __values(keys), keys_2_1 = keys_2.next(); !keys_2_1.done; keys_2_1 = keys_2.next()) {
-                    var i = keys_2_1.value;
+            for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                var i = keys_1[_i];
+                for (var _a = 0, _b = sources[i]; _a < _b.length; _a++) {
+                    var source = _b[_a];
                     if (!result[i]) {
-                        result[i] = { set: new Set(), freq: new Map() };
+                        result[i] = new Set();
                     }
-                    var res = result[i];
-                    var input_i = TypedGraph_2.convertToExpansionResult(sources[i]);
-                    try {
-                        for (var _d = (e_5 = void 0, __values(input_i.set)), _e = _d.next(); !_e.done; _e = _d.next()) {
-                            var source = _e.value;
-                            var targets = this._g.expand(source, dir, rel);
-                            if (!targets.set.size) {
-                                continue;
-                            }
-                            try {
-                                for (var _f = (e_6 = void 0, __values(targets.set)), _h = _f.next(); !_h.done; _h = _f.next()) {
-                                    var nodeRef = _h.value;
-                                    if (!res.freq.has(nodeRef)) {
-                                        res.freq.set(nodeRef, targets.freq.get(nodeRef));
-                                    }
-                                    if (res.set.has(nodeRef)) {
-                                        res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
-                                    }
-                                    res.set.add(nodeRef);
-                                }
-                            }
-                            catch (e_6_1) { e_6 = { error: e_6_1 }; }
-                            finally {
-                                try {
-                                    if (_h && !_h.done && (_c = _f.return)) _c.call(_f);
-                                }
-                                finally { if (e_6) throw e_6.error; }
-                            }
-                        }
+                    var targets = this._g.expand(source, dir, rel);
+                    if (!targets) {
+                        continue;
                     }
-                    catch (e_5_1) { e_5 = { error: e_5_1 }; }
-                    finally {
-                        try {
-                            if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
-                        }
-                        finally { if (e_5) throw e_5.error; }
+                    for (var _c = 0, _d = targets.set; _c < _d.length; _c++) {
+                        var target = _d[_c];
+                        result[i].add(target);
                     }
                 }
-            }
-            catch (e_4_1) { e_4 = { error: e_4_1 }; }
-            finally {
-                try {
-                    if (keys_2_1 && !keys_2_1.done && (_a = keys_2.return)) _a.call(keys_2);
-                }
-                finally { if (e_4) throw e_4.error; }
             }
             return result;
         };
+        /**
+         * @todo figure out how often we'll need that & test it !!!
+         *
+         * @param sources
+         * @param dir
+         * @param rel
+         */
+        TheExpanse.prototype.accumulateSetsFromSetsFreq = function (sources, dir, rel) {
+            var result = {};
+            var keys = Object.keys(sources);
+            for (var _i = 0, keys_2 = keys; _i < keys_2.length; _i++) {
+                var i = keys_2[_i];
+                if (!result[i]) {
+                    result[i] = { set: new Set(), freq: new Map() };
+                }
+                var res = result[i];
+                // convert each ExpansionInput into a properly formatted object
+                var input_i = TypedGraph.convertToExpansionResult(sources[i]);
+                // iterate over the set only? => Why not, it's delivering ITypedNodes
+                // which simultaneously are the keys in the freq Map
+                for (var _a = 0, _b = input_i.set; _a < _b.length; _a++) {
+                    var source = _b[_a];
+                    var targets = this._g.expand(source, dir, rel);
+                    if (!targets.set.size) {
+                        continue;
+                    }
+                    for (var _c = 0, _d = targets.set; _c < _d.length; _c++) {
+                        var nodeRef = _d[_c];
+                        if (!res.freq.has(nodeRef)) {
+                            res.freq.set(nodeRef, targets.freq.get(nodeRef));
+                        }
+                        if (res.set.has(nodeRef)) {
+                            res.freq.set(nodeRef, res.freq.get(nodeRef) + targets.freq.get(nodeRef));
+                        }
+                        res.set.add(nodeRef);
+                    }
+                }
+            }
+            return result;
+        };
+        /**
+         *
+         * @param obj
+         * @param cfg
+         */
         TheExpanse.prototype.setFromSetsTopK = function (obj, cfg) {
-            var e_7, _a;
             if (cfg === void 0) { cfg = { k: 5, top: true }; }
             var sortFunc = cfg.top ? function (a, b) { return b[1] - a[1]; } : function (a, b) { return a[1] - b[1]; };
             var result = {};
-            try {
-                for (var _b = __values(Object.entries(obj)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var _d = __read(_c.value, 2), id = _d[0], e = _d[1];
-                    result[id] = { set: new Set(), freq: new Map() };
-                    result[id].freq = new Map(__spread(e.freq.entries()).sort(sortFunc).slice(0, cfg.k));
-                    result[id].set = new Set(__spread(result[id].freq.keys()));
-                }
-            }
-            catch (e_7_1) { e_7 = { error: e_7_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                }
-                finally { if (e_7) throw e_7.error; }
+            for (var _i = 0, _a = Object.entries(obj); _i < _a.length; _i++) {
+                var _b = _a[_i], id = _b[0], e = _b[1];
+                result[id] = { set: new Set(), freq: new Map() };
+                result[id].freq = new Map(__spreadArrays(e.freq.entries()).sort(sortFunc).slice(0, cfg.k));
+                result[id].set = new Set(__spreadArrays(result[id].freq.keys()));
             }
             return result;
         };
+        /**
+         * @description get a readable version of a SetFromSetsFreq object
+         *
+         * @param obj
+         * @param idName
+         * @param collectionName
+         * @param itemName
+         *
+         * @returns object with source name & a list of plain item names with item frequencies
+         *
+         * @todo specify return value
+         */
         TheExpanse.prototype.readableSetsFromSetsFreq = function (obj, idName, collectionName, itemName) {
             var _this = this;
             return Object.entries(obj).map(function (e) {
@@ -6095,7 +4195,6 @@
         };
         return TheExpanse;
     }());
-    //# sourceMappingURL=TheExpanse.js.map
 
     var AllSubstringsIndexStrategy_1 = createCommonjsModule(function (module, exports) {
 
@@ -6141,7 +4240,7 @@
 
       return AllSubstringsIndexStrategy;
     }();
-    //# sourceMappingURL=AllSubstringsIndexStrategy.js.map
+
     });
 
     unwrapExports(AllSubstringsIndexStrategy_1);
@@ -6179,7 +4278,7 @@
 
       return ExactWordIndexStrategy;
     }();
-    //# sourceMappingURL=ExactWordIndexStrategy.js.map
+
     });
 
     unwrapExports(ExactWordIndexStrategy_1);
@@ -6225,7 +4324,7 @@
 
       return PrefixIndexStrategy;
     }();
-    //# sourceMappingURL=PrefixIndexStrategy.js.map
+
     });
 
     unwrapExports(PrefixIndexStrategy_1);
@@ -6263,7 +4362,7 @@
         return PrefixIndexStrategy_1.PrefixIndexStrategy;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(IndexStrategy);
@@ -6300,7 +4399,7 @@
 
       return CaseSensitiveSanitizer;
     }();
-    //# sourceMappingURL=CaseSensitiveSanitizer.js.map
+
     });
 
     unwrapExports(CaseSensitiveSanitizer_1);
@@ -6338,7 +4437,7 @@
 
       return LowerCaseSanitizer;
     }();
-    //# sourceMappingURL=LowerCaseSanitizer.js.map
+
     });
 
     unwrapExports(LowerCaseSanitizer_1);
@@ -6367,7 +4466,7 @@
         return LowerCaseSanitizer_1.LowerCaseSanitizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Sanitizer);
@@ -6402,7 +4501,7 @@
 
       return value;
     }
-    //# sourceMappingURL=getNestedFieldValue.js.map
+
     });
 
     unwrapExports(getNestedFieldValue_1);
@@ -6579,7 +4678,7 @@
 
       return TfIdfSearchIndex;
     }();
-    //# sourceMappingURL=TfIdfSearchIndex.js.map
+
     });
 
     unwrapExports(TfIdfSearchIndex_1);
@@ -6678,7 +4777,7 @@
 
       return UnorderedSearchIndex;
     }();
-    //# sourceMappingURL=UnorderedSearchIndex.js.map
+
     });
 
     unwrapExports(UnorderedSearchIndex_1);
@@ -6707,7 +4806,7 @@
         return UnorderedSearchIndex_1.UnorderedSearchIndex;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(SearchIndex);
@@ -6751,7 +4850,7 @@
 
       return SimpleTokenizer;
     }();
-    //# sourceMappingURL=SimpleTokenizer.js.map
+
     });
 
     unwrapExports(SimpleTokenizer_1);
@@ -6805,7 +4904,7 @@
 
       return StemmingTokenizer;
     }();
-    //# sourceMappingURL=StemmingTokenizer.js.map
+
     });
 
     unwrapExports(StemmingTokenizer_1);
@@ -6946,7 +5045,7 @@
     StopWordsMap.toLocaleString = false;
     StopWordsMap.toString = false;
     StopWordsMap.valueOf = false;
-    //# sourceMappingURL=StopWordsMap.js.map
+
     });
 
     unwrapExports(StopWordsMap_1);
@@ -6999,7 +5098,7 @@
 
       return StopWordsTokenizer;
     }();
-    //# sourceMappingURL=StopWordsTokenizer.js.map
+
     });
 
     unwrapExports(StopWordsTokenizer_1);
@@ -7037,7 +5136,7 @@
         return StopWordsTokenizer_1.StopWordsTokenizer;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     unwrapExports(Tokenizer);
@@ -7292,7 +5391,7 @@
 
       return Search;
     }();
-    //# sourceMappingURL=Search.js.map
+
     });
 
     unwrapExports(Search_1);
@@ -7415,7 +5514,7 @@
 
       return TokenHighlighter;
     }();
-    //# sourceMappingURL=TokenHighlighter.js.map
+
     });
 
     unwrapExports(TokenHighlighter_1);
@@ -7525,7 +5624,7 @@
         return TokenHighlighter_1.TokenHighlighter;
       }
     });
-    //# sourceMappingURL=index.js.map
+
     });
 
     var index = unwrapExports(commonjs);
@@ -7536,6 +5635,9 @@
         __moduleExports: commonjs
     });
 
+    /**
+     * Why does the import statement above work differently in TS / Bundled...
+     */
     var JsSearch = index || JSSearch;
     function buildIdxJSSearch(graph, idxConfig) {
         var types = {};
@@ -7543,28 +5645,42 @@
         var indexes = {};
         Object.keys(idxConfig).forEach(function (k) { return indexes[k] = null; });
         Object.values(graph.getNodes()).forEach(function (n) {
-            if (BaseGraph_2.isTyped(n) === false) {
+            if (BaseGraph.isTyped(n) === false) {
                 throw Error("Node Type not supported in this scenario...!");
             }
             var type = n.type.toLowerCase();
+            // console.log(type);
             var idxObj = idxConfig[type];
             if (!idxObj) {
                 return false;
             }
             var idxEntry = { id: n.id };
             idxObj.fields.forEach(function (f) { return idxEntry[f] = n.f(f); });
+            // console.log(idxEntry);
             types[type].push(idxEntry);
         });
+        // Object.keys(types).forEach(k => console.log(`${types[k].length} nodes of type ${k} registered.`));
         Object.values(idxConfig).forEach(function (model) {
             indexes[model.string] = new JsSearch.Search(model.id);
             model.fields.forEach(function (f) { return indexes[model.string].addIndex(f); });
             indexes[model.string].addDocuments(types[model.string]);
         });
+        /**
+         * In `jsdom` environment, we can use the first variant...
+         */
         window['idx'] = indexes;
+        // if ( typeof window != null ) {
+        //   (<any>window)['idx'] = indexes;
+        // }
+        // console.log(indexes);
         return indexes;
     }
-    //# sourceMappingURL=buildJSSearch.js.map
 
+    /**
+     * Just for declaring available Models
+     *
+     * @todo find more elegant solution (24/07/2019 -> too tired...)
+     */
     var shopifyModels;
     (function (shopifyModels) {
         shopifyModels["tag"] = "tag";
@@ -7594,7 +5710,6 @@
             fields: ['label', 'body_sanitized']
         }
     };
-    //# sourceMappingURL=interfaces.js.map
 
     var testGraphDir = "../test-data/graphs";
     var graphs = [
@@ -7613,57 +5728,54 @@
         searchModel: shopifyModels.product
     };
 
-    var _this = undefined;
-    console.log('Graphinius: ', $G);
-    window.$G = graphinius;
-    window.comSim = $comSim;
-    window.setSim = $setSim;
-    window.scoSim = $scoSim;
+    /* HACKETY HACK */
+    window.setSim = setSimFuncs;
+    window.scoSim = scoreSimFuncs;
     (function () {
-        [shopifyConfig].forEach(function (config) { return __awaiter(_this, void 0, void 0, function () {
+        [shopifyConfig].forEach(function (config) { return __awaiter(void 0, void 0, void 0, function () {
             var graph, indexes, searchRes;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, importGraph(config)];
+                    case 0: return [4 /*yield*/, importGraph(config)];
                     case 1:
-                        graph = _a.sent();
+                        graph = (_a.sent());
                         window.ex = new TheExpanse(graph);
                         indexes = createJSSearchIndex(graph, config);
                         searchRes = executeSearch(indexes, config, graph);
                         testBDPFS(graph);
                         testPagerank(graph);
-                        return [2];
+                        return [2 /*return*/];
                 }
             });
         }); });
     })();
     function testBDPFS(g) {
         var tic, toc;
-        [BFS_2, DFS_3, PFS_3].forEach(function (traversal) {
-            tic = +new Date;
+        [BFS, DFS, PFS].forEach(function (traversal) {
+            tic = +new Date();
             traversal(g, g.getRandomNode());
-            toc = +new Date;
+            toc = +new Date();
             console.log(traversal.name + " on " + g.label + " graph took " + (toc - tic) + " ms.");
         });
     }
     function testPagerank(g) {
-        var PR = new Pagerank_2(g, { normalize: true, epsilon: 1e-6 });
-        var tic = +new Date;
+        var PR = new Pagerank(g, { normalize: true, epsilon: 1e-6 });
+        var tic = +new Date();
         PR.computePR();
-        var toc = +new Date;
+        var toc = +new Date();
         console.log("Pagerank on " + g.label + " graph took " + (toc - tic) + " ms.");
     }
     function createJSSearchIndex(graph, config) {
-        var tic = +new Date;
+        var tic = +new Date();
         var indexes = buildIdxJSSearch(graph, config.idxConfig);
-        var toc = +new Date;
+        var toc = +new Date();
         console.log("Building Indexes in JS-SEARCH took " + (toc - tic) + " ms.");
         return indexes;
     }
     function executeSearch(indexes, config, graph) {
-        var tic = +new Date;
+        var tic = +new Date();
         var searchRes = indexes[config.searchModel].search(config.searchTerm);
-        var toc = +new Date;
+        var toc = +new Date();
         console.log("executing search for '" + config.searchTerm + "' in JS-SEARCH took " + (toc - tic) + " ms.");
         console.log(searchRes);
         searchRes.forEach(function (res) {
@@ -7671,7 +5783,6 @@
         });
         return searchRes;
     }
-    //# sourceMappingURL=index.js.map
 
-}));
+})));
 //# sourceMappingURL=bundle.js.map

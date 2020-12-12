@@ -1,15 +1,4 @@
-import * as $G from 'graphinius';
-console.log('Graphinius: ', $G);
-/* HACKETY HACK */
-window.$G = $G.default;
-
-import { IGraph } from 'graphinius/lib/core/base/BaseGraph';
-import { TypedGraph } from 'graphinius/lib/core/typed/TypedGraph';
-import { ComputeGraph } from 'graphinius/lib/core/compute/ComputeGraph';
-import { BFS } from 'graphinius/lib/search/BFS';
-import { DFS } from 'graphinius/lib/search/DFS';
-import { PFS } from 'graphinius/lib/search/PFS';
-import { Pagerank } from 'graphinius/lib/centralities/Pagerank';
+import { IGraph, TypedGraph, ComputeGraph, BFS, DFS, PFS, Pagerank } from 'graphinius';
 import { importGraph } from './common/importGraph';
 import { TheExpanse } from './recommender/TheExpanse';
 
@@ -22,12 +11,9 @@ import { meetupConfig } from './indexers/meetup/appConfig';
 import { northwindConfig } from './indexers/northwind/appConfig';
 import { shopifyConfig } from './indexers/shopify/appConfig';
 
-import * as $comSim from 'graphinius/lib/similarities/SimilarityCommons';
-import * as $setSim from 'graphinius/lib/similarities/SetSimilarities';
-import * as $scoSim from 'graphinius/lib/similarities/ScoreSimilarities';
+import {setSimFuncs as $setSim, scoreSimFuncs as $scoSim} from 'graphinius';
 
 /* HACKETY HACK */
-window.comSim = $comSim;
 window.setSim = $setSim;
 window.scoSim = $scoSim;
 

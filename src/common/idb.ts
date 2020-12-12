@@ -1,4 +1,4 @@
-import { IGraph } from 'graphinius/lib/core/Graph';
+import { IGraph } from 'graphinius';
 import { AppConfig } from '../indexers/interfaces';
 import { openDB, deleteDB, wrap, unwrap } from 'idb';
 

@@ -1,12 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "es5",
-		"module": "commonjs",
+		"target": "ESNext",
+		"module": "ESNext",
 		"declaration": true,
-		"moduleResolution": "node",
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"downlevelIteration": true,
-		"esModuleInterop": true,
 		"sourceMap": false,
 		"lib": [
 				"es2017",
