@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/cassinius/graphinius-recommenders#readme",
   "dependencies": {
-    "graphinius": "^2.0.2",
     "idb": "^4.0.4",
     "js-search": "^1.4.3"
   },
